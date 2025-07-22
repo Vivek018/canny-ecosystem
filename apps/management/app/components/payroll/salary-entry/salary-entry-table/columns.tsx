@@ -81,6 +81,30 @@ export const salaryEntryColumns = ({
       ),
     },
     {
+      enableSorting: false,
+      accessorKey: "site",
+      header: "Site",
+      cell: ({ row }) => {
+        return (
+          <p className="truncate ">
+            {row.original.salary_entries?.site?.name ?? "--"}
+          </p>
+        );
+      },
+    },
+    {
+      enableSorting: false,
+      accessorKey: "department",
+      header: "Department",
+      cell: ({ row }) => {
+        return (
+          <p className="truncate ">
+            {row.original.salary_entries?.department?.name ?? "--"}
+          </p>
+        );
+      },
+    },
+    {
       id: "present_days",
       accessorKey: "present_days",
       header: "P. Days",
@@ -147,7 +171,6 @@ export const salaryEntryColumns = ({
 
         const displayValue =
           valueObj?.amount !== undefined ? valueObj.amount : 0;
-        
 
         return (
           <SalaryEntrySheet

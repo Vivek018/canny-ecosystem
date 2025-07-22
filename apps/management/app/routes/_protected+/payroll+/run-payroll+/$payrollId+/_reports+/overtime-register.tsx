@@ -16,7 +16,7 @@ import {
   type EmployeeProjectAssignmentDataType,
   getCompanyById,
   getPrimaryLocationByCompanyId,
-  getSalaryEntriesByPayrollIdForSalaryRegister,
+  getSalaryEntriesForSalaryRegisterAndAll,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
@@ -705,7 +705,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     await getPrimaryLocationByCompanyId({ supabase, companyId });
 
   const { data: payrollDataAndOthers } =
-    await getSalaryEntriesByPayrollIdForSalaryRegister({
+    await getSalaryEntriesForSalaryRegisterAndAll({
       supabase,
       payrollId,
     });

@@ -67,11 +67,9 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
   {
     key: "site",
-    required: true,
   },
   {
     key: "department",
-    required: true,
   },
 ];
 

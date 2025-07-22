@@ -16,7 +16,7 @@ import {
   type EmployeeProjectAssignmentDataType,
   getCompanyById,
   getPrimaryLocationByCompanyId,
-  getSalaryEntriesByPayrollIdForSalaryRegister,
+  getSalaryEntriesForSalaryRegisterAndAll,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
@@ -32,6 +32,7 @@ import type {
 import {
   getMonthNameFromNumber,
   replaceUnderscore,
+  roundToNearest,
 } from "@canny_ecosystem/utils";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 
@@ -119,6 +120,21 @@ type DataType = {
 };
 
 const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
+  const uniqueEarningFields = Array.from(
+    new Set(
+      data.employeeData.flatMap((emp: any) =>
+        emp.earnings.map((e: any) => e.name)
+      )
+    )
+  );
+  const uniqueDeductingFields = Array.from(
+    new Set(
+      data.employeeData.flatMap((emp: any) =>
+        emp.deductions.map((e: any) => e.name)
+      )
+    )
+  );
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -172,7 +188,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 },
               ]}
             >
-              {`For  ${data.month} ${data.year}`}
+              {`For  ${data?.month} ${data?.year}`}
             </Text>
           </View>
           <View
@@ -261,11 +277,9 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
             >
               Rate
             </Text>
-            <Text>BASIC</Text>
-            <Text>HRA</Text>
-            <Text>LTA</Text>
-            <Text>O.T</Text>
-            <Text>BONUS</Text>
+            {uniqueEarningFields.map((fieldName, index) => (
+              <Text key={index.toString()}>{fieldName}</Text>
+            ))}
           </View>
           <View
             style={[
@@ -291,11 +305,9 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
             >
               Earnings
             </Text>
-            <Text>BASIC</Text>
-            <Text>HRA</Text>
-            <Text>LTA</Text>
-            <Text>O.T</Text>
-            <Text>BONUS</Text>
+            {uniqueEarningFields.map((fieldName, index) => (
+              <Text key={index.toString()}>{fieldName}</Text>
+            ))}
           </View>
           <View
             style={[
@@ -340,15 +352,15 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                   justifyContent: "center",
                   paddingRight: "5",
                   gap: "1",
-                  borderRight: "0.5pt solid #000000", // <-- separator between left and right
+                  borderRight: "0.5pt solid #000000",
                 }}
               >
-                <Text style={{ fontSize: "7" }}>EPF</Text>
-                <Text style={{ fontSize: "7" }}>ESIC</Text>
-                <Text style={{ fontSize: "7" }}>PT</Text>
-                <Text style={{ fontSize: "7" }}>PF</Text>
-                <Text style={{ fontSize: "7" }}>LWF</Text>
-                <Text style={{ fontSize: "7" }}>Advances</Text>
+                {(uniqueDeductingFields.length <= 3
+                  ? [...uniqueDeductingFields, " ", " ", " "]
+                  : uniqueDeductingFields
+                ).map((fieldName, index) => (
+                  <Text key={index.toString()}>{fieldName}</Text>
+                ))}
               </View>
               <View
                 style={{
@@ -494,41 +506,20 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 },
               ]}
             >
-              <Text>
-                {Number(
-                  employee?.earnings
-                    .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text>
-                {Number(
-                  employee?.earnings
-                    .find((e) => e?.name === "HRA")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text>
-                {Number(
-                  employee?.earnings
-                    .find((e) => e?.name === "LTA")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text>
-                {Number(
-                  employee?.earnings
-                    .find((e) => e.name === "Others")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text>
-                {Number(
-                  employee?.earnings
-                    .find((e) => e?.name === "BONUS")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
+              {uniqueEarningFields.map((fieldName, j) => {
+                const amount =
+                  employee.earnings.find((e: any) => e.name === fieldName)
+                    ?.amount || 0;
+
+                return (
+                  <Text
+                    key={j.toString()}
+                    style={{ width: 60, textAlign: "center" }}
+                  >
+                    {amount}
+                  </Text>
+                );
+              })}
             </View>
             <View
               style={[
@@ -565,72 +556,20 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 },
               ]}
             >
-              <Text
-                style={{
-                  fontSize: "7",
-                }}
-              >
-                {Number(
-                  employee?.deductions
-                    .find((e) => e?.name === "EPF" || "PF")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text
-                style={{
-                  fontSize: "7",
-                }}
-              >
-                {Number(
-                  employee?.deductions
-                    .find((e) => e?.name === "ESIC")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text
-                style={{
-                  fontSize: "7",
-                }}
-              >
-                {Number(
-                  employee?.deductions
-                    .find((e) => e?.name === "PT")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text
-                style={{
-                  fontSize: "7",
-                }}
-              >
-                {Number(
-                  employee?.deductions
-                    .find((e) => e?.name === "PF")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text
-                style={{
-                  fontSize: "7",
-                }}
-              >
-                {Number(
-                  employee?.deductions
-                    .find((e) => e?.name === "LWF")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
-              <Text
-                style={{
-                  fontSize: "7",
-                }}
-              >
-                {Number(
-                  employee?.deductions
-                    .find((e) => e.name === "Advances")
-                    ?.amount?.toFixed(2) ?? 0.0
-                )}
-              </Text>
+              {uniqueDeductingFields.map((fieldName, j) => {
+                const amount =
+                  employee.deductions.find((e: any) => e.name === fieldName)
+                    ?.amount || 0;
+
+                return (
+                  <Text
+                    key={j.toString()}
+                    style={{ width: 60, textAlign: "center" }}
+                  >
+                    {amount}
+                  </Text>
+                );
+              })}
             </View>
             <View
               style={[
@@ -665,18 +604,18 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
               ]}
             >
               <Text>
-                {(
+                {roundToNearest(
                   Number(
                     employee?.earnings
                       .reduce((sum, earning) => sum + earning?.amount, 0)
                       ?.toFixed(2)
                   ) -
-                  Number(
-                    employee?.deductions
-                      .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2)
-                  )
-                )?.toFixed(2)}
+                    Number(
+                      employee?.deductions
+                        .reduce((sum, earning) => sum + earning?.amount, 0)
+                        ?.toFixed(2)
+                    )
+                )}
               </Text>
             </View>
             <View style={[styles.headerCell, { flex: 1 }]} />
@@ -705,7 +644,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     await getPrimaryLocationByCompanyId({ supabase, companyId });
 
   const { data: payrollDataAndOthers } =
-    await getSalaryEntriesByPayrollIdForSalaryRegister({
+    await getSalaryEntriesForSalaryRegisterAndAll({
       supabase,
       payrollId,
     });

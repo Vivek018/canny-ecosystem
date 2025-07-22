@@ -43,7 +43,6 @@ import {
   deleteInvoiceProof,
 } from "@canny_ecosystem/supabase/media";
 
-
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const invoiceId = params.invoiceId;
 
@@ -119,9 +118,7 @@ export async function action({
     supabase,
     id: invoiceId!,
   });
-  const oldFilePath = `invoice/${oldInvoiceData!.payroll_id}/${
-    oldInvoiceData!.invoice_number
-  }`;
+  const oldFilePath = `invoice/${oldInvoiceData!.invoice_number}`;
 
   try {
     const formData = await parseMultipartFormData(
@@ -202,9 +199,7 @@ export async function action({
         oldInvoiceData?.proof &&
         oldInvoiceData?.invoice_number !== submission.value.invoice_number
       ) {
-        const newFilePath = `invoice/${submission.value.payroll_id}/${
-          submission.value!.invoice_number
-        }`;
+        const newFilePath = `invoice/${submission.value!.invoice_number}`;
 
         const { data: fileData, error: downloadError } = await supabase.storage
           .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)

@@ -10,10 +10,8 @@ import {
 } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
-  getDepartmentsBySiteId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
-  getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -29,7 +27,6 @@ import {
   type ClientLoaderFunctionArgs,
   defer,
   json,
-  redirect,
   useActionData,
   useLoaderData,
   useParams,
@@ -53,71 +50,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (error || !payrollData) {
       clearExactCacheEntry(`${cacheKeyPrefix.payroll_history_id}${payrollId}`);
     }
-    let departmentOptions: any = [];
-    let siteOptions: any = [];
 
-    if (payrollData?.project_id) {
-      const { data: allSites } = await getSitesByProjectId({
-        projectId: payrollData?.project_id,
-        supabase,
-      });
-      siteOptions = allSites?.map((sites) => ({
-        label: sites?.name,
-        value: sites?.id,
-      }));
-    }
-    if (payrollData?.site_id) {
-      const { data: allDepartments } = await getDepartmentsBySiteId({
-        siteId: payrollData?.site_id,
-        supabase,
-      });
-      departmentOptions = allDepartments?.map((sites) => ({
-        label: sites?.name,
-        value: sites?.id,
-      }));
-    }
-
-    const url = new URL(request.url);
-    const searchParams = new URLSearchParams(url.searchParams);
-    let site = searchParams.get("site")?.split(",") ?? [];
-    let department = searchParams.get("department")?.split(",") ?? [];
-    let shouldRedirect = false;
-    if (
-      site.length === 0 &&
-      payrollData?.project_id &&
-      siteOptions.length > 0
-    ) {
-      site = [siteOptions[0].value];
-      searchParams.set("site", site.join(","));
-      shouldRedirect = true;
-    }
-
-    if (
-      department.length === 0 &&
-      payrollData?.site_id &&
-      departmentOptions.length > 0
-    ) {
-      department = [departmentOptions[0].value];
-      searchParams.set("department", department.join(","));
-      shouldRedirect = true;
-    }
-    if (shouldRedirect) {
-      return redirect(`${url.pathname}?${searchParams.toString()}`);
-    }
     const salaryEntriesPromise = getSalaryEntriesByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
-      params: {
-        site,
-        department,
-      },
     });
 
     return defer({
       payrollData,
       salaryEntriesPromise,
-      departmentOptions,
-      siteOptions,
       error: null,
       env,
     });
@@ -139,7 +80,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.payroll_history_id}${args.params.payrollId
+    `${cacheKeyPrefix.payroll_history_id}${
+      args.params.payrollId
     }${url.searchParams.toString()}`,
     args
   );
@@ -191,13 +133,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function HistoryPayrollId() {
-  const {
-    payrollData,
-    salaryEntriesPromise,
-    departmentOptions,
-    siteOptions,
-    env,
-  } = useLoaderData<typeof loader>();
+  const { payrollData, salaryEntriesPromise, env } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const revalidator = useRevalidator();
@@ -261,8 +198,6 @@ export default function HistoryPayrollId() {
               noButtons={true}
               env={env as SupabaseEnv}
               fromWhere="payrollhistory"
-              departmentOptions={departmentOptions}
-              siteOptions={siteOptions}
             />
           );
         }}

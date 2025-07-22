@@ -41,7 +41,7 @@ export const MultiSelectCombobox = ({
     onChange(
       value.includes(currentValue)
         ? value.filter((val) => val !== currentValue)
-        : [...value, currentValue],
+        : [...value, currentValue]
     );
   };
 
@@ -91,20 +91,31 @@ export const MultiSelectCombobox = ({
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
-                  key={option.value}
+                  key={option.value + option.label}
                   value={option.label}
                   onSelect={() => handleChange(String(option.value))}
                   aria-selected={value.includes(String(option.value))}
+                  disabled={
+                    option?.value?.toString().toLowerCase() === "separator"
+                  }
                 >
                   <Icon
                     name="check"
                     size="sm"
                     className={cn(
                       "mr-1",
-                      !value.includes(String(option.value)) && "opacity-0",
+                      !value.includes(String(option.value)) && "opacity-0"
                     )}
                   />
                   {renderItem(option)}
+                  <p
+                    className={cn(
+                      "text-muted-foreground ml-6 w-28 truncate",
+                      !option?.pseudoLabel && "hidden"
+                    )}
+                  >
+                    {option?.pseudoLabel}
+                  </p>
                 </CommandItem>
               ))}
             </CommandGroup>

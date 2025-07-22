@@ -136,6 +136,7 @@ export async function action({
           proof: submission.value.proof as File,
           supabase,
           route: "add",
+          selectedSalaryEntriesData,
         });
 
         if (isGoodStatus(status!)) {
@@ -161,9 +162,9 @@ export async function action({
 
     if (data?.id) {
       const updatedSalaryEntries = (
-        selectedSalaryEntriesData as Array<{ id: string }>
-      ).map(({ id }: { id: string }) => ({
-        id: id!,
+        selectedSalaryEntriesData as Array<any>
+      ).map((salaryEntry) => ({
+        id: salaryEntry.salary_entries.id,
         invoice_id: data.id!,
       }));
 
@@ -177,7 +178,7 @@ export async function action({
         if (error) {
           return json({
             status: "error",
-            message: "Error udating Salary Entries",
+            message: "Error udating Salary Entry",
             error,
           });
         }
@@ -188,7 +189,6 @@ export async function action({
         error: null,
       });
     }
-
     if (isGoodStatus(status)) {
       return json({
         status: "success",
@@ -389,9 +389,8 @@ export default function CreateInvoice({
                     ...getInputProps(fields.company_address_id, {
                       type: "text",
                     }),
-                    defaultValue: 
-                      fields.company_address_id.initialValue
-                    ?? undefined,
+                    defaultValue:
+                      fields.company_address_id.initialValue ?? undefined,
                   }}
                   placeholder={"Select Company Location"}
                   labelProps={{
@@ -516,7 +515,7 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                    fields.payroll_data.value
+                      fields.payroll_data.value
                   ),
                 }}
                 fields={[
