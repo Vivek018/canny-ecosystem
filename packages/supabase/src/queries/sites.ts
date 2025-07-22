@@ -4,7 +4,7 @@ import type { InferredType, SiteDatabaseRow, TypedSupabaseClient } from "../type
 // Sites
 export type SitesWithLocation = SiteDatabaseRow & {
   company_location: { id: string; name: string };
-  project: {id: string; name: string};
+  project: { id: string; name: string };
 };
 
 export async function getSitesByCompanyId({
@@ -57,11 +57,11 @@ export async function getSiteNamesByCompanyId({
   companyId: string;
 }) {
   const { data, error } = await supabase
-    .from("sites").select("id,name")
+    .from("sites").select("id,name, projects!left(name)")
     .eq("company_id", companyId)
     .limit(MID_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<{ id: string; name: string }[]>();
+    .returns<{ id: string; name: string; projects: { name: string } }[]>();
 
   if (error) {
     console.error("getSiteNamesByCompanyId Error", error);

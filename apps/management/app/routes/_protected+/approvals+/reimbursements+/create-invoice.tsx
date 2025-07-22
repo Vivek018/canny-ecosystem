@@ -138,7 +138,7 @@ export async function action({
           route: "add",
         });
 
-        if (isGoodStatus(status!)) {
+        if (isGoodStatus(status)) {
           return json({
             status: "success",
             message: "Invoice created successfully",
@@ -278,13 +278,13 @@ export default function CreateInvoiceFromRiembursement({
       clearExactCacheEntry(cacheKeyPrefix.payroll_invoice);
       toast({
         title: "Success",
-        description: actionData.message ?? "Invoice created",
+        description: actionData?.error ?? "Invoice created",
         variant: "success",
       });
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "Invoice create failed",
+        description: actionData.error?.message ?? "Invoice create failed",
         variant: "destructive",
       });
     }
@@ -362,15 +362,16 @@ export default function CreateInvoiceFromRiembursement({
                   errors={fields.subject.errors}
                 />
                 <SearchableSelectField
+                  key={resetKey}
                   className="capitalize"
                   options={companyLocationArray ?? locationArrayFromUpdate}
                   inputProps={{
                     ...getInputProps(fields.company_address_id, {
                       type: "text",
                     }),
-                    defaultValue: String(
+                    defaultValue:
                       fields.company_address_id.initialValue
-                    ),
+                      ?? undefined,
                   }}
                   placeholder={"Select Company Location"}
                   labelProps={{
@@ -381,6 +382,7 @@ export default function CreateInvoiceFromRiembursement({
               </div>
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <SearchableSelectField
+                  key={resetKey + 1}
                   className="capitalize"
                   options={transformStringArrayIntoOptions([
                     "salary",
@@ -391,7 +393,7 @@ export default function CreateInvoiceFromRiembursement({
                     ...getInputProps(fields.type, {
                       type: "text",
                     }),
-                    defaultValue: String(fields.type.initialValue),
+                    defaultValue: fields.type.initialValue ?? undefined,
                   }}
                   placeholder={"Select Type"}
                   labelProps={{
@@ -487,7 +489,7 @@ export default function CreateInvoiceFromRiembursement({
                 />
               </div>
               <RangeField
-                key={resetKey}
+                key={resetKey + 2}
                 labelProps={{ children: "Payroll salary" }}
                 inputProps={{
                   ...getInputProps(fields.payroll_data, {
@@ -495,7 +497,7 @@ export default function CreateInvoiceFromRiembursement({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                      fields.payroll_data.value
+                    fields.payroll_data.value
                   ),
                 }}
                 fields={[

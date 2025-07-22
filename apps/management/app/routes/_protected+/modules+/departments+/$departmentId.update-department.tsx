@@ -52,7 +52,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
       return json({
         data,
-        siteOptions: siteNamesData?.map((site) => ({ label: site.name, value: site.id })),
+        siteOptions: siteNamesData?.map((site) => ({
+          label: site.name,
+          pseudoLabel: site?.projects?.name,
+          value: site.id
+        })),
         error: null,
       });
     }

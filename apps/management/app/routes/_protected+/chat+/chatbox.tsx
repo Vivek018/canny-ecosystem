@@ -87,7 +87,8 @@ export default function Chatbox() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message,
+          description:
+            actionData?.message,
           variant: "destructive",
         });
       }

@@ -276,7 +276,7 @@ export async function getEmployeesBySiteId({
       `${columns.join(
         ","
       )}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        site_id, name, projects!inner(id, name)))`
+        site_id, sites!inner(name, projects(id, name))))`
     )
     .eq("employee_project_assignment.site_id", siteId)
     .order("created_at", { ascending: false })
@@ -1329,7 +1329,7 @@ export async function getActiveEmployeesByCompanyId({
       )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!inner(id, name)))`
     )
     .eq("company_id", companyId)
-    .in("is_active", [true]);
+    .eq("is_active", true);
 
   const { data: activeEmployeesBySites, error: activeEmployeeErrorBySites } =
     await activeQueryBySites;

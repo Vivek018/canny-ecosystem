@@ -22,7 +22,7 @@ import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import { UpdateAttendance } from "@canny_ecosystem/supabase/mutations";
 import type { EmployeeMonthlyAttendanceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import AddMonthlyAttendance from "./$employeeId.add-attendance";
+import AddMonthlyAttendance from "../../employees+/$employeeId+/_attendance+/add-attendance";
 import { getAttendanceById } from "@canny_ecosystem/supabase/queries";
 
 export const UPDATE_ATTENDANCE_TAG = "Update-Attendance";

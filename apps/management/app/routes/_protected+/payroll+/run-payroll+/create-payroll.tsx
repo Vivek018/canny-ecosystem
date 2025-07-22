@@ -19,6 +19,7 @@ import {
   transformStringArrayIntoOptions,
   createRole,
   defaultYear,
+  getYears,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -89,6 +90,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
     allSiteOptions = allSites?.map((sites) => ({
       label: sites?.name,
+      pseudoLabel: sites?.projects?.name,
       value: sites?.id,
     }));
   }
@@ -207,11 +209,7 @@ export default function CreatePayroll() {
                 <SearchableSelectField
                   key={resetKey}
                   className="w-full capitalize flex-1 "
-                  options={transformStringArrayIntoOptions([
-                    `${defaultYear - 2}`,
-                    `${defaultYear - 1}`,
-                    `${defaultYear}`,
-                  ] as unknown as string[])}
+                  options={transformStringArrayIntoOptions(getYears(25, defaultYear) as unknown as string[])}
                   inputProps={{
                     ...getInputProps(fields.year, { type: "text" }),
                   }}
@@ -294,7 +292,7 @@ export default function CreatePayroll() {
                       ...getInputProps(fields.site_id, {
                         type: "text",
                       }),
-                      defaultValue: String(fields.site_id.initialValue),
+                      defaultValue: fields.site_id.initialValue ?? undefined,
                     }}
                     placeholder={"Select Site"}
                     labelProps={{

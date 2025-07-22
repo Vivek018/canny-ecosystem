@@ -289,7 +289,7 @@ export default function CreateInvoice({
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "Invoice create failed",
+        description: actionData.error?.message ?? "Invoice create failed",
         variant: "destructive",
       });
     }
@@ -327,9 +327,6 @@ export default function CreateInvoice({
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
-              />
-              <input
-                {...getInputProps(fields.payroll_id, { type: "hidden" })}
               />
 
               <div className="grid grid-cols-2 gap-4">
@@ -376,9 +373,9 @@ export default function CreateInvoice({
                     ...getInputProps(fields.company_address_id, {
                       type: "text",
                     }),
-                    defaultValue: String(
+                    defaultValue:
                       fields.company_address_id.initialValue
-                    ),
+                      ?? undefined,
                   }}
                   placeholder={"Select Company Location"}
                   labelProps={{
@@ -399,7 +396,7 @@ export default function CreateInvoice({
                     ...getInputProps(fields.type, {
                       type: "text",
                     }),
-                    defaultValue: String(fields.type.initialValue),
+                    defaultValue: fields.type.initialValue ?? undefined,
                   }}
                   placeholder={"Select Type"}
                   labelProps={{
@@ -503,7 +500,7 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                      fields.payroll_data.value
+                    fields.payroll_data.value
                   ),
                 }}
                 fields={[

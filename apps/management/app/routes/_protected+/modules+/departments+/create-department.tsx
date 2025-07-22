@@ -67,7 +67,11 @@ export async function loader({
     if (error) throw error;
 
     return json({
-      siteOptions: data?.map((site) => ({ label: site.name, value: site.id })),
+      siteOptions: data?.map((site) => ({
+        label: site.name,
+        pseudoLabel: site?.projects?.name,
+        value: site.id
+      })),
       companyId,
       error: null,
     });
@@ -175,7 +179,7 @@ export default function CreateDepartment({
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "Departments Creation failed",
+        description: actionData.error?.message ?? "Departments Creation failed",
         variant: "destructive",
       });
     }

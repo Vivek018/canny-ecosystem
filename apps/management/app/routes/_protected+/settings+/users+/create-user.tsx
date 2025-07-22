@@ -83,6 +83,7 @@ export async function loader({
 
     const siteOptions = sites?.map((site) => ({
       label: site?.name,
+      pseudoLabel: site?.projects?.name,
       value: site?.id,
     }));
 
@@ -200,7 +201,7 @@ export default function CreateUser({
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "User creation failed",
+        description: actionData.error?.message ?? "User creation failed",
         variant: "destructive",
       });
     }

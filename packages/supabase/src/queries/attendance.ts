@@ -207,7 +207,7 @@ export async function getMonthlyAttendanceByCompanyId({
       projects!${foreignFilters ? "inner" : "left"}(id, name)
     )
   ),
-  monthly_attendance:monthly_attendance!left(
+  monthly_attendance:monthly_attendance!inner(
     id,
     employee_id,
     present_days,

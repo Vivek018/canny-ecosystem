@@ -65,7 +65,7 @@ export async function addOrUpdateInvoiceWithProof({
           .remove([filePath]);
         console.error("addInvoiceProof Error", insertError);
         return {
-          insertStatus,
+          status: insertStatus,
           error: insertError || "Error uploading document record",
         };
       }
@@ -86,7 +86,7 @@ export async function addOrUpdateInvoiceWithProof({
       if (updateError) {
         console.error("updateInvoiceProof Error", updateError);
         return {
-          updateStatus,
+          status: updateStatus,
           error: updateError || "Error uploading document record",
         };
       }

@@ -206,7 +206,7 @@ export default function EmployeesIndex() {
           </Suspense>
         </div>
         <EmployeesActions
-          isEmpty={!projectPromise}
+          isEmpty={!employeesPromise}
         // emails={}
         />
       </div>

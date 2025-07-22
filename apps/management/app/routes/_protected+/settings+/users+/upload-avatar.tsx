@@ -53,7 +53,8 @@ export default function UploadAvatar() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message,
+          description:
+            actionData?.error?.message ?? actionData?.message,
           variant: "destructive",
         });
       }

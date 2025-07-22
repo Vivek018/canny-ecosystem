@@ -233,6 +233,7 @@ type SearchableSelectFieldProps = {
   errorClassName?: string;
   placeholder?: string;
   onChange?: (value: string) => void;
+  onInput?: (value: string) => void,
 };
 
 export function SearchableSelectField({
@@ -244,6 +245,7 @@ export function SearchableSelectField({
   errorClassName,
   placeholder,
   onChange,
+  onInput,
 }: SearchableSelectFieldProps) {
   const fallbackId = useId();
   const id = inputProps.id ?? fallbackId;
@@ -287,6 +289,7 @@ export function SearchableSelectField({
           input.change(value);
           onChange?.(value);
         }}
+        onInput={onInput}
         placeholder={placeholder ?? inputProps.placeholder}
         disabled={inputProps.disabled || inputProps.readOnly}
       />

@@ -49,6 +49,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const siteOptions = sites?.map((site) => ({
       label: site?.name,
+      pseudoLabel: site?.projects?.name,
       value: site?.id,
     }));
 

@@ -175,11 +175,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const reportedBySiteOptions = reportedBySite?.map((item) => ({
       label: item?.name,
+      pseudoLabel: item?.projects?.name,
       value: item?.id,
     }));
 
     const reportedOnSiteOptions = reportedOnSite?.map((item) => ({
       label: item?.name,
+      pseudoLabel: item?.projects?.name,
       value: item?.id,
     }));
 
@@ -392,7 +394,8 @@ export default function CreateCase({
       if (actionData.status === "error") {
         toast({
           title: "Error",
-          description: actionData?.message ?? "An unexpected error occurred",
+          description:
+            actionData?.error?.message ?? actionData?.message ?? "An unexpected error occurred",
           variant: "destructive",
         });
       } else if (actionData.status === "success") {

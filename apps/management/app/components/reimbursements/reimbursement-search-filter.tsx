@@ -349,7 +349,7 @@ export function ReimbursementSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {reimbursementTypeArray.map((name, index) => (
+                {reimbursementTypeArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
@@ -361,7 +361,7 @@ export function ReimbursementSearchFilter({
                       }));
                     }}
                   >
-                    {name}
+                    {replaceUnderscore(name)}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>

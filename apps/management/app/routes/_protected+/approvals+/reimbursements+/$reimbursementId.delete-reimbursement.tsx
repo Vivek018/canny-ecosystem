@@ -88,7 +88,7 @@ export default function DeleteEmployee() {
           title: "Error",
           description:
             actionData?.error ??
-            actionData?.message ??
+            actionData?.error?.message ?? actionData?.message ??
             "Reimbursement delete failed",
           variant: "destructive",
         });

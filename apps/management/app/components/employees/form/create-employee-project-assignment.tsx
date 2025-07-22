@@ -60,7 +60,7 @@ export const CreateEmployeeProjectAssignment = ({
           options={siteOptions ?? []}
           inputProps={{
             ...getInputProps(fields.site_id, { type: "text" }),
-            defaultValue: String(fields.site_id.initialValue),
+            defaultValue: fields.site_id.initialValue ?? undefined,
           }}
           placeholder={"Select Site"}
           labelProps={{

@@ -1,6 +1,6 @@
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
+import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { Link, useNavigate } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useInvoiceStore } from "@/store/invoices";
 import { ColumnVisibility } from "./column-visibility";
@@ -11,7 +11,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
 
   return (
     <div className="gap-4 hidden md:flex">
-      <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
+      <div className="flex gap-2">
         {" "}
         <ColumnVisibility disabled={isEmpty} />
         <Button
@@ -27,16 +27,6 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
           <Icon name="chart" className="h-[18px] w-[18px]" />
         </Button>
       </div>
-      <Link
-        to="/chat/chatbox/payment"
-        className={cn(
-          buttonVariants({ variant: "gradiant" }),
-          "flex items-center justify-center gap-2 h-10"
-        )}
-      >
-        <Icon name="magic" size="xs" />
-        <p>AI Chat</p>
-      </Link>
     </div>
   );
 }

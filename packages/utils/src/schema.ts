@@ -90,6 +90,7 @@ export const zFile = z
   );
 
 export const booleanArray = ["true", "false"] as const;
+export const currentDate = new Date().toISOString().split("T")[0];
 
 // Theme
 export const themes = ["light", "dark", "system"] as const;
@@ -164,7 +165,7 @@ export const RelationshipSchema = z.object({
       return z.NEVER;
     }
   }),
-  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  start_date: z.string().default(currentDate),
   end_date: z.string().optional(),
 });
 
@@ -191,7 +192,7 @@ export const ProjectSchema = z.object({
   project_type: zNumberString.min(3).max(50),
   description: zTextArea.optional(),
   company_id: z.string(),
-  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  start_date: z.string().default(currentDate),
   end_date: z.string().optional(),
   status: z.enum(statusArray).default("active"),
 });
@@ -402,7 +403,7 @@ export const EmployeeProjectAssignmentSchema = z.object({
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
-  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  start_date: z.string().default(currentDate),
   end_date: z.string().optional(),
   probation_period: z.boolean().default(false),
   probation_end_date: z.string().optional(),
@@ -712,7 +713,7 @@ export const eligibilityOptionsArray = ["position", "skill_level"] as const;
 export const EmployeeLinkSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
-  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_from: z.string().default(currentDate),
   effective_to: z.string().optional(),
   template_id: z.string(),
   employee_id: z.string(),
@@ -721,7 +722,7 @@ export const EmployeeLinkSchema = z.object({
 
 export const PaymentTemplateFormSiteDialogSchema = z.object({
   name: z.string(),
-  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_from: z.string().default(currentDate),
   effective_to: z.string().optional(),
   template_id: z.string(),
   eligibility_option: z.enum(eligibilityOptionsArray).optional(),
@@ -736,7 +737,7 @@ export const DeleteEmployeeLinkSchema = z.object({
 export const SiteLinkSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
-  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_from: z.string().default(currentDate),
   effective_to: z.string().optional(),
   template_id: z.string(),
   eligibility_option: z.enum(eligibilityOptionsArray).optional(),
@@ -760,7 +761,7 @@ export const reimbursementTypeArray = [
 
 export const ReimbursementSchema = z.object({
   id: z.string().optional(),
-  submitted_date: z.string(),
+  submitted_date: z.string().default(currentDate),
   status: z.enum(reimbursementStatusArray),
   amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
@@ -1253,7 +1254,7 @@ export const ImportSingleEmployeeProjectAssignmentsDataSchema = z.object({
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
-  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  start_date: z.string().default(currentDate),
   end_date: z.string().optional(),
   probation_end_date: z.string().optional(),
   probation_period: z
@@ -1278,7 +1279,7 @@ export const PayrollSchema = z.object({
   id: z.string().optional(),
   title: z.string(),
   status: z.enum(payrollPaymentStatusArray).default("pending"),
-  run_date: z.string().default(new Date().toISOString().split("T")[0]),
+  run_date: z.string().default(currentDate),
   total_net_amount: z.number().default(0),
   company_id: z.string(),
   total_employees: z.number().default(0),
@@ -1296,24 +1297,6 @@ export const SalaryEntrySchema = z.object({
   name: z.string(),
   type: z.enum(componentTypeArray).default("earning"),
   amount: z.number(),
-});
-
-export const ReimbursementEntrySchema = z.object({
-  id: z.string().optional(),
-  amount: z.number(),
-  employee_id: z.string().optional(),
-  payroll_id: z.string(),
-  type: z.string(),
-});
-export const ExitEntrySchema = z.object({
-  id: z.string().optional(),
-  gratuity: z.number(),
-  leave_encashment: z.number(),
-  bonus: z.number(),
-  deduction: z.number(),
-  employee_id: z.string(),
-  payroll_id: z.string(),
-  type: z.string(),
 });
 
 // Exits
@@ -1422,12 +1405,13 @@ export const attendanceHolidayTypeArray = [
 export const AttendanceSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string(),
-  present_days: z.number().min(0).max(31),
-  overtime_hours: z.number().default(0),
   month: z.number().min(1).max(12),
   year: z.number(),
-  working_days: z.number().min(0).max(31),
-  absent_days: z.number().min(0).max(31),
+  working_days: z.number().min(0).max(31).default(26),
+  present_days: z.number().min(0).max(31).default(26),
+  overtime_hours: z.number().default(0),
+  absent_days: z.number().min(0).max(31).optional
+  (),
   working_hours: z.number().default(0),
   paid_holidays: z.number().min(0).max(31).optional(),
   paid_leaves: z.number().min(0).max(31).optional(),
@@ -1554,7 +1538,7 @@ export const EmployeeLetterSchema = z.object({
   include_signatuory: z.boolean().default(false),
   include_employee_signature: z.boolean().default(false),
   subject: z.string().min(3).max(100),
-  date: z.string().default(new Date().toISOString().split("T")[0]),
+  date: z.string().default(currentDate),
   letter_type: z
     .enum(employeeLetterTypesArray)
     .default(employeeLetterTypesArray[0]),
@@ -1620,7 +1604,7 @@ export const categoryOfIncidentArray = [
 export const IncidentSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string(),
-  date: z.string().default(new Date().toISOString().split("T")[0]),
+  date: z.string().default(currentDate),
   title: zString.min(3).max(30),
   location_type: z.enum(locationTypeArray).default("onsite"),
   location: z.string().optional(),
@@ -1693,7 +1677,7 @@ export const caseLocationTypeArray = ["employee", "site", "other"] as const;
 export const CaseSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
-  date: z.string().default(new Date().toISOString().split("T")[0]),
+  date: z.string().default(currentDate),
   title: z.string().min(1, "Title is required"),
   case_type: z.enum(caseTypeArray).default("dispute"),
   status: z.enum(caseStatusArray).default("open"),
@@ -1902,7 +1886,7 @@ export const InvoiceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   invoice_number: z.string(),
-  date: z.string(),
+  date: z.string().default(currentDate),
   subject: z
     .string()
     .default(

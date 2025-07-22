@@ -77,7 +77,7 @@ export const EmployeeOptionsDropdown = ({
       },
       {
         method: "POST",
-        action: `/time-tracking/attendance/${employee.id}/add-attendance`,
+        action: `/employees/${employee.id}/add-attendance`,
       }
     );
   };

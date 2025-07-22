@@ -145,9 +145,6 @@ export async function getReimbursementsByCompanyId({
             referencedTable: "employees",
           }
         );
-        query.or(`name.ilike.*${searchQueryElement}*`, {
-          referencedTable: "reimbursement",
-        });
       }
     } else {
       query.or(
@@ -156,9 +153,6 @@ export async function getReimbursementsByCompanyId({
           referencedTable: "employees",
         }
       );
-      query.or(`name.ilike.*${searchQuery}*`, {
-        referencedTable: "reimbursement",
-      });
     }
   }
 
