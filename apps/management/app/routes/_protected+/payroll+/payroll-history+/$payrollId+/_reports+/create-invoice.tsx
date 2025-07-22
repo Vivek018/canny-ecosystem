@@ -136,6 +136,7 @@ export async function action({
           proof: submission.value.proof as File,
           supabase,
           route: "add",
+          selectedSalaryEntriesData,
         });
 
         if (isGoodStatus(status!)) {
@@ -162,13 +163,10 @@ export async function action({
     if (data?.id) {
       const updatedSalaryEntries = (
         selectedSalaryEntriesData as Array<any>
-      ).flatMap((employee) =>
-        employee.salary_entries.map((entry: { id: string }) => ({
-          id: entry.id,
-          invoice_id: data.id!,
-        }))
-      );
-
+      ).map((salaryEntry) => ({
+        id: salaryEntry.salary_entries.id,
+        invoice_id: data.id!,
+      }));
 
       for (const entry of updatedSalaryEntries) {
         const { id, invoice_id } = entry;
@@ -236,10 +234,13 @@ export default function CreateInvoice({
     const fieldTotals: Record<string, { rawAmount: number; type: string }> = {};
 
     for (const emp of employees) {
-      for (const entry of emp.salary_entries) {
-        const field = entry.field_name;
+      for (const entry of emp.salary_entries.salary_field_values) {
+        const field = entry.payroll_fields.name;
         if (!fieldTotals[field]) {
-          fieldTotals[field] = { rawAmount: 0, type: entry.type };
+          fieldTotals[field] = {
+            rawAmount: 0,
+            type: entry.payroll_fields.type,
+          };
         }
         fieldTotals[field].rawAmount += entry.amount;
       }
@@ -305,7 +306,7 @@ export default function CreateInvoice({
     } else {
       toast({
         title: "Error",
-        description: actionData.error?.message ?? "Invoice create failed",
+        description: actionData.error ?? "Invoice create failed",
         variant: "destructive",
       });
     }
@@ -388,9 +389,9 @@ export default function CreateInvoice({
                     ...getInputProps(fields.company_address_id, {
                       type: "text",
                     }),
-                    defaultValue: 
+                    defaultValue: String(
                       fields.company_address_id.initialValue
-                    ?? undefined,
+                    ),
                   }}
                   placeholder={"Select Company Location"}
                   labelProps={{
@@ -411,7 +412,7 @@ export default function CreateInvoice({
                     ...getInputProps(fields.type, {
                       type: "text",
                     }),
-                    defaultValue: fields.type.initialValue ?? undefined,
+                    defaultValue: String(fields.type.initialValue),
                   }}
                   placeholder={"Select Type"}
                   labelProps={{
@@ -515,7 +516,7 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                    fields.payroll_data.value
+                      fields.payroll_data.value
                   ),
                 }}
                 fields={[

@@ -16,7 +16,6 @@ import {
   Outlet,
   useLoaderData,
 } from "@remix-run/react";
-import { useState } from "react";
 
 interface GroupedPayrollFields {
   [fieldName: string]: {
@@ -55,12 +54,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       console.error(error);
     }
     return defer({
+      employeeId,
       salaryEntries,
       filters,
       error,
     });
   } catch (error) {
     return defer({
+      employeeId: "",
       salaryEntries: null,
       filters,
       error,
@@ -72,7 +73,9 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return clientCaching(
-    `${cacheKeyPrefix.employee_salary}${url.searchParams.toString()}`,
+    `${cacheKeyPrefix.employee_salary}${
+      args.params.employeeId
+    }${url.searchParams.toString()}`,
     args
   );
 }
@@ -80,51 +83,51 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Salary() {
-  const { error, salaryEntries, filters } = useLoaderData<typeof loader>();
+  const { error, salaryEntries, filters, employeeId } =
+    useLoaderData<typeof loader>();
 
   if (error) {
-    clearCacheEntry(`${cacheKeyPrefix.employee_salary}`);
+    clearCacheEntry(`${cacheKeyPrefix.employee_salary}${employeeId}`);
     return (
       <ErrorBoundary error={error} message="Failed to load employee details" />
     );
   }
+
   function groupPayrollData(data: unknown) {
-    interface SalaryEntry {
-      payroll_id: string;
-      employee_id: string;
-      field_name: string;
-      amount: number;
-      type: string;
-      monthly_attendance: {
-        id: string;
-        month: number;
-        year: number;
-        present_days: number;
-        overtime_hours: number;
-      };
-    }
+    const grouped: { [id: string]: GroupedPayrollEntry } = {};
 
-    const [grouped] = useState<{ [id: string]: GroupedPayrollEntry }>({});
+    if (!Array.isArray(data)) return [];
 
-    for (const entry of data as SalaryEntry[]) {
-      const id = entry.payroll_id;
+    for (const entry of data) {
+      const id = entry.salary_entries?.payroll_id;
+      if (!id) continue;
 
       if (!grouped[id]) {
         grouped[id] = {
           payroll_id: id,
-          employee_id: entry.employee_id,
-          month: entry.monthly_attendance.month,
-          year: entry.monthly_attendance.year,
-          present_days: entry.monthly_attendance.present_days,
-          overtime_hours: entry.monthly_attendance.overtime_hours,
+          employee_id: entry.employee?.id,
+          month: entry.month,
+          year: entry.year,
+          present_days: entry.present_days,
+          overtime_hours: entry.overtime_hours,
           fields: {},
         };
       }
 
-      grouped[id].fields[entry.field_name] = {
-        amount: entry.amount,
-        type: entry.type,
-      };
+      const fieldValues = entry.salary_entries?.salary_field_values ?? [];
+
+      for (const fieldValue of fieldValues) {
+        const fieldName = fieldValue.payroll_fields?.name;
+        const fieldType = fieldValue.payroll_fields?.type;
+        const fieldAmount = fieldValue.amount;
+
+        if (fieldName && fieldType !== undefined) {
+          grouped[id].fields[fieldName] = {
+            amount: fieldAmount,
+            type: fieldType,
+          };
+        }
+      }
     }
 
     return Object.values(grouped);

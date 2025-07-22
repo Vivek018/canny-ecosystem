@@ -1,6 +1,4 @@
-import type {
-  SupabaseEnv,
-} from "@canny_ecosystem/supabase/types";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
@@ -65,29 +63,17 @@ export function PayrollActions({
             </Button>
           </div>
           <DropdownMenuSeparator
-            className={cn(
-              "flex ",
-              fromWhere !== "payrollhistory" || status !== "approved"
-                ? "hidden"
-                : ""
-            )}
+            className={cn("flex ", status !== "approved" ? "hidden" : "")}
           />
+
           <Button variant={"ghost"} className="w-full px-2">
             <DownloadBankAdvice env={env} data={data} />
           </Button>
-          <DropdownMenuSeparator
-            className={cn("hidden", status === "approved" && "flex")}
-          />
           <Button variant={"ghost"} className={cn("w-full px-2")}>
             <DownloadEsiFormat env={env} data={data} />
           </Button>
 
-          <Button
-            variant={"ghost"}
-            className={cn(
-              " w-full px-2",
-            )}
-          >
+          <Button variant={"ghost"} className={cn(" w-full px-2")}>
             <DownloadEpfFormat env={env} data={data} />
           </Button>
 
@@ -197,7 +183,7 @@ export function PayrollActions({
               Download Salary Register
             </Button>
           </div> */}
-          <DropdownMenuSeparator
+          {/* <DropdownMenuSeparator
             className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
@@ -221,7 +207,7 @@ export function PayrollActions({
               <Icon name="import" />
               Download Overtime Register
             </Button>
-          </div>
+          </div> */}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -11,10 +11,8 @@ import {
 } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
-  getDepartmentsBySiteId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
-  getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -30,7 +28,6 @@ import {
   type ClientLoaderFunctionArgs,
   defer,
   json,
-  redirect,
   useActionData,
   useLoaderData,
   useNavigate,
@@ -54,73 +51,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
-    let departmentOptions: any = [];
-    let siteOptions: any = [];
-
-    if (payrollData?.project_id) {
-      const { data: allSites } = await getSitesByProjectId({
-        projectId: payrollData?.project_id,
-        supabase,
-      });
-      siteOptions = allSites?.map((sites) => ({
-        label: sites?.name,
-        value: sites?.id,
-      }));
-    }
-    if (payrollData?.site_id) {
-      const { data: allDepartments } = await getDepartmentsBySiteId({
-        siteId: payrollData?.site_id,
-        supabase,
-      });
-      departmentOptions = allDepartments?.map((sites) => ({
-        label: sites?.name,
-        value: sites?.id,
-      }));
-    }
-
-    const url = new URL(request.url);
-    const searchParams = new URLSearchParams(url.searchParams);
-    let site = searchParams.get("site")?.split(",") ?? [];
-    let department = searchParams.get("department")?.split(",") ?? [];
-
-    let shouldRedirect = false;
-    if (
-      site.length === 0 &&
-      payrollData?.project_id &&
-      siteOptions.length > 0
-    ) {
-      site = [siteOptions[0].value];
-      searchParams.set("site", site.join(","));
-      shouldRedirect = true;
-    }
-
-    if (
-      department.length === 0 &&
-      payrollData?.site_id &&
-      departmentOptions.length > 0
-    ) {
-      department = [departmentOptions[0].value];
-      searchParams.set("department", department.join(","));
-      shouldRedirect = true;
-    }
-    if (shouldRedirect) {
-      return redirect(`${url.pathname}?${searchParams.toString()}`);
-    }
-
     const salaryEntriesPromise = getSalaryEntriesByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
-      params: {
-        site,
-        department,
-      },
     });
 
     return defer({
       payrollData,
       salaryEntriesPromise,
-      departmentOptions,
-      siteOptions,
       error: null,
       env,
     });
@@ -129,8 +67,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollData: null,
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
-      departmentOptions: [],
-      siteOptions: [],
       error,
       env: null,
     });
@@ -140,7 +76,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId
+    `${cacheKeyPrefix.run_payroll_id}${
+      args.params.payrollId
     }${url.searchParams.toString()}`,
     args
   );
@@ -200,13 +137,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function RunPayrollId() {
-  const {
-    payrollData,
-    salaryEntriesPromise,
-    departmentOptions,
-    siteOptions,
-    env,
-  } = useLoaderData<typeof loader>();
+  const { payrollData, salaryEntriesPromise, env } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const navigate = useNavigate();
@@ -229,7 +161,9 @@ export default function RunPayrollId() {
         toast({
           title: "Error",
           description:
-            actionData?.error || actionData?.message || "Payroll update failed",
+            (actionData?.error as any)?.message ||
+            actionData?.message ||
+            "Payroll update failed",
           variant: "destructive",
         });
       }
@@ -269,8 +203,6 @@ export default function RunPayrollId() {
                 data={data as any}
                 env={env as SupabaseEnv}
                 fromWhere="runpayroll"
-                siteOptions={siteOptions}
-                departmentOptions={departmentOptions}
               />
             );
           }}

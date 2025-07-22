@@ -1,13 +1,7 @@
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import {
-  Outlet,
-  useNavigation,
-  useParams,
-  useSearchParams,
-  useSubmit,
-} from "@remix-run/react";
+import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/utils/user";
@@ -21,7 +15,6 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type {
   PayrollDatabaseRow,
   SupabaseEnv,
@@ -53,6 +46,7 @@ import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
 import { clearCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export function SalaryEntryComponent({
   data,
@@ -60,19 +54,64 @@ export function SalaryEntryComponent({
   noButtons = false,
   env,
   fromWhere,
-  departmentOptions,
-  siteOptions,
 }: {
-  data: SalaryEntriesWithEmployee[];
+  data: any[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
-  siteOptions: any[];
-  departmentOptions: any[];
 }) {
+  const siteOptions = data.reduce((acc: ComboboxSelectOption[], entry) => {
+    const site = entry.salary_entries?.site;
+    const siteId = entry.salary_entries?.site_id;
+    const projectName = entry.salary_entries?.site?.projects?.name;
+
+    if (site && siteId && !acc.some((opt) => opt.value === siteId)) {
+      acc.push({ label: site.name, value: siteId, pseudoLabel: projectName });
+    }
+
+    return acc;
+  }, []);
+
+  const departmentOptions = data.reduce(
+    (acc: ComboboxSelectOption[], entry) => {
+      const department = entry.salary_entries?.department;
+      const departmentId = entry.salary_entries?.department_id;
+      const siteName = entry.salary_entries?.department?.sites?.name;
+
+      if (
+        department &&
+        departmentId &&
+        !acc.some((opt) => opt.value === departmentId)
+      ) {
+        acc.push({
+          label: department.name,
+          value: departmentId,
+          pseudoLabel: siteName,
+        });
+      }
+
+      return acc;
+    },
+    []
+  );
+
+  function conditionalOptions() {
+    if (payrollData?.project_id) {
+      return siteOptions;
+    }
+    if (payrollData?.site_id) {
+      return departmentOptions;
+    }
+    return [
+      siteOptions?.length && { label: "Sites", value: "separator" },
+      ...siteOptions,
+      departmentOptions?.length && { label: "Departments", value: "separator" },
+      ...departmentOptions,
+    ].filter(Boolean);
+  }
+
   const { selectedRows } = useSalaryEntriesStore();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [title, setTitle] = useState(payrollData?.title);
   const [rundate, setRundate] = useState(payrollData?.run_date);
 
@@ -89,65 +128,58 @@ export function SalaryEntryComponent({
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
 
-  const [site, setSite] = useState<string[]>(
-    () => searchParams.get("site")?.split(",") ?? []
-  );
-  const [department, setDepartment] = useState<string[]>(
-    () => searchParams.get("department")?.split(",") ?? []
-  );
-
-  let redirectUrl = `/payroll/run-payroll/${payrollId}`;
-  if (site.length) {
-    redirectUrl += `?site=${searchParams.getAll("site").join(",")}`;
-  } else if (department.length) {
-    redirectUrl += `?department=${searchParams.getAll("department").join(",")}`;
-  }
+  const [site, setSite] = useState<string[]>();
+  const [department, setDepartment] = useState<string[]>();
 
   const handleFieldChange = (newSelectedFields: string[]) => {
-    payrollData.project_id
-      ? setSite(newSelectedFields)
-      : setDepartment(newSelectedFields);
+    if (newSelectedFields?.length) {
+      const siteIds = siteOptions.map((opt) => opt.value);
+      const departmentIds = departmentOptions.map((opt) => opt.value);
+
+      const selectedSiteIds = newSelectedFields.filter((id) =>
+        siteIds.includes(id)
+      );
+      const selectedDepartmentIds = newSelectedFields.filter((id) =>
+        departmentIds.includes(id)
+      );
+
+      setSite(selectedSiteIds);
+      setDepartment(selectedDepartmentIds);
+    } else {
+      setSite([]);
+      setDepartment([]);
+    }
   };
 
   const handleRenderSelectedItem = (values: string[]): string => {
     if (values.length === 0) return "";
 
     if (values.length <= 3) {
-      return payrollData.project_id
-        ? siteOptions
+      if (site?.length! > 0) {
+        return `Site: ${siteOptions
           .filter((option) => values.includes(String(option.value)))
           .map((option) => option.label)
-          .join(", ")
-        : departmentOptions
+          .join(", ")}`;
+      }
+      if (department?.length! > 0) {
+        return `Dep: ${departmentOptions
           .filter((option) => values.includes(String(option.value)))
           .map((option) => option.label)
-          .join(", ");
+          .join(", ")}`;
+      }
+      if (site && department) {
+        return `Site: ${siteOptions
+          .filter((option) => values.includes(String(option.value)))
+          .map((option) => option.label)
+          .join(", ")} | Dep: ${departmentOptions
+          .filter((option) => values.includes(String(option.value)))
+          .map((option) => option.label)
+          .join(", ")}`;
+      }
     }
 
     return `${values.length} selected`;
   };
-
-  useEffect(() => {
-    const newParams = new URLSearchParams(searchParams);
-
-    if (payrollData.project_id) {
-      if (site.length) {
-        newParams.set("site", site.join(","));
-      } else {
-        newParams.delete("site");
-      }
-    }
-
-    if (payrollData.site_id) {
-      if (department.length) {
-        newParams.set("department", department.join(","));
-      } else {
-        newParams.delete("department");
-      }
-    }
-
-    setSearchParams(newParams);
-  }, [site, department]);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(
@@ -155,12 +187,38 @@ export function SalaryEntryComponent({
   );
 
   useEffect(() => {
-    const filteredData = data?.filter((item) =>
-      searchInObject(item, searchString)
-    );
+    let filteredData: any[] = [];
 
-    setTableData(filteredData as any);
-  }, [searchString, data]);
+    if (searchString) {
+      filteredData =
+        data?.filter((item) => searchInObject(item, searchString)) ?? [];
+    } else if (site?.length && department?.length) {
+      filteredData =
+        data?.filter((item) => {
+          const itemSiteId = item.salary_entries?.site_id;
+          const itemDeptId = item.salary_entries?.department_id;
+          return site.includes(itemSiteId) || department.includes(itemDeptId);
+        }) ?? [];
+    } else if (site?.length) {
+      filteredData =
+        data?.filter((item) => {
+          const itemSiteId = item.salary_entries?.site_id;
+          const itemSiteIdStr = itemSiteId != null ? String(itemSiteId) : "";
+          return site.includes(itemSiteIdStr);
+        }) ?? [];
+    } else if (department?.length) {
+      filteredData =
+        data?.filter((item) => {
+          const itemDeptId = item.salary_entries?.department_id;
+          const itemDeptIdStr = itemDeptId != null ? String(itemDeptId) : "";
+          return department.includes(itemDeptIdStr);
+        }) ?? [];
+    } else {
+      filteredData = data ?? [];
+    }
+
+    setTableData(filteredData);
+  }, [searchString, site, department]);
 
   const updateStatusPayroll = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -176,7 +234,7 @@ export function SalaryEntryComponent({
           total_employees: payrollData?.total_employees,
           total_net_amount: payrollData?.total_net_amount,
         }),
-        redirectUrl: redirectUrl,
+        redirectUrl: `/payroll/run-payroll/${payrollId}`,
       },
       {
         method: "POST",
@@ -241,7 +299,7 @@ export function SalaryEntryComponent({
       {
         payrollId: payrollId ?? payrollData?.id,
         payrollData: JSON.stringify({ title: title, run_date: rundate }),
-        failedRedirect: redirectUrl,
+        failedRedirect: `/payroll/run-payroll/${payrollId}`,
       },
       {
         method: "POST",
@@ -475,29 +533,32 @@ export function SalaryEntryComponent({
         </div>
       </div>
       <div className="w-full flex items-center justify-between gap-3 pb-4">
-        <div className="w-1/3">
+        <div
+          className={cn(
+            "w-2/3",
+            siteOptions.length === 0 &&
+              departmentOptions.length === 0 &&
+              "hidden"
+          )}
+        >
           <MultiSelectCombobox
             label="Departments"
-            options={payrollData?.project_id ? siteOptions : departmentOptions}
-            value={payrollData?.project_id ? site : department}
+            options={conditionalOptions() as unknown as any[]}
+            value={[
+              ...(site?.length ? site : []),
+              ...(department?.length ? department : []),
+            ]}
             onChange={handleFieldChange}
-            renderItem={(option) =>
-              payrollData?.project_id ? (
+            renderItem={(option) => {
+              return (
                 <div
                   role="option"
-                  aria-selected={site.includes(String(option.value))}
+                  aria-selected={department?.includes(String(option.value))}
                 >
                   {option.label}
                 </div>
-              ) : (
-                <div
-                  role="option"
-                  aria-selected={department.includes(String(option.value))}
-                >
-                  {option.label}
-                </div>
-              )
-            }
+              );
+            }}
             renderSelectedItem={handleRenderSelectedItem}
             aria-label="Filter by payment field"
             aria-required="false"
@@ -530,8 +591,8 @@ export function SalaryEntryComponent({
               "hidden h-10",
               (payrollData.status === "pending" ||
                 payrollData.status === "approved") &&
-              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-              "flex"
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -543,8 +604,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-              "flex"
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -555,8 +616,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-              "flex"
+                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >

@@ -26,7 +26,13 @@ import {
   numberToWordsIndian,
   SALARY_SLIP_TITLE,
 } from "@/constant";
-import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateTime,
+  getMonthNameFromNumber,
+  replaceUnderscore,
+  roundToNearest,
+} from "@canny_ecosystem/utils";
 import type {
   CompanyDatabaseRow,
   EmployeeDatabaseRow,
@@ -34,7 +40,6 @@ import type {
   LocationDatabaseRow,
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
-import { months } from "@canny_ecosystem/utils/constant";
 
 // Define styles for PDF
 const styles = StyleSheet.create({
@@ -214,6 +219,12 @@ type DataType = {
     attendance: {
       overtime_hours: number;
       working_days: number;
+      present_days: number;
+      absent_days: number;
+      casual_leaves: number;
+      paid_leaves: number;
+      paid_holidays: number;
+      working_hours: number;
     };
     employeeData: EmployeeDatabaseRow;
     employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
@@ -259,13 +270,17 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
         <View style={styles.employeeSection}>
           <View style={styles.employeeDetails}>
             <Text style={styles.employeeName}>
-              {`${data.employee?.employeeData?.first_name} ${data?.employee?.employeeData?.middle_name} ${data?.employee?.employeeData.last_name}`}{" "}
+              {`${data.employee?.employeeData?.first_name} ${
+                data?.employee?.employeeData?.middle_name ?? ""
+              } ${data?.employee?.employeeData.last_name}`}{" "}
               <Text style={styles.employeeId}>
                 (Employee Code: {data?.employee?.employeeData?.employee_code})
               </Text>
             </Text>
             <Text style={styles.department}>
-              {data?.employee?.employeeProjectAssignmentData?.position}
+              {replaceUnderscore(
+                data?.employee?.employeeProjectAssignmentData?.position
+              )}
             </Text>
             <Text style={styles.department}>
               Location: {data?.companyData?.city}
@@ -275,15 +290,39 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.workingTitle}>WORKING DETAILS</Text>
 
             <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Working Days</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.working_days ?? 0}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Paid Days</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.working_days}
+                {data?.employee?.attendance?.present_days ?? 0}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Absents</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.absent_days ?? 0}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Overtime Hours</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.overtime_hours}
+                {data?.employee?.attendance?.overtime_hours ?? 0}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Casual Leaves</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.casual_leaves ?? 0}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Paid Leaves</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.paid_leaves ?? 0}
               </Text>
             </View>
           </View>
@@ -312,11 +351,9 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Date of Joining</Text>
             <Text style={styles.infoValue}>
-              <>
-                {formatDate(
-                  data?.employee?.employeeProjectAssignmentData?.start_date
-                )}
-              </>
+              {formatDate(
+                data?.employee?.employeeProjectAssignmentData?.start_date
+              )}
             </Text>
           </View>
         </View>
@@ -339,10 +376,12 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <View style={styles.totalRow}>
               <Text>Gross Pay</Text>
               <Text>
-                {Number(
-                  data?.employee?.earnings
-                    ?.reduce((sum, earning) => sum + earning.amount, 0)
-                    .toFixed(2)
+                {roundToNearest(
+                  Number(
+                    data?.employee?.earnings
+                      ?.reduce((sum, earning) => sum + earning.amount, 0)
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -364,10 +403,12 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <View style={styles.totalRow}>
               <Text>Total Deductions</Text>
               <Text>
-                {Number(
-                  data?.employee?.deductions
-                    ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                    .toFixed(2)
+                {roundToNearest(
+                  Number(
+                    data?.employee?.deductions
+                      ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -376,30 +417,34 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
 
         {/* Net Payable */}
         <View style={styles.netPayable}>
-          <Text style={styles.netPayableAmount}>{`Net Payable: Rs ${
+          <Text
+            style={styles.netPayableAmount}
+          >{`Net Payable: Rs ${roundToNearest(
             Number(
               data?.employee?.earnings
                 ?.reduce((sum, earning) => sum + earning.amount, 0)
                 .toFixed(2)
             ) -
-            Number(
-              data?.employee?.deductions
-                ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                .toFixed(2)
-            )
-          }`}</Text>
+              Number(
+                data?.employee?.deductions
+                  ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                  .toFixed(2)
+              )
+          )}`}</Text>
           <Text style={styles.netPayableWords}>
             {numberToWordsIndian(
-              Number(
-                data?.employee?.earnings
-                  ?.reduce((sum, earning) => sum + earning.amount, 0)
-                  .toFixed(2)
-              ) -
+              roundToNearest(
                 Number(
-                  data?.employee?.deductions
-                    ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                  data?.employee?.earnings
+                    ?.reduce((sum, earning) => sum + earning.amount, 0)
                     .toFixed(2)
-                )
+                ) -
+                  Number(
+                    data?.employee?.deductions
+                      ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                      .toFixed(2)
+                  )
+              )
             )}
           </Text>
         </View>
@@ -456,10 +501,10 @@ export default function SalarySlip() {
 
   function transformData(data: any) {
     const fullName = {
-      first_name: data?.payrollData.first_name,
-      middle_name: data?.payrollData.middle_name,
-      last_name: data?.payrollData.last_name,
-      employee_code: data?.payrollData.employee_code,
+      first_name: data?.payrollData?.employee?.first_name,
+      middle_name: data?.payrollData?.employee?.middle_name,
+      last_name: data?.payrollData?.employee?.last_name,
+      employee_code: data?.payrollData?.employee?.employee_code,
     };
 
     const companyData = {
@@ -482,27 +527,22 @@ export default function SalarySlip() {
       uan_number: data?.employeeStatutoryDetails?.uan_number || "",
     };
 
-    function getMonthName(monthNumber: number) {
-      const entry = Object.entries(months).find(
-        ([, value]) => value === monthNumber
-      );
-      return entry ? entry[0] : undefined;
-    }
-
-    const attendanceData = data?.payrollData.salary_entries[0] || {};
-    const salaryEntries = data?.payrollData.salary_entries || [];
+    const salaryEntries =
+      data?.payrollData?.salary_entries?.salary_field_values || [];
 
     interface SalaryEntry {
-      field_name: string;
       amount: number;
-      type: string;
+      payroll_fields: {
+        name: string;
+        type: string;
+      };
     }
 
     const earnings: { name: string; amount: number }[] = salaryEntries
-      .filter((entry: SalaryEntry) => entry.type === "earning")
+      .filter((entry: SalaryEntry) => entry.payroll_fields.type === "earning")
       .map((entry: SalaryEntry) => ({
-        name: entry.field_name,
-        amount: entry.amount,
+        name: entry?.payroll_fields?.name,
+        amount: entry?.amount,
       }));
 
     interface DeductionEntry {
@@ -511,23 +551,31 @@ export default function SalarySlip() {
     }
 
     const deductions: DeductionEntry[] = salaryEntries
-      .filter((entry: SalaryEntry) => entry.type === "deduction")
+      .filter(
+        (entry: SalaryEntry) => entry?.payroll_fields?.type === "deduction"
+      )
       .map((entry: SalaryEntry) => ({
-        name: entry.field_name,
-        amount: entry.amount,
+        name: entry?.payroll_fields?.name,
+        amount: entry?.amount,
       }));
 
     return {
-      month: getMonthName(attendanceData?.month),
-      year: attendanceData?.year,
+      month: getMonthNameFromNumber(data?.payrollData?.month),
+      year: data?.payrollData?.year,
       companyData,
       employee: {
         employeeData: fullName,
         employeeProjectAssignmentData: projectAssignment,
         employeeStatutoryDetails: statutoryDetails,
         attendance: {
-          working_days: attendanceData?.present_days || 0,
-          overtime_hours: attendanceData?.overtime_hours || 0,
+          working_days: data?.payrollData?.working_days || 0,
+          present_days: data?.payrollData?.present_days || 0,
+          working_hours: data?.payrollData?.absent_days || 0,
+          overtime_hours: data?.payrollData?.overtime_hours || 0,
+          paid_holidays: data?.payrollData?.total_hours || 0,
+          paid_leaves: data?.payrollData?.paid_leaves || 0,
+          casual_leaves: data?.payrollData?.casual_leaves || 0,
+          absent_days: data?.payrollData?.absent_days || 0,
         },
         earnings,
         deductions,

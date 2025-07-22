@@ -269,8 +269,6 @@ export default function CreatePayroll() {
                     placeholder={"Link Payroll With"}
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 {linkWith === "project" && (
                   <SearchableSelectField
                     key={resetKey}
@@ -304,6 +302,7 @@ export default function CreatePayroll() {
                   />
                 )}
               </div>
+              
             </CardContent>
 
             <FormButtons

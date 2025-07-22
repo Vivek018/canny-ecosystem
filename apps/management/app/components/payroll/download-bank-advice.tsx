@@ -42,7 +42,7 @@ export const prepareBankAdviceWorkbook = async ({
   );
   const dateToBeSent = formatDate(date)
     ?.toString()!
-    .replace(/([A-Za-z]{3})/, (match) => match.toUpperCase())
+    .replace(/([A-Za-z]{3})/, (match: any) => match.toUpperCase())
     .replaceAll(" ", "-");
 
   const updatedData = data.map((entry, index) => ({
@@ -166,22 +166,19 @@ export const DownloadBankAdvice = ({
     return data.map((emp) => {
       let earnings = 0;
       let deductions = 0;
-      for (const entry of emp.salary_entries) {
-        if (entry.type === "earning") earnings += entry.amount;
-        else if (
-          entry.type === "deduction" 
-        )
+      for (const entry of emp.salary_entries.salary_field_values) {
+        if (entry.payroll_fields.type === "earning") earnings += entry.amount;
+        else if (entry.payroll_fields.type === "deduction")
           deductions += entry.amount;
       }
       return {
         amount: earnings - deductions,
-        employee_id: emp.id,
+        employee_id: emp.employee?.id,
         employees: {
-          company_id: emp.company_id,
-          employee_code: emp.employee_code,
-          first_name: emp.first_name,
-          middle_name: emp.middle_name,
-          last_name: emp.last_name,
+          employee_code: emp.employee?.employee_code,
+          first_name: emp.employee?.first_name,
+          middle_name: emp.employee?.middle_name,
+          last_name: emp.employee?.last_name,
         },
       };
     });

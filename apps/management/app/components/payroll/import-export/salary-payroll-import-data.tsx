@@ -1,9 +1,11 @@
 import { useImportStoreForSalaryPayroll } from "@/store/import";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
+  getDepartmentIdsByDepartmentNames,
   getEmployeeIdsByEmployeeCodes,
   getEmployeeIdsByEsicNumber,
   getEmployeeIdsByUanNumber,
+  getSiteIdsBySiteNames,
 } from "@canny_ecosystem/supabase/queries";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -43,7 +45,42 @@ export function SalaryPayrollImportData({
   const handleFinalImport = async () => {
     const importEntries = importData.data! as any[];
 
-    const employeeCodes = importEntries
+    const siteNames = importEntries.map((value) => value.site);
+
+    const { data: sites, error: siteError } = await getSiteIdsBySiteNames({
+      supabase,
+      siteNames: siteNames,
+    });
+
+    if (siteError) throw siteError;
+
+    const departmentNames = importEntries.map((value) => value.department);
+
+    const { data: departments, error: departmentError } =
+      await getDepartmentIdsByDepartmentNames({
+        supabase,
+        departmentNames: departmentNames,
+      });
+
+    if (departmentError) throw departmentError;
+
+    const preData = importEntries.map((item: any) => {
+      const siteId = sites?.find((e) => e.name === item.site)?.id;
+
+      const departmentId = departments?.find(
+        (u) => u.name === item.department
+      )?.id;
+
+      const { department, site, ...rest } = item;
+
+      return {
+        ...rest,
+        ...(siteId ? { site_id: siteId } : {}),
+        ...(departmentId ? { department_id: departmentId } : {}),
+      };
+    });
+
+    const employeeCodes = preData
       .map((entry) => entry.employee_code)
       .filter(Boolean);
     const {
@@ -53,7 +90,7 @@ export function SalaryPayrollImportData({
     } = await getEmployeeIdsByEmployeeCodes({ supabase, employeeCodes });
     if (codeError) throw codeError;
 
-    let unresolvedEntries = importEntries.filter((entry) =>
+    let unresolvedEntries = preData.filter((entry) =>
       missingCodes.includes(entry.employee_code)
     );
 
@@ -96,7 +133,7 @@ export function SalaryPayrollImportData({
       })) ?? []),
     ];
 
-    const updatedData = importEntries
+    const updatedData = preData
       .map((item) => {
         const matched = allEmployees.find(
           (e) =>

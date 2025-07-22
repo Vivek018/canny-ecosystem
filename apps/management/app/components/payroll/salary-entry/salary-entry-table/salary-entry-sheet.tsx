@@ -67,15 +67,27 @@ export function SalaryEntrySheet({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...formattedDefaultValue,
-      salaryFieldValues_id: salaryEntry.id,
-      payrollFields_id: salaryEntry.payroll_fields.id,
+      salaryFieldValues_id: salaryEntry?.id,
+      payrollFields_id: salaryEntry?.payroll_fields?.id,
       payroll_id: payrollId,
     },
   });
 
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    if (salaryEntry.length) {
+      setOpen(true);
+    }
+  };
+
   return (
-    <Sheet>
-      <SheetTrigger asChild className="cursor-pointer py-2">
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger
+        asChild
+        className={cn("cursor-pointer py-2", !salaryEntry && "cursor-default")}
+        onClick={handleClick}
+      >
         {triggerChild}
       </SheetTrigger>
       <SheetContent className="flex flex-col w-[600px] h-full">
@@ -172,43 +184,3 @@ export function SalaryEntrySheet({
     </Sheet>
   );
 }
-
-// {/* <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
-//   <CheckboxField
-//     buttonProps={getInputProps(fields.is_pro_rata, {
-//       type: "checkbox",
-//       readOnly: !editable,
-//     })}
-//     labelProps={{
-//       children: "Calculate on pro-rata basis",
-//     }}
-//   />
-
-//   <CheckboxField
-//     buttonProps={getInputProps(fields.is_overtime, {
-//       type: "checkbox",
-
-//     })}
-//     labelProps={{
-//       children: "Calculate on overtime basis",
-//     }}
-//   />
-
-//   <CheckboxField
-//     buttonProps={getInputProps(fields.consider_for_epf, {
-//       type: "checkbox",
-//     })}
-//     labelProps={{
-//       children: "Consider for EPF Contribution",
-//     }}
-//   />
-
-//   <CheckboxField
-//     buttonProps={getInputProps(fields.consider_for_esic, {
-//       type: "checkbox",
-//     })}
-//     labelProps={{
-//       children: "Consider for ESI Contribution",
-//     }}
-//   />
-// </div> */}

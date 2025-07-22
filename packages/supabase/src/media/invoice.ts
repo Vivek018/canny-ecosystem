@@ -12,11 +12,13 @@ export async function addOrUpdateInvoiceWithProof({
   proof,
   invoiceData,
   route,
+  selectedSalaryEntriesData,
 }: {
   supabase: TypedSupabaseClient;
   proof: File;
   invoiceData: InvoiceDatabaseInsert;
   route?: "add" | "update";
+  selectedSalaryEntriesData?: any[];
 }) {
   if (proof instanceof File) {
     const filePath = `invoice/${invoiceData.invoice_number}`;
@@ -51,13 +53,46 @@ export async function addOrUpdateInvoiceWithProof({
     }
 
     if (route === "add") {
-      const { status: insertStatus, error: insertError } = await createInvoice({
+      const {
+        status: insertStatus,
+        error: insertError,
+        data: invoiceDataCreated,
+      } = await createInvoice({
         supabase,
         data: {
           ...invoiceData,
           proof: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
         },
       });
+      if (invoiceDataCreated?.id) {
+        const updatedSalaryEntries = (
+          selectedSalaryEntriesData as Array<any>
+        ).map((salaryEntry) => ({
+          id: salaryEntry.salary_entries.id,
+          invoice_id: invoiceDataCreated.id!,
+        }));
+
+        for (const entry of updatedSalaryEntries) {
+          const { id, invoice_id } = entry;
+          const { error } = await supabase
+            .from("salary_entries")
+            .update({ invoice_id })
+            .eq("id", id);
+
+          if (error) {
+            return {
+              status: "error",
+              message: "Error udating Salary Entry",
+              error,
+            };
+          }
+        }
+        return {
+          status: "success",
+          message: "Invoice created successfully",
+          error: null,
+        };
+      }
 
       if (insertError) {
         await supabase.storage

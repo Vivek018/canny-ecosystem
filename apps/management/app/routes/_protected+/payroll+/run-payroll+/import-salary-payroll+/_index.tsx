@@ -65,6 +65,12 @@ const FIELD_CONFIGS: FieldConfig[] = [
     key: "present_days",
     required: true,
   },
+  {
+    key: "site",
+  },
+  {
+    key: "department",
+  },
 ];
 
 export async function loader() {
@@ -165,19 +171,22 @@ export default function PayrollImportFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = fieldConfigs.reduce((mapping, field) => {
-        const matchedHeader = headerArray.find(
-          (value) =>
-            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-        );
+      const initialMapping = fieldConfigs.reduce(
+        (mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+          );
 
-        if (matchedHeader) {
-          mapping[field.key] = matchedHeader;
-        }
+          if (matchedHeader) {
+            mapping[field.key] = matchedHeader;
+          }
 
-        return mapping;
-      }, {} as Record<string, string>);
+          return mapping;
+        },
+        {} as Record<string, string>
+      );
 
       setFieldMapping(initialMapping);
     }

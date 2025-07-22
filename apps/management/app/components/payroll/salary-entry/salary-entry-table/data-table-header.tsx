@@ -22,6 +22,8 @@ export function SalaryTableHeader({
     "sr_no",
     "employee_code",
     "name",
+    "site",
+    "department",
     "present_days",
     "overtime_hours",
     "period",
@@ -95,8 +97,8 @@ export function SalaryTableHeader({
               key={id}
               className={cn(
                 "px-4 py-2",
-                id === "employee_code" && "sticky left-12 bg-card z-10",
-                id === "full_name" && "sticky w-full left-48 bg-card z-10"
+                id === "sr_no" && "sticky left-12 bg-card z-10",
+                id === "employee_code" && "sticky left-32 bg-card z-10",
               )}
             >
               <Button
