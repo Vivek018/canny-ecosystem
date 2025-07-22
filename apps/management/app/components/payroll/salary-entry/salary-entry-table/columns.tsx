@@ -146,7 +146,8 @@ export const salaryEntryColumns = ({
               : "";
 
         const displayValue =
-          valueObj?.amount !== undefined ? valueObj.amount : "--";
+          valueObj?.amount !== undefined ? valueObj.amount : 0;
+        
 
         return (
           <SalaryEntrySheet

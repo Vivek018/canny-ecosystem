@@ -1,4 +1,4 @@
-import type { ImportSalaryPayrollDataType } from "@canny_ecosystem/supabase/queries";
+
 import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -10,7 +10,7 @@ import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export const ImportedDataColumns = (
   fieldConfigs: FieldConfig[]
-): ColumnDef<ImportSalaryPayrollDataType>[] => [
+): ColumnDef<any>[] => [
   {
     accessorKey: "sr_no",
     header: "Sr No.",
@@ -21,11 +21,10 @@ export const ImportedDataColumns = (
   ...fieldConfigs.map((field) => ({
     accessorKey: field.key.toLowerCase(),
     header: replaceUnderscore(field.key),
-    cell: ({ row }: { row: { original: ImportSalaryPayrollDataType } }) => {
+    cell: ({ row }: { row: { original: any } }) => {
       const key = field.key;
 
-      const value: any =
-        row.original?.[key as keyof ImportSalaryPayrollDataType];
+      const value: any = row.original?.[key as keyof any];
       const displayColor =
         typeof value === "object"
           ? value?.type === "earning"
@@ -35,7 +34,7 @@ export const ImportedDataColumns = (
       const displayValue =
         typeof value === "object" && value?.amount !== undefined
           ? value.amount
-          : value ?? "--";
+          : (value ?? "--");
       return <p className={displayColor}>{displayValue}</p>;
     },
   })),

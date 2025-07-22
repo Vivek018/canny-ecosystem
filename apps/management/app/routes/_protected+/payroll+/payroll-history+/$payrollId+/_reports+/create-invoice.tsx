@@ -236,10 +236,13 @@ export default function CreateInvoice({
     const fieldTotals: Record<string, { rawAmount: number; type: string }> = {};
 
     for (const emp of employees) {
-      for (const entry of emp.salary_entries) {
-        const field = entry.field_name;
+      for (const entry of emp.salary_entries.salary_field_values) {
+        const field = entry.payroll_fields.name;
         if (!fieldTotals[field]) {
-          fieldTotals[field] = { rawAmount: 0, type: entry.type };
+          fieldTotals[field] = {
+            rawAmount: 0,
+            type: entry.payroll_fields.type,
+          };
         }
         fieldTotals[field].rawAmount += entry.amount;
       }

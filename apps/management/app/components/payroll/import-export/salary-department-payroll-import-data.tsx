@@ -126,7 +126,7 @@ export function SalaryDepartmentPayrollImportData({
           importData.data.length - updatedData.length > 0
             ? importData.data.length - updatedData.length
             : 0,
-        failedRedirect: updatedData[0].deaprtment_id
+        failedRedirect: updatedData[0].department_id
           ? `/payroll/run-payroll/${payrollId}?department=${updatedData[0]?.department_id}`
           : `/payroll/run-payroll/${payrollId}?site=${updatedData[0]?.site_id}`,
       },

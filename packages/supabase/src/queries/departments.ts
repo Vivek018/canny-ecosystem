@@ -1,9 +1,13 @@
 import { MID_QUERY_LIMIT } from "../constant";
-import type { DepartmentsDatabaseRow, InferredType, TypedSupabaseClient } from "../types";
+import type {
+  DepartmentsDatabaseRow,
+  InferredType,
+  TypedSupabaseClient,
+} from "../types";
 
 export type DepartmentWithSite = DepartmentsDatabaseRow & {
-  site: { id: string; name: string }
-}
+  site: { id: string; name: string };
+};
 
 export async function getDepartmentsByCompanyId({
   supabase,
@@ -18,7 +22,7 @@ export async function getDepartmentsByCompanyId({
     "site_id",
     "company_id",
     "site:sites!site_id(id, name)",
-    "created_at"
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -48,7 +52,7 @@ export async function getDepartmentsBySiteId({
     "name",
     "site_id",
     "company_id",
-    "created_at"
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -75,7 +79,7 @@ export async function getDepartmentById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  const columns = ["id", "name", "site_id", "company_id",] as const;
+  const columns = ["id", "name", "site_id", "company_id"] as const;
 
   const { data, error } = await supabase
     .from("departments")
@@ -85,6 +89,30 @@ export async function getDepartmentById({
 
   if (error) {
     console.error("getDepartmentById Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getDepartmentIdsByDepartmentNames({
+  supabase,
+  departmentNames,
+}: {
+  supabase: TypedSupabaseClient;
+  departmentNames: string[];
+}) {
+  const columns = ["name", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("departments")
+    .select(columns.join(","))
+    .in("name", departmentNames)
+    .returns<
+      InferredType<DepartmentsDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error("getDepartmentIdsByDepartmentNames Error", error);
   }
 
   return { data, error };

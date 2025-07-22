@@ -13,10 +13,7 @@ import type {
   PayrollFieldsDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import {
-  calculateSalaryTotalNetAmount,
-  isGoodStatus,
-} from "@canny_ecosystem/utils";
+import { calculateSalaryTotalNetAmount } from "@canny_ecosystem/utils";
 
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
@@ -130,24 +127,24 @@ export async function action({
 
         const { data } = await getPayrollById({ payrollId, supabase });
 
-        const {
-          status,
-          error: salaryError,
-          message,
-        } = await createSalaryPayrollByDepartment({
-          supabase,
-          data: {
-            payrollId,
-            salaryData: [],
-            oldTotalEmployees: data?.total_employees ?? 0,
-            totalEmployees:
-              Number(salaryImportData.length) + Number(data?.total_employees),
-            oldTotalNetAmount: data?.total_net_amount ?? 0,
-            totalNetAmount:
-              Number(totalNetAmount) + Number(data?.total_net_amount),
-          },
-        });
-        if (isGoodStatus(status)) {
+        const { error: salaryError, message } =
+          await createSalaryPayrollByDepartment({
+            supabase,
+            data: {
+              payrollId,
+              salaryEntryData: transformedSalaryEntries,
+              oldTotalEmployees: data?.total_employees ?? 0,
+              totalEmployees:
+                Number(salaryImportData.length) + Number(data?.total_employees),
+              oldTotalNetAmount: data?.total_net_amount ?? 0,
+              totalNetAmount:
+                Number(totalNetAmount) + Number(data?.total_net_amount),
+              payrollFieldsData:
+                payrollFields as unknown as PayrollFieldsDatabaseRow[],
+              rawData: salaryImportData,
+            },
+          });
+        if (!salaryError) {
           if (Number(skipped) > 0) {
             return json({
               status: "success",

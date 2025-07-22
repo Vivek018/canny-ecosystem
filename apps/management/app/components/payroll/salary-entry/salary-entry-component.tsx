@@ -21,7 +21,6 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type {
   PayrollDatabaseRow,
   SupabaseEnv,
@@ -63,7 +62,7 @@ export function SalaryEntryComponent({
   departmentOptions,
   siteOptions,
 }: {
-  data: SalaryEntriesWithEmployee[];
+  data: any[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
   env: SupabaseEnv;

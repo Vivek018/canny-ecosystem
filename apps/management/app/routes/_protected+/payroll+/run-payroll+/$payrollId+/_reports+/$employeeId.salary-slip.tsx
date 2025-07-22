@@ -499,10 +499,10 @@ export default function SalarySlip() {
 
   function transformData(data: any) {
     const fullName = {
-      first_name: data?.payrollData?.first_name,
-      middle_name: data?.payrollData?.middle_name,
-      last_name: data?.payrollData?.last_name,
-      employee_code: data?.payrollData?.employee_code,
+      first_name: data?.payrollData?.employee?.first_name,
+      middle_name: data?.payrollData?.employee?.middle_name,
+      last_name: data?.payrollData?.employee?.last_name,
+      employee_code: data?.payrollData?.employee?.employee_code,
     };
 
     const companyData = {
@@ -525,20 +525,22 @@ export default function SalarySlip() {
       uan_number: data?.employeeStatutoryDetails?.uan_number || "",
     };
 
-    const attendanceData = data?.payrollData.salary_entries[0] || {};
-    const salaryEntries = data?.payrollData.salary_entries || [];
+    const salaryEntries =
+      data?.payrollData?.salary_entries?.salary_field_values || [];
 
     interface SalaryEntry {
-      field_name: string;
       amount: number;
-      type: string;
+      payroll_fields: {
+        name: string;
+        type: string;
+      };
     }
 
     const earnings: { name: string; amount: number }[] = salaryEntries
-      .filter((entry: SalaryEntry) => entry.type === "earning")
+      .filter((entry: SalaryEntry) => entry.payroll_fields.type === "earning")
       .map((entry: SalaryEntry) => ({
-        name: entry.field_name,
-        amount: entry.amount,
+        name: entry?.payroll_fields?.name,
+        amount: entry?.amount,
       }));
 
     interface DeductionEntry {
@@ -547,28 +549,29 @@ export default function SalarySlip() {
     }
 
     const deductions: DeductionEntry[] = salaryEntries
-      .filter((entry: SalaryEntry) => entry.type === "deduction")
+      .filter(
+        (entry: SalaryEntry) => entry?.payroll_fields?.type === "deduction"
+      )
       .map((entry: SalaryEntry) => ({
-        name: entry.field_name,
-        amount: entry.amount,
+        name: entry?.payroll_fields?.name,
+        amount: entry?.amount,
       }));
 
     return {
-      month: getMonthNameFromNumber(attendanceData?.monthly_attendance.month),
-      year: attendanceData?.monthly_attendance.year,
+      month: getMonthNameFromNumber(data?.payrollData?.month),
+      year: data?.payrollData?.year,
       companyData,
       employee: {
         employeeData: fullName,
         employeeProjectAssignmentData: projectAssignment,
         employeeStatutoryDetails: statutoryDetails,
         attendance: {
-          working_days: attendanceData?.monthly_attendance.working_days || 0,
-          paid_days: attendanceData?.monthly_attendance.present_days,
-          overtime_hours:
-            attendanceData?.monthly_attendance?.overtime_hours || 0,
-          paid_leaves: attendanceData?.monthly_attendance?.paid_leaves || 0,
-          casual_leaves: attendanceData?.monthly_attendance?.casual_leaves || 0,
-          absents: attendanceData?.monthly_attendance.absent_days || 0,
+          working_days: data?.payrollData?.working_days || 0,
+          paid_days: data?.payrollData?.present_days || 0,
+          overtime_hours: data?.payrollData?.overtime_hours || 0,
+          paid_leaves: data?.payrollData?.paid_leaves || 0,
+          casual_leaves: data?.payrollData?.casual_leaves || 0,
+          absents: data?.payrollData?.absent_days || 0,
         },
         earnings,
         deductions,

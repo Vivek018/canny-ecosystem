@@ -103,6 +103,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       searchParams.set("department", department.join(","));
       shouldRedirect = true;
     }
+
     if (shouldRedirect) {
       return redirect(`${url.pathname}?${searchParams.toString()}`);
     }
@@ -140,7 +141,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId
+    `${cacheKeyPrefix.run_payroll_id}${
+      args.params.payrollId
     }${url.searchParams.toString()}`,
     args
   );
@@ -262,7 +264,6 @@ export default function RunPayrollId() {
                 />
               );
             }
-
             return (
               <SalaryEntryComponent
                 payrollData={payrollData as any}

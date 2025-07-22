@@ -85,24 +85,26 @@ export const DownloadEpfFormat = ({
 
   function transformSalaryData(data: any[]) {
     return data.map((emp: any) => {
-      const earnings = emp.salary_entries
-        .filter((e: { type: string; amount: number }) => e.type === "earning")
+      const earnings = emp.salary_entries.salary_field_values
+        .filter(
+          (e: {
+            amount: number;
+            payroll_fields: { type: string; name: string };
+          }) => e.payroll_fields.type === "earning"
+        )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
-
-      const firstAttendance = emp.salary_entries[0]?.monthly_attendance;
 
       return {
         amount: earnings,
-        presentDays: firstAttendance?.present_days ?? null,
-        workingDays: firstAttendance?.working_days ?? null,
-        absentDays: firstAttendance?.absent_days ?? null,
-        employee_id: emp.id,
+        presentDays: emp?.present_days ?? null,
+        workingDays: emp?.working_days ?? null,
+        absentDays: emp?.absent_days ?? null,
+        employee_id: emp?.employee?.id,
         employees: {
-          company_id: emp.company_id,
-          employee_code: emp.employee_code,
-          first_name: emp.first_name,
-          middle_name: emp.middle_name,
-          last_name: emp.last_name,
+          employee_code: emp.employee?.employee_code,
+          first_name: emp.employee?.first_name,
+          middle_name: emp.employee?.middle_name,
+          last_name: emp.employee?.last_name,
         },
       };
     });

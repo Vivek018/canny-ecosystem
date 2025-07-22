@@ -449,8 +449,8 @@ export default function SalarySlips() {
 
   const updatedData = {
     ...data,
-    payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
-      selectedRows.some((emp2) => emp2.id === emp1.id)
+    payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1: any) =>
+      selectedRows.some((emp2: any) => emp2.employee.id === emp1.employee.id)
     ),
   };
   const navigate = useNavigate();
@@ -469,155 +469,70 @@ export default function SalarySlips() {
       pincode: location?.pincode,
     };
 
-    interface SalaryEntry {
-      field_name: string;
-      amount: number;
-      type: "earning" | "deduction";
-      monthly_attendance: {
-        working_days: number;
-        present_days: number;
-        month: number;
-        year: number;
-        working_hours: number;
-        absent_days: number;
-        overtime_hours: number;
-        paid_holidays: number;
-        paid_leaves: number;
-        casual_leaves: number;
-      };
-    }
-    interface Leaves {
-      start_date: string;
-      end_date: string;
-      leave_type:
-        | "casual_leave"
-        | "paid_leave"
-        | "sick_leave"
-        | "paternity_leave"
-        | "unpaid_leave";
-    }
-
-    interface EmployeeProjectAssignment {
-      position: string;
-      department: string;
-      start_date?: string;
-    }
-
-    interface EmployeeStatutoryDetails {
-      pf_number: string;
-      esic_number: string;
-      uan_number: string;
-    }
-
-    interface EmployeeAttendance {
-      working_days: number;
-      absents: number;
-    }
-
     interface EmployeeEarningsOrDeductions {
       name: string;
       amount: number;
     }
 
-    interface EmployeeData {
-      first_name: string;
-      middle_name: string;
-      last_name: string;
-      employee_code: string;
-    }
-    interface BankDetails {
-      bank_name: string;
-      account_number: number;
-    }
+    const employeeData: any[] = data.payrollDataAndOthers.map((emp: any) => {
+      const earnings: EmployeeEarningsOrDeductions[] = [];
+      const deductions: EmployeeEarningsOrDeductions[] = [];
 
-    interface TransformedEmployeeData {
-      employeeData: EmployeeData;
-      employeeProjectAssignmentData: EmployeeProjectAssignment;
-      employeeStatutoryDetails: EmployeeStatutoryDetails;
-      attendance: EmployeeAttendance;
-      earnings: EmployeeEarningsOrDeductions[];
-      deductions: EmployeeEarningsOrDeductions[];
-      bankDetails: BankDetails;
-    }
+      for (const entry of emp.salary_entries.salary_field_values) {
+        const entryItem: EmployeeEarningsOrDeductions = {
+          name: entry.payroll_fields.name,
+          amount: entry.amount,
+        };
 
-    const attendanceData =
-      data?.payrollDataAndOthers[0].salary_entries[0] || {};
-
-    const employeeData: TransformedEmployeeData[] =
-      data.payrollDataAndOthers.map(
-        (emp: {
-          first_name: string;
-          middle_name: string;
-          last_name: string;
-          employee_code: string;
-          employee_project_assignment?: EmployeeProjectAssignment;
-          employee_statutory_details?: EmployeeStatutoryDetails;
-          salary_entries: SalaryEntry[];
-          leaves: Leaves[];
-          employee_bank_details: BankDetails;
-        }) => {
-          const earnings: EmployeeEarningsOrDeductions[] = [];
-          const deductions: EmployeeEarningsOrDeductions[] = [];
-
-          for (const entry of emp.salary_entries) {
-            const entryItem: EmployeeEarningsOrDeductions = {
-              name: entry.field_name,
-              amount: entry.amount,
-            };
-
-            if (entry.type === "earning") {
-              earnings.push(entryItem);
-            } else if (entry.type === "deduction") {
-              deductions.push(entryItem);
-            }
-          }
-
-          return {
-            employeeData: {
-              first_name: emp?.first_name,
-              middle_name: emp?.middle_name,
-              last_name: emp?.last_name,
-              employee_code: emp?.employee_code,
-            },
-            employeeProjectAssignmentData: {
-              position: emp?.employee_project_assignment?.position || "",
-              department: emp?.employee_project_assignment?.department || "",
-              date_of_joining:
-                emp.employee_project_assignment?.start_date || "",
-            },
-            employeeStatutoryDetails: {
-              pf_number: emp.employee_statutory_details?.pf_number || "",
-              esic_number: emp.employee_statutory_details?.esic_number || "",
-              uan_number: emp.employee_statutory_details?.uan_number || "",
-            },
-            attendance: {
-              working_days:
-                emp?.salary_entries[0]?.monthly_attendance.working_days ?? 0,
-              weekly_off: 5,
-              paid_holidays:
-                emp?.salary_entries[0]?.monthly_attendance.paid_holidays ?? 0,
-              paid_days:
-                emp?.salary_entries[0]?.monthly_attendance.present_days,
-              paid_leaves:
-                emp?.salary_entries[0]?.monthly_attendance.paid_leaves ?? 0,
-              casual_leaves:
-                emp?.salary_entries[0]?.monthly_attendance.casual_leaves ?? 0,
-              absents:
-                emp?.salary_entries[0]?.monthly_attendance.absent_days ?? 0,
-            },
-            bankDetails: {
-              bank: emp.employee_bank_details?.bank_name,
-              account_number: emp.employee_bank_details?.account_number,
-            },
-            earnings,
-            deductions,
-          };
+        if (entry.payroll_fields?.type === "earning") {
+          earnings.push(entryItem);
+        } else if (entry.payroll_fields?.type === "deduction") {
+          deductions.push(entryItem);
         }
-      );
+      }
+
+      return {
+        employeeData: {
+          first_name: emp?.employee?.first_name,
+          middle_name: emp?.employee?.middle_name,
+          last_name: emp?.employee?.last_name,
+          employee_code: emp?.employee?.employee_code,
+        },
+        employeeProjectAssignmentData: {
+          position: emp?.employee?.employee_project_assignment?.position || "",
+          department:
+            emp?.employee?.employee_project_assignment?.department || "",
+          date_of_joining:
+            emp.employee?.employee_project_assignment?.start_date || "",
+        },
+        employeeStatutoryDetails: {
+          pf_number: emp.employee?.employee_statutory_details?.pf_number || "",
+          esic_number:
+            emp.employee?.employee_statutory_details?.esic_number || "",
+          uan_number:
+            emp.employee?.employee_statutory_details?.uan_number || "",
+        },
+        attendance: {
+          working_days: emp?.working_days ?? 0,
+          weekly_off: 5,
+          paid_holidays: emp?.paid_holidays ?? 0,
+          paid_days: emp?.present_days,
+          paid_leaves: emp?.paid_leaves ?? 0,
+          casual_leaves: emp?.casual_leaves ?? 0,
+          absents: emp?.absent_days ?? 0,
+        },
+        bankDetails: {
+          bank: emp.employee?.employee_bank_details?.bank_name,
+          account_number: emp.employee?.employee_bank_details?.account_number,
+        },
+        earnings,
+        deductions,
+      };
+    });
 
     return {
-      month: getMonthNameFromNumber(attendanceData?.monthly_attendance.month),
-      year: attendanceData?.monthly_attendance.year,
+      month: getMonthNameFromNumber(data.payrollDataAndOthers[0]?.month),
+      year: data.payrollDataAndOthers[0]?.year,
       companyData,
       employeeData,
     };
