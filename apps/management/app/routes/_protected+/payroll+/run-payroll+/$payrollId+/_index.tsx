@@ -5,7 +5,6 @@ import { ImportDepartmentSalaryPayrollModal } from "@/components/payroll/import-
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import {
-  clearCacheEntry,
   clearExactCacheEntry,
   clientCaching,
 } from "@/utils/cache";
@@ -150,7 +149,7 @@ export default function RunPayrollId() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
-        clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
         clearExactCacheEntry(cacheKeyPrefix.payroll_history);
         toast({
           title: "Success",
@@ -173,7 +172,7 @@ export default function RunPayrollId() {
   }, [actionData]);
 
   if (!payrollData) {
-    clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
     return (
       <ErrorBoundary
         error={null}
@@ -188,7 +187,7 @@ export default function RunPayrollId() {
         <Await resolve={salaryEntriesPromise}>
           {({ data, error }) => {
             if (error || !data) {
-              clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+              clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
               return (
                 <ErrorBoundary
                   error={error}

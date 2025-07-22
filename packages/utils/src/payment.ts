@@ -28,9 +28,9 @@ export function getSelectedPaymentComponentFromField<
   field: T | undefined | null;
   monthlyCtc: number;
   priortizedComponent?:
-    | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
-    | null
-    | undefined;
+  | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
+  | null
+  | undefined;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
     "created_at" | "updated_at"
@@ -347,16 +347,75 @@ export function calculateSalaryTotalNetAmount(
 
 
 export const calculateNetAmountAfterEntryCreated = (employee: any): number => {
-    let gross = 0;
-    let deductions = 0;
+  let gross = 0;
+  let deductions = 0;
 
-    for (const entry of employee.salary_entries.salary_field_values) {
+  for (const entry of employee.salary_entries.salary_field_values) {
+    const amount = entry.amount ?? 0;
+    const type = entry.payroll_fields?.type;
+
+    if (type === "earning") gross += amount;
+    else if (type === "deduction") deductions += amount;
+  }
+
+  return gross - deductions;
+};
+
+export const calculateFieldTotalsWithNetPay = (
+  employees: any[]
+): Record<string, { amount: number; type: string } | number> => {
+  const fieldTotals: Record<string, { amount: number; type: string }> = {};
+  let gross = 0;
+  let deductions = 0;
+
+  for (const employee of employees) {
+    const fieldValues = employee.salary_entries?.salary_field_values ?? [];
+
+    for (const entry of fieldValues) {
       const amount = entry.amount ?? 0;
-      const type = entry.payroll_fields?.type;
+      const fieldName = entry.payroll_fields.name;
+      const fieldType = entry.payroll_fields.type;
 
-      if (type === "earning") gross += amount;
-      else if (type === "deduction") deductions += amount;
+      if (!fieldTotals[fieldName]) {
+        fieldTotals[fieldName] = { amount: 0, type: fieldType };
+      }
+      fieldTotals[fieldName].amount += amount;
+
+      if (fieldType === "earning") {
+        gross += amount;
+      } else if (fieldType === "deduction") {
+        deductions += amount;
+      }
     }
+  }
 
-    return gross - deductions;
+  return {
+    ...fieldTotals,
+    GROSS: gross,
+    DEDUCTION: deductions,
+    TOTAL: gross - deductions,
   };
+};
+
+export const getUniqueFields = (data: any[]): string[] => {
+  const fieldMap = new Map<string, string>();
+
+  for (const emp of data) {
+    const fieldValues = emp.salary_entries?.salary_field_values ?? [];
+    for (const entry of fieldValues) {
+      const name = entry.payroll_fields.name;
+      const type = entry.payroll_fields.type;
+      if (!fieldMap.has(name)) {
+        fieldMap.set(name, type);
+      }
+    }
+  }
+
+  return Array.from(fieldMap.entries())
+    .sort((a, b) => {
+      if (a[1] === "earning" && b[1] === "deduction") return -1;
+      if (a[1] === "deduction" && b[1] === "earning") return 1;
+      return 0;
+    })
+    .map(([name]) => name);
+};

@@ -3,6 +3,11 @@
   "compilerOptions": {
     "noImplicitAny": false
   },
-  "include": ["."],
-  "exclude": ["node_modules"]
+  "include": [
+    ".",
+    "../../apps/management/app/utils/hooks/salary-data.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
