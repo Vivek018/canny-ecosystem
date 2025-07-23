@@ -5,7 +5,6 @@ import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
-
 interface FilterControlsProps {
   searchString: string;
   onSearchChange: (value: string) => void;
