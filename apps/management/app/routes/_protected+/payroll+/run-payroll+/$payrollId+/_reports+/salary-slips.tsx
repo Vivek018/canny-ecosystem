@@ -42,7 +42,7 @@ import { useSalaryEntriesStore } from "@/store/salary-entries";
 // Define styles for PDF
 const styles = StyleSheet.create({
   page: {
-    padding: "20 10",
+    padding: "10 10",
     fontFamily: "Helvetica",
     fontSize: 8,
     backgroundColor: "#FFFFFF",
@@ -171,11 +171,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                       {data?.companyData?.name}
                     </Text>
                     <Text style={styles.companyAddress}>
-                      {`${data?.companyData?.address_line_1 || ""}, ${
-                        data?.companyData?.address_line_2 || ""
-                      }, ${data?.companyData?.city}, ${
-                        data?.companyData?.state
-                      }, ${data?.companyData?.pincode}`}
+                      {`${emp?.employeeProjectAssignmentData?.salary_location.address_line_1 ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.address_line_1 ?? data?.companyData?.address_line_1}, ${emp?.employeeProjectAssignmentData?.salary_location.address_line_2 ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.address_line_2 ?? data?.companyData?.address_line_2}, ${emp?.employeeProjectAssignmentData?.salary_location.city ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.city ?? data?.companyData?.city}, ${emp?.employeeProjectAssignmentData?.salary_location.state ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.state ?? data?.companyData?.state}, ${emp?.employeeProjectAssignmentData?.salary_location.pincode ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.pincode ?? data?.companyData?.pincode}`}
                     </Text>
                   </View>
                   <View style={{ flex: 1 }}>
@@ -467,12 +463,15 @@ export default function SalarySlips() {
   const { data, payrollId } = useLoaderData<typeof loader>();
   const { selectedRows } = useSalaryEntriesStore();
 
+  const selectedIds = new Set(selectedRows.map((emp: any) => emp.employee?.id));
+
   const updatedData = {
     ...data,
-    payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1: any) =>
-      selectedRows.some((emp2: any) => emp2.employee.id === emp1.employee.id)
-    ),
+    payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp: any) => {
+      return selectedIds.has(emp.employee?.id);
+    }),
   };
+
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
@@ -529,6 +528,32 @@ export default function SalarySlips() {
           salary_entry_site: emp?.salary_entries?.site?.name,
           salary_entry_department: emp?.salary_entries?.department?.name,
           salary_entry_site_project: emp?.salary_entries?.site?.projects?.name,
+
+          salary_location: {
+            address_line_1:
+              emp?.salary_entries?.site?.company_locations?.address_line_1,
+            address_line_2:
+              emp?.salary_entries?.site?.company_locations?.address_line_2,
+            city: emp?.salary_entries?.site?.company_locations?.city,
+            state: emp?.salary_entries?.site?.company_locations?.state,
+            pincode: emp?.salary_entries?.site?.company_locations?.pincode,
+          },
+          project_assignment_location: {
+            address_line_1:
+              emp?.employee?.employee_project_assignment?.sites
+                ?.company_locations?.address_line_1,
+            address_line_2:
+              emp?.employee?.employee_project_assignment?.sites
+                ?.company_locations?.address_line_2,
+            city: emp?.employee?.employee_project_assignment?.sites
+              ?.company_locations?.city,
+            state:
+              emp?.employee?.employee_project_assignment?.sites
+                ?.company_locations?.state,
+            pincode:
+              emp?.employee?.employee_project_assignment?.sites
+                ?.company_locations?.pincode,
+          },
         },
         employeeStatutoryDetails: {
           pf_number: emp.employee?.employee_statutory_details?.pf_number || "",

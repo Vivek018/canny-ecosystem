@@ -56,6 +56,7 @@ export const salaryEntryColumns = ({
       id: "employee_code",
       accessorKey: "employee_code",
       header: "Employee Code",
+      accessorFn: (row) => row.employee.employee_code,
       sortingFn: (a, b) =>
         String(a.getValue("employee_code") ?? "").localeCompare(
           String(b.getValue("employee_code") ?? "")
@@ -87,9 +88,13 @@ export const salaryEntryColumns = ({
       ),
     },
     {
-      enableSorting: false,
       accessorKey: "site",
       header: "Site",
+      accessorFn: (row) => row.salary_entries?.site?.name,
+      sortingFn: (a, b) =>
+        String(a.getValue("site") ?? "").localeCompare(
+          String(b.getValue("site") ?? "")
+        ),
       cell: ({ row }) => {
         return (
           <SalaryEntrySiteDepartmentSheet
@@ -98,6 +103,7 @@ export const salaryEntryColumns = ({
                 {row.original.salary_entries?.site?.name ?? "--"}
               </p>
             }
+            editable={editable}
             allSiteOptions={allSiteOptions}
             allDepartmentOptions={allDepartmentOptions}
             salaryEntry={row.original.salary_entries}
@@ -108,9 +114,13 @@ export const salaryEntryColumns = ({
       },
     },
     {
-      enableSorting: false,
       accessorKey: "department",
       header: "Department",
+      accessorFn: (row) => row.salary_entries?.department?.name,
+      sortingFn: (a, b) =>
+        String(a.getValue("department") ?? "").localeCompare(
+          String(b.getValue("department") ?? "")
+        ),
       cell: ({ row }) => {
         return (
           <SalaryEntrySiteDepartmentSheet
@@ -119,6 +129,7 @@ export const salaryEntryColumns = ({
                 {row.original.salary_entries?.department?.name ?? "--"}
               </p>
             }
+            editable={editable}
             allSiteOptions={allSiteOptions}
             allDepartmentOptions={allDepartmentOptions}
             salaryEntry={row.original.salary_entries}

@@ -45,7 +45,7 @@ export function SalaryPayrollImportData({
   const handleFinalImport = async () => {
     const importEntries = importData.data! as any[];
 
-    const siteNames = importEntries.map((value) => value.site);
+    const siteNames = importEntries.map((value) => value?.site?.trim());
 
     const { data: sites, error: siteError } = await getSiteIdsBySiteNames({
       supabase,
@@ -54,7 +54,9 @@ export function SalaryPayrollImportData({
 
     if (siteError) throw siteError;
 
-    const departmentNames = importEntries.map((value) => value.department);
+    const departmentNames = importEntries.map((value) =>
+      value?.department?.trim()
+    );
 
     const { data: departments, error: departmentError } =
       await getDepartmentIdsByDepartmentNames({

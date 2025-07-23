@@ -232,6 +232,20 @@ type DataType = {
       salary_entry_site: string;
       salary_entry_department: string;
       salary_entry_site_project: string;
+      salary_location: {
+        address_line_1: string;
+        address_line_2: string;
+        city: string;
+        state: string;
+        pincode: string;
+      };
+      project_assignment_location: {
+        address_line_1: string;
+        address_line_2: string;
+        city: string;
+        state: string;
+        pincode: string;
+      };
     };
     employeeStatutoryDetails: EmployeeStatutoryDetailsDatabaseRow;
     earnings: { name: string; amount: number }[];
@@ -240,6 +254,13 @@ type DataType = {
 };
 
 const SalarySlipPDF = ({ data }: { data: DataType }) => {
+  const address_line_1 = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.address_line_1 ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.address_line_1 ?? data?.companyData?.address_line_1}`;
+
+  const address_line_2 = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.address_line_2 ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.address_line_2 ?? data?.companyData?.address_line_2}`;
+  const city = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.city ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.city ?? data?.companyData?.city}`;
+  const state = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.state ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.state ?? data?.companyData?.state}`;
+  const pincode = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.pincode ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.pincode ?? data?.companyData?.pincode}`;
+
   return (
     <Document title={`Salary Slip - ${formatDateTime(Date.now())}`}>
       <Page size="A4" style={styles.page}>
@@ -249,7 +270,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.companyName}>{data.companyData.name}</Text>
             <Text
               style={styles.companyAddress}
-            >{`${data?.companyData?.address_line_1}, ${data?.companyData?.address_line_2}, ${data?.companyData?.city}, ${data.companyData?.state}, ${data?.companyData?.pincode}`}</Text>
+            >{`${address_line_1}, ${address_line_2}, ${city}, ${state}, ${pincode}`}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.companyName}>
@@ -309,37 +330,37 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Working Days</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.working_days ?? 0}
+                {data?.employee?.attendance?.working_days}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Paid Days</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.paid_days ?? 0}
+                {data?.employee?.attendance?.paid_days}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Absents</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.absents ?? 0}
+                {data?.employee?.attendance?.absents}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Overtime Hours</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.overtime_hours ?? 0}
+                {data?.employee?.attendance?.overtime_hours}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Casual Leaves</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.casual_leaves ?? 0}
+                {data?.employee?.attendance?.casual_leaves}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Paid Leaves</Text>
               <Text style={styles.workingValue}>
-                {data?.employee?.attendance?.paid_leaves ?? 0}
+                {data?.employee?.attendance?.paid_leaves}
               </Text>
             </View>
           </View>
@@ -543,6 +564,34 @@ export default function SalarySlip() {
         data?.payrollData?.salary_entries?.department?.name,
       salary_entry_site_project:
         data?.payrollData?.salary_entries?.site?.projects?.name,
+      salary_location: {
+        address_line_1:
+          data?.payrollData?.salary_entries?.site?.company_locations
+            ?.address_line_1,
+        address_line_2:
+          data?.payrollData?.salary_entries?.site?.company_locations
+            ?.address_line_2,
+        city: data?.payrollData?.salary_entries?.site?.company_locations?.city,
+        state:
+          data?.payrollData?.salary_entries?.site?.company_locations?.state,
+        pincode:
+          data?.payrollData?.salary_entries?.site?.company_locations?.pincode,
+      },
+      project_assignment_location: {
+        address_line_1:
+          data?.employeeProjectAssignmentData?.sites?.company_locations
+            ?.address_line_1,
+        address_line_2:
+          data?.employeeProjectAssignmentData?.sites?.company_locations
+            ?.address_line_2,
+        city: data?.employeeProjectAssignmentData?.sites?.company_locations
+          ?.city,
+        state:
+          data?.employeeProjectAssignmentData?.sites?.company_locations?.state,
+        pincode:
+          data?.employeeProjectAssignmentData?.sites?.company_locations
+            ?.pincode,
+      },
     };
 
     const statutoryDetails = {
@@ -593,13 +642,11 @@ export default function SalarySlip() {
         employeeStatutoryDetails: statutoryDetails,
         attendance: {
           working_days: data?.payrollData?.working_days || 0,
-          present_days: data?.payrollData?.present_days || 0,
-          working_hours: data?.payrollData?.absent_days || 0,
+          paid_days: data?.payrollData?.present_days || 0,
           overtime_hours: data?.payrollData?.overtime_hours || 0,
-          paid_holidays: data?.payrollData?.total_hours || 0,
           paid_leaves: data?.payrollData?.paid_leaves || 0,
           casual_leaves: data?.payrollData?.casual_leaves || 0,
-          absent_days: data?.payrollData?.absent_days || 0,
+          absents: data?.payrollData?.absent_days || 0,
         },
         earnings,
         deductions,

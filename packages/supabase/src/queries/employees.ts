@@ -110,15 +110,16 @@ export async function getEmployeesByCompanyId({
     dol_end,
   } = filters ?? {};
 
-  const foreignFilters = project
-    || site
-    || assignment_type
-    || position
-    || skill_level
-    || doj_start
-    || doj_end
-    || dol_start
-    || dol_end;
+  const foreignFilters =
+    project ||
+    site ||
+    assignment_type ||
+    position ||
+    skill_level ||
+    doj_start ||
+    doj_end ||
+    dol_start ||
+    dol_end;
 
   const columns = [
     "id",
@@ -137,11 +138,13 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          foreignFilters ? "inner" : "left"
+        }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
-      }(id, name))
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+          foreignFilters ? "inner" : "left"
+        }(id, name))
       )`,
       { count: "exact" }
     )
@@ -187,10 +190,7 @@ export async function getEmployeesByCompanyId({
     query.eq("education", education.toLowerCase());
   }
   if (project) {
-    query.eq(
-      "employee_project_assignment.sites.projects.name",
-      project
-    );
+    query.eq("employee_project_assignment.sites.projects.name", project);
   }
   if (site) {
     query.eq("employee_project_assignment.sites.name", site);
@@ -889,7 +889,7 @@ export type EmployeeProjectAssignmentDataType = Omit<
     name: string;
     projects: { id: string; name: string };
   };
-}
+};
 
 export async function getEmployeeProjectAssignmentByEmployeeId({
   supabase,
@@ -912,7 +912,9 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
 
   const { data, error } = await supabase
     .from("employee_project_assignment")
-    .select(`${columns.join(",")}, sites(id, name, projects(name))`)
+    .select(
+      `${columns.join(",")}, sites(id, name, projects(name),company_locations!left(address_line_1,address_line_2,city,state,pincode))`
+    )
 
     .eq("employee_id", employeeId)
     .maybeSingle<EmployeeProjectAssignmentDataType>();
@@ -971,14 +973,8 @@ export async function getEmployeesReportByCompanyId({
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
-  const {
-    project,
-    site,
-    start_year,
-    start_month,
-    end_year,
-    end_month,
-  } = filters ?? {};
+  const { project, site, start_year, start_month, end_year, end_month } =
+    filters ?? {};
   const foreignFilters = project || site;
 
   const columns = [
@@ -993,10 +989,12 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
-      }(id, name))
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          foreignFilters ? "inner" : "left"
+        }(employee_id, assignment_type, skill_level, position, start_date, end_date,
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+          foreignFilters ? "inner" : "left"
+        }(id, name))
       )`,
       { count: "exact" }
     )
@@ -1053,10 +1051,7 @@ export async function getEmployeesReportByCompanyId({
   }
 
   if (project) {
-    query.eq(
-      "employee_project_assignment.sites.projects.name",
-      project
-    );
+    query.eq("employee_project_assignment.sites.projects.name", project);
   }
   if (site) {
     query.eq("employee_project_assignment.sites.name", site);
@@ -1268,11 +1263,12 @@ export async function getSiteIdByEmployeeId({
     )
     .order("created_at", { ascending: false })
     .eq("id", employeeId)
-    .single<Pick<EmployeeDatabaseRow, "id"> & {
-      employee_project_assignment: {
-        site: SiteDatabaseRow["id"];
-      };
-    }
+    .single<
+      Pick<EmployeeDatabaseRow, "id"> & {
+        employee_project_assignment: {
+          site: SiteDatabaseRow["id"];
+        };
+      }
     >();
 
   if (error) {

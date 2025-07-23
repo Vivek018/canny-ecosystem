@@ -30,9 +30,11 @@ export function SalaryEntrySiteDepartmentSheet({
   payrollId,
   allDepartmentOptions,
   allSiteOptions,
+  editable,
 }: {
   triggerChild: React.ReactNode;
   salaryEntry: any;
+  editable: boolean;
   employee: EmployeeDatabaseRow;
   payrollId: string;
   allSiteOptions: ComboboxSelectOption[];
@@ -108,6 +110,7 @@ export function SalaryEntrySiteDepartmentSheet({
                 options={allSiteOptions}
                 inputProps={{
                   ...getInputProps(fields.site_id, { type: "text" }),
+                  readOnly: !editable,
                 }}
                 placeholder={"Select Site"}
                 labelProps={{
@@ -121,6 +124,7 @@ export function SalaryEntrySiteDepartmentSheet({
                 options={allDepartmentOptions ?? []}
                 inputProps={{
                   ...getInputProps(fields.department_id, { type: "text" }),
+                  readOnly: !editable,
                 }}
                 placeholder={"Select Department"}
                 labelProps={{
@@ -137,6 +141,7 @@ export function SalaryEntrySiteDepartmentSheet({
               form={form}
               setResetKey={setResetKey}
               isSingle={true}
+              className={cn(!editable && "hidden")}
             />
           </SheetClose>
         </SheetFooter>

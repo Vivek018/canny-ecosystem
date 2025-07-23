@@ -293,7 +293,7 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
         payroll_id,
         site_id,
         department_id,
-        site:sites!salary_entries_site_id_fkey (name, projects!left(name)),
+        site:sites!salary_entries_site_id_fkey (name, projects!left(name),company_locations!left(address_line_1,address_line_2,city,state,pincode)),
         department:departments!salary_entries_department_id_fkey (name, sites!left(name)),
         salary_field_values!inner (
           id,
@@ -506,10 +506,10 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
         middle_name,
         last_name,
         employee_code,
-        employee_project_assignment!inner (
+        employee_project_assignment!left (
           position,
           start_date,
-          sites(name, projects(name))
+          sites(name, projects(name),company_locations!left(address_line_1,address_line_2,city,state,pincode))
         ),
         employee_statutory_details!left (
           aadhaar_number,
@@ -518,7 +518,7 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
           pf_number,
           esic_number
         ),
-        employee_bank_details (
+        employee_bank_details!left (
           account_number,
           bank_name
         )
@@ -526,8 +526,8 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
       salary_entries!inner (
         site_id,
         department_id,
-        site:sites!salary_entries_site_id_fkey (name, projects!left(name)),
-        department:departments!salary_entries_department_id_fkey (name, sites!left(name)),
+        site:sites!salary_entries_site_id_fkey!left (name, projects!left(name),company_locations!left(address_line_1,address_line_2,city,state,pincode)),
+        department:departments!salary_entries_department_id_fkey!left (name, sites!left(name)),
         salary_field_values!inner (
           amount,
           payroll_fields!inner (
@@ -683,7 +683,7 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
         middle_name,
         last_name,
         employee_code,
-        employee_project_assignment!inner (
+        employee_project_assignment!left (
           position,
           start_date
         ),
@@ -694,7 +694,7 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
           pf_number,
           esic_number
         ),
-        employee_bank_details (
+        employee_bank_details!left (
           account_number,
           bank_name
         )

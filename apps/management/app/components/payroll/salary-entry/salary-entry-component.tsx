@@ -69,7 +69,6 @@ export function SalaryEntryComponent({
   } = useSalaryData(data);
 
   // Memoize calculations
-  const displayData = selectedRows.length > 0 ? selectedRows : filteredData;
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
@@ -77,8 +76,8 @@ export function SalaryEntryComponent({
   );
 
   const uniqueFields = useMemo(
-    () => getUniqueFields(displayData),
-    [displayData]
+    () => getUniqueFields(filteredData),
+    [filteredData]
   );
 
   // Memoized handlers
@@ -224,7 +223,7 @@ export function SalaryEntryComponent({
         <LoadingSpinner className="my-20" />
       ) : (
         <SalaryEntryDataTable
-          data={displayData}
+          data={filteredData}
           columns={salaryEntryColumns({
             uniqueFields,
             data,
