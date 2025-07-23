@@ -141,6 +141,18 @@ function chunkArray(array: any, size: number) {
 const SalarySlipsPDF = ({ data }: { data: DataType }) => {
   const employeeChunks = chunkArray(data.employeeData, 2);
 
+  const getFullAddress = (emp: any) => {
+    const address =
+      emp?.employeeProjectAssignmentData?.salary_location ||
+      emp?.employeeProjectAssignmentData?.project_assignment_location ||
+      data?.companyData;
+
+    if (!address) return null;
+
+    return `${address.address_line_1 ?? ''}, ${address.address_line_2 ?? ''}, ${address.city ?? ''}, ${address.state ?? ''}, ${address.pincode ?? ''}`;
+  };
+
+
   return (
     <Document>
       {employeeChunks.map((chunk, pageIndex) => (
@@ -170,9 +182,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     <Text style={styles.companyName}>
                       {data?.companyData?.name}
                     </Text>
-                    <Text style={styles.companyAddress}>
-                      {`${emp?.employeeProjectAssignmentData?.salary_location.address_line_1 ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.address_line_1 ?? data?.companyData?.address_line_1}, ${emp?.employeeProjectAssignmentData?.salary_location.address_line_2 ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.address_line_2 ?? data?.companyData?.address_line_2}, ${emp?.employeeProjectAssignmentData?.salary_location.city ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.city ?? data?.companyData?.city}, ${emp?.employeeProjectAssignmentData?.salary_location.state ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.state ?? data?.companyData?.state}, ${emp?.employeeProjectAssignmentData?.salary_location.pincode ?? emp?.employeeProjectAssignmentData?.project_assignment_location?.pincode ?? data?.companyData?.pincode}`}
-                    </Text>
+                    <Text style={styles.companyAddress}>{getFullAddress(emp)}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.companyName}>
@@ -272,12 +282,12 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         { flex: 2, textTransform: "capitalize" },
                       ]}
                     >
-                      {data.companyData.city}
+                      {emp?.employeeProjectAssignmentData?.salary_entry_site ??
+                        emp?.employeeProjectAssignmentData?.site}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>Bank</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
-                      {emp?.employeeProjectAssignmentData?.salary_entry_site ??
-                        emp?.employeeProjectAssignmentData?.site}
+                      {emp?.bankDetails?.bank}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -309,7 +319,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp.employeeProjectAssignmentData.start_date
+                          emp?.employeeProjectAssignmentData?.start_date
                         )}
                       </>
                     </Text>
@@ -595,7 +605,7 @@ export default function SalarySlips() {
   if (!isDocument) return <div>Loading...</div>;
 
   const handleOpenChange = () => {
-    navigate(`/payroll/payroll-history/${payrollId}`);
+    navigate(`/payroll/run-payroll/${payrollId}`);
   };
 
   return (

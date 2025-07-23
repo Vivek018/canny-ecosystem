@@ -254,12 +254,16 @@ type DataType = {
 };
 
 const SalarySlipPDF = ({ data }: { data: DataType }) => {
-  const address_line_1 = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.address_line_1 ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.address_line_1 ?? data?.companyData?.address_line_1}`;
+  const getFullAddress = (emp: any) => {
+    const address =
+      emp?.employeeProjectAssignmentData?.salary_location ||
+      emp?.employeeProjectAssignmentData?.project_assignment_location ||
+      data?.companyData;
 
-  const address_line_2 = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.address_line_2 ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.address_line_2 ?? data?.companyData?.address_line_2}`;
-  const city = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.city ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.city ?? data?.companyData?.city}`;
-  const state = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.state ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.state ?? data?.companyData?.state}`;
-  const pincode = `${data?.employee?.employeeProjectAssignmentData?.salary_location?.pincode ?? data?.employee?.employeeProjectAssignmentData?.project_assignment_location?.pincode ?? data?.companyData?.pincode}`;
+    if (!address) return null;
+
+    return `${address.address_line_1 ?? ''}, ${address.address_line_2 ?? ''}, ${address.city ?? ''}, ${address.state ?? ''}, ${address.pincode ?? ''}`;
+  };
 
   return (
     <Document title={`Salary Slip - ${formatDateTime(Date.now())}`}>
@@ -270,7 +274,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.companyName}>{data.companyData.name}</Text>
             <Text
               style={styles.companyAddress}
-            >{`${address_line_1}, ${address_line_2}, ${city}, ${state}, ${pincode}`}</Text>
+            >{getFullAddress(data?.employee)}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.companyName}>

@@ -67,10 +67,10 @@ export function SalaryPayrollImportData({
     if (departmentError) throw departmentError;
 
     const preData = importEntries.map((item: any) => {
-      const siteId = sites?.find((e) => e.name === item.site)?.id;
+      const siteId = sites?.find((e) => e.name.toLowerCase() === item.site.toLowerCase())?.id;
 
       const departmentId = departments?.find(
-        (u) => u.name === item.department
+        (u) => u.name.toLowerCase() === item.department.toLowerCase()
       )?.id;
 
       const { department, site, ...rest } = item;
