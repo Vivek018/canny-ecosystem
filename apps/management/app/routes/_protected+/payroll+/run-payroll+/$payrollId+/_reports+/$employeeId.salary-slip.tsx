@@ -13,7 +13,6 @@ import { Dialog, DialogContent } from "@canny_ecosystem/ui/dialog";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  type EmployeeProjectAssignmentDataType,
   getCompanyById,
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeStatutoryDetailsById,
@@ -90,11 +89,11 @@ const styles = StyleSheet.create({
   employeeName: {
     fontSize: 12,
     fontFamily: "Helvetica-Bold",
-    marginBottom: 4,
   },
   employeeId: {
     color: "#666666",
     fontSize: 9,
+    marginBottom: 10,
   },
   department: {
     textTransform: "capitalize",
@@ -225,7 +224,15 @@ type DataType = {
       absents: number;
     };
     employeeData: EmployeeDatabaseRow;
-    employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
+    employeeProjectAssignmentData: {
+      position: string;
+      start_date: string;
+      site: string;
+      project: string;
+      salary_entry_site: string;
+      salary_entry_department: string;
+      salary_entry_site_project: string;
+    };
     employeeStatutoryDetails: EmployeeStatutoryDetailsDatabaseRow;
     earnings: { name: string; amount: number }[];
     deductions: { name: string; amount: number }[];
@@ -271,17 +278,29 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
               {`${data.employee?.employeeData?.first_name} ${
                 data?.employee?.employeeData?.middle_name ?? ""
               } ${data?.employee?.employeeData.last_name}`}{" "}
-              <Text style={styles.employeeId}>
-                (Employee Code: {data?.employee?.employeeData?.employee_code})
-              </Text>
+            </Text>
+            <Text style={styles.employeeId}>
+              (Employee Code: {data?.employee?.employeeData?.employee_code})
             </Text>
             <Text style={styles.department}>
+              Designation:{" "}
               {replaceUnderscore(
                 data?.employee?.employeeProjectAssignmentData?.position
               )}
             </Text>
             <Text style={styles.department}>
-              Location: {data?.companyData?.city}
+              Location:{" "}
+              {data?.employee?.employeeProjectAssignmentData
+                ?.salary_entry_site ??
+                data?.employee?.employeeProjectAssignmentData?.site}
+            </Text>
+            <Text style={styles.department}>
+              Department:{" "}
+              {data?.employee?.employeeProjectAssignmentData
+                ?.salary_entry_department ??
+                data?.employee?.employeeProjectAssignmentData
+                  ?.salary_entry_site_project ??
+                data?.employee?.employeeProjectAssignmentData?.project}
             </Text>
           </View>
           <View style={styles.workingDetails}>
@@ -517,6 +536,13 @@ export default function SalarySlip() {
     const projectAssignment = {
       position: data?.employeeProjectAssignmentData?.position || "",
       start_date: data?.employeeProjectAssignmentData?.start_date || "",
+      site: data?.employeeProjectAssignmentData?.sites?.name || "",
+      project: data?.employeeProjectAssignmentData?.sites?.projects?.name || "",
+      salary_entry_site: data?.payrollData?.salary_entries?.site?.name,
+      salary_entry_department:
+        data?.payrollData?.salary_entries?.department?.name,
+      salary_entry_site_project:
+        data?.payrollData?.salary_entries?.site?.projects?.name,
     };
 
     const statutoryDetails = {
@@ -580,6 +606,7 @@ export default function SalarySlip() {
   }
 
   const slipData = transformData(data);
+
 
   if (!isDocument) return <div>Loading...</div>;
 

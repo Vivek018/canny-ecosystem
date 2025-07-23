@@ -239,20 +239,8 @@ export default function CreateSite({
                 }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.site_code, { type: "text" }),
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.site_code.name,
-                    )}`,
-                    className: "capitalize",
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.site_code.name),
-                  }}
-                  errors={fields.site_code.errors}
-                />
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+               
                 <SearchableSelectField
                   key={resetKey}
                   className="capitalize"

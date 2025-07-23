@@ -17,7 +17,6 @@ export async function getSitesByCompanyId({
   const columns = [
     "id",
     "name",
-    "site_code",
     "address_line_1",
     "address_line_2",
     "city",
@@ -80,7 +79,6 @@ export async function getSitesByProjectId({
   const columns = [
     "id",
     "name",
-    "site_code",
     "address_line_1",
     "address_line_2",
     "city",
@@ -146,7 +144,6 @@ export async function getSiteById({
   const columns = [
     "id",
     "name",
-    "site_code",
     "address_line_1",
     "address_line_2",
     "city",

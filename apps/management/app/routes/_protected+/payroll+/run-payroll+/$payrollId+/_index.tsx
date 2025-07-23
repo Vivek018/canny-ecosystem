@@ -4,14 +4,14 @@ import { ImportDepartmentSalaryPayrollModal } from "@/components/payroll/import-
 
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
-import {
-  clearExactCacheEntry,
-  clientCaching,
-} from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
+  getDepartmentsByCompanyId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -41,9 +41,35 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { data: allSiteData, error: siteError } =
+      await getSiteNamesByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (siteError) throw siteError;
+
+    const allSiteOptions = allSiteData?.map((siteData) => ({
+      label: siteData.name?.toLowerCase(),
+      value: siteData.id,
+      pseudoLabel: siteData?.projects?.name,
+    }));
+
+    const { data: allDepartmentData, error: departmentError } =
+      await getDepartmentsByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (departmentError) throw departmentError;
+
+    const allDepartmentOptions = allDepartmentData?.map((departmentData) => ({
+      label: departmentData.name?.toLowerCase(),
+      value: departmentData.id,
+      pseudoLabel: departmentData?.site?.name,
+    }));
 
     const { data: payrollData } = await getPayrollById({
       supabase,
@@ -58,6 +84,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollData,
       salaryEntriesPromise,
+      allSiteOptions,
+      allDepartmentOptions,
       error: null,
       env,
     });
@@ -66,6 +94,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollData: null,
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
+      allSiteOptions: [],
+      allDepartmentOptions: [],
       error,
       env: null,
     });
@@ -136,8 +166,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function RunPayrollId() {
-  const { payrollData, salaryEntriesPromise, env } =
-    useLoaderData<typeof loader>();
+  const {
+    payrollData,
+    salaryEntriesPromise,
+    env,
+    allSiteOptions,
+    allDepartmentOptions,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const navigate = useNavigate();
@@ -187,7 +222,9 @@ export default function RunPayrollId() {
         <Await resolve={salaryEntriesPromise}>
           {({ data, error }) => {
             if (error || !data) {
-              clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+              );
               return (
                 <ErrorBoundary
                   error={error}
@@ -201,6 +238,8 @@ export default function RunPayrollId() {
                 payrollData={payrollData as any}
                 data={data as any}
                 env={env as SupabaseEnv}
+                allSiteOptions={allSiteOptions ?? []}
+                allDepartmentOptions={allDepartmentOptions ?? []}
                 fromWhere="runpayroll"
               />
             );

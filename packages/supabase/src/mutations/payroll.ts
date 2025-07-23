@@ -5,6 +5,7 @@ import type {
   PayrollFieldsDatabaseRow,
   PayrollFieldsDatabaseUpdate,
   SalaryEntriesDatabaseInsert,
+  SalaryEntriesDatabaseUpdate,
   SalaryFieldValuesDatabaseInsert,
   SalaryFieldValuesDatabaseUpdate,
   TypedSupabaseClient,
@@ -710,6 +711,38 @@ export async function updatePayrollFieldsById({
     .single();
 
   if (error) console.error("updatePayrollFieldsById Error:", error);
+
+  return { error, status };
+}
+
+
+export async function updateSalaryEntryById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: SalaryEntriesDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("salary_entries")
+    .update(updateData)
+    .eq("id", data.id ?? "")
+    .single();
+
+  if (error) console.error("updateSalaryEntryById Error:", error);
 
   return { error, status };
 }

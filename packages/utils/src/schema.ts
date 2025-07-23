@@ -74,17 +74,17 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-          "application/zip",
-          "application/x-zip-compressed",
-          "multipart/x-zip",
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+            "application/zip",
+            "application/x-zip-compressed",
+            "multipart/x-zip",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .zip formats are supported."
   );
@@ -188,7 +188,6 @@ export const statusArray = [
 export const ProjectSchema = z.object({
   id: z.string().optional(),
   name: zNumberString.min(3),
-  project_code: zNumberString.min(3).max(20),
   project_type: zNumberString.min(3).max(50),
   description: zTextArea.optional(),
   company_id: z.string(),
@@ -201,7 +200,6 @@ export const ProjectSchema = z.object({
 export const SiteSchema = z.object({
   id: z.string().optional(),
   name: zString.min(3).max(50),
-  site_code: zNumberString.min(3).max(20),
   company_location_id: z.string(),
   is_active: z.boolean().default(false),
   address_line_1: z
@@ -1299,6 +1297,12 @@ export const SalaryEntrySchema = z.object({
   amount: z.number(),
 });
 
+export const SalaryEntrySiteDepartmentSchema = z.object({
+  id: z.string().optional(),
+  site_id: z.string().optional(),
+  department_id: z.string().optional(),
+});
+
 // Exits
 export const exitReasonArray = [
   "Resignation",
@@ -1410,8 +1414,7 @@ export const AttendanceSchema = z.object({
   working_days: z.number().min(0).max(31).default(26),
   present_days: z.number().min(0).max(31).default(26),
   overtime_hours: z.number().default(0),
-  absent_days: z.number().min(0).max(31).optional
-  (),
+  absent_days: z.number().min(0).max(31).optional(),
   working_hours: z.number().default(0),
   paid_holidays: z.number().min(0).max(31).optional(),
   paid_leaves: z.number().min(0).max(31).optional(),
@@ -1910,5 +1913,5 @@ export const DepartmentsSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(3),
   site_id: z.string().optional(),
-  company_id: z.string()
+  company_id: z.string(),
 });

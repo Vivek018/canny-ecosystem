@@ -35,7 +35,6 @@ export function SitesWrapper({
             key={site?.id}
             value={
               site?.name +
-              site?.site_code +
               site?.company_location?.name +
               site?.project?.name +
               site?.company_id +

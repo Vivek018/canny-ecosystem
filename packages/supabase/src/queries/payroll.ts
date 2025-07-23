@@ -293,6 +293,8 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
         payroll_id,
         site_id,
         department_id,
+        site:sites!salary_entries_site_id_fkey (name, projects!left(name)),
+        department:departments!salary_entries_department_id_fkey (name, sites!left(name)),
         salary_field_values!inner (
           id,
           amount,
@@ -506,7 +508,8 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
         employee_code,
         employee_project_assignment!inner (
           position,
-          start_date
+          start_date,
+          sites(name, projects(name))
         ),
         employee_statutory_details!left (
           aadhaar_number,
@@ -523,6 +526,8 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
       salary_entries!inner (
         site_id,
         department_id,
+        site:sites!salary_entries_site_id_fkey (name, projects!left(name)),
+        department:departments!salary_entries_department_id_fkey (name, sites!left(name)),
         salary_field_values!inner (
           amount,
           payroll_fields!inner (

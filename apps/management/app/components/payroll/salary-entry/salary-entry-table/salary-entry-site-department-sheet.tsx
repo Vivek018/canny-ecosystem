@@ -4,7 +4,7 @@ import {
   getInputProps,
   useForm,
 } from "@conform-to/react";
-import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
+import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { Form } from "@remix-run/react";
 import {
   Sheet,
@@ -18,58 +18,46 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../../../form/form-buttons";
-import {
-  componentTypeArray,
-  replaceUnderscore,
-  SalaryEntrySchema,
-  transformStringArrayIntoOptions,
-} from "@canny_ecosystem/utils";
+import { SalaryEntrySiteDepartmentSchema } from "@canny_ecosystem/utils";
 import { useState } from "react";
 import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
-export function SalaryEntrySheet({
+export function SalaryEntrySiteDepartmentSheet({
   triggerChild,
   salaryEntry,
   employee,
-  editable,
   payrollId,
+  allDepartmentOptions,
+  allSiteOptions,
 }: {
   triggerChild: React.ReactNode;
   salaryEntry: any;
   employee: EmployeeDatabaseRow;
-  editable: boolean;
   payrollId: string;
+  allSiteOptions: ComboboxSelectOption[];
+  allDepartmentOptions: ComboboxSelectOption[];
 }) {
   const name = `${employee?.first_name} ${employee?.middle_name ?? ""} ${
     employee?.last_name ?? ""
   }`;
 
   const [resetKey, setResetKey] = useState(Date.now());
-  const typeOptions = transformStringArrayIntoOptions(
-    componentTypeArray as unknown as string[]
-  );
-
-  const formattedDefaultValue = {
-    amount: salaryEntry?.amount,
-    name: salaryEntry?.payroll_fields?.name,
-    type:
-      typeOptions.find((opt) => opt.value === salaryEntry?.payroll_fields?.type)
-        ?.value ?? "",
-  };
 
   const [form, fields] = useForm({
     id: "UPDATE_SALARY_ENTRY",
-    constraint: getZodConstraint(SalaryEntrySchema),
+    constraint: getZodConstraint(SalaryEntrySiteDepartmentSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: SalaryEntrySchema });
+      return parseWithZod(formData, {
+        schema: SalaryEntrySiteDepartmentSchema,
+      });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...formattedDefaultValue,
-      salaryFieldValues_id: salaryEntry?.id,
-      payrollFields_id: salaryEntry?.payroll_fields?.id,
-      payroll_id: payrollId,
+      id: salaryEntry?.id, //
+      site_id: salaryEntry?.site_id ?? "",
+      department_id: salaryEntry?.department_id ?? "",
     },
   });
 
@@ -99,11 +87,6 @@ export function SalaryEntrySheet({
                 Employee Code: {employee?.employee_code ?? "--"}
               </h4>
             </div>
-
-            <div className="flex flex-col items-end justify-around">
-              <h2 className="text-xl text-muted-foreground">Net Pay</h2>
-              <p className="font-bold">Rs {salaryEntry?.amount}</p>
-            </div>
           </SheetTitle>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-6 pb-6">
@@ -112,60 +95,38 @@ export function SalaryEntrySheet({
               method="POST"
               {...getFormProps(form)}
               className="flex flex-col"
-              action={`/payroll/run-payroll/${payrollId}/${salaryEntry?.id}/update-salary-entry-values`}
+              action={`/payroll/run-payroll/${payrollId}/${salaryEntry?.id}/update-salary-entry`}
             >
               <input
-                {...getInputProps(fields.salaryFieldValues_id, {
+                {...getInputProps(fields.id, {
                   type: "hidden",
                 })}
-              />
-              <input
-                {...getInputProps(fields.payrollFields_id, { type: "hidden" })}
-              />
-              <input
-                {...getInputProps(fields.payroll_id, { type: "hidden" })}
-              />
-
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.name, { type: "text" }),
-                  placeholder: "Enter field name",
-                  className: "capitalize",
-                  readOnly: !editable,
-                }}
-                labelProps={{
-                  children: "Field Name",
-                }}
-                errors={fields.name.errors}
-              />
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.amount, { type: "number" }),
-                  autoFocus: true,
-                  placeholder: "Enter amount",
-                  className: "capitalize",
-                  readOnly: !editable,
-                }}
-                labelProps={{
-                  children: "Amount",
-                }}
-                errors={fields.amount.errors}
               />
               <SearchableSelectField
                 key={resetKey + 1}
                 className="capitalize"
-                options={transformStringArrayIntoOptions(
-                  componentTypeArray as unknown as string[]
-                )}
+                options={allSiteOptions}
                 inputProps={{
-                  ...getInputProps(fields.type, { type: "text" }),
-                  readOnly: !editable,
+                  ...getInputProps(fields.site_id, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.type.name)}`}
+                placeholder={"Select Site"}
                 labelProps={{
-                  children: replaceUnderscore(fields.type.name),
+                  children: "Site",
                 }}
-                errors={fields.type.errors}
+                errors={fields.site_id.errors}
+              />
+              <SearchableSelectField
+                key={resetKey + 1}
+                className="capitalize"
+                options={allDepartmentOptions ?? []}
+                inputProps={{
+                  ...getInputProps(fields.department_id, { type: "text" }),
+                }}
+                placeholder={"Select Department"}
+                labelProps={{
+                  children: "Department",
+                }}
+                errors={fields.department_id.errors}
               />
             </Form>
           </FormProvider>
@@ -176,7 +137,6 @@ export function SalaryEntrySheet({
               form={form}
               setResetKey={setResetKey}
               isSingle={true}
-              className={cn(!editable && "hidden")}
             />
           </SheetClose>
         </SheetFooter>

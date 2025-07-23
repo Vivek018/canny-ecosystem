@@ -14,7 +14,7 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { getMonthName } from "@canny_ecosystem/utils";
+import { getMonthName, roundToNearest } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
 export default function SalaryInfoCard({
@@ -22,7 +22,6 @@ export default function SalaryInfoCard({
 }: {
   salaryData: GroupedPayrollEntry;
 }) {
-
   let earningTotal = 0;
   let deductionTotal = 0;
 
@@ -30,9 +29,7 @@ export default function SalaryInfoCard({
     const item = salaryData?.fields[key];
     if (item.type === "earning") {
       earningTotal += item.amount;
-    } else if (
-      item.type === "deduction"
-    ) {
+    } else if (item.type === "deduction") {
       deductionTotal += item.amount;
     }
   }
@@ -95,7 +92,7 @@ export default function SalaryInfoCard({
           <div className="w-full flex justify-between ">
             <span className="font-bold">Net Amount</span>
             <span className="font-medium text-muted-foreground">
-              ₹ {earningTotal - deductionTotal}
+              ₹ {roundToNearest(earningTotal - deductionTotal)}
             </span>
           </div>
         </div>
@@ -116,7 +113,9 @@ export default function SalaryInfoCard({
 
           <div className="flex justify-between py-0.5 text-xs">
             <span>Gross</span>
-            <span className="font-semibold">₹ {earningTotal}</span>
+            <span className="font-semibold">
+              ₹ {roundToNearest(earningTotal)}
+            </span>
           </div>
         </div>
         <div className="flex flex-col">
@@ -125,10 +124,7 @@ export default function SalaryInfoCard({
           </h2>
           <hr className="pb-1" />
           {Object.entries(salaryData?.fields)
-            .filter(
-              ([, value]) =>
-                value.type === "deduction"
-            )
+            .filter(([, value]) => value.type === "deduction")
             .map(([key, value]) => (
               <div key={key} className="flex justify-between py-0.5 text-xs">
                 <span>{key}</span>
@@ -138,7 +134,9 @@ export default function SalaryInfoCard({
           <hr className="my-1" />
           <div className="flex justify-between py-0.5 text-xs">
             <span>Deduction</span>
-            <span className="font-semibold">₹ {deductionTotal}</span>
+            <span className="font-semibold">
+              ₹ {roundToNearest(deductionTotal)}
+            </span>
           </div>
         </div>
       </CardContent>

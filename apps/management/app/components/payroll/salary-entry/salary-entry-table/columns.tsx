@@ -17,15 +17,21 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { SalaryEntryDropdown } from "../salary-entry-dropdown";
 import { SalaryEntrySheet } from "./salary-entry-sheet";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
+import { SalaryEntrySiteDepartmentSheet } from "./salary-entry-site-department-sheet";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const salaryEntryColumns = ({
   data,
   editable = false,
   uniqueFields,
+  allDepartmentOptions,
+  allSiteOptions,
 }: {
   data: any;
   editable?: boolean;
   uniqueFields: string[];
+  allSiteOptions: ComboboxSelectOption[];
+  allDepartmentOptions: ComboboxSelectOption[];
 }): ColumnDef<any>[] => {
   return [
     {
@@ -86,9 +92,18 @@ export const salaryEntryColumns = ({
       header: "Site",
       cell: ({ row }) => {
         return (
-          <p className="truncate ">
-            {row.original.salary_entries?.site?.name ?? "--"}
-          </p>
+          <SalaryEntrySiteDepartmentSheet
+            triggerChild={
+              <p className="truncate ">
+                {row.original.salary_entries?.site?.name ?? "--"}
+              </p>
+            }
+            allSiteOptions={allSiteOptions}
+            allDepartmentOptions={allDepartmentOptions}
+            salaryEntry={row.original.salary_entries}
+            employee={row.original.employee}
+            payrollId={row.original.salary_entries.payroll_id}
+          />
         );
       },
     },
@@ -98,9 +113,18 @@ export const salaryEntryColumns = ({
       header: "Department",
       cell: ({ row }) => {
         return (
-          <p className="truncate ">
-            {row.original.salary_entries?.department?.name ?? "--"}
-          </p>
+          <SalaryEntrySiteDepartmentSheet
+            triggerChild={
+              <p className="truncate ">
+                {row.original.salary_entries?.department?.name ?? "--"}
+              </p>
+            }
+            allSiteOptions={allSiteOptions}
+            allDepartmentOptions={allDepartmentOptions}
+            salaryEntry={row.original.salary_entries}
+            employee={row.original.employee}
+            payrollId={row.original.salary_entries.payroll_id}
+          />
         );
       },
     },

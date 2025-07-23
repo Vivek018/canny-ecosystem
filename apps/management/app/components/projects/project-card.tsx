@@ -7,7 +7,13 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { Link } from "@remix-run/react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   formatDate,
@@ -38,9 +44,12 @@ export function ProjectCard({
             {replaceUnderscore(project.name ?? "")}
           </CardTitle>
           <div className="flex gap-1.5">
-            <div className="text-[10px] font-light px-1.5 bg-muted text-muted-foreground rounded-sm">{project.project_code}</div>
-            <div className="text-[10px] font-light px-1.5 bg-muted-foreground text-muted rounded-sm">{project.project_type}</div>
-            <div className="text-[10px] font-light px-1.5 bg-muted text-muted-foreground rounded-sm">{project.status}</div>
+            <div className="text-[10px] font-light px-1.5 bg-muted-foreground text-muted rounded-sm">
+              {project.project_type}
+            </div>
+            <div className="text-[10px] font-light px-1.5 bg-muted text-muted-foreground rounded-sm">
+              {project.status}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -54,8 +63,8 @@ export function ProjectCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.projects}`,
-                    ) && "hidden",
+                      `${updateRole}:${attribute.projects}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -64,27 +73,28 @@ export function ProjectCard({
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <ProjectOptionsDropdown project={project} triggerChild={
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
-              <Icon name="dots-vertical" size="xs" />
-            </DropdownMenuTrigger>
-          } />
+          <ProjectOptionsDropdown
+            project={project}
+            triggerChild={
+              <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
+                <Icon name="dots-vertical" size="xs" />
+              </DropdownMenuTrigger>
+            }
+          />
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
-        <div className="line-clamp-3">
-        {project.description}
-        </div>
+        <div className="line-clamp-3">{project.description}</div>
       </CardContent>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold"
         )}
       >
         <p
           className={cn(
             "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
-            !formatDate(project.start_date) && "hidden",
+            !formatDate(project.start_date) && "hidden"
           )}
         >
           <Icon name="clock" size="xs" className="scale-x-[-1]" />
@@ -93,7 +103,7 @@ export function ProjectCard({
         <p
           className={cn(
             "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
-            !formatDate(project.end_date) && "hidden",
+            !formatDate(project.end_date) && "hidden"
           )}
         >
           <Icon name="clock" size="xs" />

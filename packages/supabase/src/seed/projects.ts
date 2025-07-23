@@ -7,7 +7,6 @@ export function seedProject(): Omit<
 > {
   return {
     name: faker.string.alphanumeric(10),
-    project_code: faker.string.sample(5),
     project_type: faker.string.alpha(10),
     status: ["active", "pending", "cancelled", "completed"][
       faker.number.int({ min: 0, max: 3 })
@@ -24,7 +23,6 @@ export function seedSite(): Omit<
 > {
   return {
     name: faker.string.alpha(10),
-    site_code: faker.string.sample(5),
     capacity: faker.number.int({ min: 100, max: 10000 }),
     is_active: [true, false][faker.number.int({ min: 0, max: 1 })],
     address_line_1: faker.location.streetAddress(),

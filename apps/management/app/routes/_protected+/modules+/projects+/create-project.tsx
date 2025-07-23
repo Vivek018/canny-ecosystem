@@ -221,21 +221,8 @@ export default function CreateProject({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.project_code, {
-                      type: "text",
-                    }),
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.project_code.name
-                    )}`,
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.project_code.name),
-                  }}
-                  errors={fields.project_code.errors}
-                />
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+                
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_type, {

@@ -280,7 +280,27 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>Bank</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
-                      {emp?.bankDetails?.bank ?? "-"}
+                      {emp?.employeeProjectAssignmentData?.salary_entry_site ??
+                        emp?.employeeProjectAssignmentData?.site}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={[styles.cell, { flex: 1 }]}>Department</Text>
+                    <Text
+                      style={[
+                        styles.cell,
+                        { flex: 2, textTransform: "capitalize" },
+                      ]}
+                    >
+                      {emp?.employeeProjectAssignmentData
+                        ?.salary_entry_department ??
+                        emp?.employeeProjectAssignmentData
+                          ?.salary_entry_site_project ??
+                        emp?.employeeProjectAssignmentData?.project}
+                    </Text>
+                    <Text style={[styles.cell, { flex: 1 }]}>PAN No.</Text>
+                    <Text style={[styles.cell, { flex: 2 }]}>
+                      {emp?.employeeStatutoryDetails?.pan_number ?? "-"}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -293,7 +313,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp.employeeProjectAssignmentData.date_of_joining
+                          emp.employeeProjectAssignmentData.start_date
                         )}
                       </>
                     </Text>
@@ -500,10 +520,15 @@ export default function SalarySlips() {
         },
         employeeProjectAssignmentData: {
           position: emp?.employee?.employee_project_assignment?.position || "",
-          department:
-            emp?.employee?.employee_project_assignment?.department || "",
-          date_of_joining:
+          start_date:
             emp.employee?.employee_project_assignment?.start_date || "",
+          site: emp?.employee?.employee_project_assignment?.sites?.name || "",
+          project:
+            emp?.employee?.employee_project_assignment?.sites?.projects?.name ||
+            "",
+          salary_entry_site: emp?.salary_entries?.site?.name,
+          salary_entry_department: emp?.salary_entries?.department?.name,
+          salary_entry_site_project: emp?.salary_entries?.site?.projects?.name,
         },
         employeeStatutoryDetails: {
           pf_number: emp.employee?.employee_statutory_details?.pf_number || "",
@@ -511,6 +536,8 @@ export default function SalarySlips() {
             emp.employee?.employee_statutory_details?.esic_number || "",
           uan_number:
             emp.employee?.employee_statutory_details?.uan_number || "",
+          pan_number:
+            emp.employee?.employee_statutory_details?.pan_number || "",
         },
         attendance: {
           working_days: emp?.working_days ?? 0,

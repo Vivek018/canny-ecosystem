@@ -1,13 +1,17 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
-import { updateSalaryEntryById } from "@canny_ecosystem/supabase/mutations";
-
+import {
+  updatePayrollById,
+  updatePayrollFieldsById,
+  updateSalaryFieldValuesById,
+} from "@canny_ecosystem/supabase/mutations";
+import {
+  getPayrollById,
+  getSalaryFieldValuesById,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import {
-  isGoodStatus,
-  SalaryEntrySiteDepartmentSchema,
-} from "@canny_ecosystem/utils";
+import { isGoodStatus, SalaryEntrySchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate, useParams } from "@remix-run/react";
@@ -19,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: SalaryEntrySiteDepartmentSchema,
+      schema: SalaryEntrySchema,
     });
 
     if (submission.status !== "success") {
@@ -32,13 +36,61 @@ export async function action({ request }: ActionFunctionArgs) {
         { status: 500 }
       );
     }
+    const payrollId = submission.value.payroll_id;
 
-    const { status, error } = await updateSalaryEntryById({
-      data: submission.value,
+    const { data: previousAmount } = await getSalaryFieldValuesById({
+      supabase,
+      id: submission.value.salaryFieldValues_id,
+    });
+    const { data: payrollData } = await getPayrollById({
+      payrollId,
       supabase,
     });
 
-    if (isGoodStatus(status)) {
+    const newTotal =
+      submission.value.type === "earning"
+        ? Number(payrollData?.total_net_amount) -
+          Number(previousAmount?.amount) +
+          Number(submission.value.amount)
+        : Number(payrollData?.total_net_amount) +
+          Number(previousAmount?.amount) -
+          Number(submission.value.amount);
+
+    const updatedPayrollData = { total_net_amount: newTotal };
+
+    const salaryFieldValue = {
+      id: submission.value.salaryFieldValues_id,
+      amount: submission.value.amount,
+    };
+
+    const payrollField = {
+      id: submission.value.payrollFields_id,
+      name: submission.value.name,
+      type: submission.value.type,
+    };
+
+    const { status: salaryFieldValuesStatus, error: salaryFieldValuesError } =
+      await updateSalaryFieldValuesById({
+        supabase,
+        data: salaryFieldValue,
+      });
+
+    const { status: payrollFieldsStatus, error: payrollFieldsError } =
+      await updatePayrollFieldsById({
+        supabase,
+        data: payrollField,
+      });
+
+    if (
+      isGoodStatus(salaryFieldValuesStatus) &&
+      isGoodStatus(payrollFieldsStatus)
+    ) {
+      await updatePayrollById({
+        data: updatedPayrollData,
+        supabase,
+        payrollId,
+      });
+
       return json({
         status: "success",
         message: "Salary Entry updated successfully",
@@ -49,7 +101,7 @@ export async function action({ request }: ActionFunctionArgs) {
       {
         status: "error",
         message: "Salary Entry update failed",
-        error,
+        error: salaryFieldValuesError ?? payrollFieldsError,
       },
       { status: 500 }
     );

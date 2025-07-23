@@ -35,7 +35,6 @@ export function ProjectsWrapper({
             project?.id +
             project?.name +
             project?.description +
-            project?.project_code +
             project?.project_type +
             project?.start_date +
             project?.end_date +

@@ -45,16 +45,9 @@ export function SiteCard({
     >
       <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
         <div className="flex flex-col items-start">
-          <CardTitle
-            className={cn(
-              "text-lg tracking-wide",
-            )}
-          >
+          <CardTitle className={cn("text-lg tracking-wide")}>
             {site.name}
           </CardTitle>
-          <p className="text-[12px] w-max text-muted-foreground -mt-1 rounded-md">
-            {site.site_code}
-          </p>
         </div>
         <div className="flex items-center gap-3">
           <TooltipProvider>
@@ -65,10 +58,8 @@ export function SiteCard({
                   to={`${site.id}/update-site`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
-                    !hasPermission(
-                      role,
-                      `${updateRole}:${attribute.sites}`,
-                    ) && "hidden",
+                    !hasPermission(role, `${updateRole}:${attribute.sites}`) &&
+                      "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -81,10 +72,8 @@ export function SiteCard({
             <DropdownMenuTrigger
               className={cn(
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
-                !hasPermission(
-                  role,
-                  `${deleteRole}:${attribute.sites}`,
-                ) && "hidden",
+                !hasPermission(role, `${deleteRole}:${attribute.sites}`) &&
+                  "hidden"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -99,8 +88,9 @@ export function SiteCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""
-            }`}
+          {`${site.address_line_1} ${
+            site.address_line_2 ? site.address_line_2 : ""
+          }`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${site.city},`}</p>
@@ -112,7 +102,7 @@ export function SiteCard({
         <div
           className={cn(
             "border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5",
-            !site.company_location?.name && "opacity-0",
+            !site.company_location?.name && "opacity-0"
           )}
         >
           {site.company_location?.name}
@@ -120,7 +110,7 @@ export function SiteCard({
         <div
           className={cn(
             "px-2.5 py-1.5 ml-auto bg-secondary text-foreground h-full items-center text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-            !site.is_active && "opacity-0",
+            !site.is_active && "opacity-0"
           )}
         >
           <Icon name="dot-filled" size="xs" />
