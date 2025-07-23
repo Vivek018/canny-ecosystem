@@ -9,6 +9,7 @@ import { Document, Page, View, Text } from "@react-pdf/renderer";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { MarkdownRenderer } from "../markdown-renderer";
+import { CANNY_MANAGEMENT_SERVICES_NAME } from "@/constant";
 
 export function AppointmentLetter({
   data,
@@ -103,7 +104,7 @@ export function AppointmentLetter({
                 <View>
                   <Text style={styles.boldText}>Yours truly,</Text>
                   <Text style={styles.boldText}>
-                    For Canny Management Services Pvt. Ltd
+                    {CANNY_MANAGEMENT_SERVICES_NAME}
                   </Text>
                 </View>
                 <Text>Director</Text>

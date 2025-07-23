@@ -10,6 +10,7 @@ import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$emplo
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { LetterFooter } from "./letter-footer";
+import { CANNY_MANAGEMENT_SERVICES_NAME } from "@/constant";
 
 export function TerminationLetter({
   data,
@@ -24,9 +25,8 @@ export function TerminationLetter({
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
-    employeeName: `${data?.employees.first_name} ${
-      data?.employees.middle_name ?? ""
-    } ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.first_name} ${data?.employees.middle_name ?? ""
+      } ${data?.employees?.last_name}`,
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",
     employeeJoiningDate:
@@ -113,7 +113,7 @@ export function TerminationLetter({
                 <View>
                   <Text style={styles.boldText}>Yours truly,</Text>
                   <Text style={styles.boldText}>
-                    For Canny Management Services Pvt. Ltd
+                    {CANNY_MANAGEMENT_SERVICES_NAME}
                   </Text>
                 </View>
                 <Text>Director</Text>

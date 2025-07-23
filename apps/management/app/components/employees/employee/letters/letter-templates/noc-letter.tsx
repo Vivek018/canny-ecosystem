@@ -10,6 +10,7 @@ import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$emplo
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { LetterFooter } from "./letter-footer";
+import { CANNY_MANAGEMENT_SERVICES_NAME } from "@/constant";
 
 export function NOCLetter({
   data,
@@ -104,7 +105,7 @@ export function NOCLetter({
                 <View>
                   <Text style={styles.boldText}>Yours truly,</Text>
                   <Text style={styles.boldText}>
-                    For Canny Management Services Pvt. Ltd
+                    {CANNY_MANAGEMENT_SERVICES_NAME}
                   </Text>
                 </View>
                 <Text>Director</Text>

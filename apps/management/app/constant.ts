@@ -5,7 +5,7 @@ export const DEFAULT_ROUTE = "/";
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
   "3f01b65d-ba67-4d57-9e79-c5ad9d8695a3";
 
-export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services";
+export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services Pvt. Ltd.";
 
 export const CANNY_MANAGEMENT_SERVICES_ADDRESS =
   "502-503, Girivar Glean, Under Odhav Overbrigde, Sardar Patel Ring Rd, nr. Palm Hotel, Odhav, Ahmedabad, Gujarat 382415";
