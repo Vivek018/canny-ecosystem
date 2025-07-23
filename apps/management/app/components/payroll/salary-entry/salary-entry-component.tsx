@@ -28,7 +28,7 @@ import { useSalaryData } from "@/utils/hooks/salary-data";
 import { PayrollSummaryCard } from "./payroll-summary-card";
 import { PayrollDetailsCard } from "./payroll-details-card";
 import { FilterControls } from "./filter-controls";
-import type{ ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export function SalaryEntryComponent({
   data,
@@ -56,7 +56,6 @@ export function SalaryEntryComponent({
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
 
-  // Use custom hook for data filtering and options
   const {
     siteOptions,
     departmentOptions,
@@ -68,7 +67,6 @@ export function SalaryEntryComponent({
     handleFieldChange,
   } = useSalaryData(data);
 
-  // Memoize calculations
   const displayData = selectedRows.length > 0 ? selectedRows : filteredData;
   const totals = useMemo(
     () =>
@@ -81,7 +79,6 @@ export function SalaryEntryComponent({
     [displayData]
   );
 
-  // Memoized handlers
   const updateStatusPayroll = useCallback(
     (
       e: React.MouseEvent<HTMLButtonElement>,
@@ -126,7 +123,6 @@ export function SalaryEntryComponent({
     [payrollId, payrollData?.id, submit]
   );
 
-  // Memoized button visibility checks
   const showSubmitButton = useMemo(
     () =>
       (payrollData.status === "pending" || payrollData.status === "approved") &&
