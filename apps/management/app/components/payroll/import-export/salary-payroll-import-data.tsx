@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../salary-imported-table/imported-data-table";
 import { ImportedDataColumns } from "../salary-imported-table/columns";
 import type { FieldConfig } from "@/routes/_protected+/payroll+/run-payroll+/import-salary-payroll+/_index";
+import { normalizeNames } from "@canny_ecosystem/utils";
 
 export function SalaryPayrollImportData({
   env,
@@ -45,7 +46,7 @@ export function SalaryPayrollImportData({
   const handleFinalImport = async () => {
     const importEntries = importData.data! as any[];
 
-    const siteNames = importEntries.map((value) => value?.site?.trim());
+    const siteNames = importEntries.map((value) => normalizeNames(value?.site));
 
     const { data: sites, error: siteError } = await getSiteIdsBySiteNames({
       supabase,
@@ -55,9 +56,8 @@ export function SalaryPayrollImportData({
     if (siteError) throw siteError;
 
     const departmentNames = importEntries.map((value) =>
-      value?.department?.trim()
+      normalizeNames(value?.department)
     );
-
     const { data: departments, error: departmentError } =
       await getDepartmentIdsByDepartmentNames({
         supabase,
@@ -67,10 +67,12 @@ export function SalaryPayrollImportData({
     if (departmentError) throw departmentError;
 
     const preData = importEntries.map((item: any) => {
-      const siteId = sites?.find((e) => e.name.toLowerCase() === item.site.toLowerCase())?.id;
+      const siteId = sites?.find(
+        (e) => e.name === normalizeNames(item.site)
+      )?.id;
 
       const departmentId = departments?.find(
-        (u) => u.name.toLowerCase() === item.department.toLowerCase()
+        (u) => u.name === normalizeNames(item.department)
       )?.id;
 
       const { department, site, ...rest } = item;

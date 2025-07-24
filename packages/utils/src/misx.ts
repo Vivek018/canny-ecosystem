@@ -123,7 +123,7 @@ export const parseStringValue = (value: string) => {
 };
 
 export function debounce<
-  Callback extends (...args: Parameters<Callback>) => void
+  Callback extends (...args: Parameters<Callback>) => void,
 >(fn: Callback, delay: number) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<Callback>) => {
@@ -188,10 +188,13 @@ export function extractKeys<T extends Record<string, any>, K extends string>(
   keys: K[]
 ): Partial<Record<K, any>>[] {
   return arr.map((obj) =>
-    keys.reduce((acc, key) => {
-      acc[key] = key.split(".").reduce((o, k) => o?.[k], obj);
-      return acc;
-    }, {} as Partial<Record<K, any>>)
+    keys.reduce(
+      (acc, key) => {
+        acc[key] = key.split(".").reduce((o, k) => o?.[k], obj);
+        return acc;
+      },
+      {} as Partial<Record<K, any>>
+    )
   );
 }
 
@@ -319,3 +322,20 @@ export const getMonthName = (value: number): string | undefined => {
 export function roundToNearest(num: number): number {
   return Math.floor(num) + (num % 1 >= 0.5 ? 1 : 0);
 }
+
+export const normalizeNames = (name: string) => {
+  if (!name) return "";
+
+  const result = name
+    .normalize("NFKC")
+    // biome-ignore lint/suspicious/noMisleadingCharacterClass: <explanation>
+    .replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase()
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
+  return result;
+};
