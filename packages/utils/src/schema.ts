@@ -344,6 +344,7 @@ export const positionArray = [
   "peon",
   "office_boy",
   "operator",
+  "crusher",
   "computer_operator",
   "sampler",
   "helper",
@@ -378,8 +379,8 @@ export const positionArray = [
   "executive",
   "business_development_executive",
   "industry_&_environment",
-  "unknown",
   "office_attendant",
+  "unknown",
 ] as const;
 
 export const assignmentTypeArray = [
