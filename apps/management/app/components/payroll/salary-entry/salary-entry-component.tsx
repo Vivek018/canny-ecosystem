@@ -1,6 +1,6 @@
 import type React from "react";
-import { useMemo, useCallback } from "react";
-import { Button } from "@canny_ecosystem/ui/button";
+import { useMemo, useCallback, useState } from "react";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
@@ -28,7 +28,23 @@ import { useSalaryData } from "@/utils/hooks/salary-data";
 import { PayrollSummaryCard } from "./payroll-summary-card";
 import { PayrollDetailsCard } from "./payroll-details-card";
 import { FilterControls } from "./filter-controls";
-import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import {
+  Combobox,
+  type ComboboxSelectOption,
+} from "@canny_ecosystem/ui/combobox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@canny_ecosystem/ui/alert-dialog";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { Label } from "@canny_ecosystem/ui/label";
 
 export function SalaryEntryComponent({
   data,
@@ -38,6 +54,7 @@ export function SalaryEntryComponent({
   fromWhere,
   allSiteOptions,
   allDepartmentOptions,
+  allLocationOptions,
 }: {
   data: any[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
@@ -46,12 +63,16 @@ export function SalaryEntryComponent({
   fromWhere: "runpayroll" | "payrollhistory";
   allSiteOptions: ComboboxSelectOption[];
   allDepartmentOptions: ComboboxSelectOption[];
+  allLocationOptions: ComboboxSelectOption[];
 }) {
   const { selectedRows } = useSalaryEntriesStore();
   const { role } = useUser();
   const { payrollId } = useParams();
   const submit = useSubmit();
   const navigation = useNavigation();
+
+  const [sites, setSites] = useState("");
+  const [departments, setDepartments] = useState("");
 
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
@@ -104,6 +125,30 @@ export function SalaryEntryComponent({
     },
     [payrollId, payrollData, submit]
   );
+
+  const handleUpdateBulkSalaryEntry = () => {
+    const updates = selectedRows.map((entry: any) => {
+      return {
+        id: entry.salary_entries.id,
+        site_id: sites && sites.trim() !== "" ? sites : null,
+        department_id:
+          departments && departments.trim() !== "" ? departments : null,
+      };
+    });
+
+    clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+    submit(
+      {
+        payrollId: payrollId ?? payrollData?.id,
+        salaryEntryData: JSON.stringify(updates),
+        failedRedirect: `/payroll/run-payroll/${payrollId}`,
+      },
+      {
+        method: "POST",
+        action: `/payroll/run-payroll/${payrollId}/update-bulk-salary-entries`,
+      }
+    );
+  };
 
   const handleUpdatePayroll = useCallback(
     (title: string, rundate: string) => {
@@ -208,12 +253,61 @@ export function SalaryEntryComponent({
               ? "hidden"
               : ""
           )}
+          allLocationOptions={allLocationOptions}
           payrollId={payrollId ?? payrollData?.id}
           data={selectedRows.length ? selectedRows : (data as any)}
           env={env}
           fromWhere={fromWhere}
           status={payrollData?.status}
         />
+        <div className="h-full">
+          <AlertDialog>
+            <AlertDialogTrigger
+              className={cn(
+                "bg-secondary rounded-md py-2 px-2.5",
+                (payrollData?.status === "approved" || !selectedRows.length) &&
+                  "hidden"
+              )}
+            >
+              <Icon name="edit" size="md" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Update Bulk Salary Entry</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Update Bulk Salary Entry here
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm font-medium">Site</Label>
+                  <Combobox
+                    options={allSiteOptions}
+                    value={sites}
+                    onChange={(e) => setSites(e)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm font-medium">Department</Label>
+                  <Combobox
+                    options={allDepartmentOptions}
+                    value={departments}
+                    onChange={(e) => setDepartments(e)}
+                  />
+                </div>
+              </div>
+              <AlertDialogFooter className="pt-2">
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className={cn(buttonVariants({ variant: "default" }))}
+                  onClick={handleUpdateBulkSalaryEntry}
+                >
+                  Update
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {disable ? (

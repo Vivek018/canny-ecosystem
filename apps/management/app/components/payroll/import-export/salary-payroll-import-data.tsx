@@ -158,6 +158,8 @@ export function SalaryPayrollImportData({
       {
         type: "salary-import",
         title: importData.title!,
+        project: importData?.project_id ?? null,
+        site: importData?.site_id ?? null,
         salaryImportData: JSON.stringify(updatedData),
         skipped:
           importData.data.length - updatedData.length > 0

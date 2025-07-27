@@ -36,7 +36,6 @@ export default function Account() {
         <SecondaryMenu
           items={[
             { label: "Account", path: "/user/account" },
-            { label: "Help", path: "/user/help" },
             { label: "Feedback Form", path: "/user/feedback-form" },
             hasPermission(role, `${readRole}:${attribute.feedbackList}`)
               ? { label: "Feedback List", path: "/user/feedback-list" }

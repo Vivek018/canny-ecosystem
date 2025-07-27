@@ -42,12 +42,8 @@ import { CreateEmployeeAddress } from "@/components/employees/form/create-employ
 import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/form/form-step-header";
-import {
-  getSiteNamesByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
-import {
-  CreateEmployeeProjectAssignment,
-} from "@/components/employees/form/create-employee-project-assignment";
+import { getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { CreateEmployeeProjectAssignment } from "@/components/employees/form/create-employee-project-assignment";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -192,6 +188,7 @@ export async function action({
         return json(
           {
             status: "error",
+            error: employeeError,
             message: "Failed to create employee",
             returnTo: "/employees",
           },
@@ -283,13 +280,8 @@ export async function action({
 }
 
 export default function CreateEmployee() {
-  const {
-    step,
-    totalSteps,
-    stepData,
-    companyId,
-    siteOptions,
-  } = useLoaderData<typeof loader>();
+  const { step, totalSteps, stepData, companyId, siteOptions } =
+    useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const actionData = useActionData<typeof action>();
@@ -303,6 +295,7 @@ export default function CreateEmployee() {
   useIsomorphicLayoutEffect(() => {
     setResetKey(Date.now());
   }, [step]);
+  console.log(actionData);
 
   useEffect(() => {
     if (actionData) {

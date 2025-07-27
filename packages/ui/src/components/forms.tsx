@@ -89,7 +89,7 @@ export function Field({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -105,7 +105,7 @@ export function Field({
           className={cn(
             prefix && "pl-8",
             suffix && "pr-8",
-            inputProps.className,
+            inputProps.className
           )}
         />
         {suffix && (
@@ -144,7 +144,7 @@ export function TextareaField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -211,7 +211,7 @@ export function CheckboxField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -233,7 +233,7 @@ type SearchableSelectFieldProps = {
   errorClassName?: string;
   placeholder?: string;
   onChange?: (value: string) => void;
-  onInput?: (value: string) => void,
+  onInput?: (value: string) => void;
 };
 
 export function SearchableSelectField({
@@ -265,7 +265,7 @@ export function SearchableSelectField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -326,14 +326,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}",
+        inputProps.defaultValue?.toString() || "{}"
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -352,7 +352,7 @@ export function JSONBField({
         }
         return acc;
       },
-      {} as Record<string, any>,
+      {} as Record<string, any>
     );
     const event = {
       target: {
@@ -396,7 +396,7 @@ export function JSONBField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -445,8 +445,8 @@ export function JSONBField({
               if (key) acc[key] = parseStringValue(value);
               return acc;
             },
-            {} as Record<string, string>,
-          ),
+            {} as Record<string, string>
+          )
         )}
       />
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
@@ -458,7 +458,7 @@ export function JSONBField({
 
 export type FieldConfig = {
   key: string;
-  type: "number" | "text";
+  type: "number" | "text" | "checkbox";
   placeholder?: string;
 };
 
@@ -500,17 +500,27 @@ export const RangeField = ({
   ]);
 
   useEffect(() => {
-    try {
-      if (inputProps.defaultValue) {
-        const parsedValue = JSON.parse(inputProps.defaultValue);
-        if (Array.isArray(parsedValue)) {
-          setRanges(parsedValue);
-        }
+  try {
+    if (inputProps.defaultValue) {
+      const parsedValue = JSON.parse(inputProps.defaultValue);
+      if (Array.isArray(parsedValue)) {
+        const normalized = parsedValue.map((range) => {
+          const obj: Record<string, any> = { ...range };
+          for (const field of fields) {
+            if (field.type === "checkbox") {
+              obj[field.key] = !!(obj[field.key] === true || obj[field.key] === "on");
+            }
+          }
+          return obj;
+        });
+
+        setRanges(normalized);
       }
-    } catch (error) {
-      console.error("Failed to parse range value:", error);
     }
-  }, [inputProps.defaultValue]);
+  } catch (error) {
+    console.error("Failed to parse range value:", error);
+  }
+}, [inputProps.defaultValue]);
 
   const updateValue = (newRanges: Array<Record<string, any>>) => {
     const event = {
@@ -526,7 +536,7 @@ export const RangeField = ({
   const handleFieldChange = (
     index: number,
     fieldKey: string,
-    value: string,
+    value: string | boolean
   ) => {
     const newRanges = [...ranges];
     newRanges[index] = {
@@ -534,7 +544,9 @@ export const RangeField = ({
       [fieldKey]:
         fields.find((f) => f.key === fieldKey)?.type === "number"
           ? Number(value) || 0
-          : value,
+          : fields.find((f) => f.key === fieldKey)?.type === "checkbox"
+            ? Boolean(value)
+            : value,
     };
     setRanges(newRanges);
     updateValue(newRanges);
@@ -546,7 +558,7 @@ export const RangeField = ({
         acc[field.key] = field.type === "number" ? 0 : "";
         return acc;
       },
-      {} as Record<string, any>,
+      {} as Record<string, any>
     );
 
     const newRanges = [...ranges, newRange];
@@ -567,7 +579,7 @@ export const RangeField = ({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -581,10 +593,16 @@ export const RangeField = ({
               key={field.key}
               type={field.type}
               placeholder={field.placeholder || field.key}
-              value={range[field.key]}
-              onChange={(e) =>
-                handleFieldChange(index, field.key, e.target.value)
-              }
+              {...(field.type === "checkbox"
+                ? { checked: !!range[field.key] }
+                : { value: range[field.key] })}
+              onChange={(e) => {
+                handleFieldChange(
+                  index,
+                  field.key,
+                  field.type === "checkbox" ? e.target.checked : e.target.value
+                );
+              }}
               className="flex-1"
             />
           ))}
@@ -646,7 +664,7 @@ export function MarkdownField({
 }) {
   const { isDocument } = useIsDocument();
   const [markdownValue, setMarkdownValue] = useState<string>(
-    String(inputProps.defaultValue ?? ""),
+    String(inputProps.defaultValue ?? "")
   );
 
   const fallbackId = useId();
@@ -673,7 +691,7 @@ export function MarkdownField({
       <sub
         className={cn(
           "hidden text-primary",
-          inputProps?.children && inputProps.required && "inline",
+          inputProps?.children && inputProps.required && "inline"
         )}
       >
         *

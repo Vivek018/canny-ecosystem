@@ -31,6 +31,8 @@ export async function createSalaryPayroll({
   supabase: TypedSupabaseClient;
   data: {
     title: string;
+    site?: string | null;
+    project?: string | null;
     run_date?: string;
     rawData: any[];
     status?: "pending" | "approved" | "submitted";
@@ -65,6 +67,8 @@ export async function createSalaryPayroll({
       title: data.title,
       month: data.month,
       year: data.year,
+      site_id: data?.site ? data.site : null,
+      project_id: data?.project ? data.project : null,
       run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       total_employees: data.totalEmployees,
@@ -715,7 +719,6 @@ export async function updatePayrollFieldsById({
   return { error, status };
 }
 
-
 export async function updateSalaryEntryById({
   supabase,
   data,
@@ -734,15 +737,50 @@ export async function updateSalaryEntryById({
     };
   }
 
-  const updateData = convertToNull(data);
-
   const { error, status } = await supabase
     .from("salary_entries")
-    .update(updateData)
-    .eq("id", data.id ?? "")
+    .update(data)
+    .eq("id", data.id!)
     .single();
 
   if (error) console.error("updateSalaryEntryById Error:", error);
 
   return { error, status };
+}
+
+export async function updateMultipleSalaryEntries({
+  supabase,
+  salaryEntries,
+}: {
+  supabase: TypedSupabaseClient;
+  salaryEntries: SalaryEntriesDatabaseUpdate[];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  for (const entry of salaryEntries) {
+    const { error, status } = await supabase
+      .from("salary_entries")
+      .update({
+        site_id: entry.site_id ?? null,
+        department_id: entry.department_id ?? null,
+      })
+      .eq("id", entry.id!)
+      .single();
+
+    if (error) {
+      console.error("Error updating entry:", error);
+      return { error, status };
+    }
+  }
+
+  return { error: null, status: 200 };
 }

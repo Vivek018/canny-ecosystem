@@ -30,6 +30,8 @@ export async function action({
     const skipped = formData.get("skipped") as string;
     const type = formData.get("type") as string;
     const different = formData.get("different") as string;
+    const site = formData.get("site") as string;
+    const project = formData.get("project") as string;
 
     const failedRedirect = formData.get("failedRedirect") as string;
     let error = null;
@@ -169,6 +171,8 @@ export async function action({
         data: {
           title: payrollTitle,
           type: "salary",
+          site,
+          project,
           rawData: salaryImportData,
           salaryEntryData: transformedSalaryEntries,
           totalEmployees: salaryImportData.length,

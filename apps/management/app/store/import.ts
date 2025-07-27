@@ -172,10 +172,14 @@ export const useImportStoreForExitPayroll = create<ImportStateForExitPayroll>()(
 type ImportStateForSalaryPayroll = {
   importData: {
     title?: string;
+    site_id?: string;
+    project_id?: string;
     data: ImportSalaryPayrollDataType[];
   };
   setImportData: (importData: {
     title?: string;
+    site_id?: string;
+    project_id?: string;
     data: ImportSalaryPayrollDataType[];
   }) => void;
 };
@@ -184,6 +188,8 @@ export const useImportStoreForSalaryPayroll =
   create<ImportStateForSalaryPayroll>()((set) => ({
     importData: {
       title: "",
+      site_id: "",
+      project_id: "",
       data: [],
     },
     setImportData: (importData) => set({ importData }),
