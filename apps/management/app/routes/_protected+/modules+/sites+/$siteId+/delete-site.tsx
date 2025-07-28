@@ -78,7 +78,7 @@ export default function DeleteSite() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }

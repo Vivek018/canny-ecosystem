@@ -6,12 +6,12 @@ import {
   getCompanyById,
   getInvoiceById,
   getReimbursementEntriesByInvoiceIdForInvoicePreview,
-  getPrimaryLocationByCompanyId,
   getRelationshipsByParentAndChildCompanyId,
   type EmployeeProjectAssignmentDataType,
   getExitEntriesByPayrollIdForInvoicePreview,
   getLocationById,
   getSalaryEntriesForInvoiceByInvoiceId,
+  getUserById,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
   },
   mainHeader: {
-    marginTop: 30,
+    marginTop: 20,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -355,14 +355,25 @@ const InvoicePDF = ({
         <View style={[styles.companyDetails]}>
           <View style={{ gap: 1 }}>
             <Text>{data?.companyData?.name}</Text>
-            <Text>{data?.companyData?.address_line_1}</Text>
-            <Text>{data?.companyData?.address_line_2}</Text>
+            <Text>{location?.address_line_1}</Text>
+            <Text>{location?.address_line_2}</Text>
             <Text>
-              {data?.companyData?.city}-{data?.companyData?.pincode},{" "}
-              {data?.companyData?.state?.toUpperCase()}
+              {location?.city}-{location?.pincode},{" "}
+              {location?.state?.toUpperCase()}
             </Text>
             <Text>GSTIN : {location?.gst_number}</Text>
           </View>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 5,
+          }}
+        >
+          <Text>Contact Person :- {data.invoiceDetails?.user_id}</Text>
+          <Text>{data.invoiceDetails?.additional_text}</Text>
         </View>
 
         <View style={[styles.mainHeader]}>
@@ -412,7 +423,14 @@ const InvoicePDF = ({
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <View style={{ flex: 5, padding: 4 }}>
+          <View
+            style={{
+              flex: 5,
+              paddingVertical: 2,
+              paddingRight: 12,
+              paddingLeft: 4,
+            }}
+          >
             <Text style={{ fontFamily: "Helvetica" }}>
               {data?.invoiceDetails?.subject}
             </Text>
@@ -1169,9 +1187,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     supabase,
     id: companyId,
   });
+  let userData = null;
+  if (invoiceData?.user_id) {
+    const { data } = await getUserById({
+      id: invoiceData?.user_id,
+      supabase,
+    });
 
-  const { data: employeesCompanyLocationData } =
-    await getPrimaryLocationByCompanyId({ supabase, companyId });
+    userData = data;
+  }
 
   const { data: locationData } = await getLocationById({
     id: invoiceData?.company_address_id!,
@@ -1213,10 +1237,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return {
     data: {
       employeeCompanyData,
-      employeesCompanyLocationData,
+      locationData,
       payrollDataAndOthers,
       invoiceData,
     },
+    userData,
     locationData,
     companyRelations: companyRelations?.terms,
     contentType,
@@ -1224,7 +1249,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function PreviewInvoice() {
-  const { data, companyRelations, locationData, contentType } =
+  const { data, companyRelations, locationData, contentType, userData } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
@@ -1234,16 +1259,10 @@ export default function PreviewInvoice() {
   if (data?.invoiceData?.type === "salary") {
     function transformDataForSalary(data: any) {
       const company = data.employeeCompanyData;
-      const location = data.employeesCompanyLocationData;
       const invoice = data.invoiceData;
 
       const companyData = {
         name: company?.name,
-        address_line_1: location?.address_line_1,
-        address_line_2: location?.address_line_2,
-        city: location?.city,
-        state: location?.state,
-        pincode: location?.pincode,
       };
 
       const invoiceDetails = {
@@ -1260,6 +1279,8 @@ export default function PreviewInvoice() {
         include_header: invoice?.include_header,
         invoice_type: invoice?.invoice_type,
         proof: invoice?.proof,
+        additional_text: invoice?.additional_text,
+        user_id: `${userData?.first_name} ${userData?.last_name}`,
       };
 
       interface EmployeeEarningsOrDeductions {
@@ -1362,6 +1383,8 @@ export default function PreviewInvoice() {
         include_header: invoice?.include_header,
         type: invoice?.type,
         proof: invoice?.proof,
+        additional_text: invoice?.additional_text,
+        user_id: `${userData?.first_name} ${userData?.last_name}`,
       };
 
       interface EmployeeData {

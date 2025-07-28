@@ -1908,6 +1908,8 @@ export const InvoiceSchema = z.object({
   is_paid: z.boolean().default(false),
   paid_date: z.string().optional(),
   include_header: z.boolean().default(false),
+  user_id: z.string().optional(),
+  additional_text: z.string().optional(),
 });
 
 export const DepartmentsSchema = z.object({

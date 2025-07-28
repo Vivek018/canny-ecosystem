@@ -76,9 +76,7 @@ export function SalaryEntrySheet({
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
-    if (salaryEntry.length) {
-      setOpen(true);
-    }
+    setOpen(true);
   };
 
   return (

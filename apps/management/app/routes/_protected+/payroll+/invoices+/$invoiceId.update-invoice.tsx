@@ -18,6 +18,7 @@ import {
   getInvoiceById,
   getLocationsForSelectByCompanyId,
   getRelationshipsByParentAndChildCompanyId,
+  getUsersByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -42,6 +43,8 @@ import {
   addOrUpdateInvoiceWithProof,
   deleteInvoiceProof,
 } from "@canny_ecosystem/supabase/media";
+import CreateInvoiceFromRiembursement from "../../approvals+/reimbursements+/create-invoice";
+import CreateInvoiceForExit from "../../approvals+/exits+/create-invoice";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const invoiceId = params.invoiceId;
@@ -88,10 +91,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       label: location?.name,
       value: location?.id,
     }));
+
+    const { data: userList } = await getUsersByCompanyId({
+      companyId,
+      supabase,
+    });
+    const userOptions = userList?.map((user) => ({
+      label: user?.email,
+      value: user?.id,
+    }));
+
     return json({
       companyLocationArray,
       companyRelations,
       invoiceData,
+      userOptions,
       error: invoiceError,
     });
   } catch (error) {
@@ -101,6 +115,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         invoiceData: null,
         companyRelations: null,
         companyLocationArray: null,
+        userOptions: null,
         payroll: null,
       },
       { status: 500 }
@@ -317,8 +332,13 @@ export async function action({
 }
 
 export default function UpdateInvoice() {
-  const { companyRelations, companyLocationArray, invoiceData, error } =
-    useLoaderData<typeof loader>();
+  const {
+    companyRelations,
+    companyLocationArray,
+    userOptions,
+    invoiceData,
+    error,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -354,10 +374,29 @@ export default function UpdateInvoice() {
   }, [actionData]);
 
   return (
-    <CreateInvoice
-      updateValues={invoiceData as unknown as InvoiceDatabaseInsert}
-      locationArrayFromUpdate={companyLocationArray as unknown as any[]}
-      companyRelationsFromUpdate={companyRelations}
-    />
+    <>
+      {invoiceData?.type === "salary" ? (
+        <CreateInvoice
+          updateValues={invoiceData as unknown as InvoiceDatabaseInsert}
+          locationArrayFromUpdate={companyLocationArray as unknown as any[]}
+          companyRelationsFromUpdate={companyRelations}
+          userOptionsFromUpdate={userOptions as unknown as any[]}
+        />
+      ) : invoiceData?.type === "exit" ? (
+        <CreateInvoiceForExit
+          updateValues={invoiceData as unknown as InvoiceDatabaseInsert}
+          locationArrayFromUpdate={companyLocationArray as unknown as any[]}
+          userOptionsFromUpdate={userOptions as unknown as any[]}
+          companyRelationsFromUpdate={companyRelations}
+        />
+      ) : (
+        <CreateInvoiceFromRiembursement
+          updateValues={invoiceData as unknown as InvoiceDatabaseInsert}
+          locationArrayFromUpdate={companyLocationArray as unknown as any[]}
+          userOptionsFromUpdate={userOptions as unknown as any[]}
+          companyRelationsFromUpdate={companyRelations}
+        />
+      )}
+    </>
   );
 }

@@ -102,7 +102,7 @@ export async function getReimbursementsByCompanyId({
     site,
     in_invoice,
   } = filters ?? {};
-  const foreignFilters = project || site;
+  const foreignFilters = searchQuery || project || site;
 
   const columns = [
     "id",
@@ -120,9 +120,13 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!left(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
-      }(id, name)))),
+          employees!${
+            foreignFilters ? "inner" : "left"
+          }(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+            foreignFilters ? "inner" : "left"
+          }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+            foreignFilters ? "inner" : "left"
+          }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" }
     )
@@ -184,10 +188,7 @@ export async function getReimbursementsByCompanyId({
     );
   }
   if (site) {
-    query.eq(
-      "employees.employee_project_assignment.sites.name",
-      site
-    );
+    query.eq("employees.employee_project_assignment.sites.name", site);
   }
 
   if (in_invoice !== undefined && in_invoice !== null) {

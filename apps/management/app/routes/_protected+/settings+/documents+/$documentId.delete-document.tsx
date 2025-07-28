@@ -10,7 +10,10 @@ import { deleteCompanyDocument } from "@canny_ecosystem/supabase/media";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getCompanyDocumentById } from "@canny_ecosystem/supabase/queries";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const documentId = params.documentId ?? "";
@@ -20,7 +23,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
     const { status, error } = await deleteCompanyDocument({
       supabase,
       companyId,
-      documentName: data?.name ?? ""
+      documentName: data?.name ?? "",
     });
 
     if (isGoodStatus(status)) {
@@ -38,7 +41,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -48,7 +51,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -70,7 +73,7 @@ export default function DeleteDocument() {
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }

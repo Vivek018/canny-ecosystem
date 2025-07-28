@@ -162,7 +162,7 @@ export default function UpdateSite() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error.message || "Site update failed",
+          description: actionData?.error?.message || "Site update failed",
           variant: "destructive",
         });
       }

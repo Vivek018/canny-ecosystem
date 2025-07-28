@@ -150,24 +150,31 @@ export async function createSalaryPayroll({
 
     if (!salaryEntry) continue;
 
-    for (const [key, value] of Object.entries(record)) {
-      const normalizedKey = key.trim().toUpperCase();
-      const matchedField = payrollFieldMap[normalizedKey];
+    for (const [normalizedKey, matchedField] of Object.entries(
+      payrollFieldMap
+    )) {
+      const rawKey = Object.keys(record).find(
+        (k) => k.trim().toUpperCase() === normalizedKey
+      );
+
+      const rawValue = rawKey ? record[rawKey] : undefined;
+
+      let amount = 0;
 
       if (
-        matchedField &&
-        value &&
-        typeof value === "object" &&
-        value !== null &&
-        "amount" in value &&
-        typeof (value as { amount?: unknown }).amount === "number"
+        rawValue &&
+        typeof rawValue === "object" &&
+        "amount" in rawValue &&
+        typeof (rawValue as { amount?: unknown }).amount === "number"
       ) {
-        finalPayrollFieldEntries.push({
-          payroll_field_id: matchedField.id,
-          amount: (value as { amount: number }).amount,
-          salary_entry_id: salaryEntry.id,
-        });
+        amount = (rawValue as { amount: number }).amount;
       }
+
+      finalPayrollFieldEntries.push({
+        payroll_field_id: matchedField.id,
+        amount,
+        salary_entry_id: salaryEntry.id,
+      });
     }
   }
 

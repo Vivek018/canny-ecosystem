@@ -21,7 +21,7 @@ export async function action({
     const { status, error } = await deleteEmployeeDocument({
       supabase,
       employeeId,
-      documentType
+      documentType,
     });
 
     if (isGoodStatus(status)) {
@@ -39,7 +39,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/documents`,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -49,7 +49,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/documents`,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -63,7 +63,9 @@ export default function DeleteDocument() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_documents}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData.message,
@@ -72,7 +74,7 @@ export default function DeleteDocument() {
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }

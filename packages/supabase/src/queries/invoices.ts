@@ -188,6 +188,8 @@ export async function getInvoiceById({
     "type",
     "created_at",
     "company_id",
+    "additional_text",
+    "user_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -270,4 +272,72 @@ export async function getInvoicesByCompanyIdForDashboard({
   );
 
   return { data: groupedByMonth, error: null };
+}
+
+export async function getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements({
+  supabase,
+  companyId,
+  filters,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  filters?: DashboardFilters;
+}) {
+  const columns = ["paid_date", "payroll_data"] as const;
+  const defMonth = new Date().getMonth();
+  const filterMonth = filters?.month && Number(months[filters.month]);
+  const filterYear = filters?.year && Number(filters.year);
+
+  //For Current Month
+  const startOfCurrentMonth = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 1, 1))
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth, 1));
+  const endOfCurrentMonth = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+
+  const { data: currentMonth, error: currentMonthError } = await supabase
+    .from("invoice")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("type", "reimbursement")
+    .in("is_paid", [true])
+    .gte("paid_date", startOfCurrentMonth.toISOString())
+    .lt("paid_date", endOfCurrentMonth.toISOString())
+    .order("created_at", { ascending: false })
+    .returns<InferredType<InvoiceDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (currentMonthError)
+    console.error(
+      "getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements Error",
+      currentMonthError
+    );
+
+  //For Previous Month
+
+  const startOfPrevMonth = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 2, 1))
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth - 1, 1));
+  const endOfPrevMonth = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth - 1, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
+
+  const { data: previousMonth, error: previousMonthError } = await supabase
+    .from("invoice")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("type", "reimbursement")
+    .in("is_paid", [true])
+    .gte("paid_date", startOfPrevMonth.toISOString())
+    .lt("paid_date", endOfPrevMonth.toISOString())
+    .order("created_at", { ascending: false })
+    .returns<InferredType<InvoiceDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (previousMonthError)
+    console.error(
+      "getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements Error",
+      previousMonthError
+    );
+
+  return { currentMonth, currentMonthError, previousMonth, previousMonthError };
 }

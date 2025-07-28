@@ -1,6 +1,17 @@
-import { CompanyDocumentsSchema, SIZE_10MB, hasPermission, isGoodStatus, updateRole } from "@canny_ecosystem/utils";
+import {
+  CompanyDocumentsSchema,
+  SIZE_10MB,
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
-import { json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { useEffect } from "react";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
@@ -25,7 +36,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.companyDocuments}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.companyDocuments}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -33,21 +46,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return { data };
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
-    const submission = parseWithZod(formData, { schema: CompanyDocumentsSchema });
+    const submission = parseWithZod(formData, {
+      schema: CompanyDocumentsSchema,
+    });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -56,7 +73,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
       file: submission.value.document_file as File,
       companyId,
       documentName: submission.value.name,
-      existingDocumentName: submission.value.existing_document_name ?? ""
+      existingDocumentName: submission.value.existing_document_name ?? "",
     });
     if (isGoodStatus(status)) {
       return json({
@@ -73,7 +90,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -83,7 +100,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -106,7 +123,7 @@ export default function UpdateDocument() {
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }
@@ -114,5 +131,5 @@ export default function UpdateDocument() {
     }
   }, [actionData]);
 
-  return <AddDocument updatedValues={data as DocumentsDatabaseRow} />
+  return <AddDocument updatedValues={data as DocumentsDatabaseRow} />;
 }

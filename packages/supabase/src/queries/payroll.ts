@@ -7,6 +7,7 @@ import type {
   SalaryEntriesDatabaseRow,
   SalaryFieldValuesDatabaseRow,
   PayrollFieldsDatabaseRow,
+  InvoiceDatabaseRow,
 } from "../types";
 import type { DashboardFilters } from "./exits";
 import { months } from "@canny_ecosystem/utils/constant";
@@ -415,7 +416,8 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   companyId: string;
   filters?: DashboardFilters;
 }) {
-  const columns = ["run_date", "total_net_amount"] as const;
+  const payrollColumns = ["run_date", "total_net_amount"] as const;
+  const restColumns = ["paid_date", "payroll_data"] as const;
   const defMonth = new Date().getMonth();
   const filterMonth = filters?.month && Number(months[filters.month]);
   const filterYear = filters?.year && Number(filters.year);
@@ -430,24 +432,45 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
     : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
 
-  const { data, error } = await supabase
+  const { data: payrollData, error: payrollError } = await supabase
     .from("payroll")
-    .select(columns.join(","))
+    .select(payrollColumns.join(","))
     .eq("company_id", companyId)
     .in("status", ["approved"])
     .gte("run_date", startOfYear.toISOString())
     .lt("run_date", endOfYear.toISOString())
     .order("run_date", { ascending: true })
-    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+    .returns<
+      InferredType<PayrollDatabaseRow, (typeof payrollColumns)[number]>[]
+    >();
 
-  if (error) {
-    console.error("getApprovedPayrollsByCompanyIdByYears Error", error);
-    return { data: null, error };
+  if (payrollError) {
+    console.error("getApprovedPayrollsByCompanyIdByYears Error", payrollError);
+    return { data: null, payrollError };
   }
 
-  const groupedByMonthObj: Record<string, typeof data> = {};
+  const { data: restData, error: restError } = await supabase
+    .from("invoice")
+    .select(restColumns.join(","))
+    .eq("company_id", companyId)
+    .in("type", ["reimbursement", "exit"])
+    .in("is_paid", [true])
+    .gte("paid_date", startOfYear.toISOString())
+    .lt("paid_date", endOfYear.toISOString())
+    .order("paid_date", { ascending: true })
+    .returns<
+      InferredType<InvoiceDatabaseRow, (typeof restColumns)[number]>[]
+    >();
+
+  if (restError) {
+    console.error("getApprovedPayrollsByCompanyIdByYears Error", restError);
+    return { data: null, restError };
+  }
+
+  const groupedByMonthObj: Record<string, typeof payrollData> = {};
 
   const tempDate = new Date(startOfYear);
+
   for (let i = 0; i < 12; i++) {
     const month = tempDate.toLocaleString("default", { month: "short" });
     const year = tempDate.getFullYear();
@@ -456,7 +479,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     tempDate.setMonth(tempDate.getMonth() + 1);
   }
 
-  for (const item of data) {
+  for (const item of payrollData) {
     const date = new Date(item.run_date ?? "");
     const month = date.toLocaleString("default", { month: "short" });
     const year = date.getFullYear();
@@ -474,7 +497,25 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     })
   );
 
-  return { data: groupedByMonth, error: null };
+  for (const item of restData) {
+    const date = new Date(item.paid_date ?? "");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    const key = `${month} ${year}`;
+    const amount = Number((item.payroll_data as any)?.[0]?.amount ?? 0);
+
+    const monthEntry: any = groupedByMonth.find((entry) => entry.month === key);
+
+    if (monthEntry) {
+      if (monthEntry.data.length > 0) {
+        monthEntry.data[0].total_net_amount += amount;
+      } else {
+        monthEntry.data.push({ total_net_amount: amount });
+      }
+    }
+  }
+
+  return { data: groupedByMonth };
 }
 
 export async function getSalaryEntriesForSalaryRegisterAndAll({

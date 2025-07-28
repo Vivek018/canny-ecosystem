@@ -8,6 +8,7 @@ import {
   getCannyCompanyIdByName,
   getLocationsForSelectByCompanyId,
   getRelationshipsByParentAndChildCompanyId,
+  getUsersByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { InvoiceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -90,9 +91,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     label: location?.name,
     value: location?.id,
   }));
-
+  const { data: userList } = await getUsersByCompanyId({
+    companyId,
+    supabase,
+  });
+  const userOptions = userList?.map((user) => ({
+    label: user?.email,
+    value: user?.id,
+  }));
   return {
     companyRelations,
+    userOptions,
     companyLocationArray,
     companyId,
   };
@@ -216,12 +225,14 @@ export default function CreateInvoiceFromRiembursement({
   updateValues,
   locationArrayFromUpdate,
   companyRelationsFromUpdate,
+  userOptionsFromUpdate,
 }: {
   updateValues?: InvoiceDatabaseInsert;
   locationArrayFromUpdate: any[];
+  userOptionsFromUpdate: any[];
   companyRelationsFromUpdate: any;
 }) {
-  const { companyId, companyLocationArray, companyRelations } =
+  const { companyId, companyLocationArray, userOptions, companyRelations } =
     useLoaderData<typeof loader>();
   const { selectedRows } = useReimbursementStore();
 
@@ -278,7 +289,7 @@ export default function CreateInvoiceFromRiembursement({
       clearExactCacheEntry(cacheKeyPrefix.payroll_invoice);
       toast({
         title: "Success",
-        description: actionData?.error ?? "Invoice created",
+        description: actionData?.message ?? "Invoice created",
         variant: "success",
       });
     } else {
@@ -370,14 +381,42 @@ export default function CreateInvoiceFromRiembursement({
                       type: "text",
                     }),
                     defaultValue:
-                      fields.company_address_id.initialValue
-                      ?? undefined,
+                      fields.company_address_id.initialValue ?? undefined,
                   }}
                   placeholder={"Select Company Location"}
                   labelProps={{
                     children: "Company Location",
                   }}
                   errors={fields.company_address_id.errors}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.additional_text, { type: "text" }),
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.additional_text.name
+                    )}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.additional_text.name),
+                  }}
+                  errors={fields.additional_text.errors}
+                />
+                <SearchableSelectField
+                  className="capitalize"
+                  options={userOptions ?? userOptionsFromUpdate}
+                  inputProps={{
+                    ...getInputProps(fields.user_id, {
+                      type: "text",
+                    }),
+                    defaultValue: fields.user_id.initialValue ?? undefined,
+                  }}
+                  placeholder={"Select Authority"}
+                  labelProps={{
+                    children: "Authority",
+                  }}
+                  errors={fields.user_id.errors}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -497,7 +536,7 @@ export default function CreateInvoiceFromRiembursement({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                    fields.payroll_data.value
+                      fields.payroll_data.value
                   ),
                 }}
                 fields={[

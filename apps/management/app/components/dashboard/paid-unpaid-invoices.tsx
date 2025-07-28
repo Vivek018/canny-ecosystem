@@ -64,15 +64,15 @@ export function InvoicePaidUnpaid({ chartData }: { chartData: any }) {
             <ChartLegend content={<ChartLegendContent />} />
             <Bar
               dataKey="paid"
-              stackId="a2"
+              stackId="a"
               fill="var(--color-paid)"
-              radius={[0, 0, 0, 0]}
+              radius={[0, 0, 4, 4]}
             />
             <Bar
               dataKey="unPaid"
               stackId="a"
               fill="var(--color-unPaid)"
-              radius={[3, 3, 0, 0]}
+              radius={[4, 4, 0, 0]}
             />
           </BarChart>
         </ChartContainer>

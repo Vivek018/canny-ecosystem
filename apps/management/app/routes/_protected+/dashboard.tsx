@@ -14,6 +14,7 @@ import {
   getExitsByCompanyIdByMonths,
   getInvoicesByCompanyIdForDashboard,
   getNotificationByCompanyId,
+  getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements,
   type InvoiceDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -27,6 +28,7 @@ import {
 import type {
   EmployeeDatabaseRow,
   ExitsRow,
+  InvoiceDatabaseRow,
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import { ActiveEmployeesBySite } from "@/components/payroll/analytics/active-employees-by-site";
@@ -70,7 +72,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
       filters,
     });
-
+    const reimbursementPromise =
+      getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements({
+        supabase,
+        companyId,
+        filters,
+      });
     const payrollByYearsPromise = getApprovedPayrollsByCompanyIdByYears({
       companyId,
       supabase,
@@ -86,6 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       companyId,
       notificationPromise,
+      reimbursementPromise,
       exitsPromise,
       employeesPromise,
       payrollPromise,
@@ -118,6 +126,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
         previousMonth: null,
         previousMonthError: null,
       }),
+      reimbursementPromise: Promise.resolve({
+        currentMonth: null,
+        currentMonthError: null,
+        previousMonth: null,
+        previousMonthError: null,
+      }),
       payrollByYearsPromise: Promise.resolve({ data: null, error }),
       invoicePromise: Promise.resolve({ data: null, error }),
       filters,
@@ -143,6 +157,7 @@ export default function Dashboard() {
     exitsPromise,
     employeesPromise,
     payrollPromise,
+    reimbursementPromise,
     payrollByYearsPromise,
     invoicePromise,
     filters,
@@ -216,9 +231,10 @@ export default function Dashboard() {
                 payrollPromise,
                 employeesPromise,
                 exitsPromise,
+                reimbursementPromise,
               ])}
             >
-              {([payrollData, employeesData, exitsData]) => {
+              {([payrollData, employeesData, exitsData, reimbursementData]) => {
                 if (payrollData.currentMonthError) {
                   clearCacheEntry(cacheKeyPrefix.dashboard);
                   return (
@@ -228,7 +244,15 @@ export default function Dashboard() {
                     />
                   );
                 }
-
+                if (reimbursementData.currentMonthError) {
+                  clearCacheEntry(cacheKeyPrefix.dashboard);
+                  return (
+                    <ErrorBoundary
+                      error={reimbursementData.currentMonthError}
+                      message="Failed to load reimbursement data"
+                    />
+                  );
+                }
                 if (employeesData.activeEmployeeError) {
                   clearCacheEntry(cacheKeyPrefix.dashboard);
                   return (
@@ -257,6 +281,12 @@ export default function Dashboard() {
                     previousData={
                       payrollData.previousMonth as unknown as PayrollDatabaseRow[]
                     }
+                    reimbursementCurrentData={
+                      reimbursementData.currentMonth as unknown as InvoiceDatabaseRow[]
+                    }
+                    reimbursementPreviousData={
+                      reimbursementData.previousMonth as unknown as InvoiceDatabaseRow[]
+                    }
                     activeEmployeeCount={
                       employeesData.activeEmployees as unknown as EmployeeDatabaseRow[]
                     }
@@ -277,15 +307,12 @@ export default function Dashboard() {
 
           <Suspense fallback={<LoadingSpinner className="h-64" />}>
             <Await resolve={payrollByYearsPromise}>
-              {({
-                data: payrollDataByYears,
-                error: payrollDataByYearError,
-              }) => {
-                if (payrollDataByYearError) {
+              {({ data: payrollDataByYears }) => {
+                if (!payrollDataByYears) {
                   clearCacheEntry(cacheKeyPrefix.dashboard);
                   return (
                     <ErrorBoundary
-                      error={payrollDataByYearError}
+                      error={{ error: "Failed to fetch Data" }}
                       message="Failed to load payroll trend data"
                     />
                   );

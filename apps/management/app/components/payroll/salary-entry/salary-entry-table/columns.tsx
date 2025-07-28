@@ -239,6 +239,7 @@ export const salaryEntryColumns = ({
       header: "",
       cell: ({ row }) => {
         const { role } = useUser();
+
         return (
           <SalaryEntryDropdown
             data={row.original}

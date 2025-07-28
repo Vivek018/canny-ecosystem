@@ -1,6 +1,7 @@
 import type {
   EmployeeDatabaseRow,
   ExitsRow,
+  InvoiceDatabaseRow,
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import {
@@ -19,6 +20,8 @@ export function CountCards({
   previousData,
   activeEmployeeCount,
   totalEmployeeCount,
+  reimbursementCurrentData,
+  reimbursementPreviousData,
 }: {
   currentExits: ExitsRow[];
   previousExits: ExitsRow[];
@@ -26,6 +29,8 @@ export function CountCards({
   previousData: PayrollDatabaseRow[];
   activeEmployeeCount: EmployeeDatabaseRow[];
   totalEmployeeCount: EmployeeDatabaseRow[];
+  reimbursementCurrentData: InvoiceDatabaseRow[];
+  reimbursementPreviousData: InvoiceDatabaseRow[];
 }) {
   const currentResult = currentData.reduce(
     (acc: Record<string, number>, item) => {
@@ -44,15 +49,35 @@ export function CountCards({
     {} as Record<string, number>
   );
 
+  const reimbursementCurrentResult = reimbursementCurrentData.reduce(
+    (acc: Record<string, number>, item: any) => {
+      const type = "reimbursement";
+      const amount = Number(item.payroll_data[0]?.amount ?? 0);
+      acc[type] = (acc[type] || 0) + amount;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  const reimbursementPreviousResult = reimbursementPreviousData.reduce(
+    (acc: Record<string, number>, item: any) => {
+      const type = "reimbursement";
+      const amount = Number(item.payroll_data[0]?.amount ?? 0);
+      acc[type] = (acc[type] || 0) + amount;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
   const salaryCalculation =
     ((Number(currentResult.salary ?? 0) - Number(previousResult.salary ?? 0)) /
       Number(previousResult.salary)) *
     100;
 
   const reimbursementCalculation =
-    ((Number(currentResult.reimbursement ?? 0) -
-      Number(previousResult.reimbursement ?? 0)) /
-      Number(previousResult.reimbursement)) *
+    ((Number(reimbursementCurrentResult.reimbursement ?? 0) -
+      Number(reimbursementPreviousResult.reimbursement ?? 0)) /
+      Number(reimbursementPreviousResult.reimbursement)) *
     100;
 
   return (
@@ -94,24 +119,26 @@ export function CountCards({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {currentResult.reimbursement ?? 0}
+            {reimbursementCurrentResult.reimbursement ?? 0}
           </div>
           <p
             className={cn(
               "text-xs text-muted-foreground flex",
-              (previousResult.reimbursement ? reimbursementCalculation : 100) >
-                0
+              (reimbursementPreviousResult.reimbursement
+                ? reimbursementCalculation
+                : 100) > 0
                 ? "text-green"
                 : "text-destructive"
             )}
           >
-            {previousResult.reimbursement
+            {reimbursementPreviousResult.reimbursement
               ? Math.abs(reimbursementCalculation).toFixed(2)
-              : (currentResult.reimbursement ?? 0)}
+              : (reimbursementCurrentResult.reimbursement ?? 0)}
             %
             <p className="text-xs text-muted-foreground ml-1">
-              {(previousResult.reimbursement ? reimbursementCalculation : 100) >
-              0
+              {(reimbursementPreviousResult.reimbursement
+                ? reimbursementCalculation
+                : 100) > 0
                 ? "more"
                 : "less"}{" "}
               than last month

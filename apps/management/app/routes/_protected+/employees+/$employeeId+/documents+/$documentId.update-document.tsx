@@ -119,7 +119,7 @@ export default function UpdateDocument() {
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }

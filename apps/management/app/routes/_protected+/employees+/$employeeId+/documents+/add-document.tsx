@@ -152,11 +152,12 @@ export default function AddDocument({
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_documents}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData.message,
@@ -165,7 +166,7 @@ export default function AddDocument({
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }
@@ -221,11 +222,14 @@ export default function AddDocument({
               }}
               errors={fields.url.errors}
             />
-            <FormButtons className="self-end -mr-6 pb-0" form={form} isSingle={true} />
+            <FormButtons
+              className="self-end -mr-6 pb-0"
+              form={form}
+              isSingle={true}
+            />
           </Form>
         </FormProvider>
       </div>
     </div>
   );
 }
-

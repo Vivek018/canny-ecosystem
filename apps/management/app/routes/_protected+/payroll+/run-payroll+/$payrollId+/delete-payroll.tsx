@@ -76,7 +76,7 @@ export default function DeletePayroll() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error,
+          description: (actionData?.error as any)?.message,
           variant: "destructive",
         });
       }

@@ -27,17 +27,18 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
     const siteCounts: Record<string, Record<string, number>> = {};
 
     for (const item of chartData) {
-      const project =
-        item.employee_project_assignment?.sites?.projects?.name;
+      const project = item.employee_project_assignment?.sites?.projects?.name;
       const site = item.employee_project_assignment?.sites?.name;
 
-      if (project && site) {
-        if (!siteCounts[project]) {
-          siteCounts[project] = {};
-        }
-        siteCounts[project][site] =
-          (siteCounts[project][site] || 0) + 1;
+      if (!site) continue; // Skip if site is missing
+
+      const projectKey = project || site; // If no project, use site as project
+
+      if (!siteCounts[projectKey]) {
+        siteCounts[projectKey] = {};
       }
+
+      siteCounts[projectKey][site] = (siteCounts[projectKey][site] || 0) + 1;
     }
 
     const finalData = Object.entries(siteCounts).map(

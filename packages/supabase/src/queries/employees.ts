@@ -1322,7 +1322,7 @@ export async function getActiveEmployeesByCompanyId({
     .select(
       `${columns.join(
         ","
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!inner(id, name)))`
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))`
     )
     .eq("company_id", companyId)
     .eq("is_active", true);
