@@ -65,7 +65,7 @@ export function InvoiceTable<TData, TValue>({
   const { rowSelection, setRowSelection, setSelectedRows, setColumns } =
     useInvoiceStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
   const loadMoreInvoices = async () => {
     const formattedFrom = from;
@@ -139,7 +139,7 @@ export function InvoiceTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -169,12 +169,12 @@ export function InvoiceTable<TData, TValue>({
                             cell.column.id === "invoice_number" &&
                               "sticky left-12 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -188,7 +188,7 @@ export function InvoiceTable<TData, TValue>({
                   <TableCell
                     colSpan={columns.length}
                     className={cn(
-                      "h-96 bg-background grid place-items-center text-center tracking-wide"
+                      "h-96 bg-background grid place-items-center text-center tracking-wide",
                     )}
                   >
                     <div className="flex flex-col items-center gap-1">
@@ -196,7 +196,7 @@ export function InvoiceTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -205,7 +205,7 @@ export function InvoiceTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

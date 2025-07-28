@@ -30,7 +30,6 @@ export function InvoiceTrend({
   chartData: InvoiceDataType[];
   companyRelations: any;
 }) {
-
   const [activeChart, setActiveChart] =
     useState<keyof typeof chartConfig>("amount");
 
@@ -53,21 +52,22 @@ export function InvoiceTrend({
         ?.filter((item: PayrollDataItem) => item.type === "earning")
         ?.reduce(
           (sum: number, item: PayrollDataItem) => sum + Number(item.amount),
-          0
+          0,
         ) ?? 0;
 
     const beforeService: number =
       totalGross +
       Number(
         invoice.payroll_data?.find(
-          (item: PayrollDataItem) => item.field === "PF" || item.field === "EPF"
-        )?.amount ?? 0
+          (item: PayrollDataItem) =>
+            item.field === "PF" || item.field === "EPF",
+        )?.amount ?? 0,
       ) +
       Number(
         invoice.payroll_data?.find(
           (item: PayrollDataItem) =>
-            item.field === "ESIC" || item.field === "ESI"
-        )?.amount ?? 0
+            item.field === "ESIC" || item.field === "ESI",
+        )?.amount ?? 0,
       );
 
     const includedFields: string[] | undefined =
@@ -77,11 +77,11 @@ export function InvoiceTrend({
 
     const sum: number = invoice.payroll_data
       ?.filter((item: PayrollDataItem) =>
-        includedFields?.includes(item.field.toUpperCase())
+        includedFields?.includes(item.field.toUpperCase()),
       )
       ?.reduce(
         (acc: number, curr: PayrollDataItem) => acc + Number(curr.amount ?? 0),
-        0
+        0,
       );
 
     const service_charge: number =
@@ -90,13 +90,13 @@ export function InvoiceTrend({
           ? (sum * companyRelations.service_charge) / 100
           : 0
         : invoice.include_charge
-        ? (invoice.payroll_data.reduce(
-            (sum: number, item: PayrollDataItem) => sum + Number(item.amount),
-            0
-          ) *
-            companyRelations.reimbursement_charge) /
-          100
-        : 0;
+          ? (invoice.payroll_data.reduce(
+              (sum: number, item: PayrollDataItem) => sum + Number(item.amount),
+              0,
+            ) *
+              companyRelations.reimbursement_charge) /
+            100
+          : 0;
 
     const total: number =
       type === "salary"
@@ -130,7 +130,7 @@ export function InvoiceTrend({
     () => ({
       amount: trendData.reduce((acc, curr) => acc + (curr.amount || 0), 0),
     }),
-    []
+    [],
   );
 
   return (

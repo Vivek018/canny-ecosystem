@@ -1,4 +1,8 @@
-import type { HolidaysDatabaseInsert, HolidaysDatabaseUpdate, TypedSupabaseClient } from "../types";
+import type {
+  HolidaysDatabaseInsert,
+  HolidaysDatabaseUpdate,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function addHolidaysFromData({
   supabase,
@@ -7,9 +11,7 @@ export async function addHolidaysFromData({
   supabase: TypedSupabaseClient;
   data: HolidaysDatabaseInsert[];
 }) {
-  const { error, status } = await supabase
-    .from("holidays")
-    .insert(data);
+  const { error, status } = await supabase.from("holidays").insert(data);
 
   if (error) {
     console.error("createHolidaysFromData Error:", error);

@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useReportsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreReport = async () => {
@@ -113,14 +113,14 @@ export function DataTable<TData, TValue>({
             is_eligible_for_gratuity:
               employeeWorkingYears >= gratuityEligibleYears,
             employee_eligible_date: joining_date.setDate(
-              joining_date.getDate() + totalDays
+              joining_date.getDate() + totalDays,
             ),
           };
-        }
+        },
       );
       if (data) {
         setData(
-          (prevData) => [...prevData, ...(gratuityReportData ?? [])] as TData[]
+          (prevData) => [...prevData, ...(gratuityReportData ?? [])] as TData[],
         );
       }
       setFrom(to + 1);
@@ -165,14 +165,14 @@ export function DataTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <DataTableHeader
               table={table}
@@ -184,7 +184,7 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className='relative h-[40px] md:h-[45px] cursor-default select-text'
+                    className="relative h-[40px] md:h-[45px] cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -204,12 +204,12 @@ export function DataTable<TData, TValue>({
                             cell.column.id === "employee_name" &&
                               "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -223,24 +223,24 @@ export function DataTable<TData, TValue>({
                   <TableCell
                     colSpan={columns.length}
                     className={cn(
-                      "h-96 bg-background grid place-items-center text-center tracking-wide"
+                      "h-96 bg-background grid place-items-center text-center tracking-wide",
                     )}
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No employees found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No employees found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -258,10 +258,10 @@ export function DataTable<TData, TValue>({
       </div>
 
       {hasNextPage && initialData?.length && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className='text-sm text-[#606060]'>Loading more...</span>
+            <span className="text-sm text-[#606060]">Loading more...</span>
           </div>
         </div>
       )}

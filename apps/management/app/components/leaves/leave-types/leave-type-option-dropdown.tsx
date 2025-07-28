@@ -31,7 +31,7 @@ export const LeaveTypeOptionsDropdown = ({
             className={cn(
               "",
               !hasPermission(role, `${updateRole}:${attribute.leaves}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={() => {
               navigate(`/time-tracking/leaves/${id}/update-leave-type`);
@@ -44,7 +44,7 @@ export const LeaveTypeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.leaves}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeleteLeaveType id={id} />

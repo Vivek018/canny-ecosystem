@@ -31,7 +31,8 @@ export function ExitByReasons({ chartData }: { chartData: ExitDataType[] }) {
   const exitByReasonsData = Object.values(
     chartData.reduce(
       (acc, row) => {
-        const reason = row?.reason?.toLowerCase().replace(/\s+/g, "_") || "other";
+        const reason =
+          row?.reason?.toLowerCase().replace(/\s+/g, "_") || "other";
 
         if (!acc[reason]) acc[reason] = { reason, amount: 0 };
 

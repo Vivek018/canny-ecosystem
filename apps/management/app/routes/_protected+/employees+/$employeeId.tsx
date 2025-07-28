@@ -40,16 +40,12 @@ export default function Employee() {
           to="/employees"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full"
+            "bg-card w-9 h-9 px-0 rounded-full",
           )}
         >
           <Icon name="chevron-left" size="sm" />
         </Link>
-        <SecondaryMenu
-          items={items}
-          pathname={pathname}
-          Link={Link}
-        />
+        <SecondaryMenu items={items} pathname={pathname} Link={Link} />
       </div>
       <div className="px-4">
         <Outlet />

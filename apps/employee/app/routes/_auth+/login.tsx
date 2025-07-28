@@ -1,6 +1,9 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
-import { employeeRoleCookie, getEmployeeIdFromCookie } from "@/utils/server/user.server";
+import {
+  employeeRoleCookie,
+  getEmployeeIdFromCookie,
+} from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -9,7 +12,12 @@ import { Field } from "@canny_ecosystem/ui/forms";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { EmployeeLoginSchema } from "@canny_ecosystem/utils";
-import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import {
+  FormProvider,
+  getFormProps,
+  getInputProps,
+  useForm,
+} from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   json,
@@ -57,7 +65,10 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     if (error || !data || data.length === 0) {
-      return json({ error: error || "No employee data found", employeeId: null }, { status: 400 });
+      return json(
+        { error: error || "No employee data found", employeeId: null },
+        { status: 400 },
+      );
     }
 
     if (typeof window !== "undefined") {
@@ -94,7 +105,6 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect(data.url, { headers });
   }
 
-
   return json({ error: "Failed to get login URL" }, { status: 500 });
 }
 
@@ -102,7 +112,9 @@ export default function Login() {
   const actionData = useActionData<typeof action>();
   const loaderData = useLoaderData<typeof loader>();
   const { toast } = useToast();
-  const error = (actionData && 'error' in actionData ? actionData.error : null) || loaderData.error;
+  const error =
+    (actionData && "error" in actionData ? actionData.error : null) ||
+    loaderData.error;
 
   const [form, fields] = useForm({
     id: "login",
@@ -120,7 +132,7 @@ export default function Login() {
         title: "Error",
         description: JSON.stringify(error) ?? "Failed to load employee details",
         variant: "destructive",
-      })
+      });
     }
   }, [error, actionData]);
 
@@ -188,7 +200,8 @@ export default function Login() {
                 >
                   Login as Supervisor
                 </Button>
-              </Form></div>
+              </Form>
+            </div>
           </div>
 
           <p className="text-xs text-[#878787]">

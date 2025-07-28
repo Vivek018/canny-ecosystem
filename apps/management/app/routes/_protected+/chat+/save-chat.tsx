@@ -19,9 +19,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 
     if (user?.id) {
-      const { data: dbData, error } = await getChatsByUserId({ supabase, userId: user?.id ?? "" });
+      const { data: dbData, error } = await getChatsByUserId({
+        supabase,
+        userId: user?.id ?? "",
+      });
 
-      const data = dbData?.map(({ prompt, id }) => ({ name: prompt, link: `/chat/save-chat/${id}` }))
+      const data = dbData?.map(({ prompt, id }) => ({
+        name: prompt,
+        link: `/chat/save-chat/${id}`,
+      }));
 
       return defer({ data, error });
     }
@@ -47,5 +53,5 @@ export default function SaveChat() {
         <Outlet context={{ dataLength: data?.length }} />
       </div>
     </section>
-  )
+  );
 }

@@ -66,7 +66,7 @@ export const FilesSelect = ({
       <p
         className={cn(
           "text-xs text-destructive mt-1 hidden",
-          (fls?.length === 0 || fls?.length === undefined) && "flex"
+          (fls?.length === 0 || fls?.length === undefined) && "flex",
         )}
       >
         Required

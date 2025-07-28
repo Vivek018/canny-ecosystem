@@ -54,7 +54,7 @@ export const ThemeSwitch = ({
             {
               method: "POST",
               action: "/cookie",
-            }
+            },
           );
         }}
       >
@@ -62,7 +62,7 @@ export const ThemeSwitch = ({
           noIcon={!isExpanded}
           className={cn(
             "py-5 px-[13px] gap-2.5 h-12 w-12 rounded-full capitalize text-sm tracking-wide flex items-center justify-start transition-[width]",
-            isExpanded && "w-full"
+            isExpanded && "w-full",
           )}
         >
           <ThemeIcon

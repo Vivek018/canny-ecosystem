@@ -64,38 +64,33 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
 
   return (
     <TableHeader className={className}>
-      <TableRow className='h-[45px] hover:bg-transparent'>
+      <TableRow className="h-[45px] hover:bg-transparent">
         {LeavesColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead
-                key={id}
-                className={cn(
-                  "px-4 py-2",
-                )}
-              >
+              <TableHead key={id} className={cn("px-4 py-2")}>
                 <Button
-                  className='p-0 hover:bg-transparent space-x-2 disabled:opacity-100'
-                  variant='ghost'
+                  className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+                  variant="ghost"
                   disabled={!isEnableSorting(id)}
                   onClick={(e) => {
                     e.preventDefault();
                     createSortQuery(id);
                   }}
                 >
-                  <span className='capitalize'>{columnName(id)}</span>
+                  <span className="capitalize">{columnName(id)}</span>
                   <Icon
-                    name='chevron-up'
+                    name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
-                    name='chevron-down'
+                    name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

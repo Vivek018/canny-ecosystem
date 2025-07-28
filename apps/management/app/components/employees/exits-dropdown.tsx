@@ -1,5 +1,7 @@
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { DeleteEmployeeExits } from "./delete-employee-exits";
 

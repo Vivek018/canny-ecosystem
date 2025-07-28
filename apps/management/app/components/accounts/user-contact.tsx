@@ -81,7 +81,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.mobile_number.name
+                  fields.mobile_number.name,
                 )}`,
                 className: "disabled:opacity-100",
                 disabled: true,

@@ -79,7 +79,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.feedback_list}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -89,7 +89,9 @@ function FeedbackCard({ feedback }: { feedback: any }) {
   return (
     <Card className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between">
       <CardHeader className="flex flex-row space-y-0 items-center justify-between py-4">
-        <CardTitle className="font-bold capitalize">{feedback.category}</CardTitle>
+        <CardTitle className="font-bold capitalize">
+          {feedback.category}
+        </CardTitle>
         <CardTitle
           className={cn(
             "px-1 capitalize",
@@ -97,7 +99,7 @@ function FeedbackCard({ feedback }: { feedback: any }) {
               ? "text-destructive"
               : feedback.severity === "normal"
                 ? "text-purple-500"
-                : "text-yellow-400"
+                : "text-yellow-400",
           )}
         >
           {feedback.severity}

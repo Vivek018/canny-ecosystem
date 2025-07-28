@@ -38,7 +38,7 @@ export const DeleteDepartment = ({
   };
 
   const handleDeleteDepartment = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -48,7 +48,7 @@ export const DeleteDepartment = ({
           method: "post",
           action: `${id}/delete-department`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -62,7 +62,8 @@ export const DeleteDepartment = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
-          hasPermission(role, `${deleteRole}:${attribute.departments}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.departments}`) &&
+            "flex",
         )}
       >
         Delete Department

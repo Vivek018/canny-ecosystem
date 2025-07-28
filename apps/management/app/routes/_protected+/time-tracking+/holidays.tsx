@@ -14,7 +14,12 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission, readRole, searchInObject } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  hasPermission,
+  readRole,
+  searchInObject,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -109,8 +114,8 @@ export default function Holidays() {
                       "flex items-center gap-1",
                       !hasPermission(
                         role,
-                        `${createRole}:${attribute.holidays}`
-                      ) && "hidden"
+                        `${createRole}:${attribute.holidays}`,
+                      ) && "hidden",
                     )}
                   >
                     <span>Add</span>

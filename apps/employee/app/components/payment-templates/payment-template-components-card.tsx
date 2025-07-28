@@ -11,7 +11,8 @@ export const PaymentTemplateComponentsCard = ({
   paymentTemplateComponents:
     | Omit<PaymentTemplateComponentType, "created_at" | "updated_at">[]
     | PaymentTemplateComponentType[]
-    | null | undefined;
+    | null
+    | undefined;
   returnTo?: string;
 }) => {
   const navigate = useNavigate();
@@ -26,15 +27,15 @@ export const PaymentTemplateComponentsCard = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className='min-w-max'>
+      <DialogContent className="min-w-max">
         <DialogTitle>Payment Template Components</DialogTitle>
-        <div className='flex flex-col w-full h-full'>
-          <div className='grid grid-cols-3 place-content-center justify-between gap-4 py-4 text-foreground text-base font-semibold'>
+        <div className="flex flex-col w-full h-full">
+          <div className="grid grid-cols-3 place-content-center justify-between gap-4 py-4 text-foreground text-base font-semibold">
             <span>Component Name</span>
             <span>Component Type</span>
             <span>Amount</span>
           </div>
-          <div className='max-h-96 overflow-y-auto'>
+          <div className="max-h-96 overflow-y-auto">
             {paymentTemplateComponents?.map((paymentTemplateComponent) => {
               const name =
                 paymentTemplateComponent?.payment_fields?.name ??
@@ -44,17 +45,17 @@ export const PaymentTemplateComponentsCard = ({
               return (
                 <div
                   key={paymentTemplateComponent?.id}
-                  className='grid grid-cols-3 place-content-center justify-between gap-4 py-3'
+                  className="grid grid-cols-3 place-content-center justify-between gap-4 py-3"
                 >
-                  <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+                  <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
                     {String(name)}
                   </div>
-                  <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+                  <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
                     {replaceUnderscore(
-                      paymentTemplateComponent?.component_type
+                      paymentTemplateComponent?.component_type,
                     )}
                   </div>
-                  <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+                  <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
                     {paymentTemplateComponent?.calculation_value}
                   </div>
                 </div>

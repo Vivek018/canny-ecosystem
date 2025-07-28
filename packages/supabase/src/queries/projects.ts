@@ -36,7 +36,7 @@ export async function getProjectsByCompanyId({
     "start_date",
     "end_date",
     "status",
-    "company_id"
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -91,7 +91,7 @@ export async function getProjectById({
     "start_date",
     "end_date",
     "status",
-    "company_id"
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase

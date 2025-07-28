@@ -65,8 +65,8 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
 
   return (
     <TableHeader className={className}>
-      <TableRow className='h-[45px] hover:bg-transparent'>
-        <TableHead className='hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10'>
+      <TableRow className="h-[45px] hover:bg-transparent">
+        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -85,31 +85,32 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
                 className={cn(
                   "px-4 py-2",
                   id === "employee_code" && "sticky left-12 bg-card z-10",
-                  id === "employee_name" && "sticky w-full left-48 bg-card z-10"
+                  id === "employee_name" &&
+                    "sticky w-full left-48 bg-card z-10",
                 )}
               >
                 <Button
-                  className='p-0 hover:bg-transparent space-x-2 disabled:opacity-100'
-                  variant='ghost'
+                  className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+                  variant="ghost"
                   disabled={!isEnableSorting(id)}
                   onClick={(e) => {
                     e.preventDefault();
                     createSortQuery(id);
                   }}
                 >
-                  <span className='capitalize'>{columnName(id)}</span>
+                  <span className="capitalize">{columnName(id)}</span>
                   <Icon
-                    name='chevron-up'
+                    name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
-                    name='chevron-down'
+                    name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>
@@ -117,7 +118,7 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
             )
           );
         })}
-        <TableHead className='sticky right-0 min-w-20 max-w-20 bg-card z-10' />
+        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

@@ -107,10 +107,10 @@ export async function getExitsConflicts({
     .select(
       `
       employee_id
-    `
+    `,
     )
     .or(
-      [`employee_id.in.(${employeeIds.map((id) => id).join(",")})`].join(",")
+      [`employee_id.in.(${employeeIds.map((id) => id).join(",")})`].join(","),
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -123,7 +123,7 @@ export async function getExitsConflicts({
   const conflictingIndices = importedData.reduce(
     (indices: number[], record, index) => {
       const hasConflict = conflictingRecords?.some(
-        (existing) => existing.employee_id === record.employee_id
+        (existing) => existing.employee_id === record.employee_id,
       );
 
       if (hasConflict) {
@@ -131,7 +131,7 @@ export async function getExitsConflicts({
       }
       return indices;
     },
-    []
+    [],
   );
 
   return { conflictingIndices, error: null };
@@ -159,7 +159,7 @@ export async function createExitsFromImportedData({
     .select("employee_id")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+      identifiers.map((entry) => entry.employee_id).filter(Boolean),
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -210,7 +210,7 @@ export async function createExitsFromImportedData({
       data.map(async (record) => {
         const existingRecord = existingRecords?.find(
           (existing) =>
-            normalize(existing.employee_id) === normalize(record.employee_id)
+            normalize(existing.employee_id) === normalize(record.employee_id),
         );
 
         if (existingRecord) {
@@ -227,7 +227,7 @@ export async function createExitsFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      })
+      }),
     );
 
     const errors = results.filter((r) => r.error);
@@ -258,7 +258,7 @@ export async function updateExitsForPayrollCreation({
     data.map((item) => {
       const { id, ...updateData } = item;
       return supabase.from("exits").update(updateData).eq("id", id!);
-    })
+    }),
   );
 
   const errors = results.filter((res) => res.error);

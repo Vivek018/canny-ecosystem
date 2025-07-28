@@ -56,7 +56,6 @@ export function EmployeeDetailsImportData({
     }
   };
 
-  
   const fetchConflicts = async () => {
     try {
       const { conflictingIndices, error } = await getEmployeeDetailsConflicts({

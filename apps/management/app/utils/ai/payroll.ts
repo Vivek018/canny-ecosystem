@@ -14,19 +14,19 @@ export const PayrollFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Title of the payroll which will usually be combination of name of company, project, site, month and year. Example: 'COTECNA CG ODISHA MINERAL MARCH 2025'. "
+      "Title of the payroll which will usually be combination of name of company, project, site, month and year. Example: 'COTECNA CG ODISHA MINERAL MARCH 2025'. ",
     ),
   date_start: z
     .string()
     .optional()
     .describe(
-      "Date of Payroll start range in YYYY-MM-DD format. Example: 1990-01-01"
+      "Date of Payroll start range in YYYY-MM-DD format. Example: 1990-01-01",
     ),
   date_end: z
     .string()
     .optional()
     .describe(
-      "Date of Payroll end range in YYYY-MM-DD format. Example: 2000-12-31"
+      "Date of Payroll end range in YYYY-MM-DD format. Example: 2000-12-31",
     ),
   status: z
     .enum(payrollPaymentStatusArray)

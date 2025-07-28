@@ -68,7 +68,7 @@ export default function AttendanceEmailMenu({
   }
 
   const sortedDateHeaders = [...dateHeaders].sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
   );
 
   const formattedData: any[] | Papa.UnparseObject<any> = [];
@@ -121,10 +121,10 @@ export default function AttendanceEmailMenu({
     });
 
     const attendanceRegisterBase64 = arrayBufferToBase64(
-      attendanceRegisterFile
+      attendanceRegisterFile,
     );
     const attendanceHourlyRegisterBase64 = arrayBufferToBase64(
-      attendanceHourlyRegisterFile
+      attendanceHourlyRegisterFile,
     );
 
     const formData = new FormData();
@@ -132,7 +132,7 @@ export default function AttendanceEmailMenu({
     formData.append("attendanceRegisterBase64", attendanceRegisterBase64);
     formData.append(
       "attendanceHourlyRegisterBase64",
-      attendanceHourlyRegisterBase64
+      attendanceHourlyRegisterBase64,
     );
 
     if (to) {
@@ -154,8 +154,8 @@ export default function AttendanceEmailMenu({
     <div
       className={cn(
         !hasPermission(role, `${emailRole}:${attribute.attendance}`) &&
-        "hidden",
-        !selectedRows.length && "hidden"
+          "hidden",
+        !selectedRows.length && "hidden",
       )}
     >
       <Dialog>

@@ -1,9 +1,5 @@
-import {
-  useImportStoreForEmployeeProjectAssignments,
-} from "@/store/import";
-import type {
-  ImportEmployeeProjectAssignmentsDataType,
-} from "@canny_ecosystem/supabase/queries";
+import { useImportStoreForEmployeeProjectAssignments } from "@/store/import";
+import type { ImportEmployeeProjectAssignmentsDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +56,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -71,7 +67,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -92,7 +88,7 @@ export const UpdateImportedEmployee = ({
             />
             <Combobox
               options={transformStringArrayIntoOptions(
-                skillLevelArray as unknown as string[]
+                skillLevelArray as unknown as string[],
               )}
               value={data.skill_level ?? skillLevelArray[0]}
               onChange={(value: string) => {
@@ -127,7 +123,7 @@ export const UpdateImportedEmployee = ({
           <div className="grid mb-5 grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                assignmentTypeArray as unknown as string[]
+                assignmentTypeArray as unknown as string[],
               )}
               value={data.assignment_type ?? assignmentTypeArray[0]}
               onChange={(value: string) => {
@@ -137,7 +133,7 @@ export const UpdateImportedEmployee = ({
             />
             <Combobox
               options={transformStringArrayIntoOptions(
-                positionArray as unknown as string[]
+                positionArray as unknown as string[],
               )}
               value={data.position ?? positionArray[1]}
               onChange={(value: string) => {

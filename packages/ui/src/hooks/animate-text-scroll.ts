@@ -6,7 +6,7 @@ type UseAnimateTextScrollOptions = {
 };
 
 export function useAnimateTextScroll(
-  options: UseAnimateTextScrollOptions = {}
+  options: UseAnimateTextScrollOptions = {},
 ) {
   const containerRef = useRef<any>(null);
   const contentRef = useRef<any>(null);

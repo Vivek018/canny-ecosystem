@@ -37,7 +37,7 @@ export const SalaryEntryDropdown = ({
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    document: string
+    document: string,
   ) => {
     e.preventDefault();
     navigate(`${employeeId}/${document}`);
@@ -86,7 +86,7 @@ export const DeleteSalaryEntry = ({
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/${employeeId}/delete-salary-entry`,
-      }
+      },
     );
   };
 
@@ -95,7 +95,7 @@ export const DeleteSalaryEntry = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Delete Salary Entry

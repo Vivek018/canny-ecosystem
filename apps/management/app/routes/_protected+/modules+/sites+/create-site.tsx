@@ -41,7 +41,10 @@ import { createSite } from "@canny_ecosystem/supabase/mutations";
 import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { UPDATE_SITE } from "./$siteId+/update-site";
-import { getLocationsForSelectByCompanyId, getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  getLocationsForSelectByCompanyId,
+  getProjectsByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -71,7 +74,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
-    const { data: projectsData, error: projectsError } = await getProjectsByCompanyId({ supabase, companyId });
+    const { data: projectsData, error: projectsError } =
+      await getProjectsByCompanyId({ supabase, companyId });
 
     if (error ?? projectsError) throw error ?? projectsError;
 
@@ -162,7 +166,8 @@ export default function CreateSite({
   projectFromUpdate: ComboboxSelectOption[] | undefined | null;
   updateValues?: SiteDatabaseUpdate | null;
 }) {
-  const { companyId, locationOptions, projectOptions, error } = useLoaderData<typeof loader>();
+  const { companyId, locationOptions, projectOptions, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
 
@@ -197,7 +202,8 @@ export default function CreateSite({
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.error?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.error?.message,
           variant: "destructive",
         });
       }
@@ -240,11 +246,12 @@ export default function CreateSite({
                 errors={fields.name.errors}
               />
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-
                 <SearchableSelectField
                   key={resetKey}
                   className="capitalize"
-                  options={((updateValues ? projectFromUpdate : projectOptions)) ?? []}
+                  options={
+                    (updateValues ? projectFromUpdate : projectOptions) ?? []
+                  }
                   inputProps={{
                     ...getInputProps(fields.project_id, {
                       type: "text",
@@ -259,7 +266,9 @@ export default function CreateSite({
                 <SearchableSelectField
                   key={resetKey + 1}
                   className="capitalize"
-                  options={(updateValues ? locationFromUpdate : locationOptions) ?? []}
+                  options={
+                    (updateValues ? locationFromUpdate : locationOptions) ?? []
+                  }
                   inputProps={{
                     ...getInputProps(fields.company_location_id, {
                       type: "text",
@@ -348,7 +357,7 @@ export default function CreateSite({
                     placeholder: `Enter ${fields.capacity.name}`,
                   }}
                   labelProps={{
-                    className: 'capitalize',
+                    className: "capitalize",
                     children: `Employee ${fields.capacity.name}`,
                   }}
                   errors={fields.capacity.errors}

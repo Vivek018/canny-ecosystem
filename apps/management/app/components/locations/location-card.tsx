@@ -66,8 +66,8 @@ export function LocationCard({
                     "p-2 rounded-md bg-secondary grid place-items-center ",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.settingLocations}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.settingLocations}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -84,9 +84,9 @@ export function LocationCard({
                   !location.longitude &&
                   !hasPermission(
                     `${role}`,
-                    `${deleteRole}:${attribute.settingLocations}`
+                    `${deleteRole}:${attribute.settingLocations}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -96,7 +96,7 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.latitude && "hidden"
+                    !location.latitude && "hidden",
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(location.latitude));
@@ -107,7 +107,7 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.longitude && "hidden"
+                    !location.longitude && "hidden",
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(location.longitude));
@@ -117,7 +117,7 @@ export function LocationCard({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    !location.latitude && !location.longitude && "hidden"
+                    !location.latitude && !location.longitude && "hidden",
                   )}
                 />
                 <DropdownMenuItem
@@ -133,8 +133,8 @@ export function LocationCard({
                   className={cn(
                     !hasPermission(
                       `${role}`,
-                      `${deleteRole}:${attribute.settingLocations}`
-                    ) && "hidden"
+                      `${deleteRole}:${attribute.settingLocations}`,
+                    ) && "hidden",
                   )}
                 />
                 <DeleteLocation locationId={location.id} />
@@ -175,7 +175,7 @@ export function LocationCard({
       <CardFooter
         className={cn(
           "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
-          !location.is_primary && "opacity-0"
+          !location.is_primary && "opacity-0",
         )}
       >
         <Icon name="dot-filled" size="xs" />

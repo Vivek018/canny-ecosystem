@@ -68,11 +68,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-  attendance: Pick<
-    EmployeeMonthlyAttendanceDatabaseRow,
-    "id" | "employee_id" | "working_days" | "present_days"
-  >;
-}[];
+    attendance: Pick<
+      EmployeeMonthlyAttendanceDatabaseRow,
+      "id" | "employee_id" | "working_days" | "present_days"
+    >;
+  }[];
 
 export async function getAttendanceById({
   supabase,
@@ -199,8 +199,9 @@ export async function getMonthlyAttendanceByCompanyId({
     .select(
       `
   ${columns.join(",")},
-  employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(
+  employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+    foreignFilters ? "inner" : "left"
+  }(
     sites!${foreignFilters ? "inner" : "left"}(
       id,
       name,
@@ -222,7 +223,7 @@ export async function getMonthlyAttendanceByCompanyId({
     casual_leaves
   )
 `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId);
 
@@ -231,12 +232,12 @@ export async function getMonthlyAttendanceByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`
+          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`,
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
       );
     }
   }
@@ -247,19 +248,15 @@ export async function getMonthlyAttendanceByCompanyId({
   query = query.eq("monthly_attendance.month", effectiveMonth);
   query = query.eq("monthly_attendance.year", effectiveYear);
 
-
   if (project) {
     query = query.eq(
       "employee_project_assignment.sites.projects.name",
-      project
+      project,
     );
   }
 
   if (site) {
-    query = query.eq(
-      "employee_project_assignment.sites.name",
-      site
-    );
+    query = query.eq("employee_project_assignment.sites.name", site);
   }
 
   if (sort) {
@@ -369,14 +366,8 @@ export async function getAttendanceReportByCompanyId({
   const startDate = `${currentYear}-01-01`;
   const endDate = `${currentYear}-12-31`;
   const { sort, from, to, filters, searchQuery } = params;
-  const {
-    project,
-    site,
-    start_year,
-    start_month,
-    end_year,
-    end_month,
-  } = filters ?? {};
+  const { project, site, start_year, start_month, end_year, end_month } =
+    filters ?? {};
   const foreignFilters = project || site;
 
   const columns = [
@@ -392,10 +383,12 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        foreignFilters ? "inner" : "left"
       }(
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
-      }(id, name))),
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+          foreignFilters ? "inner" : "left"
+        }(id, name))),
       attendance(
         id,
         date,
@@ -403,7 +396,7 @@ export async function getAttendanceReportByCompanyId({
         employee_id
       )
     `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId)
     .eq("attendance.present", true)
@@ -423,12 +416,12 @@ export async function getAttendanceReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
       );
     }
   }
@@ -441,24 +434,21 @@ export async function getAttendanceReportByCompanyId({
     }
     const start_date = new Date(`${start_month} 1, ${start_year} 12:00:00`);
     const end_date = new Date(
-      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`
+      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`,
     );
     if (start_year)
       query.gte(
         "attendance.date",
-        formatUTCDate(start_date.toISOString().split("T")[0])
+        formatUTCDate(start_date.toISOString().split("T")[0]),
       );
     if (end_year)
       query.lte(
         "attendance.date",
-        formatUTCDate(end_date.toISOString().split("T")[0])
+        formatUTCDate(end_date.toISOString().split("T")[0]),
       );
   }
   if (project) {
-    query.eq(
-      "employee_project_assignment.sites.projects.name",
-      project
-    );
+    query.eq("employee_project_assignment.sites.projects.name", project);
   }
   if (site) {
     query.eq("employee_project_assignment.sites.name", site);
@@ -477,7 +467,7 @@ export async function getAttendanceReportByCompanyId({
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string }
+    {} as { [key: number]: string },
   );
 
   const processedData = data?.map((employee) => {

@@ -71,19 +71,26 @@ export const useSalaryData = (data: any[]) => {
     return result;
   }, [data, searchString, selectedSiteIds, selectedDeptIds]);
 
-  const handleFieldChange = useCallback((newSelectedFields: string[]) => {
-    if (!newSelectedFields.length) {
-      setSelectedSiteIds([]);
-      setSelectedDeptIds([]);
-      return;
-    }
+  const handleFieldChange = useCallback(
+    (newSelectedFields: string[]) => {
+      if (!newSelectedFields.length) {
+        setSelectedSiteIds([]);
+        setSelectedDeptIds([]);
+        return;
+      }
 
-    const siteIds = siteOptions.map((opt) => opt.value);
-    const deptIds = departmentOptions.map((opt) => opt.value);
+      const siteIds = siteOptions.map((opt) => opt.value);
+      const deptIds = departmentOptions.map((opt) => opt.value);
 
-    setSelectedSiteIds(newSelectedFields.filter((id) => siteIds.includes(id)));
-    setSelectedDeptIds(newSelectedFields.filter((id) => deptIds.includes(id)));
-  }, [siteOptions, departmentOptions]);
+      setSelectedSiteIds(
+        newSelectedFields.filter((id) => siteIds.includes(id)),
+      );
+      setSelectedDeptIds(
+        newSelectedFields.filter((id) => deptIds.includes(id)),
+      );
+    },
+    [siteOptions, departmentOptions],
+  );
 
   return {
     siteOptions,

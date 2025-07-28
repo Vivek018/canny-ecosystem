@@ -69,7 +69,6 @@ import { generateLeavesFilter } from "@/utils/ai/leave";
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
 
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
@@ -104,7 +103,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const { data: companyName } = await getCompanyNameByCompanyId({
@@ -177,7 +176,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.leaves}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -257,13 +256,13 @@ export default function LeavesIndex() {
                               "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
                               !hasPermission(
                                 role,
-                                `${deleteRole}:${attribute.leaves}`
+                                `${deleteRole}:${attribute.leaves}`,
                               ) &&
-                              !hasPermission(
-                                role,
-                                `${updateRole}:${attribute.leaves}`
-                              ) &&
-                              "hidden"
+                                !hasPermission(
+                                  role,
+                                  `${updateRole}:${attribute.leaves}`,
+                                ) &&
+                                "hidden",
                             )}
                           >
                             <Icon name="dots-vertical" size="xs" />
@@ -290,7 +289,7 @@ export default function LeavesIndex() {
                         if (
                           hasPermission(
                             role,
-                            `${createRole}:${attribute.leaves}`
+                            `${createRole}:${attribute.leaves}`,
                           )
                         )
                           navigate("add-leave-type");
@@ -325,22 +324,20 @@ export default function LeavesIndex() {
                             projectArray={
                               projectData?.data?.length
                                 ? projectData?.data?.map(
-                                  (project) => project!.name
-                                )
+                                    (project) => project!.name,
+                                  )
                                 : []
                             }
                             siteArray={
                               siteData?.data?.length
-                                ? siteData?.data?.map(
-                                  (site) => site!.name
-                                )
+                                ? siteData?.data?.map((site) => site!.name)
                                 : []
                             }
                             userEmails={
                               userEmailsData?.data?.length
                                 ? userEmailsData?.data?.map(
-                                  (user) => user!.email
-                                )
+                                    (user) => user!.email,
+                                  )
                                 : []
                             }
                           />
@@ -368,7 +365,7 @@ export default function LeavesIndex() {
                 size="icon"
                 className={cn(
                   "h-10 w-10 bg-muted/70 text-muted-foreground",
-                  !selectedRows.length && "hidden"
+                  !selectedRows.length && "hidden",
                 )}
                 disabled={!selectedRows.length}
                 onClick={() => navigate("analytics")}
@@ -377,7 +374,9 @@ export default function LeavesIndex() {
               </Button>
               <LeavesMenu
                 companyName={companyName as unknown as CompanyDatabaseRow}
-                companyAddress={companyAddress as unknown as LocationDatabaseRow}
+                companyAddress={
+                  companyAddress as unknown as LocationDatabaseRow
+                }
               />
             </div>
           </div>
@@ -416,7 +415,6 @@ export default function LeavesIndex() {
       </div>
       <ImportLeavesModal />
       <Outlet />
-    </section >
+    </section>
   );
 }
-

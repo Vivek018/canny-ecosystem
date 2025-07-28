@@ -22,7 +22,10 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import CreateDepartment from "./create-department";
-import { getDepartmentById, getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  getDepartmentById,
+  getSiteNamesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { updateDepartmentById } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
@@ -46,7 +49,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         id: departmentId,
       });
 
-      const { data: siteNamesData, error: siteNamesError } = await getSiteNamesByCompanyId({ supabase, companyId });
+      const { data: siteNamesData, error: siteNamesError } =
+        await getSiteNamesByCompanyId({ supabase, companyId });
 
       if (error ?? siteNamesError) throw error ?? siteNamesError;
 
@@ -55,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         siteOptions: siteNamesData?.map((site) => ({
           label: site.name,
           pseudoLabel: site?.projects?.name,
-          value: site.id
+          value: site.id,
         })),
         error: null,
       });
@@ -69,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         siteOptions: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -88,7 +92,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -116,7 +120,7 @@ export async function action({
         message: "Failed to update department",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

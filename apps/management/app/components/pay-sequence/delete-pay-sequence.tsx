@@ -33,7 +33,7 @@ export const DeletePaySequence = ({ id }: { id: string }) => {
   };
 
   const handleDeletePaySequence = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -42,7 +42,7 @@ export const DeletePaySequence = ({ id }: { id: string }) => {
         {
           method: "post",
           action: `${id}/delete-pay-sequence`,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -57,7 +57,7 @@ export const DeletePaySequence = ({ id }: { id: string }) => {
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
           hasPermission(role, `${deleteRole}:${attribute.paySequence}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Pay Sequence

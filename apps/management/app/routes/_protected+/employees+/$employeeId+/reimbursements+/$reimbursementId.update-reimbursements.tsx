@@ -41,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeReimbursements}`
+      `${updateRole}:${attribute.employeeReimbursements}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -86,7 +86,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -111,8 +111,7 @@ export async function action({
 }
 
 export default function UpdateReimbursememts() {
-  const { data, userOptions, error } =
-    useLoaderData<typeof loader>();
+  const { data, userOptions, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
 
@@ -131,7 +130,7 @@ export default function UpdateReimbursememts() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
         );
         toast({
           title: "Success",

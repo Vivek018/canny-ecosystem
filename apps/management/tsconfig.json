@@ -7,6 +7,16 @@
     },
     "strict": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts", "types/index.d.ts", "index.js", "server/dev-server.js", "server/index.ts", "../../packages/utils/src/payment.ts", "../../packages/ui/src/utils/rechart-format.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "tailwind.config.ts",
+    "types/index.d.ts",
+    "index.js",
+    "server/dev-server.js",
+    "server/index.ts",
+    "../../packages/utils/src/payment.ts",
+    "../../packages/ui/src/utils/rechart-format.ts"
+  ],
   "exclude": ["node_modules"]
 }

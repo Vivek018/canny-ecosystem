@@ -234,7 +234,7 @@ export async function deleteEmployeeDocument({
   if (deleteEmployeeDocumentError)
     console.error(
       "deleteEmployeeDocumentByEmployeeId error",
-      deleteEmployeeDocumentError
+      deleteEmployeeDocumentError,
     );
   return { status, error: null };
 }

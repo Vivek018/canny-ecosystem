@@ -28,7 +28,7 @@ export async function seedRequisitesForCompanyCreation({
 }) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
+    process.env.SUPABASE_ANON_KEY!,
   );
   await createLocation({
     supabase,
@@ -263,7 +263,7 @@ export async function seedRequisitesForEmployeeCreation({
 }) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
+    process.env.SUPABASE_ANON_KEY!,
   );
   for (let index = 0; index < employeeLetterTypesArray.length - 1; index++) {
     const letterType = employeeLetterTypesArray[index];
@@ -271,16 +271,16 @@ export async function seedRequisitesForEmployeeCreation({
       letterType === "appointment_letter"
         ? DEFAULT_APPOINTMENT_LETTER
         : letterType === "experience_letter"
-        ? DEFAULT_EXPERIENCE_LETTER
-        : letterType === "noc_letter"
-        ? DEFAULT_NOC_LETTER
-        : letterType === "offer_letter"
-        ? DEFAULT_OFFER_LETTER
-        : letterType === "relieving_letter"
-        ? DEFAULT_RELIEVING_LETTER
-        : letterType === "termination_letter"
-        ? DEFAULT_TERMINATION_LETTER
-        : null;
+          ? DEFAULT_EXPERIENCE_LETTER
+          : letterType === "noc_letter"
+            ? DEFAULT_NOC_LETTER
+            : letterType === "offer_letter"
+              ? DEFAULT_OFFER_LETTER
+              : letterType === "relieving_letter"
+                ? DEFAULT_RELIEVING_LETTER
+                : letterType === "termination_letter"
+                  ? DEFAULT_TERMINATION_LETTER
+                  : null;
 
     const letterData: Omit<
       EmployeeLetterDatabaseInsert,

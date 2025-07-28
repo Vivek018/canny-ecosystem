@@ -233,17 +233,17 @@ export default function AttendanceReport() {
             const monthYearsRange =
               filters?.start_year && filters?.end_year
                 ? getMonthYearRange(
-                  filters.start_month,
-                  Number(filters.start_year),
-                  filters.end_month,
-                  Number(filters.end_year),
-                )
+                    filters.start_month,
+                    Number(filters.start_year),
+                    filters.end_month,
+                    Number(filters.end_year),
+                  )
                 : getMonthYearRange(
-                  "January",
-                  Number(currentYear),
-                  "December",
-                  Number(currentYear),
-                );
+                    "January",
+                    Number(currentYear),
+                    "December",
+                    Number(currentYear),
+                  );
 
             const hasNextPage = Boolean(meta?.count > data?.length);
 

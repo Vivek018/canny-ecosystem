@@ -41,8 +41,8 @@ export const LinkTemplateDropdown = ({
             className={cn(
               !hasPermission(
                 `${role}`,
-                `${deleteRole}:${attribute.employeePaymentTemplateLink}`
-              ) && "hidden"
+                `${deleteRole}:${attribute.employeePaymentTemplateLink}`,
+              ) && "hidden",
             )}
           />
           <DeleteEmployeePaymentTemplateAssignment

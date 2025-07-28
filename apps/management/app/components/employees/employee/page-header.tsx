@@ -4,7 +4,11 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useSubmit } from "@remix-run/react";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@canny_ecosystem/ui/avatar";
 import type {
   EmployeeDatabaseRow,
   SupabaseEnv,
@@ -53,7 +57,9 @@ export function EmployeePageHeader({
     if (!validationResult.success) {
       toast({
         title: "Error",
-        description: validationResult.error.errors.map((err) => err.message).join("\n"),
+        description: validationResult.error.errors
+          .map((err) => err.message)
+          .join("\n"),
         variant: "destructive",
       });
       return;
@@ -81,7 +87,9 @@ export function EmployeePageHeader({
               <>
                 <AvatarImage src={employee.photo ?? undefined} />
                 <AvatarFallback className="rounded-md">
-                  <span className="text-md">{employee.first_name?.charAt(0)}</span>
+                  <span className="text-md">
+                    {employee.first_name?.charAt(0)}
+                  </span>
                 </AvatarFallback>
               </>
 
@@ -108,8 +116,9 @@ export function EmployeePageHeader({
             </div>
             <div className="mt-3">
               <h1 className="text-3xl tracking-wide font-bold capitalize">
-                {`${employee?.first_name} ${employee?.middle_name ?? ""} ${employee?.last_name ?? ""
-                  }`}
+                {`${employee?.first_name} ${employee?.middle_name ?? ""} ${
+                  employee?.last_name ?? ""
+                }`}
               </h1>
               <p className="w-max bg-muted text-sm text-muted-foreground px-1.5 pb-0.5 mt-0.5 rounded">
                 {employee?.employee_code}
@@ -125,7 +134,8 @@ export function EmployeePageHeader({
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
               !hasPermission(
-                role, `${updateRole}:${attribute.employeeDetails}`,
+                role,
+                `${updateRole}:${attribute.employeeDetails}`,
               ) && "hidden",
             )}
           >

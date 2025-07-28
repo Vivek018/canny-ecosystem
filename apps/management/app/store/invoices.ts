@@ -1,6 +1,4 @@
-import type {
-  InvoiceDataType,
-} from "@canny_ecosystem/supabase/queries";
+import type { InvoiceDataType } from "@canny_ecosystem/supabase/queries";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 

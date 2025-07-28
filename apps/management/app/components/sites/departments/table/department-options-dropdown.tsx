@@ -36,7 +36,7 @@ export const DepartmentOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.departments}`) &&
-                "flex"
+                "flex",
             )}
             onClick={handleEdit}
           >
@@ -46,7 +46,7 @@ export const DepartmentOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.departments}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeleteDepartment id={id} role={role} />

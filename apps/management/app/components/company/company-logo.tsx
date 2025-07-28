@@ -42,7 +42,9 @@ export const CompanyLogo = ({
     if (!validationResult.success) {
       toast({
         title: "Error",
-        description: validationResult.error.errors.map((err) => err.message).join("\n"),
+        description: validationResult.error.errors
+          .map((err) => err.message)
+          .join("\n"),
         variant: "destructive",
       });
       return;
@@ -96,4 +98,3 @@ export const CompanyLogo = ({
     </Card>
   );
 };
-

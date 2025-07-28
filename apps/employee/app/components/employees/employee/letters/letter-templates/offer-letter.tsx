@@ -38,8 +38,7 @@ export function OfferLetter({
     companyName: companyData?.data?.name ?? "",
     compantAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",
-    siteName:
-      data?.employees.employee_project_assignment?.sites.name ?? "",
+    siteName: data?.employees.employee_project_assignment?.sites.name ?? "",
   };
 
   return (
@@ -49,7 +48,9 @@ export function OfferLetter({
           <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
         <View style={styles.wrapper}>
           {/* Header Section */}
           <View style={styles.headerDate}>

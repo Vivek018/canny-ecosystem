@@ -61,7 +61,7 @@ export async function action({
         message: "Invoice delete failed",
         error: proofError || error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -70,7 +70,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -93,7 +93,8 @@ export default function DeleteInvoice() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.error?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.error?.message,
           variant: "destructive",
         });
       }

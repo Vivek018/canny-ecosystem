@@ -78,7 +78,7 @@ export function DataTableHeader({ table, loading, className }: Props) {
                 className={cn(
                   "px-4 py-2",
                   id === "employee_code" && "md:sticky left-0 bg-card z-10",
-                  id === "full_name" && "md:sticky w-full left-32 bg-card z-10"
+                  id === "full_name" && "md:sticky w-full left-32 bg-card z-10",
                 )}
               >
                 <Button
@@ -96,14 +96,14 @@ export function DataTableHeader({ table, loading, className }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

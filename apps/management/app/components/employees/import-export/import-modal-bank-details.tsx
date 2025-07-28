@@ -9,7 +9,7 @@ import {
 } from "@canny_ecosystem/ui/dialog";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {  SIZE_1KB, SIZE_1MB } from "@canny_ecosystem/utils";
+import { SIZE_1KB, SIZE_1MB } from "@canny_ecosystem/utils";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
@@ -64,7 +64,7 @@ export const ImportEmployeeBankDetailsModal = () => {
     return `${(size / SIZE_1MB).toFixed(2)} MB`;
   };
 
- const demo: any[] | Papa.UnparseObject<any> = [
+  const demo: any[] | Papa.UnparseObject<any> = [
     {
       employee_code: null,
       account_holder_name: null,
@@ -76,7 +76,7 @@ export const ImportEmployeeBankDetailsModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -85,10 +85,7 @@ export const ImportEmployeeBankDetailsModal = () => {
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute(
-      "download",
-      "Employee-Bank-Details-Format"
-    );
+    link.setAttribute("download", "Employee-Bank-Details-Format");
 
     document.body.appendChild(link);
     link.click();
@@ -96,15 +93,13 @@ export const ImportEmployeeBankDetailsModal = () => {
     document.body.removeChild(link);
   };
 
-
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            Only .csv format is supported! 
+            Only .csv format is supported!
             <span
               className="text-primary cursor-pointer ml-2"
               onClick={downloadDemoCsv}
@@ -114,7 +109,7 @@ export const ImportEmployeeBankDetailsModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}

@@ -107,7 +107,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
   const { status, error } = await createPayroll({
@@ -209,7 +209,9 @@ export default function CreatePayroll() {
                 <SearchableSelectField
                   key={resetKey}
                   className="w-full capitalize flex-1 "
-                  options={transformStringArrayIntoOptions(getYears(25, defaultYear) as unknown as string[])}
+                  options={transformStringArrayIntoOptions(
+                    getYears(25, defaultYear) as unknown as string[],
+                  )}
                   inputProps={{
                     ...getInputProps(fields.year, { type: "text" }),
                   }}
@@ -302,7 +304,6 @@ export default function CreatePayroll() {
                   />
                 )}
               </div>
-              
             </CardContent>
 
             <FormButtons

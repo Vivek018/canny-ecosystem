@@ -7,7 +7,9 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { uploadCompanyLogo } from "@canny_ecosystem/supabase/media";
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const formData = await request.formData();
@@ -18,21 +20,25 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
     return json({
       status: "error",
       message: "Invalid file object received",
-      returnTo
+      returnTo,
     });
   }
-  const { error } = await uploadCompanyLogo({ supabase, logo: file, companyId });
+  const { error } = await uploadCompanyLogo({
+    supabase,
+    logo: file,
+    companyId,
+  });
   if (error) {
     return json({
       status: "error",
       message: error.toString(),
-      returnTo
+      returnTo,
     });
   }
   return json({
     status: "success",
     message: "Logo uploaded successfully",
-    returnTo
+    returnTo,
   });
 }
 
@@ -52,8 +58,7 @@ export default function UploadLogo() {
       } else {
         toast({
           title: "Error",
-          description:
-            actionData?.error?.message ?? actionData?.message,
+          description: actionData?.error?.message ?? actionData?.message,
           variant: "destructive",
         });
       }

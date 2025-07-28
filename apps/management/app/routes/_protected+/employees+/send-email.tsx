@@ -37,7 +37,7 @@ export async function action({
           status: "error",
           message: "An unexpected error occurred",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -69,7 +69,7 @@ export async function action({
         message: "Email sent succesfully",
         error: error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -78,7 +78,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -99,7 +99,8 @@ export default function EmpEmail() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || "Email sending failed",
+          description:
+            (actionData?.error as any)?.message || "Email sending failed",
           variant: "destructive",
         });
       }

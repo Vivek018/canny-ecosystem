@@ -344,7 +344,7 @@ export default function OvertimeRegister() {
   const updatedData = {
     ...data,
     payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
-      selectedRows.some((emp2) => emp2.id === emp1.id)
+      selectedRows.some((emp2) => emp2.id === emp1.id),
     ),
   };
   const navigate = useNavigate();
@@ -493,7 +493,7 @@ export default function OvertimeRegister() {
             earnings,
             deductions,
           };
-        }
+        },
       );
 
     return {

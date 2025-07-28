@@ -24,9 +24,7 @@ export async function createIncident({
     }
   }
 
-  const { error, status } = await supabase
-    .from("incidents")
-    .insert(data);
+  const { error, status } = await supabase.from("incidents").insert(data);
 
   if (error) {
     console.error("createIncident error:", error);

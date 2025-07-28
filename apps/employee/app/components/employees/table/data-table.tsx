@@ -55,7 +55,7 @@ export function DataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -85,18 +85,18 @@ export function DataTable<TData, TValue>({
                               cell.column.id === "education" ||
                               cell.column.id === "gender" ||
                               cell.column.id === "is_active") &&
-                            " md:table-cell",
+                              " md:table-cell",
                             cell.column.id === "employee_code" &&
-                            "md:sticky left-0 bg-card z-10",
+                              "md:sticky left-0 bg-card z-10",
                             cell.column.id === "full_name" &&
-                            "md:sticky left-32 bg-card z-10",
+                              "md:sticky left-32 bg-card z-10",
                             cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -110,7 +110,7 @@ export function DataTable<TData, TValue>({
                   <TableCell
                     colSpan={columns?.length}
                     className={cn(
-                      "h-96 bg-background grid place-items-center text-center tracking-wide"
+                      "h-96 bg-background grid place-items-center text-center tracking-wide",
                     )}
                   >
                     <div className="flex flex-col items-center gap-1">
@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && "hidden"
+                          !data?.length && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters

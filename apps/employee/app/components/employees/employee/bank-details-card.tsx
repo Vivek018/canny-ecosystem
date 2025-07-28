@@ -18,11 +18,7 @@ type EmployeeBankDetails = Omit<
   "created_at" | "updated_at"
 >;
 
-export const DetailItem: React.FC<DetailItemProps> = ({
-  label,
-  value,
-}) => {
-
+export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
     <div className="flex flex-col items-start">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">

@@ -29,9 +29,7 @@ export default function SalaryInfoCard({
     const item = salaryData?.fields[key];
     if (item.type === "earning") {
       earningTotal += item.amount;
-    } else if (
-      item.type === "deduction"
-    ) {
+    } else if (item.type === "deduction") {
       deductionTotal += item.amount;
     }
   }
@@ -40,7 +38,7 @@ export default function SalaryInfoCard({
 
   const handlePreviewSalarySlip = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    payrollId: string
+    payrollId: string,
   ) => {
     e.preventDefault();
     navigate(`${payrollId}/salary-slip`);
@@ -55,7 +53,7 @@ export default function SalaryInfoCard({
           <DropdownMenu>
             <DropdownMenuTrigger
               className={cn(
-                "p-2 py-2 rounded-md bg-secondary grid place-items-center "
+                "p-2 py-2 rounded-md bg-secondary grid place-items-center ",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -124,10 +122,7 @@ export default function SalaryInfoCard({
           </h2>
           <hr className="pb-1" />
           {Object.entries(salaryData?.fields)
-            .filter(
-              ([, value]) =>
-                value.type === "deduction"
-            )
+            .filter(([, value]) => value.type === "deduction")
             .map(([key, value]) => (
               <div key={key} className="flex justify-between py-0.5 text-xs">
                 <span>{key}</span>

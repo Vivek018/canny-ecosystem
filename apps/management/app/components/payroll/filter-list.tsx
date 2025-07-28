@@ -25,7 +25,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.date_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 

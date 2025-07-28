@@ -79,9 +79,9 @@ export function ReimbursementSearchFilter({
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
       navigation.location.pathname ===
-      (employeeId
-        ? `/employees/${employeeId}/reimbursements`
-        : "/approvals/reimbursements") &&
+        (employeeId
+          ? `/employees/${employeeId}/reimbursements`
+          : "/approvals/reimbursements") &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -148,7 +148,7 @@ export function ReimbursementSearchFilter({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -183,7 +183,7 @@ export function ReimbursementSearchFilter({
         {
           action: "/approvals/reimbursements?index",
           method: "POST",
-        }
+        },
       );
     } else {
       if (prompt.length) {
@@ -195,7 +195,7 @@ export function ReimbursementSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name"
+      ([key, value]) => value?.length && key !== "name",
     ).length > 0;
 
   return (
@@ -212,7 +212,7 @@ export function ReimbursementSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin"
+              isSubmitting && "animate-spin",
             )}
           />
           <Input
@@ -243,9 +243,9 @@ export function ReimbursementSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100"
+                isOpen && "opacity-100",
               )}
             >
               <Icon name="mixer" />
@@ -441,23 +441,21 @@ export function ReimbursementSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {
-                  siteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
-                }
+                {siteArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

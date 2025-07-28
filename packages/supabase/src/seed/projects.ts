@@ -1,10 +1,7 @@
 import { faker } from "@faker-js/faker";
 import type { ProjectDatabaseInsert, SiteDatabaseInsert } from "../types";
 
-export function seedProject(): Omit<
-  ProjectDatabaseInsert,
-  "company_id"
-> {
+export function seedProject(): Omit<ProjectDatabaseInsert, "company_id"> {
   return {
     name: faker.string.alphanumeric(10),
     project_type: faker.string.alpha(10),

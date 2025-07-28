@@ -25,21 +25,20 @@ export const SiteOptionsDropdown = ({
 
   const handleEdit = () => {
     navigate(
-      `/projects/${projectId}/${siteId}/link-templates/${currentPaymentTemplateAssignmentId}/update-site-template`
+      `/projects/${projectId}/${siteId}/link-templates/${currentPaymentTemplateAssignmentId}/update-site-template`,
     );
   };
 
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.site}`) &&
-              "flex"
+              hasPermission(role, `${updateRole}:${attribute.site}`) && "flex",
             )}
           >
             Edit Link Assignment
@@ -47,8 +46,7 @@ export const SiteOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.site}`) &&
-              "flex"
+              hasPermission(role, `${deleteRole}:${attribute.site}`) && "flex",
             )}
           />
           <DeleteSitePaymentTemplateAssignment

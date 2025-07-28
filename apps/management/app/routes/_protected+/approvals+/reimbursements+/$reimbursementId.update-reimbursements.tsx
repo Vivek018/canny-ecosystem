@@ -82,7 +82,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -134,7 +134,8 @@ export default function UpdateReimbursements() {
 
         toast({
           title: "Success",
-          description: actionData?.message || "Reimbursement updated successfully",
+          description:
+            actionData?.message || "Reimbursement updated successfully",
           variant: "success",
         });
       } else {

@@ -59,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
     const usersPromise = getUsersEmail({ supabase, companyId });
 
@@ -106,9 +106,10 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return clientCaching(
-    `${cacheKeyPrefix.employee_leaves}${args.params.employeeId
+    `${cacheKeyPrefix.employee_leaves}${
+      args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -159,7 +160,7 @@ export default function Leaves() {
                 {({ data, meta, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_leaves}${employeeId}`
+                      `${cacheKeyPrefix.employee_leaves}${employeeId}`,
                     );
                     toast({
                       variant: "destructive",
@@ -169,7 +170,7 @@ export default function Leaves() {
                     return null;
                   }
                   const hasNextPage = Boolean(
-                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
+                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
                   );
 
                   const leaveType = data!.map((item: any) => {
@@ -207,8 +208,8 @@ export default function Leaves() {
                                     userEmails={
                                       usersData?.data
                                         ? usersData?.data?.map(
-                                          (user) => user!.email
-                                        )
+                                            (user) => user!.email,
+                                          )
                                         : []
                                     }
                                   />

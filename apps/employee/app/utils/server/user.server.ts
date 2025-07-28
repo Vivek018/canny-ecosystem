@@ -73,13 +73,18 @@ export const employeeRoleCookie = createCookie("employee_role", {
   path: "/",
 });
 
-export async function getEmployeeIdFromCookie(request: Request): Promise<string | null> {
+export async function getEmployeeIdFromCookie(
+  request: Request,
+): Promise<string | null> {
   const cookieHeader = request.headers.get("Cookie");
   const cookie = (await employeeRoleCookie.parse(cookieHeader)) || {};
   return cookie.employeeId || null;
 }
 
-export function setEmployeeCookie(user: UserCookieType | null, deleteUser = false) {
+export function setEmployeeCookie(
+  user: UserCookieType | null,
+  deleteUser = false,
+) {
   if (!user || deleteUser) {
     return cookie.serialize("employeeId", "", {
       path: "/",

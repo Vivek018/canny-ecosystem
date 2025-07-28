@@ -26,7 +26,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const { status, error } = await createCompany({
@@ -54,7 +54,7 @@ export async function action({
         returnTo: "/companies",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

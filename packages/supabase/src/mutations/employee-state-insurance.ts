@@ -24,10 +24,7 @@ export async function createEmployeeStateInsurance({
     }
   }
 
-  const {
-    error,
-    status,
-  } = await supabase
+  const { error, status } = await supabase
     .from("employee_state_insurance")
     .insert(data);
 
@@ -65,8 +62,7 @@ export async function updateEmployeeStateInsurance({
   const { error, status } = await supabase
     .from("employee_state_insurance")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
+    .eq("id", data.id!);
 
   if (error) {
     console.error("updateEmployeeStateInsurance Error", error);
@@ -100,8 +96,7 @@ export async function deleteEmployeeStateInsurance({
   const { error, status } = await supabase
     .from("employee_state_insurance")
     .delete()
-    .eq("id", id)
-    ;
+    .eq("id", id);
 
   if (error) {
     console.error("deleteEmployeeStateInsurance Error", error);

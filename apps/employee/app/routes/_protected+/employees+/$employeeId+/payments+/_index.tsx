@@ -3,9 +3,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
-import {
-  getExitByEmployeeId,
-} from "@canny_ecosystem/supabase/queries";
+import { getExitByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {

@@ -1,4 +1,8 @@
-import type { SiteDatabaseInsert, SiteDatabaseUpdate, TypedSupabaseClient } from "../types";
+import type {
+  SiteDatabaseInsert,
+  SiteDatabaseUpdate,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function createSite({
   supabase,
@@ -52,7 +56,8 @@ export async function updateSite({
   }
 
   const { error, status } = await supabase
-    .from("sites").update(data)
+    .from("sites")
+    .update(data)
     .eq("id", data.id!);
   if (error) {
     console.error("updateSite Error:", error);
@@ -80,9 +85,7 @@ export async function deleteSite({
     }
   }
 
-  const { error, status } = await supabase
-    .from("sites").delete()
-    .eq("id", id);
+  const { error, status } = await supabase.from("sites").delete().eq("id", id);
 
   if (error) {
     console.error("deleteSite Error:", error);

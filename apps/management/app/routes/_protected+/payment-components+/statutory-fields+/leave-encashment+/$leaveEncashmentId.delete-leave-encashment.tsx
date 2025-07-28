@@ -82,8 +82,7 @@ export default function DeleteLeaveEncashment() {
     } else {
       toast({
         title: "Error",
-        description:
-          actionData?.error || "Leave encashment delete failed",
+        description: actionData?.error || "Leave encashment delete failed",
         type: "error",
       });
     }

@@ -1,7 +1,17 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@canny_ecosystem/ui/avatar";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 import { toast } from "@canny_ecosystem/ui/use-toast";
 import { zImage } from "@canny_ecosystem/utils";
 import { useSubmit } from "@remix-run/react";
@@ -32,7 +42,9 @@ export const UserAvatar = ({
     if (!validationResult.success) {
       toast({
         title: "Error",
-        description: validationResult.error.errors.map((err) => err.message).join("\n"),
+        description: validationResult.error.errors
+          .map((err) => err.message)
+          .join("\n"),
         variant: "destructive",
       });
       return;

@@ -38,7 +38,7 @@ export default function SalaryInfoCard({
 
   const handlePreviewSalarySlip = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    payrollId: string
+    payrollId: string,
   ) => {
     e.preventDefault();
     navigate(`${payrollId}/salary-slip`);
@@ -53,7 +53,7 @@ export default function SalaryInfoCard({
           <DropdownMenu>
             <DropdownMenuTrigger
               className={cn(
-                "p-2 py-2 rounded-md bg-secondary grid place-items-center "
+                "p-2 py-2 rounded-md bg-secondary grid place-items-center ",
               )}
             >
               <Icon name="dots-vertical" size="xs" />

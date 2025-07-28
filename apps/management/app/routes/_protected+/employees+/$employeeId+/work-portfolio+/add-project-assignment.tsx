@@ -15,17 +15,13 @@ import {
   hasPermission,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
-import {
-  getSiteNamesByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
+import { getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { createEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import {
-  CreateEmployeeProjectAssignment,
-} from "@/components/employees/form/create-employee-project-assignment";
+import { CreateEmployeeProjectAssignment } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -37,10 +33,7 @@ import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 export const ADD_EMPLOYEE_PROJECT_ASSIGNMENT =
   "add-employee-project-assignment";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
@@ -137,12 +130,8 @@ export async function action({
 }
 
 export default function CreateEmployeeProjectAssignmentRoute() {
-  const {
-    employeeId,
-    siteOptions,
-    status,
-    error,
-  } = useLoaderData<typeof loader>();
+  const { employeeId, siteOptions, status, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeProjectAssignmentSchema;

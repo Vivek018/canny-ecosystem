@@ -146,7 +146,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/payment-templates?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -179,7 +179,7 @@ export async function action({
             message: "Failed to create payment template",
             returnTo: "/payment-templates",
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -190,7 +190,7 @@ export async function action({
             message: "Failed to create template components",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -210,7 +210,7 @@ export async function action({
           {
             status: status,
             headers: headers,
-          }
+          },
         );
       }
     } else if (
@@ -229,7 +229,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/payment-templates?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -254,7 +254,7 @@ export async function action({
         message: `An unexpected error occurred: ${error}`,
         returnTo: "/payment-templates",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -284,13 +284,13 @@ export default function CreatePaymentTemplate() {
     step === 1
       ? stepData[step - 1]
         ? {
-          ...stepData[step - 1],
-          company_id: companyId,
-        }
+            ...stepData[step - 1],
+            company_id: companyId,
+          }
         : {
-          ...initialValues,
-          company_id: companyId,
-        }
+            ...initialValues,
+            company_id: companyId,
+          }
       : stepData[step - 1] ?? initialValues;
 
   const [form, fields] = useForm({
@@ -351,7 +351,7 @@ export default function CreatePaymentTemplate() {
     const updatedComponents = [
       ...selectedPaymentFields.map((paymentField) => {
         const existingComponent = existingComponents?.find(
-          (component) => component?.payment_field_id === paymentField?.id
+          (component) => component?.payment_field_id === paymentField?.id,
         );
 
         return {

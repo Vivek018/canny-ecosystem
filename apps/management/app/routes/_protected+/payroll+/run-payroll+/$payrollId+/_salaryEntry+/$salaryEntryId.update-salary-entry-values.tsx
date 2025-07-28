@@ -33,7 +33,7 @@ export async function action({ request }: ActionFunctionArgs) {
           message: "Salary Entry update failed",
           error: submission.error,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
     const payrollId = submission.value.payroll_id;
@@ -50,11 +50,11 @@ export async function action({ request }: ActionFunctionArgs) {
     const newTotal =
       submission.value.type === "earning"
         ? Number(payrollData?.total_net_amount) -
-        Number(previousAmount?.amount) +
-        Number(submission.value.amount)
+          Number(previousAmount?.amount) +
+          Number(submission.value.amount)
         : Number(payrollData?.total_net_amount) +
-        Number(previousAmount?.amount) -
-        Number(submission.value.amount);
+          Number(previousAmount?.amount) -
+          Number(submission.value.amount);
 
     const updatedPayrollData = { total_net_amount: newTotal };
 
@@ -103,7 +103,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Salary Entry update failed",
         error: salaryFieldValuesError ?? payrollFieldsError,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -113,7 +113,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -137,7 +137,8 @@ export default function UpdateSalaryEntry() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

@@ -103,7 +103,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const needsReportedBySite =
-      (reportedBy === "site" || reportedBy === "employee");
+      reportedBy === "site" || reportedBy === "employee";
 
     if (needsReportedBySite) {
       ({ data: reportedBySite } = await getSiteNamesByCompanyId({
@@ -113,7 +113,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const needsReportedOnSite =
-      (reportedOn === "site" || reportedOn === "employee");
+      reportedOn === "site" || reportedOn === "employee";
 
     if (needsReportedOnSite) {
       ({ data: reportedOnSite } = await getSiteNamesByCompanyId({
@@ -150,14 +150,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       (employee: any) => ({
         label: employee?.employee_code as string,
         value: employee?.id as string,
-      })
+      }),
     );
 
     const reportedOnEmployeeOptions = reportedOnEmployee?.map(
       (employee: any) => ({
         label: employee?.employee_code as string,
         value: employee?.id as string,
-      })
+      }),
     );
 
     const reportedBySiteOptions = reportedBySite?.map((item) => ({
@@ -212,14 +212,14 @@ export async function action({
 
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
   );
   const submission = parseWithZod(formData, { schema: CaseSchema });
 
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -300,7 +300,7 @@ export async function action({
           message: "Case Updated Failed",
           error: error,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -323,7 +323,7 @@ export async function action({
         message: "Case Updated Failed",
         error: error,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

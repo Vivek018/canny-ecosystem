@@ -64,9 +64,11 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
           prefetch="intent"
           className="group"
         >
-          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${row.original?.first_name
-            } ${row.original?.middle_name ?? ""} ${row.original?.last_name ?? ""
-            }`}</p>
+          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+            row.original?.first_name
+          } ${row.original?.middle_name ?? ""} ${
+            row.original?.last_name ?? ""
+          }`}</p>
         </Link>
       );
     },
@@ -96,10 +98,7 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {
-            row.original?.employee_project_assignment?.sites?.projects
-              ?.name
-          }
+          {row.original?.employee_project_assignment?.sites?.projects?.name}
         </p>
       );
     },

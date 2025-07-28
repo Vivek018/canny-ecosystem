@@ -70,7 +70,7 @@ export function AttendanceActions({
       {
         method: "POST",
         action: "/time-tracking/attendance/update-bulk-attendances",
-      }
+      },
     );
   };
 
@@ -90,7 +90,7 @@ export function AttendanceActions({
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/time-tracking/attendance/analytics")}
@@ -107,7 +107,7 @@ export function AttendanceActions({
             <AlertDialogTrigger
               className={cn(
                 "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden"
+                !selectedRows.length && "hidden",
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -129,7 +129,7 @@ export function AttendanceActions({
                   <Label className="text-sm font-medium">Year</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      getYears(25, defaultYear) as unknown as string[]
+                      getYears(25, defaultYear) as unknown as string[],
                     )}
                     value={year}
                     onChange={(e) => setYear(e)}

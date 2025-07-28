@@ -25,5 +25,9 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Departments() {
-  return <div className="px-4"><Outlet /></div>;
+  return (
+    <div className="px-4">
+      <Outlet />
+    </div>
+  );
 }

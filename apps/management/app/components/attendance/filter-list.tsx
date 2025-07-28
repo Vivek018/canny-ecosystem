@@ -11,15 +11,17 @@ type Props = {
 
 export function FilterList({ filters }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const monthNames = Object.entries(months).reduce((acc, [name, num]) => {
-    acc[num] = name;
-    return acc;
-  }, {} as { [key: number]: string });
+  const monthNames = Object.entries(months).reduce(
+    (acc, [name, num]) => {
+      acc[num] = name;
+      return acc;
+    },
+    {} as { [key: number]: string },
+  );
 
-  const defaultFilters =
-    Object.keys(filters!).length
-      ? filters
-      : {
+  const defaultFilters = Object.keys(filters!).length
+    ? filters
+    : {
         month: monthNames[defaultMonth + 2],
         year: defaultYear.toString(),
       };

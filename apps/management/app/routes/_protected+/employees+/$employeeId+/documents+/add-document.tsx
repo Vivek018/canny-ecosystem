@@ -48,7 +48,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const submission = parseWithZod(formData, {
       schema: EmployeeDocumentsSchema,
@@ -57,7 +57,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -83,7 +83,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/documents`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -93,7 +93,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/documents`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -156,7 +156,7 @@ export default function AddDocument({
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_documents}${employeeId}`
+          `${cacheKeyPrefix.employee_documents}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -201,7 +201,7 @@ export default function AddDocument({
             <SearchableSelectField
               className="capitalize"
               options={transformStringArrayIntoOptions(
-                employeeDocumentTypeArray as unknown as string[]
+                employeeDocumentTypeArray as unknown as string[],
               )}
               inputProps={{
                 ...getInputProps(fields.document_type, { type: "text" }),

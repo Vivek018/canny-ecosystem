@@ -63,8 +63,8 @@ export function ProjectCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.projects}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.projects}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -88,13 +88,13 @@ export function ProjectCard({
       </CardContent>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold"
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
         )}
       >
         <p
           className={cn(
             "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
-            !formatDate(project.start_date) && "hidden"
+            !formatDate(project.start_date) && "hidden",
           )}
         >
           <Icon name="clock" size="xs" className="scale-x-[-1]" />
@@ -103,7 +103,7 @@ export function ProjectCard({
         <p
           className={cn(
             "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
-            !formatDate(project.end_date) && "hidden"
+            !formatDate(project.end_date) && "hidden",
           )}
         >
           <Icon name="clock" size="xs" />

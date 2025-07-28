@@ -76,7 +76,7 @@ export const DashboardFilter = ({ disabled }: { disabled?: boolean }) => {
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
   return (
     <div>
@@ -95,7 +95,7 @@ export const DashboardFilter = ({ disabled }: { disabled?: boolean }) => {
                   type="button"
                   className={cn(
                     "flex items-center justify-center opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
-                    isOpen && "opacity-100"
+                    isOpen && "opacity-100",
                   )}
                 >
                   <Icon name="mixer" className="h-4 w-4" />

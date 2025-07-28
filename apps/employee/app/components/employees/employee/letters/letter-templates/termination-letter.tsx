@@ -46,7 +46,9 @@ export function TerminationLetter({
           <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
 
         <View style={styles.wrapper}>
           {/* Date Section */}

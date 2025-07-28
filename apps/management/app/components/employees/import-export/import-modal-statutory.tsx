@@ -9,7 +9,7 @@ import {
 } from "@canny_ecosystem/ui/dialog";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {SIZE_1KB, SIZE_1MB } from "@canny_ecosystem/utils";
+import { SIZE_1KB, SIZE_1MB } from "@canny_ecosystem/utils";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
@@ -79,7 +79,7 @@ export const ImportEmployeeStatutoryModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -88,10 +88,7 @@ export const ImportEmployeeStatutoryModal = () => {
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute(
-      "download",
-      "Employee-Statutory-Format"
-    );
+    link.setAttribute("download", "Employee-Statutory-Format");
 
     document.body.appendChild(link);
     link.click();
@@ -105,7 +102,7 @@ export const ImportEmployeeStatutoryModal = () => {
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            Only .csv format is supported! 
+            Only .csv format is supported!
             <span
               className="text-primary cursor-pointer ml-2"
               onClick={downloadDemoCsv}
@@ -115,7 +112,7 @@ export const ImportEmployeeStatutoryModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -142,7 +139,7 @@ export const ImportEmployeeStatutoryModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

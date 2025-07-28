@@ -2,10 +2,7 @@ import type { LeavesFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  formatDate,
-  formatDateRange,
-} from "@canny_ecosystem/utils";
+import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {

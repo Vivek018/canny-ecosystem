@@ -60,7 +60,7 @@ export const createAttendanceHourlyWorkbook = async ({
     }
   }
   const sortedDates = Array.from(allDates).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
   );
 
   const allMonths = new Set<string>();
@@ -80,9 +80,8 @@ export const createAttendanceHourlyWorkbook = async ({
   };
 
   worksheet.mergeCells("A2:E3");
-  worksheet.getCell(
-    "A2"
-  ).value = `${companyAddress?.address_line_1}, ${companyAddress?.address_line_2}, ${companyAddress?.city}, ${companyAddress?.state} ${companyAddress?.pincode}`;
+  worksheet.getCell("A2").value =
+    `${companyAddress?.address_line_1}, ${companyAddress?.address_line_2}, ${companyAddress?.city}, ${companyAddress?.state} ${companyAddress?.pincode}`;
   worksheet.getCell("A2").font = { bold: false, size: 12 };
   worksheet.getCell("A2").alignment = {
     horizontal: "center",
@@ -91,9 +90,8 @@ export const createAttendanceHourlyWorkbook = async ({
   };
 
   worksheet.mergeCells("F1:AE4");
-  worksheet.getCell(
-    "F1"
-  ).value = `Attendance(Hourly) Register for ${monthYear}`;
+  worksheet.getCell("F1").value =
+    `Attendance(Hourly) Register for ${monthYear}`;
   worksheet.getCell("F1").font = { bold: true, size: 20 };
   worksheet.getCell("F1").alignment = {
     horizontal: "center",
@@ -134,7 +132,9 @@ export const createAttendanceHourlyWorkbook = async ({
       emp.employee_code || "N/A",
       emp.project || "N/A",
       emp.site || "N/A",
-      ...sortedDates.map((date) => (emp[date as "attendance"] as any)?.hours || 0),
+      ...sortedDates.map(
+        (date) => (emp[date as "attendance"] as any)?.hours || 0,
+      ),
       emp.total_hours || 0,
     ];
     const newRow = worksheet.addRow(row);
@@ -183,7 +183,7 @@ export const AttendanceHourlyRegister = ({
   className?: string;
 }) => {
   const generateAttendanceHourlyExcel = async (
-    selectedRows: TransformedAttendanceDataType[]
+    selectedRows: TransformedAttendanceDataType[],
   ) => {
     if (!selectedRows.length) return;
 
@@ -197,7 +197,7 @@ export const AttendanceHourlyRegister = ({
       new Blob([workbook], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       }),
-      `Attendance(Hourly)-Register ${formatDateTime(Date.now())}.xlsx`
+      `Attendance(Hourly)-Register ${formatDateTime(Date.now())}.xlsx`,
     );
   };
 
@@ -207,7 +207,7 @@ export const AttendanceHourlyRegister = ({
         className={cn(
           buttonVariants({ variant: "muted" }),
           "w-full justify-start text-[13px] h-9 px-2 gap-2",
-          className
+          className,
         )}
       >
         <Icon name="plus-circled" />

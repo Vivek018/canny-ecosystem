@@ -65,7 +65,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     let templateComponentData = null;
     let employeeSalaryData = null;
 
-    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({ supabase, employeeId, companyId });
+    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({
+      supabase,
+      employeeId,
+      companyId,
+    });
 
     if (!error && data?.template_id) {
       templateId = data.template_id;

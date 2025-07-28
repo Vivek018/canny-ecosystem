@@ -106,7 +106,7 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -144,14 +144,14 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name"
+      ([key, value]) => value?.length && key !== "name",
     ).length > 0;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className='flex space-x-4 w-full md:w-auto items-center'>
+      <div className="flex space-x-4 w-full md:w-auto items-center">
         <form
-          className='relative w-full md:w-auto'
+          className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(e);
@@ -161,7 +161,7 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin"
+              isSubmitting && "animate-spin",
             )}
           />
           <Input
@@ -171,40 +171,40 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               disabled ? "No Case Data to Search And Filter" : "Search Cases"
             }
             disabled={disabled}
-            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
+            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
-            autoComplete='on'
-            autoCapitalize='none'
-            autoCorrect='off'
-            spellCheck='false'
+            autoComplete="on"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type='button'
+              type="button"
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100"
+                isOpen && "opacity-100",
               )}
             >
-              <Icon name='mixer' />
+              <Icon name="mixer" />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className='w-full md:w-[480px]'
-        align='end'
+        className="w-full md:w-[480px]"
+        align="end"
         sideOffset={19}
         alignOffset={-11}
-        side='top'
+        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -215,12 +215,11 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 <Calendar
-                  mode='range'
+                  mode="range"
                   captionLayout="dropdown"
-
                   today={
                     filterParams.date_start
                       ? new Date(filterParams.date_start)
@@ -263,12 +262,11 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 <Calendar
-                  mode='range'
+                  mode="range"
                   captionLayout="dropdown"
-
                   today={
                     filterParams.incident_date_start
                       ? new Date(filterParams.incident_date_start)
@@ -311,12 +309,11 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 <Calendar
-                  mode='range'
+                  mode="range"
                   captionLayout="dropdown"
-
                   today={
                     filterParams.resolution_date_start
                       ? new Date(filterParams.resolution_date_start)
@@ -359,12 +356,12 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {caseStatusArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.status === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -390,12 +387,12 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {caseLocationTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.location_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -421,12 +418,12 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {caseTypeArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.case_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -452,12 +449,12 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {reportedOnArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.reported_by === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -483,12 +480,12 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {reportedByArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.reported_by === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({

@@ -15,7 +15,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
     const salaryEntryData = JSON.parse(
-      formData.get("salaryEntryData") as string
+      formData.get("salaryEntryData") as string,
     );
 
     const { status, error } = await updateMultipleSalaryEntries({
@@ -36,7 +36,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Salary Entries update failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -46,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -70,7 +70,8 @@ export default function UpdateBulkSalaryEntries() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

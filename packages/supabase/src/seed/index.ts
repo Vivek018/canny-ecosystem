@@ -88,7 +88,7 @@ dotenv.config();
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 // Function to generate a random number within a range
@@ -111,7 +111,7 @@ export async function seed(newCompanyId?: string) {
     }
 
     console.time(
-      "Created Locations and Relationships(with Project & Sites)..."
+      "Created Locations and Relationships(with Project & Sites)...",
     );
     for (let index = 0; index < 2; index++) {
       await createLocation({
@@ -223,17 +223,17 @@ export async function seed(newCompanyId?: string) {
                 const caseData: Partial<CasesDatabaseRow> = {};
                 const reportedBy =
                   reportedByArray[
-                  faker.number.int({
-                    min: 0,
-                    max: reportedByArray.length - 1,
-                  })
+                    faker.number.int({
+                      min: 0,
+                      max: reportedByArray.length - 1,
+                    })
                   ];
                 const reportedOn =
                   reportedOnArray[
-                  faker.number.int({
-                    min: 0,
-                    max: reportedOnArray.length - 1,
-                  })
+                    faker.number.int({
+                      min: 0,
+                      max: reportedOnArray.length - 1,
+                    })
                   ];
                 caseData.reported_by = reportedBy;
                 caseData.reported_on = reportedOn;
@@ -255,8 +255,7 @@ export async function seed(newCompanyId?: string) {
                       supabase,
                       employeeId: employeeData.id,
                     });
-                  caseData.reported_by_site_id =
-                    assignmentData?.sites
+                  caseData.reported_by_site_id = assignmentData?.sites;
                 }
                 // Reported On
                 let employeeId = null;
@@ -275,16 +274,14 @@ export async function seed(newCompanyId?: string) {
                       supabase,
                       employeeId: employeeId!,
                     });
-                  caseData.reported_on_project_id =
-                    assignmentData?.sites
+                  caseData.reported_on_project_id = assignmentData?.sites;
                 } else if (reportedOn === "site") {
                   const { data: assignmentData } =
                     await getEmployeeProjectAssignmentByEmployeeId({
                       supabase,
                       employeeId: employeeId,
                     });
-                  caseData.reported_on_site_id =
-                    assignmentData?.sites
+                  caseData.reported_on_site_id = assignmentData?.sites;
                 }
                 await createCase({
                   supabase,
@@ -391,7 +388,7 @@ export async function seed(newCompanyId?: string) {
       console.timeEnd("Created Project and Sites(with Employees)...");
     }
     console.timeEnd(
-      "Created Locations and Relationships(with Project & Sites)..."
+      "Created Locations and Relationships(with Project & Sites)...",
     );
 
     console.time("Created Taxes...");

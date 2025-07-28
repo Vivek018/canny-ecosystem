@@ -31,8 +31,8 @@ export const prepareEpfFormat = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
+    ),
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -51,19 +51,21 @@ export const prepareEpfFormat = async ({
     eps_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
     edli_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
     epf_contribution: roundToNearest(
-      Number((formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12)
+      Number((formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12),
     ),
     eps_contribution: roundToNearest(
-      Number((formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833)
+      Number(
+        (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833,
+      ),
     ),
     diffEpf_Eps:
       roundToNearest(
-        Number(formatData?.amount > 15000 ? 15000 : formatData?.amount * 0.12)
+        Number(formatData?.amount > 15000 ? 15000 : formatData?.amount * 0.12),
       ) -
       roundToNearest(
         Number(
-          (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833
-        )
+          (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833,
+        ),
       ),
     ncp_days:
       formatData.absentDays ??
@@ -90,7 +92,7 @@ export const DownloadEpfFormat = ({
           (e: {
             amount: number;
             payroll_fields: { type: string; name: string };
-          }) => e.payroll_fields.type === "earning"
+          }) => e.payroll_fields.type === "earning",
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
@@ -111,7 +113,7 @@ export const DownloadEpfFormat = ({
   }
 
   const generateEpfFormat = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 

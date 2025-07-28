@@ -23,7 +23,7 @@ interface ComboboxProps {
   options: ComboboxSelectOption[] | null | null[];
   value: string | number;
   onChange: (value: string) => void;
-  onInput?: (value: string) => void,
+  onInput?: (value: string) => void;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -40,7 +40,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options?.find(
-    (option) => String(option?.value) === String(value)
+    (option) => String(option?.value) === String(value),
   );
 
   return (
@@ -48,29 +48,32 @@ export function Combobox({
       <PopoverTrigger asChild>
         <Button
           disabled={disabled}
-          variant='outline'
-          role='combobox'
+          variant="outline"
+          role="combobox"
           aria-expanded={open}
           className={cn(
             "truncate justify-between",
             !selectedOption && "text-muted-foreground",
-            className
+            className,
           )}
         >
           {replaceUnderscore(
-            selectedOption ? selectedOption?.label : placeholder
+            selectedOption ? selectedOption?.label : placeholder,
           )}
           <Icon
-            name='caret-sort'
-            size='sm'
-            className='ml-2 shrink-0 opacity-50'
+            name="caret-sort"
+            size="sm"
+            className="ml-2 shrink-0 opacity-50"
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align='start' className='p-0'>
+      <PopoverContent align="start" className="p-0">
         <Command>
-          <CommandInput placeholder='Search options...' onValueChange={(value) => onInput?.(value)} />
-          <CommandEmpty className='w-full py-6 text-center'>
+          <CommandInput
+            placeholder="Search options..."
+            onValueChange={(value) => onInput?.(value)}
+          />
+          <CommandEmpty className="w-full py-6 text-center">
             No option found.
           </CommandEmpty>
           <CommandList>
@@ -78,29 +81,42 @@ export function Combobox({
               {options?.map((option) => (
                 <CommandItem
                   key={option?.value}
-                  value={String((option?.value ?? "") + (option?.label ?? "") + (option?.pseudoLabel ?? ""))}
+                  value={String(
+                    (option?.value ?? "") +
+                      (option?.label ?? "") +
+                      (option?.pseudoLabel ?? ""),
+                  )}
                   onSelect={() => {
                     onChange(
                       String(option?.value) === String(value)
                         ? ""
-                        : String(option?.value)
+                        : String(option?.value),
                     );
                     setOpen(false);
                   }}
-                  className='max-w-96 flex flex-row'
+                  className="max-w-96 flex flex-row"
                 >
                   <Icon
-                    name='check'
-                    size='sm'
+                    name="check"
+                    size="sm"
                     className={cn(
                       "mr-2 shrink-0",
                       String(value) === String(option?.value)
                         ? "opacity-100"
-                        : "opacity-0"
+                        : "opacity-0",
                     )}
                   />
-                  <p className='truncate w-max flex-1'>{replaceUnderscore(option?.label)}</p>
-                  <p className={cn("text-muted-foreground ml-6 w-28 truncate", !option?.pseudoLabel && "hidden")}>{option?.pseudoLabel}</p>
+                  <p className="truncate w-max flex-1">
+                    {replaceUnderscore(option?.label)}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-muted-foreground ml-6 w-28 truncate",
+                      !option?.pseudoLabel && "hidden",
+                    )}
+                  >
+                    {option?.pseudoLabel}
+                  </p>
                 </CommandItem>
               ))}
             </CommandGroup>

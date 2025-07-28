@@ -28,13 +28,11 @@ export async function getHolidaysByCompanyId({
 
   const { data, error } = await supabase
     .from("holidays")
-    .select(
-      `${columns.join(",")}`,
-    )
+    .select(`${columns.join(",")}`)
     .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(HARD_QUERY_LIMIT)
-    .returns<InferredType<HolidaysDatabaseRow, typeof columns[number]>[]>();
+    .returns<InferredType<HolidaysDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
     console.error("getHolidaysByEmployeeId Error", error);

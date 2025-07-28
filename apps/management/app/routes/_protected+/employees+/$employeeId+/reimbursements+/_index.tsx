@@ -101,7 +101,8 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return clientCaching(
-    `${cacheKeyPrefix.employee_reimbursements}${args.params.employeeId
+    `${cacheKeyPrefix.employee_reimbursements}${
+      args.params.employeeId
     }${url.searchParams.toString()}`,
     args,
   );

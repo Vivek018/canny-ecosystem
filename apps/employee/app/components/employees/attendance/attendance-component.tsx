@@ -1,11 +1,6 @@
 import type { EmployeeMonthlyAttendanceDatabaseRow } from "@canny_ecosystem/supabase/types";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import { Card, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { getMonthNameFromNumber } from "@canny_ecosystem/utils";
-
 
 export default function AttendanceComponent({
   attendanceData,

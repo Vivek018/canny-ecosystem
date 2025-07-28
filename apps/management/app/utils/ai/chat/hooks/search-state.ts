@@ -1,5 +1,10 @@
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
-import { useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react";
+import {
+  useNavigate,
+  useNavigation,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -23,19 +28,19 @@ const placeholders = [
   "Still with me? Your answer is coming together now",
   "Formatting the cleanest, clearest response possible",
   "Checking all the latest details before replying",
-  "Still cooking that answer — hang tight!"
+  "Still cooking that answer — hang tight!",
 ];
 
 export function useSearchState({
   data,
   config,
   query,
-  returnTo
+  returnTo,
 }: {
   data: any[] | null;
   config: any;
   query: string | null;
-  returnTo: string
+  returnTo: string;
 }) {
   const [stateData, setStateData] = useState(data ?? []);
   const [stateConfig, setStateConfig] = useState(config);
@@ -81,16 +86,14 @@ export function useSearchState({
     if (config) {
       setStateConfig(config);
     }
-  }, [data, config])
+  }, [data, config]);
 
   useEffect(() => {
     setIsSubmitting(
       navigation.state === "submitting" ||
-      (
-        navigation.state === "loading" &&
-        navigation.location.pathname.includes("/chat/chatbox") &&
-        !!navigation.location.search.length
-      )
+        (navigation.state === "loading" &&
+          navigation.location.pathname.includes("/chat/chatbox") &&
+          !!navigation.location.search.length),
     );
   }, [navigation.state]);
 
@@ -101,7 +104,7 @@ export function useSearchState({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +113,7 @@ export function useSearchState({
   };
 
   const handleSubmit = () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     if (prompt !== searchPrompt) {
       setStateData([]);
       setStateConfig(null);
@@ -134,14 +137,14 @@ export function useSearchState({
 
     submit(formData, {
       action: "/chat/chatbox",
-      method: "POST"
-    })
+      method: "POST",
+    });
 
     setStateData([]);
     setStateConfig(null);
     setPrompt("");
     setIsSubmitting(false);
-  }
+  };
 
   return {
     stateData,

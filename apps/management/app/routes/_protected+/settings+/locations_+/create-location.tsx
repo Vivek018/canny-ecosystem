@@ -95,7 +95,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -113,7 +113,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Location creation failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -122,7 +122,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -272,7 +272,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name
+                      fields.pincode.name,
                     )}`,
                   }}
                   labelProps={{
@@ -298,7 +298,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.gst_number, { type: "text" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.gst_number.name
+                      fields.gst_number.name,
                     )}`,
                   }}
                   labelProps={{
@@ -324,7 +324,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name
+                      fields.longitude.name,
                     )}`,
                   }}
                   labelProps={{

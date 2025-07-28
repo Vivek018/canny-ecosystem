@@ -41,7 +41,7 @@ export const MultiSelectCombobox = ({
     onChange(
       value.includes(currentValue)
         ? value.filter((val) => val !== currentValue)
-        : [...value, currentValue]
+        : [...value, currentValue],
     );
   };
 
@@ -104,14 +104,14 @@ export const MultiSelectCombobox = ({
                     size="sm"
                     className={cn(
                       "mr-1",
-                      !value.includes(String(option.value)) && "opacity-0"
+                      !value.includes(String(option.value)) && "opacity-0",
                     )}
                   />
                   {renderItem(option)}
                   <p
                     className={cn(
                       "text-muted-foreground ml-6 w-28 truncate",
-                      !option?.pseudoLabel && "hidden"
+                      !option?.pseudoLabel && "hidden",
                     )}
                   >
                     {option?.pseudoLabel}

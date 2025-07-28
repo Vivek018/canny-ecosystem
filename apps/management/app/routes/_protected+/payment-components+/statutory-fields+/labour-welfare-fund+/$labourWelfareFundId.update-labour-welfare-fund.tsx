@@ -63,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         lwfData: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -82,7 +82,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -110,7 +110,7 @@ export async function action({
         message: "Failed to update Labour Welfare Fund",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -122,7 +122,7 @@ export default function UpdateLabourWelfareFund() {
   const navigate = useNavigate();
 
   const matchedState = statesAndUTs.find(
-    (state) => state.label.toLowerCase() === lwfData?.state.toLowerCase()
+    (state) => state.label.toLowerCase() === lwfData?.state.toLowerCase(),
   );
 
   if (matchedState && lwfData) {

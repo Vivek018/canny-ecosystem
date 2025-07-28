@@ -38,7 +38,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
   };
 
   const handleDeleteEmployeePaymentTemplateAssignment = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -47,7 +47,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
         {
           method: "POST",
           action: `/employees/${employeeId}/payments/${templateAssignmentId}/delete-link-template`,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -63,8 +63,8 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
           "text-[13px] h-9",
           !hasPermission(
             `${role}`,
-            `${deleteRole}:${attribute.employeePaymentTemplateLink}`
-          ) && "hidden"
+            `${deleteRole}:${attribute.employeePaymentTemplateLink}`,
+          ) && "hidden",
         )}
       >
         Delete link template

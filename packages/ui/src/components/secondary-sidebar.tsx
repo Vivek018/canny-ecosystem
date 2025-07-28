@@ -9,7 +9,7 @@ export const SecondarySidebar = ({
   items: { name: string; link: string }[];
   className?: string;
   navLinkClassName?: string;
-  bottomItem?: React.ReactNode,
+  bottomItem?: React.ReactNode;
 }) => {
   const { pathname } = useLocation();
 
@@ -18,7 +18,7 @@ export const SecondarySidebar = ({
       className={cn(
         "flex py-4 flex-col items-start justify-start overflow-hidden bg-background border-r",
         className,
-        !items?.length && "hidden"
+        !items?.length && "hidden",
       )}
     >
       <nav
@@ -42,11 +42,13 @@ export const SecondarySidebar = ({
                     link === pathname
                       ? "cursor-auto bg-primary/25 text-primary hover:bg-primary/25"
                       : "",
-                    navLinkClassName
+                    navLinkClassName,
                   )
                 }
               >
-                <span className={cn("w-44 truncate", navLinkClassName)}>{name}</span>
+                <span className={cn("w-44 truncate", navLinkClassName)}>
+                  {name}
+                </span>
               </NavLink>
             );
           })}

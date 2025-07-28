@@ -106,7 +106,8 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return clientCaching(
-    `${cacheKeyPrefix.employee_leaves}${args.params.employeeId
+    `${cacheKeyPrefix.employee_leaves}${
+      args.params.employeeId
     }${url.searchParams.toString()}`,
     args,
   );
@@ -207,8 +208,8 @@ export default function Leaves() {
                                     userEmails={
                                       usersData?.data
                                         ? usersData?.data?.map(
-                                          (user) => user!.email,
-                                        )
+                                            (user) => user!.email,
+                                          )
                                         : []
                                     }
                                   />

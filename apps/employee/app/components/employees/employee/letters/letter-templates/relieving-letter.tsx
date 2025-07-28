@@ -41,7 +41,9 @@ export function RelievingLetter({
           <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
         <View style={styles.wrapper}>
           {/* Date Section */}
           <View style={styles.headerDate}>

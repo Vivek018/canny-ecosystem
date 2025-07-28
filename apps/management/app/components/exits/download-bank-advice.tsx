@@ -37,8 +37,8 @@ export const prepareBankAdviceWorkbook = async ({
   const date = new Date();
   const bankDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeBankDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeBankDetailsById({ id: employee_id, supabase }),
+    ),
   );
   const dateToBeSent = formatDate(date)
     ?.toString()!
@@ -60,7 +60,7 @@ export const prepareBankAdviceWorkbook = async ({
       account_holder_name: bankDetails?.account_holder_name || "",
       account_number: bankDetails?.account_number || "",
       ifsc_code: bankDetails?.ifsc_code || "",
-    })
+    }),
   );
 
   function isIciciBankIfsc(ifsc: string | null | undefined): boolean {

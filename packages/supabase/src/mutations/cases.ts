@@ -24,16 +24,13 @@ export async function createCase({
     }
   }
 
-  const { error, status } = await supabase
-    .from("cases")
-    .insert(data);
+  const { error, status } = await supabase.from("cases").insert(data);
 
   if (error) {
     console.error("createCases error:", error);
   }
 
   return { status, error };
-  
 }
 
 export async function updateCaseById({

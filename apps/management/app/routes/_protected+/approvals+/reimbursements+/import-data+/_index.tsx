@@ -108,7 +108,7 @@ export default function ReimbursementFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -127,7 +127,7 @@ export default function ReimbursementFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
           );
 
           if (matchedHeader) {
@@ -136,7 +136,7 @@ export default function ReimbursementFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>
+        {} as Record<string, string>,
       );
 
       setFieldMapping(initialMapping);
@@ -150,13 +150,13 @@ export default function ReimbursementFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -176,7 +176,7 @@ export default function ReimbursementFieldMapping() {
       const result = ImportReimbursementDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -209,7 +209,7 @@ export default function ReimbursementFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -222,7 +222,9 @@ export default function ReimbursementFieldMapping() {
 
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -231,13 +233,13 @@ export default function ReimbursementFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportReimbursementDataType
-                    )
-                  )
+                      key as keyof ImportReimbursementDataType,
+                    ),
+                  ),
               );
 
               return {
@@ -304,7 +306,7 @@ export default function ReimbursementFieldMapping() {
 
                 <Combobox
                   options={transformStringArrayIntoOptions(
-                    Array.from(reimbursementTypeArray)
+                    Array.from(reimbursementTypeArray),
                   )}
                   placeholder="Select Type"
                   value={type}
@@ -344,7 +346,7 @@ export default function ReimbursementFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline"
+                        field.required && "inline",
                       )}
                     >
                       *
@@ -358,11 +360,11 @@ export default function ReimbursementFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||

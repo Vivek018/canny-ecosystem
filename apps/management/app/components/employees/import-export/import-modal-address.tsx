@@ -79,7 +79,7 @@ export const ImportEmployeeAddressModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -88,10 +88,7 @@ export const ImportEmployeeAddressModal = () => {
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute(
-      "download",
-      "Employee-Address-Format"
-    );
+    link.setAttribute("download", "Employee-Address-Format");
 
     document.body.appendChild(link);
     link.click();
@@ -105,7 +102,7 @@ export const ImportEmployeeAddressModal = () => {
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            Only .csv format is supported! 
+            Only .csv format is supported!
             <span
               className="text-primary cursor-pointer ml-2"
               onClick={downloadDemoCsv}
@@ -115,7 +112,7 @@ export const ImportEmployeeAddressModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -142,7 +139,7 @@ export const ImportEmployeeAddressModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

@@ -123,7 +123,7 @@ export function AttendanceReportSearchFilter({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -157,7 +157,7 @@ export function AttendanceReportSearchFilter({
       {
         action: "/reports/attendance?index",
         method: "POST",
-      }
+      },
     );
     if (prompt.length) {
       searchParams.set("name", prompt);
@@ -168,7 +168,7 @@ export function AttendanceReportSearchFilter({
   const hasValidFilters =
     Object.entries(filterParams).filter(
       ([key, value]) =>
-        typeof value === "string" && value.length && key !== "name"
+        typeof value === "string" && value.length && key !== "name",
     ).length > 0;
 
   return (
@@ -185,7 +185,7 @@ export function AttendanceReportSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin"
+              isSubmitting && "animate-spin",
             )}
           />
           <Input
@@ -214,9 +214,9 @@ export function AttendanceReportSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100"
+                isOpen && "opacity-100",
               )}
             >
               <Icon name="mixer" />
@@ -244,7 +244,7 @@ export function AttendanceReportSearchFilter({
               >
                 {getYears(
                   10,
-                  endYear ? Number(endYear) : new Date().getFullYear()
+                  endYear ? Number(endYear) : new Date().getFullYear(),
                 )
                   ?.sort((a, b) => b - a)
                   .map((name, index) => (
@@ -427,23 +427,21 @@ export function AttendanceReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {
-                  siteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
-                }
+                {siteArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

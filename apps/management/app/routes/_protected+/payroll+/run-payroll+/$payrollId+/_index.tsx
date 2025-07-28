@@ -123,7 +123,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.run_payroll_id}${
       args.params.payrollId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -163,7 +163,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     return json(
       { status: "error", message: "Payroll update failed", redirectUrl, error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     console.error("Payroll Id Action error", error);
@@ -175,7 +175,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -239,7 +239,7 @@ export default function RunPayrollId() {
           {({ data, error }) => {
             if (error || !data) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                `${cacheKeyPrefix.run_payroll_id}${payrollId}`,
               );
               return (
                 <ErrorBoundary

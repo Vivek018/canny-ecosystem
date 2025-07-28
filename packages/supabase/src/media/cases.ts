@@ -85,7 +85,7 @@ export async function addOrUpdateCaseWithDocument({
             ...caseData,
             document: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
           },
-        }
+        },
       );
 
       if (updateError) {

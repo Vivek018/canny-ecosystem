@@ -33,7 +33,7 @@ export const DeleteInvoice = ({ invoiceId }: { invoiceId: string }) => {
   };
 
   const handleDeleteInvoice = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -43,7 +43,7 @@ export const DeleteInvoice = ({ invoiceId }: { invoiceId: string }) => {
           method: "post",
           action: `/payroll/invoices/${invoiceId}/delete-invoice`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -57,7 +57,7 @@ export const DeleteInvoice = ({ invoiceId }: { invoiceId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.invoice}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.invoice}`) && "flex",
         )}
       >
         Delete Invoice

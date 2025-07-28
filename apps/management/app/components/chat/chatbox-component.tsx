@@ -15,11 +15,18 @@ export function ChatboxComponent({
   data,
   config,
   returnTo = "/chat/chatbox",
-  dataExistsInDb = false
-}: { query: string | null, suggestedPrompts: string[], data: any[] | null[] | null, config: any, returnTo?: string, dataExistsInDb?: boolean }) {
-
+  dataExistsInDb = false,
+}: {
+  query: string | null;
+  suggestedPrompts: string[];
+  data: any[] | null[] | null;
+  config: any;
+  returnTo?: string;
+  dataExistsInDb?: boolean;
+}) {
   const { role } = useUser();
-  const { stateData,
+  const {
+    stateData,
     stateConfig,
     columns,
     prompt,
@@ -32,14 +39,15 @@ export function ChatboxComponent({
     handleSearch,
     saveChat,
     clearSearch,
-    refreshSearch } = useSearchState({ data, config, query, returnTo });
+    refreshSearch,
+  } = useSearchState({ data, config, query, returnTo });
 
   return (
     <section className="relative w-full h-full flex flex-col items-center justify-start gap-4 overflow-hidden">
       {/* Input Chat Box */}
-      <div className='flex space-x-3 w-full items-center'>
+      <div className="flex space-x-3 w-full items-center">
         <form
-          className='relative w-full h-full flex flex-row gap-3 items-center justify-center'
+          className="relative w-full h-full flex flex-row gap-3 items-center justify-center"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -51,7 +59,7 @@ export function ChatboxComponent({
               size="md"
               className={cn(
                 "absolute pointer-events-none left-2 top-[14px]",
-                isSubmitting && "animate-spin"
+                isSubmitting && "animate-spin",
               )}
             />
             <Input
@@ -61,18 +69,24 @@ export function ChatboxComponent({
               tabIndex={-1}
               ref={inputRef}
               placeholder="Start typing to ask a question or search across your company’s data"
-              className='pl-9 pb-[5px] text-[15px] w-full h-12 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70 bg-card tracking-wide'
+              className="pl-9 pb-[5px] text-[15px] w-full h-12 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70 bg-card tracking-wide"
               onChange={handleSearch}
               autoFocus={true}
-              autoComplete='on'
-              autoCapitalize='none'
-              autoCorrect='off'
-              spellCheck='false'
+              autoComplete="on"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
             />
           </>
           <Button
             type="submit"
-            className={cn("h-full px-5", (stateData?.length && prompt?.length && (prompt === searchPrompt)) && "hidden")}
+            className={cn(
+              "h-full px-5",
+              stateData?.length &&
+                prompt?.length &&
+                prompt === searchPrompt &&
+                "hidden",
+            )}
             disabled={!prompt || isSubmitting}
             variant={"default"}
             onClick={handleSubmit}
@@ -80,9 +94,17 @@ export function ChatboxComponent({
             <Icon name="check" size="md" />
           </Button>
         </form>
-        <div className={cn("h-full flex flex-row items-center justify-center gap-3", (!stateData?.length) && "hidden")}>
+        <div
+          className={cn(
+            "h-full flex flex-row items-center justify-center gap-3",
+            !stateData?.length && "hidden",
+          )}
+        >
           <Button
-            className={cn("h-full px-5", prompt?.length && (prompt !== searchPrompt) && "hidden")}
+            className={cn(
+              "h-full px-5",
+              prompt?.length && prompt !== searchPrompt && "hidden",
+            )}
             disabled={isSubmitting}
             variant={"default"}
             onClick={refreshSearch}
@@ -92,13 +114,17 @@ export function ChatboxComponent({
           <Button
             onClick={saveChat}
             variant="default"
-            className={cn("h-full px-5", !hasPermission(
-              `${role}`,
-              `${createRole}:${attribute.chat}`,
-            ) && "hidden")}
+            className={cn(
+              "h-full px-5",
+              !hasPermission(`${role}`, `${createRole}:${attribute.chat}`) &&
+                "hidden",
+            )}
             disabled={isSubmitting || dataExistsInDb}
           >
-            <Icon name={dataExistsInDb ? "bookmark-filled" : "bookmark"} size="sm" />
+            <Icon
+              name={dataExistsInDb ? "bookmark-filled" : "bookmark"}
+              size="sm"
+            />
           </Button>
           <Button
             className="h-full px-5"
@@ -111,10 +137,12 @@ export function ChatboxComponent({
         </div>
       </div>
       {/* Suggested Prompts */}
-      <Card className={cn(
-        "w-full h-full flex flex-col overflow-hidden",
-        searchPrompt && "hidden"
-      )}>
+      <Card
+        className={cn(
+          "w-full h-full flex flex-col overflow-hidden",
+          searchPrompt && "hidden",
+        )}
+      >
         <CardHeader className="py-3.5 text-xl font-bold capitalize tracking-wider">
           Try These Prompts:
         </CardHeader>
@@ -143,35 +171,66 @@ export function ChatboxComponent({
         </div>
       </Card>
 
-
       {/* If no state data is there after prompt */}
-      <div className={cn("hidden", (searchPrompt && !stateData?.length) && "flex flex-col gap-4 w-full sm:w-3/5 md:w-1/2 h-3/5 text-center items-center justify-center")}>
-        {(isSubmitting || searchPrompt !== prompt) ?
+      <div
+        className={cn(
+          "hidden",
+          searchPrompt &&
+            !stateData?.length &&
+            "flex flex-col gap-4 w-full sm:w-3/5 md:w-1/2 h-3/5 text-center items-center justify-center",
+        )}
+      >
+        {isSubmitting || searchPrompt !== prompt ? (
           <>
-            <p className="text-muted-foreground/60 text-xl tracking-wider">{animatedPlaceholder}</p>
+            <p className="text-muted-foreground/60 text-xl tracking-wider">
+              {animatedPlaceholder}
+            </p>
           </>
-          :
+        ) : (
           <>
             <p className="text-muted-foreground tracking-wider">
-              No data found in this prompt. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
+              No data found in this prompt. Since, this chat box is in early
+              stages it might not work as expected. Try refreshing page or other
+              prompts.
             </p>
             <div className="flex flex-col md:flex-row gap-3 items-center justify-center mt-1">
-              <Button size="full" disabled={isSubmitting} className="px-5" variant={"default"} onClick={refreshSearch}>
+              <Button
+                size="full"
+                disabled={isSubmitting}
+                className="px-5"
+                variant={"default"}
+                onClick={refreshSearch}
+              >
                 <Icon name="update" size="sm" />
               </Button>
-              <Button size="full" disabled={isSubmitting} className="px-5" variant={"muted"} onClick={clearSearch}>
+              <Button
+                size="full"
+                disabled={isSubmitting}
+                className="px-5"
+                variant={"muted"}
+                onClick={clearSearch}
+              >
                 <Icon name="cross" size="sm" />
               </Button>
             </div>
           </>
-        }
+        )}
       </div>
       {/* Data Display */}
-      <Card className={cn("w-full h-full flex flex-col overflow-hidden", (!stateData?.length) && "hidden")}>
+      <Card
+        className={cn(
+          "w-full h-full flex flex-col overflow-hidden",
+          !stateData?.length && "hidden",
+        )}
+      >
         <div className="flex-1 overflow-auto">
-          <Results results={stateData} chartConfig={stateConfig} columns={columns} />
+          <Results
+            results={stateData}
+            chartConfig={stateConfig}
+            columns={columns}
+          />
         </div>
       </Card>
     </section>
-  )
+  );
 }

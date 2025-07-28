@@ -19,7 +19,6 @@ export const AttendanceOptionsDropdown = ({
   attendanceId: string;
   triggerChild: React.ReactElement;
 }) => {
-
   const { role } = useUser();
   const navigate = useNavigate();
   const handleUpdate = () => {
@@ -33,7 +32,7 @@ export const AttendanceOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.attendance}`) &&
-              "hidden"
+                "hidden",
             )}
             onClick={handleUpdate}
           >
@@ -44,7 +43,7 @@ export const AttendanceOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.attendance}`) &&
-              "flex"
+                "flex",
             )}
           />
           <DeleteAttendance attendanceId={attendanceId} />

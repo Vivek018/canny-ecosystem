@@ -72,7 +72,7 @@ export default function DocumentCard({
 
   const handleEdit = () => {
     navigate(
-      `/employees/${employeeId}/documents/${documentData.documentId}/update-document`
+      `/employees/${employeeId}/documents/${documentData.documentId}/update-document`,
     );
   };
 
@@ -114,15 +114,15 @@ export default function DocumentCard({
                 documentData.url &&
                 handleDownload(
                   documentData.url,
-                  `${documentData.name}_${employeeId}.pdf`
+                  `${documentData.name}_${employeeId}.pdf`,
                 )
               }
               className={cn(
                 "hidden",
                 hasPermission(
                   role,
-                  `${readRole}:${attribute.employeeDocuments}`
-                ) && "flex"
+                  `${readRole}:${attribute.employeeDocuments}`,
+                ) && "flex",
               )}
             >
               Download
@@ -131,8 +131,8 @@ export default function DocumentCard({
               className={cn(
                 !hasPermission(
                   `${role}`,
-                  `${updateRole}:${attribute.employeeDocuments}`
-                ) && "hidden"
+                  `${updateRole}:${attribute.employeeDocuments}`,
+                ) && "hidden",
               )}
             />
             <DropdownMenuItem
@@ -141,8 +141,8 @@ export default function DocumentCard({
                 "hidden",
                 hasPermission(
                   role,
-                  `${updateRole}:${attribute.employeeDocuments}`
-                ) && "flex"
+                  `${updateRole}:${attribute.employeeDocuments}`,
+                ) && "flex",
               )}
             >
               Edit document
@@ -151,8 +151,8 @@ export default function DocumentCard({
               className={cn(
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.employeeDocuments}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.employeeDocuments}`,
+                ) && "hidden",
               )}
             />
             <DeleteEmployeeDocument

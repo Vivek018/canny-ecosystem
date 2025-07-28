@@ -37,7 +37,7 @@ export const IncidentOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.incidents}`) &&
-                "flex"
+                "flex",
             )}
           >
             Update Incident
@@ -46,7 +46,7 @@ export const IncidentOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.incidents}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeleteIncident id={incidentId} />

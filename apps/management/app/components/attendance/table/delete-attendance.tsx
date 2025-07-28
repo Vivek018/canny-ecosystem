@@ -37,7 +37,7 @@ export const DeleteAttendance = ({
   };
 
   const handleDeleteAttendance = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -47,7 +47,7 @@ export const DeleteAttendance = ({
           method: "post",
           action: `/time-tracking/attendance/${attendanceId}/delete-attendance`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -61,7 +61,8 @@ export const DeleteAttendance = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.attendance}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.attendance}`) &&
+            "flex",
         )}
       >
         Delete Attendnace

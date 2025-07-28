@@ -134,7 +134,7 @@ type DataType = {
 
 function chunkArray(array: any, size: number) {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size)
+    array.slice(i * size, i * size + size),
   );
 }
 
@@ -149,9 +149,8 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
 
     if (!address) return null;
 
-    return `${address.address_line_1 ?? ''}, ${address.address_line_2 ?? ''}, ${address.city ?? ''}, ${address.state ?? ''}, ${address.pincode ?? ''}`;
+    return `${address.address_line_1 ?? ""}, ${address.address_line_2 ?? ""}, ${address.city ?? ""}, ${address.state ?? ""}, ${address.pincode ?? ""}`;
   };
-
 
   return (
     <Document>
@@ -162,11 +161,11 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
           {chunk.map((emp: any, i: number) => {
             const earningsTotal = emp.earnings.reduce(
               (acc: number, e: any) => acc + e.amount,
-              0
+              0,
             );
             const deductionTotal = emp.deductions.reduce(
               (acc: number, d: any) => acc + d.amount,
-              0
+              0,
             );
             const netAmount = earningsTotal - deductionTotal;
 
@@ -182,7 +181,9 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     <Text style={styles.companyName}>
                       {data?.companyData?.name}
                     </Text>
-                    <Text style={styles.companyAddress}>{getFullAddress(emp)}</Text>
+                    <Text style={styles.companyAddress}>
+                      {getFullAddress(emp)}
+                    </Text>
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.companyName}>
@@ -266,7 +267,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                       ]}
                     >
                       {replaceUnderscore(
-                        emp.employeeProjectAssignmentData.position
+                        emp.employeeProjectAssignmentData.position,
                       )}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>ESI No.</Text>
@@ -319,7 +320,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp?.employeeProjectAssignmentData?.start_date
+                          emp?.employeeProjectAssignmentData?.start_date,
                         )}
                       </>
                     </Text>
@@ -354,7 +355,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                   {Array.from({
                     length: Math.max(
                       emp.earnings.length,
-                      emp.deductions.length
+                      emp.deductions.length,
                     ),
                   }).map((_, idx) => (
                     <View style={styles.row} key={idx.toString()}>

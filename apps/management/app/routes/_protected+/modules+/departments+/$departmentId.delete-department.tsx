@@ -36,12 +36,15 @@ export async function action({
         error: "No department ID provided",
         redirectUrl: "/modules/departments",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   try {
-    const { error, status } = await deleteDepartment({ supabase, id: departmentId });
+    const { error, status } = await deleteDepartment({
+      supabase,
+      id: departmentId,
+    });
 
     if (!isGoodStatus(status)) {
       return json(
@@ -51,7 +54,7 @@ export async function action({
           error,
           redirectUrl: "/modules/departments",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -69,7 +72,7 @@ export async function action({
         error,
         redirectUrl: "/modules/departments",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -100,7 +103,9 @@ export default function DeleteDepartment() {
       });
     }
 
-    navigate(actionData?.redirectUrl ?? "/modules/departments", { replace: true });
+    navigate(actionData?.redirectUrl ?? "/modules/departments", {
+      replace: true,
+    });
   }, [actionData]);
 
   return null;

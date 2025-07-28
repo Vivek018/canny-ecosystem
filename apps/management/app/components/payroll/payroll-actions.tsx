@@ -69,13 +69,13 @@ export function PayrollActions({
               variant={"ghost"}
               className={cn(
                 "px-2 w-full flex flex-row justify-start gap-2 ",
-                status !== "approved" ? "hidden" : ""
+                status !== "approved" ? "hidden" : "",
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/create-invoice`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/create-invoice`
+                      `/payroll/payroll-history/${payrollId}/create-invoice`,
                     )
               }
             >
@@ -107,13 +107,13 @@ export function PayrollActions({
               className={cn(
                 "hidden",
                 status === "approved" &&
-                  "flex flex-row justify-start gap-2 px-2 pr-1  "
+                  "flex flex-row justify-start gap-2 px-2 pr-1  ",
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/salary-slips`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/salary-slips`
+                      `/payroll/payroll-history/${payrollId}/salary-slips`,
                     )
               }
             >
@@ -132,7 +132,7 @@ export function PayrollActions({
                 <Button
                   variant={"ghost"}
                   className={cn(
-                    "w-full flex flex-row justify-start gap-2 px-2 pr-1"
+                    "w-full flex flex-row justify-start gap-2 px-2 pr-1",
                   )}
                 >
                   <Icon name="import" />
@@ -163,10 +163,10 @@ export function PayrollActions({
                       newParams.set("location", locations);
                       fromWhere === "runpayroll"
                         ? navigate(
-                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`
+                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`,
                           )
                         : navigate(
-                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`
+                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`,
                           );
                     }}
                   >

@@ -35,7 +35,7 @@ export async function action({
       {
         status: 403,
         headers,
-      }
+      },
     );
   }
 
@@ -61,7 +61,7 @@ export async function action({
         {
           status: 200,
           headers,
-        }
+        },
       );
     }
 
@@ -79,7 +79,7 @@ export async function action({
       {
         status: 500,
         headers,
-      }
+      },
     );
   } catch (error) {
     return json(
@@ -93,7 +93,7 @@ export async function action({
       {
         status: 500,
         headers,
-      }
+      },
     );
   }
 }

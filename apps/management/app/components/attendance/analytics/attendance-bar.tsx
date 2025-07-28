@@ -34,7 +34,7 @@ export function AttendanceBars({
       const totalPresents = (attendance ?? []).reduce(
         (total: number, entry: { present: any }) =>
           total + (entry.present ? 1 : 0),
-        0
+        0,
       );
 
       return {
@@ -59,13 +59,13 @@ export function AttendanceBars({
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart data={limitedTrendData} width={600} height={300}>
-            <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='employee_code' tickFormatter={(value) => value} />
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="employee_code" tickFormatter={(value) => value} />
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar
-              dataKey='presents'
-              fill='hsl(var(--chart-1))'
+              dataKey="presents"
+              fill="hsl(var(--chart-1))"
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

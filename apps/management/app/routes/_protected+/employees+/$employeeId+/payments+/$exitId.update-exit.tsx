@@ -59,7 +59,7 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    
+
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
 
     if (submission.status !== "success") {

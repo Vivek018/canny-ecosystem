@@ -19,14 +19,14 @@ export function ExportBar({
 }) {
   const totalAmount = data.reduce(
     (sum: number, { amount }) => sum + (amount ?? 0),
-    0
+    0,
   );
   const toBeExportedData = data.map((element) => {
     const exportedData: {
       [key: (typeof ReimbursementsColumnIdArray)[number]]:
-      | string
-      | number
-      | boolean;
+        | string
+        | number
+        | boolean;
     } = {};
 
     for (const key of ReimbursementsColumnIdArray) {
@@ -36,9 +36,8 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element?.employees?.employee_code;
       } else if (key === "employee_name") {
-        exportedData[
-          key
-        ] = `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
+        exportedData[key] =
+          `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
       } else if (key === "email") {
         exportedData[key] = element?.users?.email ?? "";
       } else if (key === "project_name") {
@@ -48,9 +47,10 @@ export function ExportBar({
         exportedData[key] =
           element?.employees?.employee_project_assignment?.sites?.name;
       } else {
-        exportedData[key] = element?.[
-          key as keyof ReimbursementDataType
-        ] as string | boolean | number;
+        exportedData[key] = element?.[key as keyof ReimbursementDataType] as
+          | string
+          | boolean
+          | number;
       }
     }
 
@@ -67,7 +67,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Reimbursements - ${formatDateTime(Date.now())}`
+      `Reimbursements - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);
@@ -80,7 +80,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

@@ -24,9 +24,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import {
-  CreateEmployeeProjectAssignment,
-} from "@/components/employees/form/create-employee-project-assignment";
+import { CreateEmployeeProjectAssignment } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -38,10 +36,7 @@ import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
   "update-employee-project-assignment";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
@@ -50,7 +45,7 @@ export async function loader({
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeProjectAssignment}`
+      `${updateRole}:${attribute.employeeProjectAssignment}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -121,7 +116,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -152,8 +147,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const { data, siteOptions, status, error } =
-    useLoaderData<typeof loader>();
+  const { data, siteOptions, status, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeProjectAssignmentSchema;
@@ -184,7 +178,7 @@ export default function UpdateEmployeeProjectAssignment() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",

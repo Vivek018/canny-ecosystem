@@ -29,7 +29,7 @@ export function PayrollCard({
             <p
               className={cn(
                 "p-2 w-auto font-semibold text-center text-sm rounded-md capitalize",
-                is_approved ? "bg-green" : "bg-muted"
+                is_approved ? "bg-green" : "bg-muted",
               )}
             >
               {data.status}

@@ -2,17 +2,28 @@ import { ChatboxComponent } from "@/components/chat/chatbox-component";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { generateChartConfig } from "@/utils/ai/chat/chart";
-import { clearCacheEntry, clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import {
+  clearCacheEntry,
+  clearExactCacheEntry,
+  clientCaching,
+} from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { getAllEmployeeTablesData, getChatByPromptAndUserId } from "@canny_ecosystem/supabase/queries";
+import {
+  getAllEmployeeTablesData,
+  getChatByPromptAndUserId,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, defer, useLoaderData } from "@remix-run/react";
+import {
+  type ClientLoaderFunctionArgs,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
 import { useEffect } from "react";
 
 const suggestedPrompts = [
@@ -31,7 +42,7 @@ const suggestedPrompts = [
   "Employees with missing bank information",
   "Top 20 oldest employees",
   "Employees with post-graduate degrees and more than 10 years of work experience",
-  "List all employees showing whether they are local or outstation based on their work location with their home city and work city"
+  "List all employees showing whether they are local or outstation based on their work location with their home city and work city",
 ];
 
 export const employeeSystemPrompt = `
@@ -108,38 +119,78 @@ export async function loader({ request }: LoaderFunctionArgs) {
     let dataExistsInDb = false;
 
     if (!prompt) {
-      return defer({ prompt, query: null, data: [], config: null, error: null, dataExistsInDb });
+      return defer({
+        prompt,
+        query: null,
+        data: [],
+        config: null,
+        error: null,
+        dataExistsInDb,
+      });
     }
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const { data: employeesData } = await getAllEmployeeTablesData({ supabase });
+    const { data: employeesData } = await getAllEmployeeTablesData({
+      supabase,
+    });
     const tablesData = JSON.stringify(employeesData);
 
-    const promptWithCompany = `${prompt} where company is company_id=${companyId}`
+    const promptWithCompany = `${prompt} where company is company_id=${companyId}`;
 
     if (prompt && user?.id) {
-      const { data, status } = await getChatByPromptAndUserId({ supabase, userId: user?.id ?? "", prompt: prompt });
+      const { data, status } = await getChatByPromptAndUserId({
+        supabase,
+        userId: user?.id ?? "",
+        prompt: prompt,
+      });
 
       if (data && isGoodStatus(status)) {
         dataExistsInDb = true;
       }
     }
 
-    const { query, error } = await generateQuery({ input: promptWithCompany, tablesData, companyId, systemPrompt: employeeSystemPrompt });
+    const { query, error } = await generateQuery({
+      input: promptWithCompany,
+      tablesData,
+      companyId,
+      systemPrompt: employeeSystemPrompt,
+    });
 
     if (query === undefined || error) {
-      return defer({ prompt, query: null, data: null, config: null, error: error ?? "Error generating query", dataExistsInDb });
+      return defer({
+        prompt,
+        query: null,
+        data: null,
+        config: null,
+        error: error ?? "Error generating query",
+        dataExistsInDb,
+      });
     }
 
-    const { data, error: sqlError } = await runGeneratedSQLQuery({ originalQuery: query });
-
+    const { data, error: sqlError } = await runGeneratedSQLQuery({
+      originalQuery: query,
+    });
 
     const { config } = await generateChartConfig(data ?? [], prompt);
 
-    return defer({ prompt, query, data, config, error: sqlError ?? null, dataExistsInDb });
+    return defer({
+      prompt,
+      query,
+      data,
+      config,
+      error: sqlError ?? null,
+      dataExistsInDb,
+    });
   } catch (error) {
     console.error("Error in action function:", error);
-    return defer({ prompt: null, query: null, data: null, config: null, error: error, dataExistsInDb: false });
+    return defer({
+      prompt: null,
+      query: null,
+      data: null,
+      config: null,
+      error: error,
+      dataExistsInDb: false,
+    });
   }
 }
 
@@ -147,22 +198,20 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   const searchParams = new URLSearchParams(url.searchParams);
   const prompt = searchParams.get("prompt") ?? "";
-  return clientCaching(
-    `${cacheKeyPrefix.chatbox_employee}${prompt}`,
-    args
-  );
+  return clientCaching(`${cacheKeyPrefix.chatbox_employee}${prompt}`, args);
 }
 clientLoader.hydrate = true;
 
 export default function EmployeeChat() {
-  const { prompt, query, data, config, error, dataExistsInDb } = useLoaderData<typeof loader>();
+  const { prompt, query, data, config, error, dataExistsInDb } =
+    useLoaderData<typeof loader>();
 
   const { toast } = useToast();
 
   useEffect(() => {
     if (error) {
-      clearCacheEntry(cacheKeyPrefix.chatbox)
-      clearExactCacheEntry(cacheKeyPrefix.chatbox_employee + prompt)
+      clearCacheEntry(cacheKeyPrefix.chatbox);
+      clearExactCacheEntry(cacheKeyPrefix.chatbox_employee + prompt);
       toast({
         title: "Error",
         description:
@@ -182,5 +231,5 @@ export default function EmployeeChat() {
       returnTo={"/chat/chatbox/employee"}
       dataExistsInDb={dataExistsInDb}
     />
-  )
+  );
 }

@@ -36,7 +36,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   try {
-    const documentsPromise = getCompanyDocumentsByCompanyId({ supabase, companyId });
+    const documentsPromise = getCompanyDocumentsByCompanyId({
+      supabase,
+      companyId,
+    });
     return defer({
       status: "success",
       message: "Company documents found",
@@ -67,60 +70,63 @@ export default function Documents() {
 
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
-    return <ErrorBoundary error={error} message='Failed to fetch documents' />;
+    return <ErrorBoundary error={error} message="Failed to fetch documents" />;
   }
 
   return (
-    <section className='w-full py-4 px-0'>
-      <div className='w-full mb-6'>
+    <section className="w-full py-4 px-0">
+      <div className="w-full mb-6">
         <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={documentsPromise}>
             {(resolvedData) => {
               if (!resolvedData || !resolvedData.data) {
                 clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
-                return <ErrorBoundary message='Failed to fetch documents' />;
+                return <ErrorBoundary message="Failed to fetch documents" />;
               }
-              return <Command className='overflow-visible w-full'>
-                <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
-                  <CommandInput
-                    divClassName='border border-input rounded-md h-10 flex-1'
-                    placeholder='Search Documents'
-                    autoFocus={true}
-                  />
-                  <Link
-                    to={"/settings/documents/add-document"}
+              return (
+                <Command className="overflow-visible w-full">
+                  <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+                    <CommandInput
+                      divClassName="border border-input rounded-md h-10 flex-1"
+                      placeholder="Search Documents"
+                      autoFocus={true}
+                    />
+                    <Link
+                      to={"/settings/documents/add-document"}
+                      className={cn(
+                        buttonVariants({ variant: "primary-outline" }),
+                        "flex items-center gap-1 whitespace-nowrap",
+                        !hasPermission(
+                          role,
+                          `${createRole}:${attribute.companyDocuments}`,
+                        ) && "hidden",
+                      )}
+                    >
+                      <span>Add Document</span>
+                    </Link>
+                  </div>
+                  <CommandEmpty
                     className={cn(
-                      buttonVariants({ variant: "primary-outline" }),
-                      "flex items-center gap-1 whitespace-nowrap",
-                      !hasPermission(
-                        role,
-                        `${createRole}:${attribute.companyDocuments}`
-                      ) && "hidden"
+                      "w-full py-40 capitalize text-lg tracking-wide text-center",
+                      !isDocument && "hidden",
                     )}
                   >
-                    <span>Add Document</span>
-                  </Link>
-                </div>
-                <CommandEmpty
-                  className={cn(
-                    "w-full py-40 capitalize text-lg tracking-wide text-center",
-                    !isDocument && "hidden"
-                  )}
-                >
-                  No document found.
-                </CommandEmpty>
-                <CommandList className='max-h-full py-2 px-0 overflow-x-visible overflow-y-visible'>
-
-                  <DocumentsWrapper data={resolvedData.data} error={resolvedData.error} />
-
-                </CommandList>
-              </Command>
+                    No document found.
+                  </CommandEmpty>
+                  <CommandList className="max-h-full py-2 px-0 overflow-x-visible overflow-y-visible">
+                    <DocumentsWrapper
+                      data={resolvedData.data}
+                      error={resolvedData.error}
+                    />
+                  </CommandList>
+                </Command>
+              );
             }}
           </Await>
         </Suspense>
       </div>
       <Outlet />
-    </section >
+    </section>
   );
 }
 
@@ -128,7 +134,7 @@ export function DocumentsWrapper({
   data,
   error,
 }: {
-  data: Pick<DocumentsDatabaseRow, "id" | "name" | "url">[]
+  data: Pick<DocumentsDatabaseRow, "id" | "name" | "url">[];
   error: unknown;
 }) {
   const { toast } = useToast();
@@ -145,16 +151,22 @@ export function DocumentsWrapper({
   }, [error]);
 
   return (
-    <CommandGroup className='w-full px-0'>
-      <div className='w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 px-0'>
+    <CommandGroup className="w-full px-0">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 px-0">
         {data.map((document) => {
           return (
             <CommandItem
               key={document.id}
               value={document.name + document.id + document.url}
-              className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
+              className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
             >
-              <DocumentCard documentData={{ name: document.name, url: document.url, id: document.id }} />
+              <DocumentCard
+                documentData={{
+                  name: document.name,
+                  url: document.url,
+                  id: document.id,
+                }}
+              />
             </CommandItem>
           );
         })}

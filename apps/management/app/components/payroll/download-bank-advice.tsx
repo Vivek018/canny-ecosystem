@@ -37,8 +37,8 @@ export const prepareBankAdviceWorkbook = async ({
   const date = new Date();
   const bankDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeBankDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeBankDetailsById({ id: employee_id, supabase }),
+    ),
   );
   const dateToBeSent = formatDate(date)
     ?.toString()!

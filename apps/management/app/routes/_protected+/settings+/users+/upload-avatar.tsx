@@ -8,7 +8,9 @@ import { uploadAvatar } from "@canny_ecosystem/supabase/media";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
   const file = formData.get("file") as File;
@@ -18,7 +20,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
     return json({
       status: "error",
       message: "Invalid file object received",
-      returnTo
+      returnTo,
     });
   }
   const { error } = await uploadAvatar({ supabase, avatar: file });
@@ -26,13 +28,13 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
     return json({
       status: "error",
       message: error.toString(),
-      returnTo
+      returnTo,
     });
   }
   return json({
     status: "success",
     message: "Avatar uploaded successfully",
-    returnTo
+    returnTo,
   });
 }
 
@@ -53,8 +55,7 @@ export default function UploadAvatar() {
       } else {
         toast({
           title: "Error",
-          description:
-            actionData?.error?.message ?? actionData?.message,
+          description: actionData?.error?.message ?? actionData?.message,
           variant: "destructive",
         });
       }

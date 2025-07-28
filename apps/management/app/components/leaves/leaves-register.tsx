@@ -54,10 +54,8 @@ export const prepareLeavesWorkbook = async ({
       last_name,
       employee_project_assignment,
     } = employees;
-    const project =
-      employee_project_assignment?.sites?.projects?.name || null;
-    const site =
-      employee_project_assignment?.sites?.name || null;
+    const project = employee_project_assignment?.sites?.projects?.name || null;
+    const site = employee_project_assignment?.sites?.name || null;
 
     if (!acc[employee_code]) {
       const monthsArray = Object.entries(months)
@@ -79,7 +77,7 @@ export const prepareLeavesWorkbook = async ({
               paternity_leave: 0,
               sick_leave: 0,
             },
-          ])
+          ]),
         ),
       };
     }
@@ -112,7 +110,7 @@ export const prepareLeavesWorkbook = async ({
   const worksheet = workbook.addWorksheet("Leaves Register");
 
   const exlMonths = Object.keys(formattedLeaveData[0]).filter((key) =>
-    key.match(/^[A-Za-z]{3}-\d{4}$/)
+    key.match(/^[A-Za-z]{3}-\d{4}$/),
   );
 
   worksheet.mergeCells("A1:E1");
@@ -127,9 +125,8 @@ export const prepareLeavesWorkbook = async ({
   };
 
   worksheet.mergeCells("A2:E3");
-  worksheet.getCell(
-    "A2"
-  ).value = `${companyAddress?.address_line_1}, ${companyAddress?.address_line_2}, ${companyAddress?.city}, ${companyAddress?.state} ${companyAddress?.pincode}`;
+  worksheet.getCell("A2").value =
+    `${companyAddress?.address_line_1}, ${companyAddress?.address_line_2}, ${companyAddress?.city}, ${companyAddress?.state} ${companyAddress?.pincode}`;
   worksheet.getCell("A2").font = { bold: false, size: 12 };
   worksheet.getCell("A2").alignment = {
     horizontal: "center",
@@ -138,8 +135,9 @@ export const prepareLeavesWorkbook = async ({
   };
 
   worksheet.mergeCells("F1:BH4");
-  worksheet.getCell("F1").value = `Leaves Register for ${refYear ? refYear : new Date().getFullYear()
-    }`;
+  worksheet.getCell("F1").value = `Leaves Register for ${
+    refYear ? refYear : new Date().getFullYear()
+  }`;
   worksheet.getCell("F1").font = { bold: true, size: 20 };
   worksheet.getCell("F1").alignment = {
     horizontal: "center",
@@ -166,12 +164,7 @@ export const prepareLeavesWorkbook = async ({
     wrapText: true,
   };
 
-  const fixedHeaders = [
-    "Employee Code",
-    "Employee Name",
-    "Project",
-    "Site",
-  ];
+  const fixedHeaders = ["Employee Code", "Employee Name", "Project", "Site"];
   const leaveTypes = [
     "Casual Leave",
     "Paid Leave",
@@ -239,7 +232,7 @@ export const prepareLeavesWorkbook = async ({
           leaveData.paternity_leave || 0,
           leaveData.sick_leave || 0,
         ];
-      })
+      }),
     );
 
     rowData.push(totalLeaves);
@@ -278,7 +271,7 @@ export const LeavesRegister = ({
       new Blob([workbook], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       }),
-      `Leaves-Register ${formatDateTime(Date.now())}.xlsx`
+      `Leaves-Register ${formatDateTime(Date.now())}.xlsx`,
     );
   };
 
@@ -288,7 +281,7 @@ export const LeavesRegister = ({
         className={cn(
           buttonVariants({ variant: "muted" }),
           "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
-          selectedRows.length && "flex"
+          selectedRows.length && "flex",
         )}
       >
         <Icon name="plus-circled" />

@@ -1,4 +1,8 @@
-import { InferredType, NotificationDatabaseRow, TypedSupabaseClient } from "../types";
+import {
+  InferredType,
+  NotificationDatabaseRow,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function getNotificationByCompanyId({
   supabase,
@@ -7,18 +11,16 @@ export async function getNotificationByCompanyId({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
-  const columns = [
-    "id",
-    "text",
-    "company_id",
-  ] as const;
+  const columns = ["id", "text", "company_id"] as const;
 
   const { data, error } = await supabase
     .from("notifications")
     .select(columns.join(","))
     .eq("company_id", companyId)
     .order("created_at", { ascending: false })
-    .maybeSingle<InferredType<NotificationDatabaseRow, typeof columns[number]>>();
+    .maybeSingle<
+      InferredType<NotificationDatabaseRow, (typeof columns)[number]>
+    >();
 
   if (error) {
     console.error("getNotificationByCompanyId Error", error);

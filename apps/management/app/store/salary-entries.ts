@@ -1,4 +1,3 @@
-
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";

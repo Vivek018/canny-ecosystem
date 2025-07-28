@@ -39,7 +39,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/documents`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -49,7 +49,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/documents`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -64,7 +64,7 @@ export default function DeleteDocument() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_documents}${employeeId}`
+          `${cacheKeyPrefix.employee_documents}${employeeId}`,
         );
         toast({
           title: "Success",

@@ -60,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.employeeProjectAssignment}`
+      `${createRole}:${attribute.employeeProjectAssignment}`,
     )
   )
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -100,7 +100,7 @@ export async function action({
   if (submission.status !== "success")
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
 
   try {
@@ -173,7 +173,7 @@ export default function CreateEmployeeLinkTemplate({
     if (actionData) {
       if (actionData.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_payments}${employeeId}`
+          `${cacheKeyPrefix.employee_payments}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -233,7 +233,7 @@ export default function CreateEmployeeLinkTemplate({
                     placeholder: replaceUnderscore(fields.effective_from.name),
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.effective_from.initialValue
+                      fields.effective_from.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -248,7 +248,7 @@ export default function CreateEmployeeLinkTemplate({
                     placeholder: replaceUnderscore(fields.effective_to.name),
                     min: getValidDateForInput(fields.effective_from.value),
                     defaultValue: getValidDateForInput(
-                      fields.effective_to.initialValue
+                      fields.effective_to.initialValue,
                     ),
                   }}
                   labelProps={{

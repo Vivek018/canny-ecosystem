@@ -24,8 +24,7 @@ export async function createPaymentTemplateAssignment({
 
   const { error, status } = await supabase
     .from("payment_template_assignments")
-    .insert(data)
-    ;
+    .insert(data);
 
   if (error) console.error("createPaymentTemplateAssignment Error", error);
 
@@ -56,8 +55,7 @@ export async function updatePaymentTemplateAssignment({
   const { error, status } = await supabase
     .from("payment_template_assignments")
     .update(updateData)
-    .eq("id", id)
-    ;
+    .eq("id", id);
 
   if (error) console.error("updatePaymentTemplateAssignment Error", error);
 

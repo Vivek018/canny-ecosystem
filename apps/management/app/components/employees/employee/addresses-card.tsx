@@ -64,8 +64,8 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.employeeAddresses}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.employeeAddresses}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -83,9 +83,9 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                   !address.longitude &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employeeAddresses}`
+                    `${deleteRole}:${attribute.employeeAddresses}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -95,7 +95,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !address.latitude && "hidden"
+                    !address.latitude && "hidden",
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(address.latitude));
@@ -106,7 +106,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !address.longitude && "hidden"
+                    !address.longitude && "hidden",
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(address.longitude));
@@ -119,9 +119,9 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     ((!address.latitude && !address.longitude) ||
                       !hasPermission(
                         role,
-                        `${deleteRole}:${attribute.employeeAddresses}`
+                        `${deleteRole}:${attribute.employeeAddresses}`,
                       )) &&
-                      "hidden"
+                      "hidden",
                   )}
                 />
                 <DeleteAddress
@@ -148,7 +148,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
       <CardFooter
         className={cn(
           "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-          !address.is_primary && "opacity-0"
+          !address.is_primary && "opacity-0",
         )}
       >
         <Icon name="dot-filled" size="xs" />
@@ -173,7 +173,7 @@ export const EmployeeAddressesCard = ({
             to={
               hasPermission(
                 role,
-                `${createRole}:${attribute.employeeAddresses}`
+                `${createRole}:${attribute.employeeAddresses}`,
               )
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
@@ -183,8 +183,8 @@ export const EmployeeAddressesCard = ({
               "bg-card",
               !hasPermission(
                 role,
-                `${createRole}:${attribute.employeeAddresses}`
-              ) && "hidden"
+                `${createRole}:${attribute.employeeAddresses}`,
+              ) && "hidden",
             )}
           >
             <Icon name="plus-circled" className="mr-2" />

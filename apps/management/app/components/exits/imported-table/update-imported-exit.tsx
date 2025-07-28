@@ -43,7 +43,7 @@ export const UpdateImportedExit = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -63,7 +63,7 @@ export const UpdateImportedExit = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Exit
@@ -141,7 +141,7 @@ export const UpdateImportedExit = ({
           <div className="grid grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                exitReasonArray as unknown as string[]
+                exitReasonArray as unknown as string[],
               )}
               value={capitalizeFirstLetter(data.reason) ?? exitReasonArray[0]}
               onChange={(value: string) => {

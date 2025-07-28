@@ -14,7 +14,6 @@ type DetailItemProps = {
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
-
   return (
     <div className="flex flex-col items-start">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
@@ -45,8 +44,9 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
         <div className="grid grid-cols-2 max-sm:gap-2">
           <DetailItem
             label="Name"
-            value={`${guardian.first_name ?? "--"} ${guardian.last_name ?? "--"
-              }`}
+            value={`${guardian.first_name ?? "--"} ${
+              guardian.last_name ?? "--"
+            }`}
           />
           <DetailItem label="Date of Birth" value={guardian.date_of_birth} />
           <DetailItem label="Gender" value={guardian.gender} />

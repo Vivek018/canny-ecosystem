@@ -1,10 +1,20 @@
-import { Client } from 'pg';
-import { generateObject } from 'ai';
-import { google } from '@ai-sdk/google';
-import { z } from '@canny_ecosystem/utils';
-import { BASIC_SYSTEM_PROMPT, GEMINI_MAIN } from './constant';
+import { Client } from "pg";
+import { generateObject } from "ai";
+import { google } from "@ai-sdk/google";
+import { z } from "@canny_ecosystem/utils";
+import { BASIC_SYSTEM_PROMPT, GEMINI_MAIN } from "./constant";
 
-export const generateQuery = async ({ input, companyId, tablesData, systemPrompt }: { input: string, companyId: string, tablesData: string, systemPrompt: string }) => {
+export const generateQuery = async ({
+  input,
+  companyId,
+  tablesData,
+  systemPrompt,
+}: {
+  input: string;
+  companyId: string;
+  tablesData: string;
+  systemPrompt: string;
+}) => {
   try {
     const result = await generateObject({
       model: google(GEMINI_MAIN),
@@ -97,6 +107,6 @@ export const runGeneratedSQLQuery = async ({
   await client.end();
   return {
     data: finalData,
-    error: finalError ? (finalError.message ?? finalError) : null,
+    error: finalError ? finalError.message ?? finalError : null,
   };
 };

@@ -101,8 +101,8 @@ export const InvoiceOptionsDropdown = ({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
-            !hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
-            "hidden"
+              !hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
+              "hidden",
           )}
         />
 
@@ -110,7 +110,7 @@ export const InvoiceOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
-              "hidden"
+                "hidden",
             )}
             onClick={handleInvoiceUpdate}
           >
@@ -120,14 +120,14 @@ export const InvoiceOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
-              "flex"
+                "flex",
             )}
           />
           <DropdownMenuItem
             className={cn(
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
-              "hidden"
+                "hidden",
             )}
             onClick={() => handleDownloadProof(proofUrl, `${invoiceNumber}`)}
           >
@@ -138,7 +138,7 @@ export const InvoiceOptionsDropdown = ({
               "flex",
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
-              "hidden"
+                "hidden",
             )}
           />
           <DeleteInvoice invoiceId={invoiceId} />

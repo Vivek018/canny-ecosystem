@@ -405,7 +405,7 @@ export async function getCompanyDocumentUrlByCompanyIdAndDocumentName({
   if (error)
     console.error(
       "getCompanyDocumentUrlByCompanyIdAndDocumentName Error",
-      error
+      error,
     );
 
   return { data, error };

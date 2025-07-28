@@ -18,7 +18,7 @@ import { InvoicesByType } from "@/components/invoice/analytics/invoice-by-type";
 
 const getDataSource = (
   selectedRows: InvoiceDataType[],
-  storedValue: InvoiceDataType[]
+  storedValue: InvoiceDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -55,7 +55,7 @@ export default function InvoicesAnalytics() {
   const { selectedRows } = useInvoiceStore();
   const [storedValue, setValue] = useLocalStorage<InvoiceDataType[]>(
     "analyticsArray",
-    []
+    [],
   );
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function InvoicesAnalytics() {
 
   const dataSource: InvoiceDataType[] = getDataSource(
     selectedRows,
-    storedValue
+    storedValue,
   );
 
   return (

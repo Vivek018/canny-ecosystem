@@ -113,14 +113,14 @@ export function SalaryTableHeader({
                   name="chevron-up"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "desc" && "flex"
+                    sortingId === id && sortingOrder === "desc" && "flex",
                   )}
                 />
                 <Icon
                   name="chevron-down"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "asc" && "flex"
+                    sortingId === id && sortingOrder === "asc" && "flex",
                   )}
                 />
               </Button>

@@ -38,7 +38,7 @@ export function ExportBar({
   }
 
   const sortedDateHeaders = [...dateHeaders].sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
   );
 
   const formattedData: any[] | Papa.UnparseObject<any> = [];
@@ -72,12 +72,7 @@ export function ExportBar({
     for (const employee of data) {
       for (const key in employee) {
         if (
-          ![
-            "employee_code",
-            "employee_name",
-            "project",
-            "site",
-          ].includes(key)
+          !["employee_code", "employee_name", "project", "site"].includes(key)
         ) {
           if (employee[key] !== "WOF") {
             totalDays++;
@@ -102,7 +97,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Attendances - ${formatDateTime(Date.now())}`
+      `Attendances - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);
@@ -115,7 +110,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

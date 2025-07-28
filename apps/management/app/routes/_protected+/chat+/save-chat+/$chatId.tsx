@@ -11,14 +11,37 @@ import { getChatById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardHeader } from "@canny_ecosystem/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuTrigger,
+} from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { deleteRole, formatDateTime, hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  formatDateTime,
+  hasPermission,
+  isGoodStatus,
+  readRole,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { type ActionFunctionArgs, defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigate, useParams, type ClientLoaderFunctionArgs } from "@remix-run/react";
+import {
+  type ActionFunctionArgs,
+  defer,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useParams,
+  type ClientLoaderFunctionArgs,
+} from "@remix-run/react";
 import { useEffect } from "react";
 import Papa from "papaparse";
 
@@ -38,7 +61,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const query = dbData?.query ?? "";
     const config = JSON.parse(dbData?.config ?? "") ?? null;
 
-    const { data, error: sqlError } = await runGeneratedSQLQuery({ originalQuery: query });
+    const { data, error: sqlError } = await runGeneratedSQLQuery({
+      originalQuery: query,
+    });
 
     return defer({ prompt, data, config, error: sqlError ?? null });
   } catch (error) {
@@ -50,7 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.save_chat_id}${args.params.chatId}`,
-    args
+    args,
   );
 }
 clientLoader.hydrate = true;
@@ -90,7 +115,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         returnTo,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -156,7 +181,6 @@ export default function Chatbox() {
         | string
         | boolean
         | number;
-
     }
     return exportedData;
   });
@@ -178,12 +202,15 @@ export default function Chatbox() {
   };
 
   return (
-    <Card className={cn("w-full h-full flex flex-col overflow-hidden", (!data?.length) && "hidden")}>
+    <Card
+      className={cn(
+        "w-full h-full flex flex-col overflow-hidden",
+        !data?.length && "hidden",
+      )}
+    >
       <Form method="POST">
         <CardHeader className="py-2 flex flex-row items-center justify-between gap-4">
-          <p className="w-full truncate tracking-wide">
-            {prompt}
-          </p>
+          <p className="w-full truncate tracking-wide">{prompt}</p>
           <div className="h-11 flex-1 flex flex-row gap-2 items-center justify-end pb-2">
             <Button variant={"secondary"} onClick={handleExport}>
               <Icon name="download" size="sm" />
@@ -192,10 +219,8 @@ export default function Chatbox() {
               <DropdownMenuTrigger
                 className={cn(
                   "h-9 px-3.5 rounded-sm bg-secondary text-secondary-foreground grid place-items-center",
-                  !hasPermission(
-                    role,
-                    `${deleteRole}:${attribute.chat}`,
-                  ) && "hidden",
+                  !hasPermission(role, `${deleteRole}:${attribute.chat}`) &&
+                    "hidden",
                 )}
               >
                 <Icon name="dots-vertical" size="sm" />
@@ -210,11 +235,7 @@ export default function Chatbox() {
         </CardHeader>
       </Form>
       <div className="flex-1 overflow-auto">
-        <Results
-          results={data ?? []}
-          chartConfig={config}
-          columns={columns}
-        />
+        <Results results={data ?? []} chartConfig={config} columns={columns} />
       </div>
     </Card>
   );

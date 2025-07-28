@@ -14,11 +14,7 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "./chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./chart";
 import {
   formatDate,
   pipe,
@@ -85,8 +81,16 @@ export function DynamicChart({
 
   const data = processChartData(chartDataGrouped, chartConfig.type);
 
-  const xLabel = pipe(formatDate, replaceDash, replaceUnderscore)(chartConfig.xKey)!;
-  const yLabel = pipe(formatDate, replaceDash, replaceUnderscore)(chartConfig.yKeys[0])!;
+  const xLabel = pipe(
+    formatDate,
+    replaceDash,
+    replaceUnderscore,
+  )(chartConfig.xKey)!;
+  const yLabel = pipe(
+    formatDate,
+    replaceDash,
+    replaceUnderscore,
+  )(chartConfig.yKeys[0])!;
 
   const formatter = pipe(formatDate, replaceDash, replaceUnderscore) as any;
 
@@ -94,7 +98,10 @@ export function DynamicChart({
     switch (chartConfig.type) {
       case "bar":
         return (
-          <BarChart data={data} margin={{ top: 10, right: 30, left: 30, bottom: 10 }}>
+          <BarChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 30, bottom: 10 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey={chartConfig.xKey}
@@ -104,9 +111,16 @@ export function DynamicChart({
               <Label value={xLabel} offset={-5} position="insideBottom" />
             </XAxis>
             <YAxis tickFormatter={formatter}>
-              <Label value={yLabel} offset={-20} angle={-90} position="insideLeft" />
+              <Label
+                value={yLabel}
+                offset={-20}
+                angle={-90}
+                position="insideLeft"
+              />
             </YAxis>
-            <ChartTooltip content={<ChartTooltipContent labelFormatter={formatter} />} />
+            <ChartTooltip
+              content={<ChartTooltipContent labelFormatter={formatter} />}
+            />
             {chartConfig.yKeys.map((key: string, i: number) => (
               <Bar key={key} dataKey={key} fill={colors[i % colors.length]} />
             ))}
@@ -124,7 +138,10 @@ export function DynamicChart({
         const usedData = useTransformedData ? multiData : data;
 
         return (
-          <LineChart data={usedData} margin={{ top: 10, right: 30, left: 30, bottom: 10 }}>
+          <LineChart
+            data={usedData}
+            margin={{ top: 10, right: 30, left: 30, bottom: 10 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey={chartConfig.xKey}
@@ -138,7 +155,9 @@ export function DynamicChart({
             <YAxis>
               <Label value={yLabel} angle={-90} position="insideLeft" />
             </YAxis>
-            <ChartTooltip content={<ChartTooltipContent labelFormatter={formatter} />} />
+            <ChartTooltip
+              content={<ChartTooltipContent labelFormatter={formatter} />}
+            />
             {(useTransformedData ? lineFields : chartConfig.yKeys).map(
               (key: string, index: number) => (
                 <Line
@@ -154,7 +173,10 @@ export function DynamicChart({
       }
       case "area":
         return (
-          <AreaChart data={data} margin={{ top: 10, right: 30, left: 30, bottom: 10 }}>
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 30, bottom: 10 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey={chartConfig.xKey}
@@ -164,7 +186,9 @@ export function DynamicChart({
               height={70}
             />
             <YAxis />
-            <ChartTooltip content={<ChartTooltipContent labelFormatter={formatter} />} />
+            <ChartTooltip
+              content={<ChartTooltipContent labelFormatter={formatter} />}
+            />
             {chartConfig.yKeys.map((key: string, index: number) => (
               <Area
                 key={key}
@@ -188,10 +212,15 @@ export function DynamicChart({
               outerRadius={120}
             >
               {data.map((_, index) => (
-                <Cell key={`cell-${index.toString()}`} fill={colors[index % colors.length]} />
+                <Cell
+                  key={`cell-${index.toString()}`}
+                  fill={colors[index % colors.length]}
+                />
               ))}
             </Pie>
-            <ChartTooltip content={<ChartTooltipContent labelFormatter={formatter} />} />
+            <ChartTooltip
+              content={<ChartTooltipContent labelFormatter={formatter} />}
+            />
           </PieChart>
         );
       default:
@@ -201,16 +230,21 @@ export function DynamicChart({
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      <h2 className="text-lg font-bold mb-2 text-center">{chartConfig.title}</h2>
+      <h2 className="text-lg font-bold mb-2 text-center">
+        {chartConfig.title}
+      </h2>
       {chartConfig && data.length > 0 && (
         <ChartContainer
-          config={chartConfig.yKeys.reduce((acc: any, key: string, i: number) => {
-            acc[key] = {
-              label: key,
-              color: colors[i % colors.length],
-            };
-            return acc;
-          }, {})}
+          config={chartConfig.yKeys.reduce(
+            (acc: any, key: string, i: number) => {
+              acc[key] = {
+                label: key,
+                color: colors[i % colors.length],
+              };
+              return acc;
+            },
+            {},
+          )}
           className="h-[300px] w-full"
         >
           <ResponsiveContainer width="100%" height="100%">

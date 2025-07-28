@@ -79,7 +79,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         siteOptions: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -98,7 +98,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -126,14 +126,13 @@ export async function action({
         message: "Failed to update user",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export default function UpdateUser() {
-  const { userData, error, siteOptions } =
-    useLoaderData<typeof loader>();
+  const { userData, error, siteOptions } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -166,10 +165,5 @@ export default function UpdateUser() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load user" />;
 
-  return (
-    <CreateUser
-      updateValues={userData}
-      siteOptions={siteOptions}
-    />
-  );
+  return <CreateUser updateValues={userData} siteOptions={siteOptions} />;
 }

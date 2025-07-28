@@ -13,19 +13,19 @@ export const ReimbursementFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Full name, employee code or reimbursement name. Example: John Doe or EMP123 or Bonus"
+      "Full name, employee code or reimbursement name. Example: John Doe or EMP123 or Bonus",
     ),
   submitted_date_start: z
     .string()
     .optional()
     .describe(
-      "Submitted Date Reimbursement start range in YYYY-MM-DD format. Example: 1990-01-01"
+      "Submitted Date Reimbursement start range in YYYY-MM-DD format. Example: 1990-01-01",
     ),
   submitted_date_end: z
     .string()
     .optional()
     .describe(
-      "Submitted Date of Reimbursement end range in YYYY-MM-DD format. Example: 2000-12-31"
+      "Submitted Date of Reimbursement end range in YYYY-MM-DD format. Example: 2000-12-31",
     ),
   users: z.string().optional().describe("Authority giving the approval."),
   status: z
@@ -40,10 +40,7 @@ export const ReimbursementFiltersSchema = z.object({
     .string()
     .optional()
     .describe("Project name assigned to the individual."),
-  site: z
-    .string()
-    .optional()
-    .describe("Name of the site under the project."),
+  site: z.string().optional().describe("Name of the site under the project."),
   in_invoice: z
     .enum(booleanArray)
     .optional()

@@ -91,8 +91,8 @@ export function ProfessionalTaxCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.statutoryFieldsPf}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.statutoryFieldsPf}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -107,8 +107,8 @@ export function ProfessionalTaxCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.statutoryFieldsPf}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.statutoryFieldsPf}`,
+                ) && "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />

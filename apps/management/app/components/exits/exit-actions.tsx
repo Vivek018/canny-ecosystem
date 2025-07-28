@@ -21,7 +21,7 @@ export function ExitActions({ isEmpty, env }: { isEmpty: boolean; env: any }) {
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/exits/analytics")}

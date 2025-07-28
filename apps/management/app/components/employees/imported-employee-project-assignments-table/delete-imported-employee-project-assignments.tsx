@@ -1,4 +1,7 @@
-import { useImportStoreForEmployeeDetails, useImportStoreForEmployeeProjectAssignments } from "@/store/import";
+import {
+  useImportStoreForEmployeeDetails,
+  useImportStoreForEmployeeProjectAssignments,
+} from "@/store/import";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +21,8 @@ export const DeleteImportedEmployeeProjectAssignments = ({
 }: {
   indexToDelete: number;
 }) => {
-  const { importData, setImportData } = useImportStoreForEmployeeProjectAssignments();
+  const { importData, setImportData } =
+    useImportStoreForEmployeeProjectAssignments();
 
   const handleDelete = () => {
     setImportData({

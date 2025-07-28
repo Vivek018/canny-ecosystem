@@ -39,10 +39,12 @@ import {
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
 import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
-import type {
-  ReimbursementInsert,
-} from "@canny_ecosystem/supabase/types";
-import { getEmployeesBySiteId, getSiteNamesByCompanyId, getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
+import type { ReimbursementInsert } from "@canny_ecosystem/supabase/types";
+import {
+  getEmployeesBySiteId,
+  getSiteNamesByCompanyId,
+  getUsersByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -56,14 +58,19 @@ import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Label } from "@canny_ecosystem/ui/label";
 
 export const ADD_REIMBURSEMENTS_TAG = "Add_Reimbursement";
-const BulkReimbursementSchema = z.object(
-  {
-    singleValue: ReimbursementSchema.pick({
-      submitted_date: true, status: true, user_id: true, company_id: true, type: true, note: true
-    }),
-    reimbursements: z.array(ReimbursementSchema.pick({ amount: true, employee_id: true }))
-  }
-);
+const BulkReimbursementSchema = z.object({
+  singleValue: ReimbursementSchema.pick({
+    submitted_date: true,
+    status: true,
+    user_id: true,
+    company_id: true,
+    type: true,
+    note: true,
+  }),
+  reimbursements: z.array(
+    ReimbursementSchema.pick({ amount: true, employee_id: true }),
+  ),
+});
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -73,7 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.employeeReimbursements}`
+      `${createRole}:${attribute.employeeReimbursements}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -89,7 +96,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const searchParams = new URLSearchParams(url.searchParams);
 
-  const { data: siteData } = await getSiteNamesByCompanyId({ supabase, companyId });
+  const { data: siteData } = await getSiteNamesByCompanyId({
+    supabase,
+    companyId,
+  });
 
   const site = searchParams.get("site") ?? "";
 
@@ -112,9 +122,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const employeeOptions = employeeData?.map((employeeData: any) => ({
     label: employeeData.employee_code as string,
-    pseudoLabel: `${employeeData?.first_name
-      } ${employeeData?.middle_name ?? ""} ${employeeData?.last_name ?? ""
-      }`,
+    pseudoLabel: `${
+      employeeData?.first_name
+    } ${employeeData?.middle_name ?? ""} ${employeeData?.last_name ?? ""}`,
     value: employeeData.id as string,
   }));
 
@@ -126,18 +136,20 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: BulkReimbursementSchema });
+  const submission = parseWithZod(formData, {
+    schema: BulkReimbursementSchema,
+  });
 
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
   const data = submission.value.reimbursements.map((value) => ({
     ...submission.value.singleValue,
-    ...value
+    ...value,
   }));
 
   const { status, error } = await createReimbursementsFromData({
@@ -160,7 +172,8 @@ export async function action({
 }
 
 export default function AddBulkReimbursements() {
-  const { userOptions, siteOptions, employeeOptions, companyId } = useLoaderData<typeof loader>();
+  const { userOptions, siteOptions, employeeOptions, companyId } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -185,7 +198,9 @@ export default function AddBulkReimbursements() {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message ?? actionData?.message ?? "Reimbursement Create Failed",
+            actionData?.error?.message ??
+            actionData?.message ??
+            "Reimbursement Create Failed",
           variant: "destructive",
         });
       }
@@ -203,7 +218,10 @@ export default function AddBulkReimbursements() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: { singleValue: { ...initialValues.singleValue, company_id: companyId }, reimbursements: initialValues.reimbursements },
+    defaultValue: {
+      singleValue: { ...initialValues.singleValue, company_id: companyId },
+      reimbursements: initialValues.reimbursements,
+    },
   });
 
   const singleField = fields.singleValue.getFieldset();
@@ -213,18 +231,21 @@ export default function AddBulkReimbursements() {
       form.update({
         value: {
           ...form.value,
-          reimbursements: [...form.value?.reimbursements as any, initialValues.reimbursements]
-        }
-      })
+          reimbursements: [
+            ...(form.value?.reimbursements as any),
+            initialValues.reimbursements,
+          ],
+        },
+      });
     } else {
       form.update({
         value: {
           ...form.value,
-          reimbursements: [initialValues.reimbursements]
-        }
-      })
+          reimbursements: [initialValues.reimbursements],
+        },
+      });
     }
-  }
+  };
 
   const removeReimbursement = (index: number) => {
     if (form.value?.reimbursements) {
@@ -234,11 +255,11 @@ export default function AddBulkReimbursements() {
       form.update({
         value: {
           ...form.value,
-          reimbursements: updated
-        }
+          reimbursements: updated,
+        },
       });
     }
-  }
+  };
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
@@ -254,11 +275,15 @@ export default function AddBulkReimbursements() {
               </CardDescription>
             </CardHeader>
             <div className="flex flex-col px-6">
-              <input {...getInputProps(singleField.company_id, { type: "hidden" })} />
+              <input
+                {...getInputProps(singleField.company_id, { type: "hidden" })}
+              />
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
                 <Field
                   inputProps={{
-                    ...getInputProps(singleField.submitted_date, { type: "date" }),
+                    ...getInputProps(singleField.submitted_date, {
+                      type: "date",
+                    }),
                     className: "",
                   }}
                   labelProps={{
@@ -270,7 +295,7 @@ export default function AddBulkReimbursements() {
                   key={resetKey}
                   className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[]
+                    reimbursementStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(singleField.status, { type: "text" }),
@@ -290,7 +315,7 @@ export default function AddBulkReimbursements() {
                     placeholder: "Select Reimbursement Type",
                   }}
                   options={transformStringArrayIntoOptions(
-                    reimbursementTypeArray as unknown as string[]
+                    reimbursementTypeArray as unknown as string[],
                   )}
                   labelProps={{
                     children: "Type",
@@ -333,7 +358,7 @@ export default function AddBulkReimbursements() {
                     onChange={(value) => {
                       searchParams.set("site", value);
                       if (!value.length) {
-                        searchParams.delete("site")
+                        searchParams.delete("site");
                       }
                       setSearchParams(searchParams);
                     }}
@@ -345,8 +370,15 @@ export default function AddBulkReimbursements() {
               {fields?.reimbursements.getFieldList().map((fieldSet, index) => {
                 const field = fieldSet.getFieldset();
                 return (
-                  <div key={String(fields?.reimbursements.key! + index + resetKey + 3)} className="flex flex-row items-center justify-center gap-2">
-                    <div className="mb-6 py-[7px] px-3 border shadow rounded text-sm">{index + 1}</div>
+                  <div
+                    key={String(
+                      fields?.reimbursements.key! + index + resetKey + 3,
+                    )}
+                    className="flex flex-row items-center justify-center gap-2"
+                  >
+                    <div className="mb-6 py-[7px] px-3 border shadow rounded text-sm">
+                      {index + 1}
+                    </div>
                     <SearchableSelectField
                       key={String(resetKey + site! + index + 5)}
                       inputProps={{
@@ -359,7 +391,7 @@ export default function AddBulkReimbursements() {
                     <Field
                       inputProps={{
                         ...getInputProps(field.amount, { type: "number" }),
-                        placeholder: 'Enter Amount',
+                        placeholder: "Enter Amount",
                       }}
                       errors={field.amount.errors}
                     />
@@ -372,7 +404,7 @@ export default function AddBulkReimbursements() {
                       <Icon name="cross" />
                     </Button>
                   </div>
-                )
+                );
               })}
               <Button
                 type="button"

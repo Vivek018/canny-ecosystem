@@ -1,6 +1,9 @@
 import { safeRedirect } from "@/utils/server/http.server";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import {
+  getEmployeeIdFromCookie,
+  getUserCookieOrFetchUser,
+} from "@/utils/server/user.server";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";

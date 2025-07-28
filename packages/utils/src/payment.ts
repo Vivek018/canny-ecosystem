@@ -319,7 +319,7 @@ export function calculateProRataAmount({
 }
 
 export function calculateSalaryTotalNetAmount(
-  salaryDataArray: Record<string, any>[]
+  salaryDataArray: Record<string, any>[],
 ): number {
   let totalNetPay = 0;
 
@@ -360,7 +360,7 @@ export const calculateNetAmountAfterEntryCreated = (employee: any): number => {
 };
 
 export const calculateFieldTotalsWithNetPay = (
-  employees: any[]
+  employees: any[],
 ): Record<string, { amount: number; type: string } | number> => {
   const fieldTotals: Record<string, { amount: number; type: string }> = {};
   let gross = 0;
@@ -420,17 +420,17 @@ export const getUniqueFields = (data: any[]): string[] => {
   }
 
   const orderedEarnings = preferredEarningOrder.filter((f) =>
-    earningFields.has(f)
+    earningFields.has(f),
   );
   const remainingEarnings = [...earningFields.keys()].filter(
-    (f) => !preferredEarningOrder.includes(f)
+    (f) => !preferredEarningOrder.includes(f),
   );
 
   const orderedDeductions = preferredDeductionOrder.filter((f) =>
-    deductionFields.has(f)
+    deductionFields.has(f),
   );
   const remainingDeductions = [...deductionFields.keys()].filter(
-    (f) => !preferredDeductionOrder.includes(f)
+    (f) => !preferredDeductionOrder.includes(f),
   );
 
   return [

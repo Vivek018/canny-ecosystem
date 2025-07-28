@@ -63,7 +63,7 @@ export function CasesTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useCaseStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
   const loadMoreCases = async () => {
     const formattedFrom = from;
@@ -115,7 +115,7 @@ export function CasesTable<TData, TValue>({
       rowArray.push(row.original);
     }
     setSelectedRows(
-      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[]
+      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[],
     );
   }, [rowSelection]);
 
@@ -142,7 +142,7 @@ export function CasesTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -168,7 +168,7 @@ export function CasesTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -177,7 +177,7 @@ export function CasesTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

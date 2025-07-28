@@ -5,7 +5,12 @@ import { Link } from "@remix-run/react";
 import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
 import { useUser } from "@/utils/user";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { deleteRole, getMonthName, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getMonthName,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -62,8 +67,8 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Project",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.sites?.projects
-          .name ?? "--"}
+        {row.original?.employee_project_assignment?.sites?.projects.name ??
+          "--"}
       </p>
     ),
   },
@@ -186,15 +191,15 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
               className={cn(
                 (!hasPermission(
                   role,
-                  `${updateRole}:${attribute.attendance}`
+                  `${updateRole}:${attribute.attendance}`,
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.attendance}`
+                    `${deleteRole}:${attribute.attendance}`,
                   )) ||
                   !row.original?.monthly_attendance?.id
                   ? "hidden"
-                  : "flex"
+                  : "flex",
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

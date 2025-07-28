@@ -1,5 +1,9 @@
 import { HARD_QUERY_LIMIT } from "../constant";
-import type { ChatDatabaseRow, InferredType, TypedSupabaseClient } from "../types";
+import type {
+  ChatDatabaseRow,
+  InferredType,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function getChatsByUserId({
   supabase,
@@ -8,20 +12,15 @@ export async function getChatsByUserId({
   supabase: TypedSupabaseClient;
   userId: string;
 }) {
-  const columns = [
-    "id",
-    "prompt",
-  ] as const;
+  const columns = ["id", "prompt"] as const;
 
   const { data, status, error } = await supabase
     .from("chat")
-    .select(
-      `${columns.join(",")}`,
-    )
+    .select(`${columns.join(",")}`)
     .eq("user_id", userId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<InferredType<ChatDatabaseRow, typeof columns[number]>[]>();
+    .returns<InferredType<ChatDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
     console.error("getChatsByUserId Error", error);
@@ -48,11 +47,9 @@ export async function getChatById({
 
   const { data, error, status } = await supabase
     .from("chat")
-    .select(
-      `${columns.join(",")}`,
-    )
+    .select(`${columns.join(",")}`)
     .eq("id", id)
-    .single<InferredType<ChatDatabaseRow, typeof columns[number]>>();
+    .single<InferredType<ChatDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
     console.error("getChatById Error", error);
@@ -81,12 +78,10 @@ export async function getChatByPromptAndUserId({
 
   const { data, error, status } = await supabase
     .from("chat")
-    .select(
-      `${columns.join(",")}`,
-    )
+    .select(`${columns.join(",")}`)
     .eq("user_id", userId)
     .eq("prompt", prompt)
-    .maybeSingle<InferredType<ChatDatabaseRow, typeof columns[number]>>();
+    .maybeSingle<InferredType<ChatDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
     console.error("getChatByPromptAndUserId Error", error);
