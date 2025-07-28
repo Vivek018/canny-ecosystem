@@ -11,7 +11,11 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { ImportSalaryPayrollHeaderSchemaObject } from "@canny_ecosystem/utils";
-import type { ImportSalaryPayrollDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getProjectsByCompanyId,
+  getSiteNamesByCompanyId,
+  type ImportSalaryPayrollDataType,
+} from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
@@ -41,6 +45,9 @@ import {
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { Input } from "@canny_ecosystem/ui/input";
 import { Label } from "@canny_ecosystem/ui/label";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export type FieldConfig = {
   key: string;
@@ -73,24 +80,49 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
 ];
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ env });
+  const { data: projects } = await getProjectsByCompanyId({
+    supabase,
+    companyId,
+  });
+
+  const projectOptions = projects?.map((project) => ({
+    label: project?.name,
+    value: project?.id,
+  }));
+
+  const { data: allSites } = await getSiteNamesByCompanyId({
+    companyId,
+    supabase,
+  });
+  const siteOptions = allSites?.map((sites) => ({
+    label: sites?.name,
+    value: sites?.id,
+    pseudoLabel: sites?.projects?.name,
+  }));
+
+  return json({ env, siteOptions, projectOptions });
 }
 
 export default function PayrollImportFieldMapping() {
   const today = new Date();
-  const { env } = useLoaderData<typeof loader>();
+  const { env, projectOptions, siteOptions } = useLoaderData<typeof loader>();
   const { setImportData } = useImportStoreForSalaryPayroll();
   const [addField, setAddField] = useState("");
   const [addFieldValue, setAddFieldValue] = useState("");
   const [addFieldValueType, setAddFieldValueType] = useState("");
   const [month, setMonth] = useState(defaultMonth + 2);
   const [year, setYear] = useState(defaultYear);
+  const [project, setProject] = useState("");
+  const [site, setSite] = useState("");
+
   const [title, setTitle] = useState("");
   const [runDate, setRunDate] = useState(today.toISOString().split("T")[0]);
   const [open, setOpen] = useState(false);
@@ -336,6 +368,8 @@ export default function PayrollImportFieldMapping() {
 
             setImportData({
               title,
+              site_id: site,
+              project_id: project,
               data: finalImport as ImportSalaryPayrollDataType[],
             });
 
@@ -391,6 +425,30 @@ export default function PayrollImportFieldMapping() {
                 value={runDate}
                 onChange={(e) => setRunDate(e.target.value)}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-8 mb-4">
+              <div className="mb-8 flex flex-col gap-1">
+                <Label className="text-sm font-medium">Project</Label>
+                <Combobox
+                  options={projectOptions ?? []}
+                  placeholder="Select Project"
+                  value={project}
+                  onChange={(value: string) => {
+                    setProject(value);
+                  }}
+                />
+              </div>
+              <div className="mb-8 flex flex-col gap-1">
+                <Label className="text-sm font-medium">Site</Label>
+                <Combobox
+                  options={siteOptions ?? []}
+                  placeholder="Select Site"
+                  value={site}
+                  onChange={(value: string) => {
+                    setSite(value);
+                  }}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-8 mb-4">
               <div className="flex  flex-col gap-1">

@@ -33,7 +33,7 @@ export async function createInvoice({
     error,
     status,
   } = await supabase.from("invoice").insert(newData).select().single();
-  
+
   if (error) {
     console.error("createInvoice Error:", error);
   }
@@ -89,4 +89,41 @@ export async function deleteInvoiceById({
   }
 
   return { status, error: null };
+}
+
+export async function updateMultipleInvoices({
+  supabase,
+  invoicesData,
+}: {
+  supabase: TypedSupabaseClient;
+  invoicesData: InvoiceDatabaseUpdate[];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  for (const entry of invoicesData) {
+    const { error, status } = await supabase
+      .from("invoice")
+      .update({
+        is_paid: Boolean(entry.is_paid) ?? null,
+        paid_date: entry.paid_date ?? null,
+      })
+      .eq("id", entry.id!)
+      .single();
+
+    if (error) {
+      console.error("Error updating entry:", error);
+      return { error, status };
+    }
+  }
+
+  return { error: null, status: 200 };
 }

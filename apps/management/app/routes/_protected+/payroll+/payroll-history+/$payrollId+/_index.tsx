@@ -8,10 +8,14 @@ import {
   clearExactCacheEntry,
   clientCaching,
 } from "@/utils/cache";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
+  getDepartmentsByCompanyId,
+  getLocationsByCompanyId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -40,8 +44,47 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { data: allSiteData, error: siteError } =
+      await getSiteNamesByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (siteError) throw siteError;
+
+    const allSiteOptions = allSiteData?.map((siteData) => ({
+      label: siteData.name?.toLowerCase(),
+      value: siteData.id,
+      pseudoLabel: siteData?.projects?.name,
+    }));
+
+    const { data: allDepartmentData, error: departmentError } =
+      await getDepartmentsByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (departmentError) throw departmentError;
+
+    const allDepartmentOptions = allDepartmentData?.map((departmentData) => ({
+      label: departmentData.name?.toLowerCase(),
+      value: departmentData.id,
+      pseudoLabel: departmentData?.site?.name,
+    }));
+
+    const { data: allLocationData, error: locationError } =
+      await getLocationsByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (locationError) throw locationError;
+
+    const allLocationOptions = allLocationData?.map((locationData) => ({
+      label: locationData.name?.toLowerCase(),
+      value: locationData.id,
+    }));
 
     const { data: payrollData, error } = await getPayrollById({
       supabase,
@@ -59,6 +102,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollData,
       salaryEntriesPromise,
+      allSiteOptions,
+      allDepartmentOptions,
+      allLocationOptions,
       error: null,
       env,
     });
@@ -66,11 +112,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     console.error("Payroll Id Index Error", error);
     return defer({
       payrollData: null,
-
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
-      departmentOptions: [],
-      siteOptions: [],
-
+      allSiteOptions: [],
+      allDepartmentOptions: [],
+      allLocationOptions: [],
       error,
       env: null,
     });
@@ -133,8 +178,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function HistoryPayrollId() {
-  const { payrollData, salaryEntriesPromise, env } =
-    useLoaderData<typeof loader>();
+  const {
+    payrollData,
+    salaryEntriesPromise,
+    env,
+    allSiteOptions,
+    allDepartmentOptions,
+    allLocationOptions,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const revalidator = useRevalidator();
@@ -198,6 +249,9 @@ export default function HistoryPayrollId() {
               noButtons={true}
               env={env as SupabaseEnv}
               fromWhere="payrollhistory"
+              allLocationOptions={allLocationOptions ?? []}
+              allSiteOptions={allSiteOptions ?? []}
+              allDepartmentOptions={allDepartmentOptions ?? []}
             />
           );
         }}

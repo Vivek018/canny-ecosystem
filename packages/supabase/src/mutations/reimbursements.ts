@@ -1,4 +1,3 @@
-
 import type {
   ReimbursementInsert,
   ReimbursementsUpdate,
@@ -88,6 +87,39 @@ export async function deleteReimbursementById({
   return { status, error: null };
 }
 
+export async function updateMultipleReimbursements({
+  supabase,
+  reimbursementsData,
+}: {
+  supabase: TypedSupabaseClient;
+  reimbursementsData: ReimbursementsUpdate[];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
 
+  for (const entry of reimbursementsData) {
+    const { error, status } = await supabase
+      .from("reimbursements")
+      .update({
+        status: entry.status ?? null,
+        type: entry.type ?? null,
+      })
+      .eq("id", entry.id!)
+      .single();
 
+    if (error) {
+      console.error("Error updating entry:", error);
+      return { error, status };
+    }
+  }
+
+  return { error: null, status: 200 };
+}

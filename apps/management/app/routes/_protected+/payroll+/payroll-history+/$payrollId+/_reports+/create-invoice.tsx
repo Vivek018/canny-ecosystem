@@ -129,6 +129,7 @@ export async function action({
         { status: submission.status === "error" ? 400 : 200 }
       );
     }
+
     if (submission.value.include_proof) {
       if (submission.value.proof) {
         const { error, status } = await addOrUpdateInvoiceWithProof({
@@ -245,14 +246,22 @@ export default function CreateInvoice({
         fieldTotals[field].rawAmount += entry.amount;
       }
     }
+
     const basicAmount = fieldTotals.BASIC?.rawAmount ?? 0;
+
+    const includedFields = (relations?.terms?.include_service_charge || "")
+      .split(",")
+      .map((f: string) => f.trim().toLowerCase());
+
+    const includeAll = includedFields.includes("all");
 
     return Object.entries(fieldTotals).map(([field, data]) => {
       let amount = data.rawAmount;
+      const fieldKey = field.trim().toLowerCase();
 
-      if (field.trim() === "PF" || field.trim() === "EPF") {
+      if (fieldKey === "pf" || fieldKey === "epf") {
         amount = (basicAmount * 13) / 100;
-      } else if (field.trim() === "ESIC" || field.trim() === "ESI") {
+      } else if (fieldKey === "esic" || fieldKey === "esi") {
         amount = (amount * 3.25) / 0.75;
       }
 
@@ -260,6 +269,7 @@ export default function CreateInvoice({
         field,
         amount: roundToNearest(Number(amount)),
         type: data.type,
+        in_service_charge: includeAll || includedFields.includes(fieldKey),
       };
     });
   }
@@ -526,9 +536,15 @@ export default function CreateInvoice({
                     placeholder: "Payroll Fields",
                   },
                   { key: "amount", type: "number", placeholder: "Amount" },
+                  {
+                    key: "in_service_charge",
+                    type: "checkbox",
+                    placeholder: "Is in Service Charge ?",
+                  },
                 ]}
                 errors={fields.payroll_data.errors}
               />
+
               <p className={cn("text-muted-foreground tracking-wide hidden")}>
                 Note : All default values are system generated, Please verify
                 them manually before submitting.

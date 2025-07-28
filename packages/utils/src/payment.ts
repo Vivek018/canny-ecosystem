@@ -28,9 +28,9 @@ export function getSelectedPaymentComponentFromField<
   field: T | undefined | null;
   monthlyCtc: number;
   priortizedComponent?:
-  | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
-  | null
-  | undefined;
+    | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
+    | null
+    | undefined;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
     "created_at" | "updated_at"
@@ -344,8 +344,6 @@ export function calculateSalaryTotalNetAmount(
   return totalNetPay;
 }
 
-
-
 export const calculateNetAmountAfterEntryCreated = (employee: any): number => {
   let gross = 0;
   let deductions = 0;
@@ -398,24 +396,47 @@ export const calculateFieldTotalsWithNetPay = (
 };
 
 export const getUniqueFields = (data: any[]): string[] => {
-  const fieldMap = new Map<string, string>();
+  const preferredEarningOrder = ["BASIC", "HRA", "DA"];
+  const preferredDeductionOrder = ["PF", "ESIC", "PT"];
+
+  const earningFields = new Map<string, true>();
+  const deductionFields = new Map<string, true>();
 
   for (const emp of data) {
     const fieldValues = emp.salary_entries?.salary_field_values ?? [];
+
     for (const entry of fieldValues) {
-      const name = entry.payroll_fields.name;
-      const type = entry.payroll_fields.type;
-      if (!fieldMap.has(name)) {
-        fieldMap.set(name, type);
+      const name = entry.payroll_fields?.name;
+      const type = entry.payroll_fields?.type ?? "earning";
+
+      if (!name) continue;
+
+      if (type === "deduction") {
+        if (!deductionFields.has(name)) deductionFields.set(name, true);
+      } else {
+        if (!earningFields.has(name)) earningFields.set(name, true);
       }
     }
   }
 
-  return Array.from(fieldMap.entries())
-    .sort((a, b) => {
-      if (a[1] === "earning" && b[1] === "deduction") return -1;
-      if (a[1] === "deduction" && b[1] === "earning") return 1;
-      return 0;
-    })
-    .map(([name]) => name);
+  const orderedEarnings = preferredEarningOrder.filter((f) =>
+    earningFields.has(f)
+  );
+  const remainingEarnings = [...earningFields.keys()].filter(
+    (f) => !preferredEarningOrder.includes(f)
+  );
+
+  const orderedDeductions = preferredDeductionOrder.filter((f) =>
+    deductionFields.has(f)
+  );
+  const remainingDeductions = [...deductionFields.keys()].filter(
+    (f) => !preferredDeductionOrder.includes(f)
+  );
+
+  return [
+    ...orderedEarnings,
+    ...remainingEarnings,
+    ...orderedDeductions,
+    ...remainingDeductions,
+  ];
 };

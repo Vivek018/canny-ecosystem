@@ -269,20 +269,14 @@ const InvoicePDF = ({
       )
     );
 
-  const includedFields = terms?.include_service_charge
-    ?.split(",")
-    .map((f: string) => f.trim().toUpperCase());
-
   const sum = data?.invoiceDetails?.payroll_data
-    ?.filter((item) => includedFields?.includes(item.field.toUpperCase()))
+    ?.filter((item) => item.in_service_charge === true)
     ?.reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
 
   const service_charge =
     type === "salary"
       ? data.invoiceDetails?.include_charge
-        ? includedFields?.includes("ALL")
-          ? roundToNearest((beforeService * terms.service_charge) / 100)
-          : roundToNearest((sum * terms.service_charge) / 100)
+        ? roundToNearest((sum * terms.service_charge) / 100)
         : 0
       : data.invoiceDetails?.include_charge
         ? roundToNearest(

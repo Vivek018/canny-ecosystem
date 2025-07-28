@@ -15,6 +15,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   type EmployeeProjectAssignmentDataType,
   getCompanyById,
+  getLocationById,
   getPrimaryLocationByCompanyId,
   getSalaryEntriesForSalaryRegisterAndAll,
 } from "@canny_ecosystem/supabase/queries";
@@ -636,12 +637,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.searchParams);
+  const location = searchParams.get("location") ?? "";
+  let employeesCompanyLocationData: any;
+  if (location) {
+    const { data: selectedLocation } = await getLocationById({
+      id: location,
+      supabase,
+    });
+
+    employeesCompanyLocationData = selectedLocation;
+  } else {
+    const { data: primaryLocation } = await getPrimaryLocationByCompanyId({
+      supabase,
+      companyId,
+    });
+    employeesCompanyLocationData = primaryLocation;
+  }
+
   const { data: employeeCompanyData } = await getCompanyById({
     supabase,
     id: companyId,
   });
-  const { data: employeesCompanyLocationData } =
-    await getPrimaryLocationByCompanyId({ supabase, companyId });
 
   const { data: payrollDataAndOthers } =
     await getSalaryEntriesForSalaryRegisterAndAll({

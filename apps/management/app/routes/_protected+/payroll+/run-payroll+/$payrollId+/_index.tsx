@@ -9,6 +9,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
   getDepartmentsByCompanyId,
+  getLocationsByCompanyId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
   getSiteNamesByCompanyId,
@@ -71,6 +72,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       pseudoLabel: departmentData?.site?.name,
     }));
 
+    const { data: allLocationData, error: locationError } =
+      await getLocationsByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (locationError) throw locationError;
+
+    const allLocationOptions = allLocationData?.map((locationData) => ({
+      label: locationData.name?.toLowerCase(),
+      value: locationData.id,
+    }));
+
     const { data: payrollData } = await getPayrollById({
       supabase,
       payrollId: payrollId ?? "",
@@ -86,6 +99,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       salaryEntriesPromise,
       allSiteOptions,
       allDepartmentOptions,
+      allLocationOptions,
       error: null,
       env,
     });
@@ -96,6 +110,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
       allSiteOptions: [],
       allDepartmentOptions: [],
+      allLocationOptions: [],
       error,
       env: null,
     });
@@ -172,6 +187,7 @@ export default function RunPayrollId() {
     env,
     allSiteOptions,
     allDepartmentOptions,
+    allLocationOptions,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -241,6 +257,7 @@ export default function RunPayrollId() {
                 allSiteOptions={allSiteOptions ?? []}
                 allDepartmentOptions={allDepartmentOptions ?? []}
                 fromWhere="runpayroll"
+                allLocationOptions={allLocationOptions ?? []}
               />
             );
           }}

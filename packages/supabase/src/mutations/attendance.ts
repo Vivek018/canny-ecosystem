@@ -137,3 +137,41 @@ export async function createAttendanceByPayrollImportAndGiveID({
 
   return { data, error: null, status };
 }
+
+export async function updateMultipleAttendances({
+  supabase,
+  attendancesData,
+}: {
+  supabase: TypedSupabaseClient;
+  attendancesData: EmployeeMonthlyAttendanceDatabaseUpdate[];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  for (const entry of attendancesData) {
+    const { error, status } = await supabase
+      .from("monthly_attendance")
+      .update({
+        month: Number(entry.month),
+        year: Number(entry.year),
+        working_days: Number(entry.working_days) ?? null,
+      })
+      .eq("id", entry.id!)
+      .single();
+
+    if (error) {
+      console.error("Error updating entry:", error);
+      return { error, status };
+    }
+  }
+
+  return { error: null, status: 200 };
+}
