@@ -526,21 +526,21 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                      fields.payroll_data.value
+                    fields.payroll_data.value
                   ),
                 }}
                 fields={[
+                  {
+                    key: "in_service_charge",
+                    type: "checkbox",
+                    placeholder: "Is in Service Charge ?",
+                  },
                   {
                     key: "field",
                     type: "text",
                     placeholder: "Payroll Fields",
                   },
                   { key: "amount", type: "number", placeholder: "Amount" },
-                  {
-                    key: "in_service_charge",
-                    type: "checkbox",
-                    placeholder: "Is in Service Charge ?",
-                  },
                 ]}
                 errors={fields.payroll_data.errors}
               />

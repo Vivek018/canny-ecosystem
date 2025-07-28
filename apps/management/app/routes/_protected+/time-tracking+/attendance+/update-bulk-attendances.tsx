@@ -68,7 +68,7 @@ export default function UpdateBulkAttedances() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.message,
+          description: (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

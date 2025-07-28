@@ -141,7 +141,7 @@ export default function AttdEmail() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || "Email sending failed",
+          description: (actionData?.error as any)?.message || "Email sending failed",
           variant: "destructive",
         });
       }

@@ -21,7 +21,7 @@ export async function action({ request }: ActionFunctionArgs) {
     );
 
     const { status, error } = await updateMultipleReimbursements({
-      reimbursementsData: reimbursementsData,
+      reimbursementsData,
       supabase,
     });
 
@@ -70,7 +70,7 @@ export default function UpdateBulkReimbursements() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.message,
+          description: (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

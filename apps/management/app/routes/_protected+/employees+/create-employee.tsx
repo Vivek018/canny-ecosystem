@@ -206,6 +206,11 @@ export async function action({
         return json(
           {
             status: "error",
+            error: employeeStatutoryDetailsError ||
+              employeeBankDetailsError ||
+              employeeProjectAssignmentError ||
+              employeeAddressesError ||
+              employeeGuardiansError,
             message: "Failed to save employee details",
             returnTo: DEFAULT_ROUTE,
           },
@@ -295,7 +300,6 @@ export default function CreateEmployee() {
   useIsomorphicLayoutEffect(() => {
     setResetKey(Date.now());
   }, [step]);
-  console.log(actionData);
 
   useEffect(() => {
     if (actionData) {

@@ -28,7 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const { status, error } = await updateMultipleInvoices({
-      invoicesData: invoicesData,
+      invoicesData,
       supabase,
     });
 
@@ -77,7 +77,7 @@ export default function UpdateBulkInvoices() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.message,
+          description: (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

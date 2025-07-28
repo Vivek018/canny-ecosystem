@@ -500,27 +500,27 @@ export const RangeField = ({
   ]);
 
   useEffect(() => {
-  try {
-    if (inputProps.defaultValue) {
-      const parsedValue = JSON.parse(inputProps.defaultValue);
-      if (Array.isArray(parsedValue)) {
-        const normalized = parsedValue.map((range) => {
-          const obj: Record<string, any> = { ...range };
-          for (const field of fields) {
-            if (field.type === "checkbox") {
-              obj[field.key] = !!(obj[field.key] === true || obj[field.key] === "on");
+    try {
+      if (inputProps.defaultValue) {
+        const parsedValue = JSON.parse(inputProps.defaultValue);
+        if (Array.isArray(parsedValue)) {
+          const normalized = parsedValue.map((range) => {
+            const obj: Record<string, any> = { ...range };
+            for (const field of fields) {
+              if (field.type === "checkbox") {
+                obj[field.key] = !!(obj[field.key] === true || obj[field.key] === "on");
+              }
             }
-          }
-          return obj;
-        });
+            return obj;
+          });
 
-        setRanges(normalized);
+          setRanges(normalized);
+        }
       }
+    } catch (error) {
+      console.error("Failed to parse range value:", error);
     }
-  } catch (error) {
-    console.error("Failed to parse range value:", error);
-  }
-}, [inputProps.defaultValue]);
+  }, [inputProps.defaultValue]);
 
   const updateValue = (newRanges: Array<Record<string, any>>) => {
     const event = {
@@ -574,7 +574,7 @@ export const RangeField = ({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className="flex mb-1.5">
         <Label htmlFor={inputProps.id} {...labelProps} />
         <sub
           className={cn(
@@ -588,24 +588,30 @@ export const RangeField = ({
 
       {ranges.map((range, index) => (
         <div key={String(index)} className="flex gap-2 mb-2">
-          {fields.map((field) => (
-            <Input
-              key={field.key}
-              type={field.type}
-              placeholder={field.placeholder || field.key}
-              {...(field.type === "checkbox"
-                ? { checked: !!range[field.key] }
-                : { value: range[field.key] })}
-              onChange={(e) => {
-                handleFieldChange(
-                  index,
-                  field.key,
-                  field.type === "checkbox" ? e.target.checked : e.target.value
-                );
-              }}
-              className="flex-1"
-            />
-          ))}
+          {fields.map((field) =>
+            field.type === "checkbox" ? (
+              <Checkbox
+                key={field.key}
+                id={`${id}-${index}-${field.key}`}
+                checked={!!range[field.key]}
+                onCheckedChange={(checked: any) => {
+                  handleFieldChange(index, field.key, checked);
+                }}
+                className="w-9 h-9"
+              />
+            ) : (
+              <Input
+                key={field.key}
+                type={field.type}
+                placeholder={field.placeholder || field.key}
+                value={range[field.key]}
+                onChange={(e) => {
+                  handleFieldChange(index, field.key, e.target.value);
+                }}
+                className="flex-1"
+              />
+            )
+          )}
           <Button
             type="button"
             onClick={() => removeRange(index)}

@@ -14,7 +14,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -82,31 +81,19 @@ export function ReimbursementActions({
         >
           <Icon name="chart" className="h-[18px] w-[18px]" />
         </Button>
-        <ReimbursementMenu
-          env={env}
-          selectedRows={selectedRows}
-          className={
-            selectedRows?.length
-              ? "bg-muted/70 text-muted-foreground"
-              : "hidden"
-          }
-        />
         <div className="h-full">
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
-                "bg-secondary rounded-md py-2 px-2.5",
+                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
                 !selectedRows.length && "hidden"
               )}
             >
-              <Icon name="edit" size="md" />
+              <Icon name="edit" className="h-[18px] w-[18px]" />
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Update Bulk Reimbursements</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Update Bulk Reimbursements here
-                </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
@@ -142,6 +129,15 @@ export function ReimbursementActions({
             </AlertDialogContent>
           </AlertDialog>
         </div>
+        <ReimbursementMenu
+          env={env}
+          selectedRows={selectedRows}
+          className={
+            selectedRows?.length
+              ? "bg-muted/70 text-muted-foreground"
+              : "hidden"
+          }
+        />
       </div>
     </div>
   );

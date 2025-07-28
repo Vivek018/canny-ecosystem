@@ -75,7 +75,7 @@ export default function DeleteProject() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.error?.message,
+          description: (actionData?.error as any)?.message || actionData?.error?.message,
           variant: "destructive",
         });
       }

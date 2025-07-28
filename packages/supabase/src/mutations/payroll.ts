@@ -767,12 +767,15 @@ export async function updateMultipleSalaryEntries({
   }
 
   for (const entry of salaryEntries) {
+    const updateObj: Partial<SalaryEntriesDatabaseUpdate> = {};
+    if (entry.site_id) updateObj.site_id = entry.site_id;
+    if (entry.department_id) updateObj.department_id = entry.department_id;
+
+    if (Object.keys(updateObj).length === 0) continue;
+
     const { error, status } = await supabase
       .from("salary_entries")
-      .update({
-        site_id: entry.site_id ?? null,
-        department_id: entry.department_id ?? null,
-      })
+      .update(updateObj)
       .eq("id", entry.id!)
       .single();
 

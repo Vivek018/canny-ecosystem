@@ -50,11 +50,11 @@ export async function action({ request }: ActionFunctionArgs) {
     const newTotal =
       submission.value.type === "earning"
         ? Number(payrollData?.total_net_amount) -
-          Number(previousAmount?.amount) +
-          Number(submission.value.amount)
+        Number(previousAmount?.amount) +
+        Number(submission.value.amount)
         : Number(payrollData?.total_net_amount) +
-          Number(previousAmount?.amount) -
-          Number(submission.value.amount);
+        Number(previousAmount?.amount) -
+        Number(submission.value.amount);
 
     const updatedPayrollData = { total_net_amount: newTotal };
 
@@ -137,7 +137,7 @@ export default function UpdateSalaryEntry() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.message,
+          description: (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

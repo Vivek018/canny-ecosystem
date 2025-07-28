@@ -197,7 +197,7 @@ export default function CreateSite({
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.error?.message,
+          description: (actionData?.error as any)?.message || actionData?.error?.message,
           variant: "destructive",
         });
       }
@@ -240,7 +240,7 @@ export default function CreateSite({
                 errors={fields.name.errors}
               />
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-               
+
                 <SearchableSelectField
                   key={resetKey}
                   className="capitalize"

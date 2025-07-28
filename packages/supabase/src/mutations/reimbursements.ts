@@ -106,14 +106,16 @@ export async function updateMultipleReimbursements({
   }
 
   for (const entry of reimbursementsData) {
+    const updateObj: Partial<ReimbursementsUpdate> = {};
+    if (entry.status?.length) updateObj.status = entry.status;
+    if (entry.type?.length) updateObj.type = entry.type;
+
+    if (Object.keys(updateObj).length === 0) continue;
+
     const { error, status } = await supabase
       .from("reimbursements")
-      .update({
-        status: entry.status ?? null,
-        type: entry.type ?? null,
-      })
-      .eq("id", entry.id!)
-      .single();
+      .update(updateObj)
+      .eq("id", entry.id!);
 
     if (error) {
       console.error("Error updating entry:", error);

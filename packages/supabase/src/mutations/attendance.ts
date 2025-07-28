@@ -157,15 +157,17 @@ export async function updateMultipleAttendances({
   }
 
   for (const entry of attendancesData) {
+    const updateObj: Record<string, any> = {};
+    if (entry.month) updateObj.month = entry.month;
+    if (entry.year) updateObj.year = entry.year;
+    if (entry.working_days) updateObj.working_days = entry.working_days;
+
+    if (Object.keys(updateObj).length === 0) continue;
+
     const { error, status } = await supabase
       .from("monthly_attendance")
-      .update({
-        month: Number(entry.month),
-        year: Number(entry.year),
-        working_days: Number(entry.working_days) ?? null,
-      })
-      .eq("id", entry.id!)
-      .single();
+      .update(updateObj)
+      .eq("id", entry.id!);
 
     if (error) {
       console.error("Error updating entry:", error);

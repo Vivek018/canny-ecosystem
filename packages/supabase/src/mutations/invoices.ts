@@ -110,14 +110,17 @@ export async function updateMultipleInvoices({
   }
 
   for (const entry of invoicesData) {
+    const updateObj: Record<string, any> = {};
+    if (entry.is_paid) updateObj.is_paid = Boolean(entry.is_paid);
+    if (entry.paid_date) updateObj.paid_date = entry.paid_date;
+
+
+    if (Object.keys(updateObj).length === 0) continue;
+
     const { error, status } = await supabase
       .from("invoice")
-      .update({
-        is_paid: Boolean(entry.is_paid) ?? null,
-        paid_date: entry.paid_date ?? null,
-      })
-      .eq("id", entry.id!)
-      .single();
+      .update(updateObj)
+      .eq("id", entry.id!);
 
     if (error) {
       console.error("Error updating entry:", error);

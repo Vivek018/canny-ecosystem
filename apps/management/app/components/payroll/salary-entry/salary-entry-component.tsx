@@ -37,7 +37,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -264,19 +263,16 @@ export function SalaryEntryComponent({
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
-                "bg-secondary rounded-md py-2 px-2.5",
+                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
                 (payrollData?.status === "approved" || !selectedRows.length) &&
-                  "hidden"
+                "hidden"
               )}
             >
-              <Icon name="edit" size="md" />
+              <Icon name="edit" className="h-[18px] w-[18px]" />
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Update Bulk Salary Entry</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Update Bulk Salary Entry here
-                </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">

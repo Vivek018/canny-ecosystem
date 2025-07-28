@@ -14,7 +14,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -49,9 +48,10 @@ export function AttendanceActions({
   const [year, setYear] = useState("");
   const [workingDays, setWorkingDays] = useState("");
   const submit = useSubmit();
+  let updates: any[] = [];
 
   const handleUpdateBulkAttendances = () => {
-    const updates = selectedRows.map((entry: any) => {
+    updates = selectedRows.map((entry: any) => {
       return {
         id: entry.monthly_attendance.id,
         month: month && month.trim() !== "" ? month : null,
@@ -106,18 +106,15 @@ export function AttendanceActions({
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
-                "bg-secondary rounded-md py-2 px-2.5",
+                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
                 !selectedRows.length && "hidden"
               )}
             >
-              <Icon name="edit" size="md" />
+              <Icon name="edit" className="h-[18px] w-[18px]" />
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Update Bulk Attendance</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Update Bulk Attendance here
-                </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
@@ -138,18 +135,19 @@ export function AttendanceActions({
                     onChange={(e) => setYear(e)}
                   />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-sm font-medium">Working Days</Label>
-                  <Input
-                    type="number"
-                    placeholder="Enter Working Days"
-                    onChange={(e) => setWorkingDays(e.target.value)}
-                  />
-                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label className="text-sm font-medium">Working Days</Label>
+                <Input
+                  type="number"
+                  placeholder="Enter Working Days"
+                  onChange={(e) => setWorkingDays(e.target.value)}
+                />
               </div>
               <AlertDialogFooter className="pt-2">
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
+                  disabled={!updates?.length}
                   className={cn(buttonVariants({ variant: "default" }))}
                   onClick={handleUpdateBulkAttendances}
                 >

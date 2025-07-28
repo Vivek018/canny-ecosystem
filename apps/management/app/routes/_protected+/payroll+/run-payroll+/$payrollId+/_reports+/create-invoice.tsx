@@ -530,16 +530,16 @@ export default function CreateInvoice({
                 }}
                 fields={[
                   {
+                    key: "in_service_charge",
+                    type: "checkbox",
+                    placeholder: "Is in Service Charge ?",
+                  },
+                  {
                     key: "field",
                     type: "text",
                     placeholder: "Payroll Fields",
                   },
                   { key: "amount", type: "number", placeholder: "Amount" },
-                  {
-                    key: "in_service_charge",
-                    type: "checkbox",
-                    placeholder: "Is in Service Charge ?",
-                  },
                 ]}
                 errors={fields.payroll_data.errors}
               />
