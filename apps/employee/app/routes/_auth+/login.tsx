@@ -5,7 +5,7 @@ import {
   getEmployeeIdFromCookie,
 } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
-import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
+import { getEmployeeByAnyIdentifier } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field } from "@canny_ecosystem/ui/forms";
@@ -53,33 +53,33 @@ export async function action({ request }: ActionFunctionArgs) {
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
     const employeeData = submission.value;
 
-    const { data, error } = await getEmployeeIdsByEmployeeCodes({
+    const { data, error } = await getEmployeeByAnyIdentifier({
       supabase,
-      employeeCodes: [employeeData?.employee_code ?? ""],
+      identifier: employeeData?.identifier ?? "",
     });
 
-    if (error || !data || data.length === 0) {
+    if (error || !data) {
       return json(
         { error: error || "No employee data found", employeeId: null },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("employeeId", JSON.stringify(data?.[0].id));
+      window.localStorage.setItem("employeeId", JSON.stringify(data?.id));
     }
 
-    return safeRedirect(`/employees/${data[0].id}/overview`, {
+    return safeRedirect(`/employees/${data.id}/overview`, {
       headers: {
         "Set-Cookie": await employeeRoleCookie.serialize({
           role: "employee",
-          employeeId: data[0].id,
+          employeeId: data.id,
         }),
       },
     });
@@ -161,12 +161,12 @@ export default function Login() {
                     <Field
                       className="-mt-1.5"
                       inputProps={{
-                        ...getInputProps(fields.employee_code, {
+                        ...getInputProps(fields.identifier, {
                           type: "text",
                         }),
-                        placeholder: "Employee Code",
+                        placeholder: "Emp Code, Mobile Number or Email",
                       }}
-                      errors={fields.employee_code.errors}
+                      errors={fields.identifier.errors}
                     />
                     <Button
                       form={form.id}

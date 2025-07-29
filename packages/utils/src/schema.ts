@@ -1883,7 +1883,7 @@ export const ImportSalaryPayrollDataSchema = z.object({
 });
 
 export const EmployeeLoginSchema = z.object({
-  employee_code: z.string().optional(),
+  identifier: z.string().optional(),
 });
 
 export const InvoiceSchema = z.object({
