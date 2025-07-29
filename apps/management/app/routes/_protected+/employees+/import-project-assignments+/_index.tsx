@@ -14,8 +14,7 @@ import type { ImportEmployeeProjectAssignmentsHeaderSchemaObject } from "@canny_
 import {
   getEmployeeIdsByEmployeeCodes,
   getEmployeeProjectAssignmentsConflicts,
-  getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  getSiteNamesByCompanyId,
   type ImportEmployeeProjectAssignmentsDataType,
 } from "@canny_ecosystem/supabase/queries";
 import {
@@ -73,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data } = await getProjectNamesByCompanyId({ companyId, supabase });
+  const { data } = await getSiteNamesByCompanyId({ companyId, supabase });
   return json({ env, companyId, data });
 }
 
@@ -81,25 +80,8 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
   const { env, companyId, data } = useLoaderData<typeof loader>();
   const { supabase } = useSupabase({ env });
 
-  const projectNames = data?.map((project) => project.name) ?? [];
-  const [project, setProject] = useState("");
-  const [siteArray, setSiteArray] = useState<string[]>([]);
-  const [site, setSite] = useState<string>("");
-
-  const handleSites = async (projectName: string) => {
-    const { data: sites } = await getSiteNamesByProjectName({
-      projectName,
-      supabase,
-    });
-
-    setSiteArray(sites?.map((site) => site.name) ?? []);
-  };
-
-  useEffect(() => {
-    if (project) {
-      handleSites(project);
-    }
-  }, [project]);
+  const siteNames = data?.map((site) => site?.name) ?? [];
+  const [site, setSite] = useState("");
 
   const { setImportData } = useImportStoreForEmployeeProjectAssignments();
 
@@ -120,14 +102,14 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== "",
+            (header) => header !== null && header.trim() !== ""
           );
           setHeaderArray(headers);
         },
         error: (error) => {
           console.error(
             "Employee Project Assignments Header parsing error:",
-            error,
+            error
           );
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
@@ -142,7 +124,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
           );
 
           if (matchedHeader) {
@@ -151,7 +133,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
       );
 
       setFieldMapping(initialMapping);
@@ -166,13 +148,13 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
             Object.entries(fieldMapping).map(([key, value]) => [
               key,
               value || undefined,
-            ]),
-          ),
+            ])
+          )
         );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message,
+          (err) => err.message
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -194,7 +176,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
       });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`,
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -203,7 +185,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
     } catch (error) {
       console.error(
         "Employee Project Assignments Data validation error:",
-        error,
+        error
       );
       setValidationErrors([
         "An unexpected error occurred during data validation",
@@ -230,7 +212,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
+      Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
     if (file) {
@@ -242,9 +224,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results?.data
             .filter((entry) =>
-              Object.values(entry!).some(
-                (value) => String(value).trim() !== "",
-              ),
+              Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -253,13 +233,13 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== "",
+                      String(value).trim() !== ""
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportEmployeeProjectAssignmentsDataType,
-                    ),
-                  ),
+                      key as keyof ImportEmployeeProjectAssignmentsDataType
+                    )
+                  )
               );
               return {
                 ...cleanEntry,
@@ -273,7 +253,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
             });
 
             const employeeCodes = finalData!.map(
-              (value) => value.employee_code,
+              (value) => value.employee_code
             );
             const { data: employees, error: idByCodeError } =
               await getEmployeeIdsByEmployeeCodes({
@@ -287,7 +267,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
 
             const updatedData = finalData!.map((item: any) => {
               const employeeId = employees?.find(
-                (e) => e.employee_code === item.employee_code,
+                (e) => e.employee_code === item.employee_code
               )?.id;
 
               const { employee_code, ...rest } = item;
@@ -315,7 +295,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
         error: (error) => {
           console.error(
             "Employee Project Assignments Data parsing error:",
-            error,
+            error
           );
           setErrors((prev) => ({
             ...prev,
@@ -361,21 +341,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
-              <div className="w-full">
-                <div className=" pb-1">
-                  <label className="text-sm text-muted-foreground capitalize">
-                    Project <span className="text-primary">*</span>
-                  </label>
-                </div>
-                <Combobox
-                  options={transformStringArrayIntoOptions(projectNames)}
-                  value={project}
-                  onChange={(value: string) => setProject(value)}
-                  placeholder={"Select Project"}
-                  className="w-full"
-                />
-              </div>
+            <div className="grid grid-cols-1 place-content-center justify-between gap-y-8 mt-5">
               <div className="w-full">
                 <div className="pb-1">
                   <label className="text-sm text-muted-foreground capitalize">
@@ -383,7 +349,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                   </label>
                 </div>
                 <Combobox
-                  options={transformStringArrayIntoOptions(siteArray)}
+                  options={transformStringArrayIntoOptions(siteNames)}
                   value={site}
                   onChange={(value: string) => setSite(value)}
                   placeholder={"Select Site"}
@@ -400,7 +366,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline",
+                        field.required && "inline"
                       )}
                     >
                       *
@@ -414,11 +380,11 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(field.key?.toLowerCase())
                         );
                       }) ||
