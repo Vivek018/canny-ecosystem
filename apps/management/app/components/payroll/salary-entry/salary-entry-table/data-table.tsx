@@ -77,37 +77,48 @@ export function SalaryEntryDataTable<TData, TValue>({
           />
           <TableBody>
             {tableLength ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="relative h-[40px] md:h-[45px] cursor-default select-text"
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    return (
-                      <TableCell
-                        key={cell.id}
-                        className={cn(
-                          "px-3 md:px-4 py-4 hidden md:table-cell",
-                          cell.column.id === "select" &&
-                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                          cell.column.id === "sr_no" &&
-                            "sticky left-12 bg-card z-10",
-                          cell.column.id === "employee_code" &&
-                            "sticky left-32 z-10 bg-card",
-                          cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
-                        )}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row: any) => {
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={
+                      (row.getIsSelected() &&
+                        row.original?.salary_entries?.invoice_id &&
+                        "both") ||
+                      (row.getIsSelected() && "selected")
+                    }
+                    className={cn(
+                      "relative h-[40px] md:h-[45px] cursor-default select-text",
+                      row.original?.salary_entries?.invoice_id &&
+                        "bg-primary/20"
+                    )}
+                  >
+                    {row.getVisibleCells().map((cell: any) => {
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={cn(
+                            "px-3 md:px-4 py-4 hidden md:table-cell",
+                            cell.column.id === "select" &&
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            cell.column.id === "sr_no" &&
+                              "sticky left-12 bg-card z-10",
+                            cell.column.id === "employee_code" &&
+                              "sticky left-32 z-10 bg-card",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                          )}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow className={cn(!tableLength && "border-none")}>
                 <TableCell className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize">

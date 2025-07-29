@@ -26,7 +26,7 @@ export async function action({
   if (
     !hasPermission(
       user?.role!,
-      `${deleteRole}:${attribute.statutoryFieldsLeaveEncashment}`,
+      `${deleteRole}:${attribute.statutoryFieldsLeaveEncashment}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -60,7 +60,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -83,7 +83,7 @@ export default function DeleteLeaveEncashment() {
       toast({
         title: "Error",
         description:
-          actionData?.error || "Leave encashment delete failed",
+          actionData?.error?.message || "Leave encashment delete failed",
         type: "error",
       });
     }

@@ -109,8 +109,10 @@ export async function getIncidentsByCompanyId({
     .select(
       `${columns.join(
         ","
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        foreignFilters ? "inner" : "left"
+      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+        foreignFilters ? "inner" : "left"
       }(id, name))))`,
       {
         count: "exact",
@@ -171,15 +173,12 @@ export async function getIncidentsByCompanyId({
   }
   if (project) {
     query.eq(
-      "employees.employee_project_assignment.sites.projects.name",
+      "employees.employee_project_assignment.sites.projects?.name",
       project
     );
   }
   if (site) {
-    query.eq(
-      "employees.employee_project_assignment.sites.name",
-      site
-    );
+    query.eq("employees.employee_project_assignment.sites?.name", site);
   }
 
   const { data, count, error } = await query.range(from, to);

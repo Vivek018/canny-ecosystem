@@ -82,7 +82,7 @@ export default function DeleteLabourWelfareFund() {
       toast({
         title: "Error",
         description:
-          actionData?.error.message || "Labour Welfare Fund delete failed",
+          actionData?.error?.message || "Labour Welfare Fund delete failed",
         variant: "destructive",
       });
     }

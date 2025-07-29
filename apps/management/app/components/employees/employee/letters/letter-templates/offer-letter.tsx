@@ -25,8 +25,9 @@ export function OfferLetter({
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
-    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name
-      } ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${
+      data?.employees.first_name
+    } ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
       data?.employees.employee_project_assignment?.start_date ?? ""
@@ -40,8 +41,7 @@ export function OfferLetter({
     companyName: companyData?.data?.name ?? "",
     compantAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",
-    siteName:
-      data?.employees.employee_project_assignment?.sites.name ?? "",
+    siteName: data?.employees.employee_project_assignment?.sites?.name ?? "",
   };
 
   return (

@@ -83,8 +83,8 @@ export default function DeleteGratuity() {
       toast({
         title: "Error",
         description:
-          actionData?.error ??
           actionData?.error?.message ??
+          actionData?.error ??
           "Gratuity delete failed",
         type: "error",
       });

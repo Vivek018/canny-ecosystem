@@ -39,7 +39,7 @@ export async function action({
         error: "Invalid user ID",
         redirectUrl: "/settings/users",
       },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -61,7 +61,7 @@ export async function action({
           error,
           redirectUrl: "/settings/users",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -105,7 +105,7 @@ export async function action({
         error,
         redirectUrl: "/settings/users",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -129,8 +129,8 @@ export default function DeleteUser() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "User deletion failed",
         variant: "destructive",
       });

@@ -19,7 +19,13 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteInvoice = ({ invoiceId }: { invoiceId: string }) => {
+export const DeleteInvoice = ({
+  invoiceId,
+  hide,
+}: {
+  invoiceId: string;
+  hide: boolean;
+}) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -57,7 +63,8 @@ export const DeleteInvoice = ({ invoiceId }: { invoiceId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.invoice}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.invoice}`) && "flex",
+          hide && "hidden"
         )}
       >
         Delete Invoice

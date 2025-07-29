@@ -1,4 +1,7 @@
-import { formatUTCDate } from "@canny_ecosystem/utils";
+import {
+  defaultYear,
+  formatUTCDate,
+} from "@canny_ecosystem/utils";
 import type {
   EmployeeDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
@@ -9,6 +12,7 @@ import type {
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
+import { months } from "@canny_ecosystem/utils/constant";
 
 export type ImportReimbursementDataType = Pick<
   ReimbursementRow,
@@ -101,6 +105,8 @@ export async function getReimbursementsByCompanyId({
     project,
     site,
     in_invoice,
+    month,
+    year,
   } = filters ?? {};
   const foreignFilters = searchQuery || project || site;
 
@@ -159,17 +165,43 @@ export async function getReimbursementsByCompanyId({
       );
     }
   }
+  const finalStartDate = () => {
+    if (month && year) {
+      return new Date(Date.UTC(Number(year), Number(months[month]) - 1, 1));
+    }
+    if (month) {
+      return new Date(Date.UTC(Number(defaultYear), Number(months[month]) - 1, 1));
+    }
+    if (year) {
+      return new Date(Date.UTC(Number(year), 0, 1));
+    }
+    if (submitted_date_start) return new Date(submitted_date_start);
+  };
+
+  const finalEndDate = () => {
+    if (month && year) {
+      return new Date(Number(year), Number(months[month]), 1);
+    }
+    if (month) {
+      return new Date(Number(defaultYear), Number(months[month]), 1);
+    }
+    if (year) {
+      return new Date(Number(year), 12, 1);
+    }
+    if (submitted_date_end) return new Date(submitted_date_end);
+  };
 
   const dateFilters = [
     {
       field: "submitted_date",
-      start: submitted_date_start,
-      end: submitted_date_end,
+      start: finalStartDate()?.toUTCString(),
+      end: finalEndDate()?.toUTCString(),
     },
   ];
+
   for (const { field, start, end } of dateFilters) {
-    if (start) query.gte(field, formatUTCDate(start));
-    if (end) query.lte(field, formatUTCDate(end));
+    if (start) query.gte(field, start);
+    if (end) query.lte(field, end);
   }
   if (status) {
     query.eq("status", status.toLowerCase());
@@ -183,12 +215,12 @@ export async function getReimbursementsByCompanyId({
   }
   if (project) {
     query.eq(
-      "employees.employee_project_assignment.sites.projects.name",
+      "employees.employee_project_assignment.sites.projects?.name",
       project
     );
   }
   if (site) {
-    query.eq("employees.employee_project_assignment.sites.name", site);
+    query.eq("employees.employee_project_assignment.sites?.name", site);
   }
 
   if (in_invoice !== undefined && in_invoice !== null) {
@@ -250,6 +282,8 @@ export type ReimbursementFilters = {
   site?: string | undefined | null;
   type?: string | undefined | null;
   in_invoice?: string | undefined | null;
+  month?: string | undefined | null;
+  year?: string | undefined | null;
 };
 
 export async function getReimbursementsByEmployeeId({

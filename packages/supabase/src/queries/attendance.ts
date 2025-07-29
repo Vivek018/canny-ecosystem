@@ -68,11 +68,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-  attendance: Pick<
-    EmployeeMonthlyAttendanceDatabaseRow,
-    "id" | "employee_id" | "working_days" | "present_days"
-  >;
-}[];
+    attendance: Pick<
+      EmployeeMonthlyAttendanceDatabaseRow,
+      "id" | "employee_id" | "working_days" | "present_days"
+    >;
+  }[];
 
 export async function getAttendanceById({
   supabase,
@@ -199,8 +199,9 @@ export async function getMonthlyAttendanceByCompanyId({
     .select(
       `
   ${columns.join(",")},
-  employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(
+  employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+    foreignFilters ? "inner" : "left"
+  }(
     sites!${foreignFilters ? "inner" : "left"}(
       id,
       name,
@@ -247,19 +248,15 @@ export async function getMonthlyAttendanceByCompanyId({
   query = query.eq("monthly_attendance.month", effectiveMonth);
   query = query.eq("monthly_attendance.year", effectiveYear);
 
-
   if (project) {
     query = query.eq(
-      "employee_project_assignment.sites.projects.name",
+      "employee_project_assignment.sites.projects?.name",
       project
     );
   }
 
   if (site) {
-    query = query.eq(
-      "employee_project_assignment.sites.name",
-      site
-    );
+    query = query.eq("employee_project_assignment.sites?.name", site);
   }
 
   if (sort) {
@@ -369,14 +366,8 @@ export async function getAttendanceReportByCompanyId({
   const startDate = `${currentYear}-01-01`;
   const endDate = `${currentYear}-12-31`;
   const { sort, from, to, filters, searchQuery } = params;
-  const {
-    project,
-    site,
-    start_year,
-    start_month,
-    end_year,
-    end_month,
-  } = filters ?? {};
+  const { project, site, start_year, start_month, end_year, end_month } =
+    filters ?? {};
   const foreignFilters = project || site;
 
   const columns = [
@@ -392,10 +383,12 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        foreignFilters ? "inner" : "left"
       }(
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
-      }(id, name))),
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+          foreignFilters ? "inner" : "left"
+        }(id, name))),
       attendance(
         id,
         date,
@@ -455,13 +448,10 @@ export async function getAttendanceReportByCompanyId({
       );
   }
   if (project) {
-    query.eq(
-      "employee_project_assignment.sites.projects.name",
-      project
-    );
+    query.eq("employee_project_assignment.sites.projects?.name", project);
   }
   if (site) {
-    query.eq("employee_project_assignment.sites.name", site);
+    query.eq("employee_project_assignment.sites?.name", site);
   }
 
   const { data, count, error } = await query

@@ -174,13 +174,21 @@ export function ReimbursementsTable<TData, TValue>({
             />
             <TableBody>
               {tableLength ? (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row: any) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="relative cursor-default select-text"
+                    data-state={
+                      (row.getIsSelected() &&
+                        row.original?.invoice_id &&
+                        "both") ||
+                      (row.getIsSelected() && "selected")
+                    }
+                    className={cn(
+                      "relative cursor-default select-text",
+                      row.original?.invoice_id && "bg-primary/20"
+                    )}
                   >
-                    {row.getVisibleCells().map((cell) => {
+                    {row.getVisibleCells().map((cell: any) => {
                       return (
                         <TableCell
                           key={cell.id}

@@ -82,7 +82,7 @@ export default function DeleteEmployeeStateInsurance() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
+          actionData?.error?.message ||
           "Employee State Insurance delete failed",
         type: "error",
       });

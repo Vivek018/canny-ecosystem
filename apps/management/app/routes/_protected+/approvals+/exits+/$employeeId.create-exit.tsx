@@ -17,12 +17,7 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import {
-  Form,
-  json,
-  useActionData,
-  useNavigate,
-} from "@remix-run/react";
+import { Form, json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -34,7 +29,7 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { createExit } from "@canny_ecosystem/supabase/mutations";
-import type { ExitsUpdate } from "@canny_ecosystem/supabase/types";
+import type { ExitsInsert, ExitsUpdate } from "@canny_ecosystem/supabase/types";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -72,9 +67,9 @@ export async function action({
       "net_pay",
       String(
         Number(formData.get("bonus")) +
-        Number(formData.get("leave_encashment")) +
-        Number(formData.get("gratuity")) -
-        Number(formData.get("deduction"))
+          Number(formData.get("leave_encashment")) +
+          Number(formData.get("gratuity")) -
+          Number(formData.get("deduction"))
       )
     );
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
@@ -88,7 +83,7 @@ export async function action({
 
     const { status, error } = await createExit({
       supabase,
-      data: submission.value,
+      data: submission.value as unknown as ExitsInsert[],
     });
 
     if (isGoodStatus(status))
@@ -147,8 +142,8 @@ export default function CreateExit({
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Exit creation failed",
         variant: "destructive",
       });
@@ -175,40 +170,21 @@ export default function CreateExit({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="flex gap-7">
+              <div>
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.organization_payable_days, {
+                    ...getInputProps(fields.payable_days, {
                       type: "number",
                     }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.organization_payable_days.name
+                      fields.payable_days.name
                     )}`,
                   }}
                   labelProps={{
-                    children: replaceUnderscore(
-                      fields.organization_payable_days.name
-                    ),
+                    children: replaceUnderscore(fields.payable_days.name),
                   }}
-                  errors={fields.organization_payable_days.errors}
-                />
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.employee_payable_days, {
-                      type: "number",
-                    }),
-                    className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.employee_payable_days.name
-                    )}`,
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(
-                      fields.employee_payable_days.name
-                    ),
-                  }}
-                  errors={fields.employee_payable_days.errors}
+                  errors={fields.payable_days.errors}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

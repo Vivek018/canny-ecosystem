@@ -34,9 +34,8 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element?.employee_code;
       } else if (key === "full_name") {
-        exportedData[
-          key
-        ] = `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
+        exportedData[key] =
+          `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "mobile_number") {
         exportedData[key] = element?.primary_mobile_number;
       } else if (key === "date_of_birth") {
@@ -49,10 +48,9 @@ export function ExportBar({
         exportedData[key] = element?.is_active ? "Active" : "Inactive";
       } else if (key === "project_name") {
         exportedData[key] =
-          element?.employee_project_assignment?.sites?.projects.name;
+          element?.employee_project_assignment?.sites?.projects?.name;
       } else if (key === "site_name") {
-        exportedData[key] =
-          element?.employee_project_assignment?.sites?.name;
+        exportedData[key] = element?.employee_project_assignment?.sites?.name;
       } else if (key === "assignment_type") {
         exportedData[key] =
           element?.employee_project_assignment?.assignment_type ?? "";

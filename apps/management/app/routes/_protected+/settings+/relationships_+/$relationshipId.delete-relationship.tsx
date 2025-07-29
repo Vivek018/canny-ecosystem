@@ -27,7 +27,7 @@ export async function action({
   if (
     !hasPermission(
       user?.role!,
-      `${deleteRole}:${attribute.settingRelationships}`,
+      `${deleteRole}:${attribute.settingRelationships}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -51,7 +51,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to delete relationship", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -60,7 +60,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -83,8 +83,8 @@ export default function DeleteRelationship() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Relationship delete failed",
         variant: "destructive",
       });

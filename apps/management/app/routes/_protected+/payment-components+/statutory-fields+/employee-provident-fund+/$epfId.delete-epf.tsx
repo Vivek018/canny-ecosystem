@@ -85,8 +85,8 @@ export default function DeleteEmployeeProvidentFund() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "EPF delete failed",
         variant: "destructive",
       });

@@ -132,8 +132,7 @@ export async function action({
 }
 
 export default function UpdateUser() {
-  const { userData, error, siteOptions } =
-    useLoaderData<typeof loader>();
+  const { userData, error, siteOptions } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -151,8 +150,8 @@ export default function UpdateUser() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "User update failed",
         variant: "destructive",
       });
@@ -166,10 +165,5 @@ export default function UpdateUser() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load user" />;
 
-  return (
-    <CreateUser
-      updateValues={userData}
-      siteOptions={siteOptions}
-    />
-  );
+  return <CreateUser updateValues={userData} siteOptions={siteOptions} />;
 }

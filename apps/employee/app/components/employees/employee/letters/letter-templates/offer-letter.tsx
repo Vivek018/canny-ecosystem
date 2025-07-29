@@ -27,19 +27,18 @@ export function OfferLetter({
     employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
-      data?.employees.employee_project_assignment?.start_date ?? "",
+      data?.employees.employee_project_assignment?.start_date ?? ""
     ).toLocaleDateString("en-IN"),
 
     employeeLeavingDate: new Date(
-      data?.employees.employee_project_assignment?.end_date ?? "",
+      data?.employees.employee_project_assignment?.end_date ?? ""
     ).toLocaleDateString("en-IN"),
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",
     companyName: companyData?.data?.name ?? "",
     compantAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",
-    siteName:
-      data?.employees.employee_project_assignment?.sites.name ?? "",
+    siteName: data?.employees.employee_project_assignment?.sites?.name ?? "",
   };
 
   return (
@@ -49,7 +48,9 @@ export function OfferLetter({
           <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
         <View style={styles.wrapper}>
           {/* Header Section */}
           <View style={styles.headerDate}>

@@ -78,7 +78,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -100,7 +100,7 @@ export async function action({
       message: "Location update failed",
       error,
     },
-    { status: 500 },
+    { status: 500 }
   );
 }
 
@@ -124,8 +124,8 @@ export default function UpdateLocation() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Location update failed",
         variant: "destructive",
       });

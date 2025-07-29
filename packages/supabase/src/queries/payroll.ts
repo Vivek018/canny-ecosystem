@@ -239,6 +239,7 @@ export const getSalaryEntriesByPayrollId = async ({
         payroll_id,
         site_id,
         department_id,
+        invoice_id,
         site:sites!salary_entries_site_id_fkey (id, name, projects!left(name)),
         department:departments!salary_entries_department_id_fkey (id, name, sites!left(name)),
         salary_field_values!inner (

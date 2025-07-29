@@ -78,7 +78,7 @@ export default function DeleteLeaveType() {
         toast({
           title: "Error",
           description:
-            actionData?.error ??
+            actionData?.error?.message ??
             actionData?.message ??
             "Leave Type delete failed",
           variant: "destructive",

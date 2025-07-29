@@ -65,7 +65,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     let templateComponentData = null;
     let employeeSalaryData = null;
 
-    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({ supabase, employeeId, companyId });
+    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({
+      supabase,
+      employeeId,
+      companyId,
+    });
 
     if (!error && data?.template_id) {
       templateId = data.template_id;
@@ -94,7 +98,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return acc;
       },
-      {} as Record<string, Record<string, number>>,
+      {} as Record<string, Record<string, number>>
     );
 
     return json({
@@ -113,7 +117,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         employeeLetterData: null,
         employeeSalaryData: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -129,7 +133,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -153,7 +157,7 @@ export async function action({
         message: "Employee Letter update failed",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -162,7 +166,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -196,7 +200,8 @@ export default function UpdateEmployeeLetter() {
       toast({
         title: "Error",
         description:
-          (actionData?.error || actionData?.error?.message) ??
+          actionData?.error?.message ??
+          actionData?.error ??
           "Employee Letter update failed",
         variant: "destructive",
       });

@@ -134,9 +134,11 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
-      }(id, name))))`,
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+            foreignFilters ? "inner" : "left"
+          }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+            foreignFilters ? "inner" : "left"
+          }(id, name))))`,
       { count: "exact" }
     )
     .eq("employees.company_id", companyId);
@@ -193,15 +195,12 @@ export const getExitsByCompanyId = async ({
 
   if (project) {
     query.eq(
-      "employees.employee_project_assignment.sites.projects.name",
+      "employees.employee_project_assignment.sites.projects?.name",
       project
     );
   }
   if (site) {
-    query.eq(
-      "employees.employee_project_assignment.sites.name",
-      site
-    );
+    query.eq("employees.employee_project_assignment.sites?.name", site);
   }
   if (in_invoice !== undefined && in_invoice !== null) {
     if (in_invoice === "true") {

@@ -59,13 +59,13 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    
+
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
     const { status, error } = await updateExit({
@@ -80,7 +80,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Exit update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -89,7 +89,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -122,8 +122,8 @@ export default function UpdateExit() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Exit update failed",
         variant: "destructive",
       });

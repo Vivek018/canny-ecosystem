@@ -18,7 +18,9 @@ export const InvoiceOptionsDropdown = ({
   triggerChild,
   proofUrl,
   invoiceNumber,
+  hide,
 }: {
+  hide: boolean;
   invoiceId: string;
   triggerChild: React.ReactElement;
   proofUrl: string;
@@ -101,16 +103,19 @@ export const InvoiceOptionsDropdown = ({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
-            !hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
-            "hidden"
+              !hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
+              "hidden",
+            hide && "hidden"
           )}
         />
 
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
-              !hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
-              "hidden"
+              "hidden",
+              hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
+                "flex",
+              hide && "hidden"
             )}
             onClick={handleInvoiceUpdate}
           >
@@ -120,14 +125,15 @@ export const InvoiceOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
-              "flex"
+                "flex",
+              hide && "hidden"
             )}
           />
           <DropdownMenuItem
             className={cn(
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
-              "hidden"
+                "hidden"
             )}
             onClick={() => handleDownloadProof(proofUrl, `${invoiceNumber}`)}
           >
@@ -138,10 +144,11 @@ export const InvoiceOptionsDropdown = ({
               "flex",
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
-              "hidden"
+                "hidden",
+              hide && "hidden"
             )}
           />
-          <DeleteInvoice invoiceId={invoiceId} />
+          <DeleteInvoice hide={hide} invoiceId={invoiceId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

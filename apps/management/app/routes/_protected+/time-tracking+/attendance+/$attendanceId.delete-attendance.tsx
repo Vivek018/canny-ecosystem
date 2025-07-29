@@ -83,7 +83,7 @@ export default function DeleteAttendance() {
         toast({
           title: "Error",
           description:
-            actionData?.error ??
+            actionData?.error?.message ??
             actionData?.message ??
             "Attendance delete failed",
           variant: "destructive",

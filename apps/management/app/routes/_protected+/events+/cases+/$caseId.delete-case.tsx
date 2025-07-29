@@ -97,7 +97,9 @@ export default function DeleteCase() {
         toast({
           title: "Error",
           description:
-            actionData?.error ?? actionData?.message ?? "Case delete failed",
+            actionData?.error?.message ??
+            actionData?.message ??
+            "Case delete failed",
           variant: "destructive",
         });
       }

@@ -22,7 +22,10 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import CreateDepartment from "./create-department";
-import { getDepartmentById, getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  getDepartmentById,
+  getSiteNamesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { updateDepartmentById } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
@@ -46,7 +49,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         id: departmentId,
       });
 
-      const { data: siteNamesData, error: siteNamesError } = await getSiteNamesByCompanyId({ supabase, companyId });
+      const { data: siteNamesData, error: siteNamesError } =
+        await getSiteNamesByCompanyId({ supabase, companyId });
 
       if (error ?? siteNamesError) throw error ?? siteNamesError;
 
@@ -55,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         siteOptions: siteNamesData?.map((site) => ({
           label: site.name,
           pseudoLabel: site?.projects?.name,
-          value: site.id
+          value: site.id,
         })),
         error: null,
       });
@@ -140,8 +144,8 @@ export default function UpdateDepartment() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Department update failed",
         variant: "destructive",
       });

@@ -169,8 +169,8 @@ export default function CreateLocation({
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Location creation failed",
         variant: "destructive",
       });

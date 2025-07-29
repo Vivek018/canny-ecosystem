@@ -129,6 +129,7 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
           invoiceId={row.original.id}
           proofUrl={row.original.proof as string}
           invoiceNumber={row.original.invoice_number as string}
+          hide={row.original.is_paid}
           triggerChild={
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">

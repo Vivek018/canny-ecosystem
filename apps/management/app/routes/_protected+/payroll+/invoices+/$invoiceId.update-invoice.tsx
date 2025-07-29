@@ -365,9 +365,9 @@ export default function UpdateInvoice() {
       toast({
         title: "Error",
         description:
-          typeof actionData?.error === "string"
-            ? actionData.error
-            : actionData?.message || "Invoice update failed",
+          actionData.error?.message ||
+          actionData?.message ||
+          "Invoice update failed",
         variant: "destructive",
       });
     }

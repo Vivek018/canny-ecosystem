@@ -41,7 +41,10 @@ export async function action({
   }
 
   try {
-    const { error, status } = await deleteDepartment({ supabase, id: departmentId });
+    const { error, status } = await deleteDepartment({
+      supabase,
+      id: departmentId,
+    });
 
     if (!isGoodStatus(status)) {
       return json(
@@ -93,14 +96,16 @@ export default function DeleteDepartment() {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Department deletion failed",
         variant: "destructive",
       });
     }
 
-    navigate(actionData?.redirectUrl ?? "/modules/departments", { replace: true });
+    navigate(actionData?.redirectUrl ?? "/modules/departments", {
+      replace: true,
+    });
   }, [actionData]);
 
   return null;

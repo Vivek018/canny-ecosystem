@@ -62,9 +62,9 @@ export function PayrollTrend({ chartData }: { chartData: any[] | null }) {
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Payroll Over Time</CardTitle>
+          <CardTitle>Payment Over Time</CardTitle>
           <CardDescription>
-            Showing trend of payrolls for the period.
+            Showing trend of payments for the period.
           </CardDescription>
         </div>
         <div className="flex">
@@ -79,7 +79,7 @@ export function PayrollTrend({ chartData }: { chartData: any[] | null }) {
                 type="button"
               >
                 <span className="text-xs text-muted-foreground">
-                  Total Payroll Amount
+                  Total Amount
                 </span>
                 <span>₹{totalAmount ?? 0}</span>
               </button>

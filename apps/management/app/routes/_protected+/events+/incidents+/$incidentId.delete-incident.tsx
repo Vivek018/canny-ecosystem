@@ -85,7 +85,7 @@ export default function DeleteIncident() {
         toast({
           title: "Error",
           description:
-            actionData?.error ??
+            actionData?.error?.message ??
             actionData?.message ??
             "Incident delete failed",
           variant: "destructive",

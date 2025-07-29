@@ -5,7 +5,12 @@ import { Link } from "@remix-run/react";
 import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
 import { useUser } from "@/utils/user";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { deleteRole, getMonthName, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getMonthName,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -50,8 +55,8 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
         className="group"
       >
         <p className="truncate text-primary/80 w-48">
-          {row.original.first_name} {row.original?.middle_name}{" "}
-          {row.original.last_name}
+          {row.original?.first_name ?? ""} {row.original?.middle_name ?? ""}{" "}
+          {row.original?.last_name ?? ""}
         </p>
       </Link>
     ),
@@ -62,8 +67,8 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Project",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.sites?.projects
-          .name ?? "--"}
+        {row.original?.employee_project_assignment?.sites?.projects?.name ??
+          "--"}
       </p>
     ),
   },
@@ -73,7 +78,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Site",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.sites.name ?? "--"}
+        {row.original?.employee_project_assignment?.sites?.name ?? "--"}
       </p>
     ),
   },

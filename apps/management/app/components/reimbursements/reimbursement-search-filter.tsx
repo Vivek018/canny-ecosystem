@@ -24,6 +24,8 @@ import {
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
   booleanArray,
+  defaultYear,
+  getYears,
   reimbursementStatusArray,
   reimbursementTypeArray,
   replaceUnderscore,
@@ -32,6 +34,7 @@ import {
 import type { ReimbursementFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+import { months } from "@canny_ecosystem/utils/constant";
 
 export const PLACEHOLDERS = [
   "Reimbursements submitted after Jan 2022 for Project 'ABC'",
@@ -79,9 +82,9 @@ export function ReimbursementSearchFilter({
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
       navigation.location.pathname ===
-      (employeeId
-        ? `/employees/${employeeId}/reimbursements`
-        : "/approvals/reimbursements") &&
+        (employeeId
+          ? `/employees/${employeeId}/reimbursements`
+          : "/approvals/reimbursements") &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,6 +102,8 @@ export function ReimbursementSearchFilter({
     project: "",
     site: "",
     in_invoice: "",
+    month: "",
+    year: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -128,6 +133,8 @@ export function ReimbursementSearchFilter({
     project: searchParams.get("project"),
     site: searchParams.get("site"),
     in_invoice: searchParams.get("in_invoice"),
+    month: searchParams.get("month"),
+    year: searchParams.get("year"),
   };
 
   useEffect(() => {
@@ -243,7 +250,7 @@ export function ReimbursementSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -441,23 +448,21 @@ export function ReimbursementSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {
-                  siteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
-                }
+                {siteArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -482,6 +487,67 @@ export function ReimbursementSearchFilter({
                       setFilterParams((prev) => ({
                         ...prev,
                         in_invoice: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Month</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {Object.keys(months).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.month === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        month: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Year</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {getYears(25, defaultYear).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.year === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        year: name.toString(),
                       }));
                     }}
                   >

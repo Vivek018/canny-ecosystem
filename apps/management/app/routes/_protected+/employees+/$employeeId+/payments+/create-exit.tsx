@@ -158,8 +158,8 @@ export default function CreateExit({
       toast({
         title: "Error",
         description:
-          actionData?.error ||
           actionData?.error?.message ||
+          actionData?.error ||
           "Exit creation failed",
         variant: "destructive",
       });

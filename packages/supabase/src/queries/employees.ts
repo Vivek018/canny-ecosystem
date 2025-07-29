@@ -190,10 +190,10 @@ export async function getEmployeesByCompanyId({
     query.eq("education", education.toLowerCase());
   }
   if (project) {
-    query.eq("employee_project_assignment.sites.projects.name", project);
+    query.eq("employee_project_assignment.sites.projects?.name", project);
   }
   if (site) {
-    query.eq("employee_project_assignment.sites.name", site);
+    query.eq("employee_project_assignment.sites?.name", site);
   }
   if (assignment_type) {
     query.eq("employee_project_assignment.assignment_type", assignment_type);
@@ -1051,10 +1051,10 @@ export async function getEmployeesReportByCompanyId({
   }
 
   if (project) {
-    query.eq("employee_project_assignment.sites.projects.name", project);
+    query.eq("employee_project_assignment.sites.projects?.name", project);
   }
   if (site) {
-    query.eq("employee_project_assignment.sites.name", site);
+    query.eq("employee_project_assignment.sites?.name", site);
   }
 
   // Fetch Data

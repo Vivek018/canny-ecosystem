@@ -70,6 +70,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       project: searchParams.get("project") ?? undefined,
       site: searchParams.get("site") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
+      month: searchParams.get("month") ?? undefined,
+      year: searchParams.get("year") ?? undefined,
     };
 
     const hasFilters =
@@ -162,6 +164,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 export default function ReimbursementsIndex() {
+  
   const {
     reimbursementsPromise,
     projectPromise,
@@ -191,8 +194,8 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                (project) => project!.name
-                              )
+                                  (project) => project!.name
+                                )
                               : []
                           }
                           siteArray={

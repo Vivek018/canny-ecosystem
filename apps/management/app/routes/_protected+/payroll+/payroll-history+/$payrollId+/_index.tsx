@@ -209,7 +209,9 @@ export default function HistoryPayrollId() {
         toast({
           title: "Error",
           description:
-            actionData?.error || actionData?.message || "Payroll update failed",
+            (actionData?.error as any)?.message ||
+            actionData?.message ||
+            "Payroll update failed",
           variant: "destructive",
         });
       }

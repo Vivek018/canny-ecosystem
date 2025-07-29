@@ -28,8 +28,14 @@ export function ExitPaymentsSheet({
     <Sheet>
       <TableRow
         key={row.id}
-        data-state={row.getIsSelected() && "selected"}
-        className="relative cursor-pointer select-text"
+        data-state={
+          (row.getIsSelected() && row.original?.invoice_id && "both") ||
+          (row.getIsSelected() && "selected")
+        }
+        className={cn(
+          "relative cursor-pointer select-text",
+          row.original?.invoice_id && "bg-primary/20"
+        )}
       >
         {row.getVisibleCells().map((cell: any) => {
           if (cell.column.id === "select" || cell.column.id === "actions") {

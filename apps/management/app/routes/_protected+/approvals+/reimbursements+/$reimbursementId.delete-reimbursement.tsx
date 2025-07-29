@@ -53,7 +53,7 @@ export async function action({
         returnTo,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -75,7 +75,7 @@ export default function DeleteEmployee() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`,
+          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`
         );
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         toast({
@@ -87,8 +87,9 @@ export default function DeleteEmployee() {
         toast({
           title: "Error",
           description:
+            actionData?.error?.message ??
             actionData?.error ??
-            actionData?.error?.message ?? actionData?.message ??
+            actionData?.message ??
             "Reimbursement delete failed",
           variant: "destructive",
         });
