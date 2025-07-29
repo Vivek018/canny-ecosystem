@@ -146,7 +146,7 @@ export async function getEmployeesByCompanyId({
           foreignFilters ? "inner" : "left"
         }(id, name))
       )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -190,10 +190,10 @@ export async function getEmployeesByCompanyId({
     query.eq("education", education.toLowerCase());
   }
   if (project) {
-    query.eq("employee_project_assignment.sites.projects?.name", project);
+    query.eq("employee_project_assignment.sites.projects.name", project);
   }
   if (site) {
-    query.eq("employee_project_assignment.sites?.name", site);
+    query.eq("employee_project_assignment.sites.name", site);
   }
   if (assignment_type) {
     query.eq("employee_project_assignment.assignment_type", assignment_type);
@@ -231,8 +231,8 @@ export async function getEmployeeIdentityBySiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(site_id)`,
+        ","
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(site_id)`
     )
     .eq("employee_project_assignment.site_id", siteId)
     .limit(MID_QUERY_LIMIT)
@@ -274,7 +274,7 @@ export async function getEmployeesBySiteId({
     .from("employees")
     .select(
       `${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        site_id, sites!inner(name, projects(id, name))))`,
+        site_id, sites!inner(name, projects(id, name))))`
     )
     .eq("employee_project_assignment.site_id", siteId)
     .order("created_at", { ascending: false })
@@ -306,8 +306,8 @@ export async function getEmployeesByPositionAndSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(site_id)`,
+        ","
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(site_id)`
     )
     .eq("employee_project_assignment.site_id", siteId)
     .eq("employee_project_assignment.position", position ?? "")
@@ -379,7 +379,7 @@ export async function getEmployeeIdsByUanNumber({
 
   const foundCodes = data.map((e) => e.uan_number);
   const missing = uan_number.filter(
-    (uan_number) => !foundCodes.includes(uan_number),
+    (uan_number) => !foundCodes.includes(uan_number)
   );
 
   return { data, missing, error };
@@ -411,7 +411,7 @@ export async function getEmployeeIdsByEsicNumber({
 
   const foundCodes = data.map((e) => e.esic_number);
   const missing = esic_number.filter(
-    (esic_number) => !foundCodes.includes(esic_number),
+    (esic_number) => !foundCodes.includes(esic_number)
   );
 
   return { data, missing, error };
@@ -872,7 +872,7 @@ export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
   if (error)
     console.error(
       "getEmployeeWorkHistoryByEmployeeIdAndCompanyName Error",
-      error,
+      error
     );
 
   return { data, error };
@@ -911,7 +911,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
   const { data, error } = await supabase
     .from("employee_project_assignment")
     .select(
-      `${columns.join(",")}, sites(id, name, projects(name),company_locations!left(address_line_1,address_line_2,city,state,pincode))`,
+      `${columns.join(",")}, sites(id, name, projects(name),company_locations!left(address_line_1,address_line_2,city,state,pincode))`
     )
 
     .eq("employee_id", employeeId)
@@ -994,7 +994,7 @@ export async function getEmployeesReportByCompanyId({
           foreignFilters ? "inner" : "left"
         }(id, name))
       )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -1013,12 +1013,12 @@ export async function getEmployeesReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
       );
     }
   }
@@ -1039,20 +1039,20 @@ export async function getEmployeesReportByCompanyId({
     if (start_year)
       query.gte(
         "employee_project_assignment.start_date",
-        formatUTCDate(start_date.toISOString().split("T")[0]),
+        formatUTCDate(start_date.toISOString().split("T")[0])
       );
     if (end_year)
       query.lte(
         "employee_project_assignment.end_date",
-        formatUTCDate(end_date.toISOString().split("T")[0]),
+        formatUTCDate(end_date.toISOString().split("T")[0])
       );
   }
 
   if (project) {
-    query.eq("employee_project_assignment.sites.projects?.name", project);
+    query.eq("employee_project_assignment.sites.projects.name", project);
   }
   if (site) {
-    query.eq("employee_project_assignment.sites?.name", site);
+    query.eq("employee_project_assignment.sites.name", site);
   }
 
   // Fetch Data
@@ -1138,7 +1138,7 @@ export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
   if (error) {
     console.error(
       "getEmployeeDocumentUrlByEmployeeIdAndDocumentName Error",
-      error,
+      error
     );
     return { data, error };
   }
@@ -1257,7 +1257,7 @@ export async function getSiteIdByEmployeeId({
     .from("employees")
     .select(
       `${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(site_id)`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .order("created_at", { ascending: false })
     .eq("id", employeeId)
@@ -1319,8 +1319,8 @@ export async function getActiveEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))`,
+        ","
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))`
     )
     .eq("company_id", companyId)
     .eq("is_active", true);
@@ -1331,7 +1331,7 @@ export async function getActiveEmployeesByCompanyId({
   if (activeEmployeeErrorBySites) {
     console.error(
       "getActiveEmployeesByCompanyId Error",
-      activeEmployeeErrorBySites,
+      activeEmployeeErrorBySites
     );
   }
 
@@ -1434,10 +1434,10 @@ export async function getEmployeeProjectAssignmentsConflicts({
     .select(
       `
       employee_id
-    `,
+    `
     )
     .or(
-      [`employee_id.in.(${employeeIds.map((id) => id).join(",")})`].join(","),
+      [`employee_id.in.(${employeeIds.map((id) => id).join(",")})`].join(",")
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -1450,7 +1450,7 @@ export async function getEmployeeProjectAssignmentsConflicts({
   const conflictingIndices = importedData.reduce(
     (indices: number[], record, index) => {
       const hasConflict = conflictingRecords?.some(
-        (existing) => existing.employee_id === record.employee_id,
+        (existing) => existing.employee_id === record.employee_id
       );
 
       if (hasConflict) {
@@ -1458,7 +1458,7 @@ export async function getEmployeeProjectAssignmentsConflicts({
       }
       return indices;
     },
-    [],
+    []
   );
 
   return { conflictingIndices, error: null };
