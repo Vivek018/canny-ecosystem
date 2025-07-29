@@ -45,17 +45,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
-
     const { data: locationOptionsData, error: locationOptionsError } =
       await getLocationsForSelectByCompanyId({
         supabase,
         companyId,
       });
 
-    const { data: projectsData, error: projectsError } = await getProjectsByCompanyId({ supabase, companyId });
+    const { data: projectsData, error: projectsError } =
+      await getProjectsByCompanyId({ supabase, companyId });
 
-
-    if (locationOptionsError ?? projectsError) throw locationOptionsError ?? projectsError;
+    if (locationOptionsError ?? projectsError)
+      throw locationOptionsError ?? projectsError;
 
     let siteData = null;
     let siteError = null;
@@ -144,7 +144,8 @@ export async function action({
 }
 
 export default function UpdateSite() {
-  const {  siteData, error, locationOptions, projectOptions } = useLoaderData<typeof loader>();
+  const { siteData, error, locationOptions, projectOptions } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -175,5 +176,11 @@ export default function UpdateSite() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load site" />;
 
-  return <CreateSite locationFromUpdate={locationOptions} projectFromUpdate={projectOptions} updateValues={siteData} />;
+  return (
+    <CreateSite
+      locationFromUpdate={locationOptions}
+      projectFromUpdate={projectOptions}
+      updateValues={siteData}
+    />
+  );
 }

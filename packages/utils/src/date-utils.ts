@@ -84,7 +84,10 @@ export function formatDate(date: Date | string | number | null): any {
     if (!trimmed.length) return date;
 
     const parsedDate = new Date(trimmed);
-    if (Number.isNaN(parsedDate.getTime()) || !trimmed.match(/^\d{4}-\d{2}-\d{2}/)) {
+    if (
+      Number.isNaN(parsedDate.getTime()) ||
+      !trimmed.match(/^\d{4}-\d{2}-\d{2}/)
+    ) {
       return date;
     }
 
@@ -97,7 +100,6 @@ export function formatDate(date: Date | string | number | null): any {
 
   return date;
 }
-
 
 export function formatDateTime(date: Date | string | number) {
   return format(new Date(date), "dd MMM yyyy, hh:mm a");
@@ -130,14 +132,11 @@ export const formatDateToMonthYear = (dateString: string | number | Date) => {
 export const calculateDateRange = (
   range: string,
   monthName: string | number | null | undefined,
-  yearValue: string | number | undefined
+  yearValue: string | number | undefined,
 ) => {
   const rangeNumber = Number.parseInt(String(range), 10);
-  const monthNumber = monthName
-    ? months[monthName]
-    : defaultMonth + 1;
-  const yearToUse =
-    Number.parseInt(yearValue as string) || defaultYear;
+  const monthNumber = monthName ? months[monthName] : defaultMonth + 1;
+  const yearToUse = Number.parseInt(yearValue as string) || defaultYear;
 
   if (rangeNumber > 0) {
     const endDateObj = new Date(yearToUse, monthNumber, rangeNumber + 1);

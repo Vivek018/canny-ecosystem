@@ -13,19 +13,19 @@ export const LeavesFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123"
+      "Full name, employee code or any identifier. Example: John Doe or EMP123",
     ),
   date_start: z
     .string()
     .optional()
     .describe(
-      "Date of Leave start range in YYYY-MM-DD format. Example: 1990-01-01"
+      "Date of Leave start range in YYYY-MM-DD format. Example: 1990-01-01",
     ),
   date_end: z
     .string()
     .optional()
     .describe(
-      "Date of Leave end range in YYYY-MM-DD format. Example: 2000-12-31"
+      "Date of Leave end range in YYYY-MM-DD format. Example: 2000-12-31",
     ),
   users: z.string().optional().describe("Authority giving the approval."),
   leave_type: z
@@ -40,10 +40,7 @@ export const LeavesFiltersSchema = z.object({
     .string()
     .optional()
     .describe("Project name assigned to the individual."),
-  site: z
-    .string()
-    .optional()
-    .describe("Name of the site under the project."),
+  site: z.string().optional().describe("Name of the site under the project."),
 });
 
 export const generateLeavesFilter = async ({

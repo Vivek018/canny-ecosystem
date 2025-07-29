@@ -50,14 +50,10 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     accessorKey: "payable_days",
     header: "Payable Days",
     cell: ({ row }) => {
-      return (
-        <p className="truncate ">
-          {row.original?.payable_days ?? "--"}
-        </p>
-      );
+      return <p className="truncate ">{row.original?.payable_days ?? "--"}</p>;
     },
   },
-  
+
   {
     accessorKey: "bonus",
     header: "Bonus",
@@ -88,7 +84,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
       return <p className="truncate ">{row.original?.deduction ?? "--"}</p>;
     },
   },
-  
+
   {
     accessorKey: "note",
     header: "Note",

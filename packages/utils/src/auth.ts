@@ -58,7 +58,10 @@ export const ROLES: { [key in (typeof userRoles)[number]]: readonly string[] } =
         .flatMap((value) => [`${readRole}:${value}`]),
       ...attributeValues
         .filter((value) => value.includes(attribute.chat))
-        .flatMap((value) => [`${createRole}:${value}`, `${deleteRole}:${value}`]),
+        .flatMap((value) => [
+          `${createRole}:${value}`,
+          `${deleteRole}:${value}`,
+        ]),
     ],
 
     supervisor: [],
@@ -66,7 +69,7 @@ export const ROLES: { [key in (typeof userRoles)[number]]: readonly string[] } =
 
 export function hasPermission(
   role: keyof typeof ROLES,
-  permission: string
+  permission: string,
 ): boolean {
   const permissions = ROLES[role];
   return permissions ? permissions.includes(permission) : false;

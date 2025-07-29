@@ -88,13 +88,11 @@ export async function getLeavesByEmployeeId({
     .from("leaves")
     .select(
       `
-        ${columns.join(
-          ","
-        )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))),
+        ${columns.join(",")},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       
       `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("employee_id", employeeId);
 
@@ -109,11 +107,11 @@ export async function getLeavesByEmployeeId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(
-          date_end
+          date_end,
         )},end_date.gte.${formatUTCDate(date_start)}),` +
           `and(start_date.gte.${formatUTCDate(
-            date_start
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+            date_start,
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
       );
     }
     if (year) {
@@ -209,7 +207,7 @@ export async function getLeavesByCompanyId({
         }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("employees.company_id", companyId);
 
@@ -224,11 +222,11 @@ export async function getLeavesByCompanyId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(
-          date_end
+          date_end,
         )},end_date.gte.${formatUTCDate(date_start)}),` +
           `and(start_date.gte.${formatUTCDate(
-            date_start
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+            date_start,
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
       );
     }
 
@@ -237,8 +235,8 @@ export async function getLeavesByCompanyId({
     }
     if (project) {
       query.eq(
-        "employees.employee_project_assignment.sites.projects?.name",
-        project
+        "employees.employee_project_assignment.sites.projects.name",
+        project,
       );
     }
     if (year) {
@@ -247,7 +245,7 @@ export async function getLeavesByCompanyId({
       query.or(`and(start_date.lte.${endDate}, end_date.gte.${startDate})`);
     }
     if (site) {
-      query.eq("employees.employee_project_assignment.sites?.name", site);
+      query.eq("employees.employee_project_assignment.sites.name", site);
     }
     if (users) {
       query.eq("users.email", users);
@@ -287,7 +285,7 @@ export async function getLeaveTypeByCompanyId({
     .select(
       `
         ${columns.join(",")}
-      `
+      `,
     )
     .eq("company_id", companyId)
     .order("created_at", { ascending: true })

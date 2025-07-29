@@ -1,6 +1,10 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
-import { employeeRoleCookie, getEmployeeIdFromCookie, setUserCookie } from "@/utils/server/user.server";
+import {
+  employeeRoleCookie,
+  getEmployeeIdFromCookie,
+  setUserCookie,
+} from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { type ActionFunctionArgs, json } from "@remix-run/node";
 
@@ -14,7 +18,7 @@ export async function action({ request }: ActionFunctionArgs) {
       await employeeRoleCookie.serialize("", {
         expires: new Date(0),
         path: "/",
-      })
+      }),
     );
   }
 

@@ -25,9 +25,9 @@ export default function StatutoryFields() {
         items={statutorySideNavList}
         className="flex-shrink-0"
       />
-      < div className="flex flex-col flex-1 min-h-0 overflow-auto">
+      <div className="flex flex-col flex-1 min-h-0 overflow-auto">
         <Outlet />
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }

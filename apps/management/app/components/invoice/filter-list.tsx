@@ -25,7 +25,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.date_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -39,7 +39,6 @@ export function FilterList({ filterList }: Props) {
 
       case "type":
         return value;
-
 
       case "service_charge":
         return value;
@@ -57,7 +56,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.paid_date_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 

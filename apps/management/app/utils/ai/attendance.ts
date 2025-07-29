@@ -9,7 +9,7 @@ export const AttendanceFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123"
+      "Full name, employee code or any identifier. Example: John Doe or EMP123",
     ),
   month: z
     .enum(Object.keys(months) as [string, ...string[]])
@@ -23,10 +23,7 @@ export const AttendanceFiltersSchema = z.object({
     .string()
     .optional()
     .describe("Project name assigned to the individual."),
-  site: z
-    .string()
-    .optional()
-    .describe("Name of the site under the project."),
+  site: z.string().optional().describe("Name of the site under the project."),
 });
 
 export const generateAttendanceFilter = async ({

@@ -24,7 +24,8 @@ export function ExitAddOption() {
         <DropdownMenuTrigger
           asChild
           className={cn(
-            !hasPermission(role, `${createRole}:${attribute.exits}`) && "hidden"
+            !hasPermission(role, `${createRole}:${attribute.exits}`) &&
+              "hidden",
           )}
         >
           <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">

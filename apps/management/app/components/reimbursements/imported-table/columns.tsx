@@ -58,7 +58,6 @@ export const ImportedDataColumns: ColumnDef<ImportReimbursementDataType>[] = [
       );
     },
   },
- 
 
   {
     id: "actions",

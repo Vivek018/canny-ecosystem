@@ -12,8 +12,6 @@ import type {
 } from "../types";
 import { HARD_QUERY_LIMIT } from "../constant";
 
-
-
 export async function getPaymentTemplatesByCompanyId({
   supabase,
   companyId,
@@ -113,7 +111,7 @@ export async function getPaymentTemplateComponentsByTemplateId({
       employee_state_insurance(id, esi_number, deduction_cycle, employee_contribution, employer_contribution, max_limit, include_employer_contribution, company_id), 
       professional_tax(id, pt_number, deduction_cycle, state, gross_salary_range), 
       labour_welfare_fund(id, state, employee_contribution, employer_contribution, deduction_cycle), 
-      statutory_bonus(id, percentage, payment_frequency, payout_month)`
+      statutory_bonus(id, percentage, payment_frequency, payout_month)`,
     )
     .eq("template_id", templateId)
     .order("created_at", { ascending: true })
@@ -263,11 +261,7 @@ export type PaymentTemplateComponentType = Omit<
   >;
   professional_tax: Pick<
     ProfessionalTaxDatabaseRow,
-    | "id"
-    | "pt_number"
-    | "deduction_cycle"
-    | "state"
-    | "gross_salary_range"
+    "id" | "pt_number" | "deduction_cycle" | "state" | "gross_salary_range"
   >;
   labour_welfare_fund: Pick<
     LabourWelfareFundDatabaseRow,
@@ -279,10 +273,7 @@ export type PaymentTemplateComponentType = Omit<
   >;
   statutory_bonus: Pick<
     StatutoryBonusDatabaseRow,
-    | "id"
-    | "percentage"
-    | "payment_frequency"
-    | "payout_month"
+    "id" | "percentage" | "payment_frequency" | "payout_month"
   >;
 };
 

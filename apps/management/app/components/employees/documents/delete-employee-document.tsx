@@ -21,10 +21,10 @@ import { useState } from "react";
 
 export const DeleteEmployeeDocument = ({
   employeeId,
-  documentType
+  documentType,
 }: {
-  employeeId:string;
-  documentType:string;
+  employeeId: string;
+  documentType: string;
 }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
@@ -73,7 +73,8 @@ export const DeleteEmployeeDocument = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your document and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            document and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">

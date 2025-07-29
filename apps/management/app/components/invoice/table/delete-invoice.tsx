@@ -39,7 +39,7 @@ export const DeleteInvoice = ({
   };
 
   const handleDeleteInvoice = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -49,7 +49,7 @@ export const DeleteInvoice = ({
           method: "post",
           action: `/payroll/invoices/${invoiceId}/delete-invoice`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();

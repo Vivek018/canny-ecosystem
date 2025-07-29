@@ -36,7 +36,7 @@ export async function action({
         error: "No department ID provided",
         redirectUrl: "/modules/departments",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -54,7 +54,7 @@ export async function action({
           error,
           redirectUrl: "/modules/departments",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -72,7 +72,7 @@ export async function action({
         error,
         redirectUrl: "/modules/departments",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -41,7 +41,7 @@ export async function action({
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -51,7 +51,7 @@ export async function action({
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

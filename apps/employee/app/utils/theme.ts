@@ -13,7 +13,7 @@ export function useTheme(): { theme: Theme } {
     return {
       theme: (optimisticMode === "system"
         ? hints?.theme
-        : optimisticMode) as unknown as Theme
+        : optimisticMode) as unknown as Theme,
     };
   }
   return { theme: requestInfo?.userPrefs.theme ?? (hints?.theme as Theme) };

@@ -64,7 +64,7 @@ export const UserEmailSelect = ({
       <p
         className={cn(
           "text-xs text-destructive mt-1 hidden",
-          (to?.length === 0 || to?.length === undefined) && "flex"
+          (to?.length === 0 || to?.length === undefined) && "flex",
         )}
       >
         Required

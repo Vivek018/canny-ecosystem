@@ -8,7 +8,16 @@ type Props = {
   loading?: boolean;
 };
 
-export const columnIdArray = ["name", "assignment_type", "eligibility_option", "position", "skill_level", "effective_from", "effective_to", "is_active"];
+export const columnIdArray = [
+  "name",
+  "assignment_type",
+  "eligibility_option",
+  "position",
+  "skill_level",
+  "effective_from",
+  "effective_to",
+  "is_active",
+];
 
 export function DataTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>

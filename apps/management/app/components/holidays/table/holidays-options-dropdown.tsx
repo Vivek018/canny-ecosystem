@@ -36,7 +36,7 @@ export const HolidaysOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.holidays}`) &&
-                "flex"
+                "flex",
             )}
             onClick={handleEdit}
           >
@@ -46,7 +46,7 @@ export const HolidaysOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.holidays}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeleteHolidays id={id} />

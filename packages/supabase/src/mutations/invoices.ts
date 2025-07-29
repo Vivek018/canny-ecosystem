@@ -114,7 +114,6 @@ export async function updateMultipleInvoices({
     if (entry.is_paid) updateObj.is_paid = Boolean(entry.is_paid);
     if (entry.paid_date) updateObj.paid_date = entry.paid_date;
 
-
     if (Object.keys(updateObj).length === 0) continue;
 
     const { error, status } = await supabase

@@ -117,8 +117,8 @@ export default function DocumentCard({
                 "hidden",
                 hasPermission(
                   role,
-                  `${readRole}:${attribute.companyDocuments}`
-                ) && "flex"
+                  `${readRole}:${attribute.companyDocuments}`,
+                ) && "flex",
               )}
             >
               Download
@@ -127,8 +127,8 @@ export default function DocumentCard({
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.employeeDocuments}`
-                ) && "hidden"
+                  `${updateRole}:${attribute.employeeDocuments}`,
+                ) && "hidden",
               )}
             />
             <DropdownMenuItem
@@ -137,8 +137,8 @@ export default function DocumentCard({
                 "hidden",
                 hasPermission(
                   role,
-                  `${updateRole}:${attribute.companyDocuments}`
-                ) && "flex"
+                  `${updateRole}:${attribute.companyDocuments}`,
+                ) && "flex",
               )}
             >
               Edit document
@@ -147,8 +147,8 @@ export default function DocumentCard({
               className={cn(
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.settingDocuments}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.settingDocuments}`,
+                ) && "hidden",
               )}
             />
             <DeleteCompanyDocument documentId={documentData.id} />

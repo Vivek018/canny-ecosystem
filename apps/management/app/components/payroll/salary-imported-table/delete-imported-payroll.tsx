@@ -1,6 +1,4 @@
-import {
-  useImportStoreForSalaryPayroll,
-} from "@/store/import";
+import { useImportStoreForSalaryPayroll } from "@/store/import";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +31,7 @@ export const DeleteImportedPayroll = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Delete Payroll

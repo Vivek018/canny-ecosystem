@@ -1,6 +1,9 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import type { DepartmentsDatabaseInsert, DepartmentsDatabaseUpdate, TypedSupabaseClient } from "../types";
-
+import type {
+  DepartmentsDatabaseInsert,
+  DepartmentsDatabaseUpdate,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function createDepartment({
   supabase,
@@ -85,7 +88,10 @@ export async function deleteDepartment({
     }
   }
 
-  const { error, status } = await supabase.from("departments").delete().eq("id", id);
+  const { error, status } = await supabase
+    .from("departments")
+    .delete()
+    .eq("id", id);
 
   if (error) {
     console.error("deleteDepartment Error:", error);

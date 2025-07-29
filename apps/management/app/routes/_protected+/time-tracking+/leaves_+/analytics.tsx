@@ -11,7 +11,7 @@ import { LeavesPerEmployer } from "@/components/leaves/analytics/leaves-per-empl
 
 const getDataSource = (
   selectedRows: LeavesDataType[],
-  storedValue: LeavesDataType[]
+  storedValue: LeavesDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -20,7 +20,7 @@ export default function LeavesAnalytics() {
   const { selectedRows } = useLeavesStore();
   const [storedValue, setValue] = useLocalStorage<LeavesDataType[]>(
     "analyticsArray",
-    []
+    [],
   );
 
   useEffect(() => {

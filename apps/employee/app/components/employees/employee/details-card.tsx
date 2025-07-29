@@ -13,7 +13,9 @@ export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize text-wrap">
         {label}
       </h3>
-      <p className="max-sm:text-wrap max-sm:break-all max-sm:break-words;">{value ?? "--"}</p>
+      <p className="max-sm:text-wrap max-sm:break-all max-sm:break-words;">
+        {value ?? "--"}
+      </p>
     </div>
   );
 };

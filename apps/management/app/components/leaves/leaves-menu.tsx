@@ -40,7 +40,7 @@ export function LeavesMenu({
           selectedRows?.length
             ? "bg-muted/70 text-muted-foreground"
             : undefined,
-          !hasPermission(role, `${createRole}:${attribute.leaves}`) && "hidden"
+          !hasPermission(role, `${createRole}:${attribute.leaves}`) && "hidden",
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
@@ -57,7 +57,7 @@ export function LeavesMenu({
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.leaves}`) &&
               "hidden",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
         />
         <DropdownMenuItem

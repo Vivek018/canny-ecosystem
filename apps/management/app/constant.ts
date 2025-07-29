@@ -5,7 +5,8 @@ export const DEFAULT_ROUTE = "/";
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
   "3f01b65d-ba67-4d57-9e79-c5ad9d8695a3";
 
-export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services Pvt. Ltd.";
+export const CANNY_MANAGEMENT_SERVICES_NAME =
+  "Canny Management Services Pvt. Ltd.";
 
 export const CANNY_MANAGEMENT_SERVICES_ADDRESS =
   "502-503, Girivar Glean, Under Odhav Overbrigde, Sardar Patel Ring Rd, nr. Palm Hotel, Odhav, Ahmedabad, Gujarat 382415";
@@ -272,7 +273,7 @@ export function numberToWordsIndian(num: number) {
       if (remainder > 0) {
         const groupName = i > 0 ? units[i] : ""; // Add lakh, crore, etc.
         parts.unshift(
-          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
         );
       }
       n = Math.floor(n / (i === 0 ? 1000 : 100)); // Reduce the number based on the group
@@ -292,7 +293,7 @@ export function numberToWordsIndian(num: number) {
   // Split integer and decimal parts
   const [integerPart, decimalPart] = num.toString().split(".");
   const integerWords = convertIntegerToWordsIndian(
-    Number.parseInt(integerPart, 10)
+    Number.parseInt(integerPart, 10),
   );
   const decimalWords = decimalPart
     ? `point ${convertDecimalPart(decimalPart)}`

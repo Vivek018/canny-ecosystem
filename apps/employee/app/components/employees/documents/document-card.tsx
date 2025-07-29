@@ -105,15 +105,15 @@ export default function DocumentCard({
                 documentData.url &&
                 handleDownload(
                   documentData.url,
-                  `${documentData.name}_${employeeId}.pdf`
+                  `${documentData.name}_${employeeId}.pdf`,
                 )
               }
               className={cn(
                 "hidden",
                 hasPermission(
                   role,
-                  `${readRole}:${attribute.employeeDocuments}`
-                ) && "flex"
+                  `${readRole}:${attribute.employeeDocuments}`,
+                ) && "flex",
               )}
             >
               Download

@@ -92,7 +92,7 @@ export const CaseOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.cases}`) && "flex"
+              hasPermission(role, `${updateRole}:${attribute.cases}`) && "flex",
             )}
           >
             Update Case
@@ -100,14 +100,14 @@ export const CaseOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.cases}`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.cases}`) && "flex",
             )}
           />
           <DropdownMenuItem
             className={cn(
               (!hasPermission(role, `${updateRole}:${attribute.cases}`) ||
                 !documentUrl) &&
-              "hidden"
+                "hidden",
             )}
             onClick={() => handleDownloadDocument(documentUrl, `${caseTitle}`)}
           >
@@ -118,7 +118,7 @@ export const CaseOptionsDropdown = ({
               "flex",
               (!hasPermission(role, `${updateRole}:${attribute.cases}`) ||
                 !documentUrl) &&
-              "hidden"
+                "hidden",
             )}
           />
           <DeleteCase id={caseId} />

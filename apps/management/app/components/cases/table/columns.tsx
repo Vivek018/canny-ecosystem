@@ -44,9 +44,7 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     header: "Description",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-52">
-          {row.original?.description ?? "--"}
-        </p>
+        <p className="truncate w-52">{row.original?.description ?? "--"}</p>
       );
     },
   },
@@ -178,7 +176,7 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.cases}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.cases}`) &&
-                  "hidden"
+                  "hidden",
               )}
               asChild
             >

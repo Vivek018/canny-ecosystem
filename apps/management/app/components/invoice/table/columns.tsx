@@ -31,7 +31,7 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
           className="group"
         >
           <p className="truncate text-primary/80 group-hover:text-primary w-38 capitalize">{`${replaceUnderscore(
-            row.original?.invoice_number
+            row.original?.invoice_number,
           )}`}</p>
         </Link>
       );

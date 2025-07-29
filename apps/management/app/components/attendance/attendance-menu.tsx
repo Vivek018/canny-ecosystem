@@ -37,7 +37,6 @@ export function AttendanceMenu({
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-
   /* Do it Later */
   // function extractAttendanceData(employees: { [key: string]: any }[]) {
   //   return employees?.map(({ employee_id, ...rest }) => {
@@ -130,7 +129,7 @@ export function AttendanceMenu({
           <div
             className={cn(
               "flex flex-col gap-1",
-              !selectedRows?.length && "hidden"
+              !selectedRows?.length && "hidden",
             )}
           >
             <AttendanceRegister
@@ -148,23 +147,30 @@ export function AttendanceMenu({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden",
-            !selectedRows.length && "hidden"
+              "hidden",
+            !selectedRows.length && "hidden",
           )}
         />
         <DropdownMenuItem
-          onClick={() => { navigate("create-bulk-attendance") }}
-          className={cn(!hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden", "space-x-2 flex items-center")}
+          onClick={() => {
+            navigate("create-bulk-attendance");
+          }}
+          className={cn(
+            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+              "hidden",
+            "space-x-2 flex items-center",
+          )}
         >
           <Icon name="plus-circled" size="sm" />
           <span>Add Attendance</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator className={cn(
-          "space-x-2 flex items-center",
-          !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-          "hidden"
-        )} />
+        <DropdownMenuSeparator
+          className={cn(
+            "space-x-2 flex items-center",
+            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+              "hidden",
+          )}
+        />
         <DropdownMenuItem
           onClick={() => {
             searchParams.set("step", modalSearchParamNames.import_attendance);
@@ -173,7 +179,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden"
+              "hidden",
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />

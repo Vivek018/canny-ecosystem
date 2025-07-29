@@ -60,7 +60,8 @@ export const DeletePayroll = ({
         className={cn(
           "w-36",
           buttonVariants({ variant: "destructive-outline" }),
-          !hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "hidden",
+          !hasPermission(role, `${deleteRole}:${attribute.payroll}`) &&
+            "hidden",
           className,
         )}
       >

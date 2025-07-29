@@ -76,7 +76,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.employee_salary}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

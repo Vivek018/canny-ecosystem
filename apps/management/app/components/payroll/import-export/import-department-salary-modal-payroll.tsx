@@ -23,7 +23,6 @@ export const ImportDepartmentSalaryPayrollModal = () => {
 
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
-
   const isOpen =
     searchParams.get("step") ===
     modalSearchParamNames.import_department_salary_payroll;
@@ -57,7 +56,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
         `/payroll/run-payroll/${payrollId}/import-department-salary-payroll`,
         {
           state: { file: selectedFile },
-        }
+        },
       );
     }
   };
@@ -85,7 +84,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -117,7 +116,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -144,7 +143,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

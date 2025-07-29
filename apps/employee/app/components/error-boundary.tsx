@@ -5,7 +5,7 @@ import { useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
 type ErrorBoundaryProps = {
-  error?: Error | { message: string;[key: string]: unknown } | null | object;
+  error?: Error | { message: string; [key: string]: unknown } | null | object;
   message?: string;
 };
 

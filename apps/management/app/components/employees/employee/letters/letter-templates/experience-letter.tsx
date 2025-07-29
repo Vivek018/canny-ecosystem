@@ -30,11 +30,11 @@ export function ExperienceLetter({
     } ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
-      data?.employees.employee_project_assignment?.start_date ?? ""
+      data?.employees.employee_project_assignment?.start_date ?? "",
     ).toLocaleDateString("en-IN"),
 
     employeeLeavingDate: new Date(
-      data?.employees.employee_project_assignment?.end_date ?? ""
+      data?.employees.employee_project_assignment?.end_date ?? "",
     ).toLocaleDateString("en-IN"),
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",

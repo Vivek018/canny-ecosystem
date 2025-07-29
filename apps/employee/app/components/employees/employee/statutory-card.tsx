@@ -1,8 +1,6 @@
 import type { EmployeeStatutoryDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
-import {
-  formatDate,
-} from "@canny_ecosystem/utils";
+import { formatDate } from "@canny_ecosystem/utils";
 
 type DetailItemProps = {
   label: string;
@@ -10,7 +8,6 @@ type DetailItemProps = {
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
-
   return (
     <div className="flex flex-col items-start">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
@@ -29,7 +26,6 @@ type EmployeeStatutoryDetails = Omit<
 export const EmployeeStatutoryCard: React.FC<{
   employeeStatutory: EmployeeStatutoryDetails | null;
 }> = ({ employeeStatutory }) => {
-
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="w-full flex items-center justify-between">

@@ -24,10 +24,7 @@ export const createGratuity = async ({
     }
   }
 
-  const { error, status } = await supabase
-    .from("gratuity")
-    .insert(data)
-    ;
+  const { error, status } = await supabase.from("gratuity").insert(data);
 
   if (error) {
     console.error("createGratuity Error", error);
@@ -63,8 +60,7 @@ export const updateGratuity = async ({
   const { error, status } = await supabase
     .from("gratuity")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
+    .eq("id", data.id!);
 
   if (error) {
     console.error("updateGratuity Error", error);

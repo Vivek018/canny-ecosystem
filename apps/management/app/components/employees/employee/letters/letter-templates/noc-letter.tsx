@@ -43,7 +43,9 @@ export function NOCLetter({
           <View style={styles.header} fixed>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
         <View style={styles.wrapper}>
           {/* Date Section */}
           <View style={styles.headerDate}>

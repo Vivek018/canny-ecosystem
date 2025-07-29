@@ -67,7 +67,7 @@ export async function getUserByEmail({
   if (error) {
     console.error("getUserByEmail Error", error);
   }
- 
+
   return { data, error };
 }
 
@@ -136,8 +136,6 @@ export async function getUserById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  
-
   const columns = [
     "id",
     "first_name",
@@ -163,16 +161,16 @@ export async function getUserById({
   if (error) {
     console.error("getUserById Error", error);
   }
-// return {
-//     data: {
-//       id: "1",
-//       email: "demo@gmail.com",
-//       first_name: "Demo",
-//       last_name: "User",
-//       role: "master",
-//     },
-//     error: null,
-//   };
+  // return {
+  //     data: {
+  //       id: "1",
+  //       email: "demo@gmail.com",
+  //       first_name: "Demo",
+  //       last_name: "User",
+  //       role: "master",
+  //     },
+  //     error: null,
+  //   };
   return { data, error };
 }
 

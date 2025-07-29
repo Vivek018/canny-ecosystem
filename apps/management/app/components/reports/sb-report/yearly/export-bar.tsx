@@ -38,14 +38,16 @@ export function ExportBar({
         exportedData[key] =
           element?.employee_project_assignment?.sites?.projects?.name;
       } else if (key === "site") {
-        exportedData[key] =
-          element?.employee_project_assignment?.sites?.name;
+        exportedData[key] = element?.employee_project_assignment?.sites?.name;
       } else if (key === "start_range") {
         exportedData[key] = element?.start_range;
       } else if (key === "end_range") {
         exportedData[key] = element?.end_range ?? "";
       } else {
-        exportedData[key] = element[key as keyof EmployeeReportDataType] as string | boolean | number;
+        exportedData[key] = element[key as keyof EmployeeReportDataType] as
+          | string
+          | boolean
+          | number;
       }
     }
 

@@ -97,7 +97,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         paymentFieldOptions: null,
         env,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -115,7 +115,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -142,7 +142,7 @@ export async function action({
         message: "Payment Template Components Update Failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -151,7 +151,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -224,11 +224,11 @@ export default function UpdatePaymentTemplateComponents() {
     const updatedComponents = [
       ...selectedPaymentFields.map((paymentField) => {
         const priortizedComponent = fieldsComponents?.find(
-          (component) => component?.payment_field_id === paymentField?.id
+          (component) => component?.payment_field_id === paymentField?.id,
         );
 
         const existingComponent = updateComponents?.find(
-          (component) => component?.payment_field_id === paymentField?.id
+          (component) => component?.payment_field_id === paymentField?.id,
         );
 
         return {
@@ -247,7 +247,7 @@ export default function UpdatePaymentTemplateComponents() {
           values: valueForEPF,
         }),
         existingComponent: updateComponents?.find(
-          (component) => component?.epf_id === selectedStatutoryFields.epf?.id
+          (component) => component?.epf_id === selectedStatutoryFields.epf?.id,
         ) as any,
       }),
       getESIComponentFromField({
@@ -257,20 +257,20 @@ export default function UpdatePaymentTemplateComponents() {
           values: valueForESI,
         }),
         existingComponent: updateComponents?.find(
-          (component) => component?.esi_id === selectedStatutoryFields.esi?.id
+          (component) => component?.esi_id === selectedStatutoryFields.esi?.id,
         ) as any,
       }),
       getPTComponentFromField({
         field: selectedStatutoryFields.pt,
         value: getGrossValue({ values: grossValue }),
         existingComponent: updateComponents?.find(
-          (component) => component?.pt_id === selectedStatutoryFields.pt?.id
+          (component) => component?.pt_id === selectedStatutoryFields.pt?.id,
         ) as any,
       }),
       getLWFComponentFromField({
         field: selectedStatutoryFields.lwf,
         existingComponent: updateComponents?.find(
-          (component) => component?.lwf_id === selectedStatutoryFields.lwf?.id
+          (component) => component?.lwf_id === selectedStatutoryFields.lwf?.id,
         ) as any,
       }),
       getBonusComponentFromField({
@@ -278,7 +278,7 @@ export default function UpdatePaymentTemplateComponents() {
         value: basicValue,
         existingComponent: updateComponents?.find(
           (component) =>
-            component?.bonus_id === selectedStatutoryFields.bonus?.id
+            component?.bonus_id === selectedStatutoryFields.bonus?.id,
         ) as any,
       }),
     ];

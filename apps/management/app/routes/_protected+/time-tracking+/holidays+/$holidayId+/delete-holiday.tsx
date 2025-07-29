@@ -48,7 +48,7 @@ export async function action({
         holidayId,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({

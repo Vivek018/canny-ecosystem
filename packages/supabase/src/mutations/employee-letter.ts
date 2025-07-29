@@ -60,8 +60,7 @@ export async function updateEmployeeLetter({
   const { error, status } = await supabase
     .from("employee_letter")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
+    .eq("id", data.id!);
 
   if (error) {
     console.error("updateEmployeeLetter Error", error);

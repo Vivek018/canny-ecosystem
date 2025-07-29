@@ -71,8 +71,6 @@ export const Results = ({
       return 0;
     });
   }, [results, sortBy, sortDirection]);
-  
-  
 
   return (
     <div className="flex-grow flex flex-col overflow-hidden">
@@ -99,13 +97,17 @@ export const Results = ({
                       className="px-6 pt-5 pb-4 text-left text-xs font-medium text-muted-foreground/80 uppercase tracking-wider w-max cursor-pointer hover:text-foreground focus:text-foreground"
                       onClick={() => handleSort(column)}
                     >
-                      {pipe(
-                        formatDate,
-                        replaceDash,
-                        replaceUnderscore,
-                      )(column)}
+                      {pipe(formatDate, replaceDash, replaceUnderscore)(column)}
                       {sortBy === column ? (
-                        <Icon name={sortDirection === "desc" ? "chevron-down" : "chevron-up"} size="xs" className="ml-1.5 -mt-1" />
+                        <Icon
+                          name={
+                            sortDirection === "desc"
+                              ? "chevron-down"
+                              : "chevron-up"
+                          }
+                          size="xs"
+                          className="ml-1.5 -mt-1"
+                        />
                       ) : (
                         ""
                       )}
@@ -138,7 +140,9 @@ export const Results = ({
           <div className="mt-4 px-4">
             {chartConfig && results.length > 0 ? (
               <DynamicChart chartData={results} chartConfig={chartConfig} />
-            ) : <></>}
+            ) : (
+              <></>
+            )}
           </div>
         </TabsContent>
       </Tabs>

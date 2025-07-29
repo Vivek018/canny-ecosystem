@@ -23,7 +23,6 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function LeavesTrend({ chartData }: { chartData: LeavesDataType[] }) {
-
   const [activeChart, setActiveChart] =
     useState<keyof typeof chartConfig>("leaves");
 

@@ -1,6 +1,10 @@
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@canny_ecosystem/ui/avatar";
 import type {
   EmployeeDatabaseRow,
   SupabaseEnv,
@@ -56,8 +60,9 @@ export function EmployeePageHeader({
             </div>
             <div className="mt-3">
               <h1 className="text-3xl tracking-wide font-bold capitalize text-center max-sm:mb-2">
-                {`${employee?.first_name} ${employee?.middle_name ?? ""} ${employee?.last_name ?? ""
-                  }`}
+                {`${employee?.first_name} ${employee?.middle_name ?? ""} ${
+                  employee?.last_name ?? ""
+                }`}
               </h1>
               <p className="w-max bg-muted text-sm text-muted-foreground px-1.5 pb-0.5 mt-0.5 rounded max-sm:mx-auto">
                 {employee?.employee_code}

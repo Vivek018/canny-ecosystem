@@ -85,9 +85,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const paymentFieldPromise = paymentFieldId
       ? getPaymentFieldById({
-        supabase,
-        id: paymentFieldId,
-      })
+          supabase,
+          id: paymentFieldId,
+        })
       : Promise.resolve({ data: null, error: null });
 
     const projectPromise = getProjectNamesByCompanyId({
@@ -97,9 +97,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const sitePromise = filters.project
       ? getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      })
+          supabase,
+          projectName: filters.project,
+        })
       : Promise.resolve({ data: null });
 
     return defer({
@@ -130,7 +130,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.payment_field_report}${args.params.paymentFieldId
+    `${cacheKeyPrefix.payment_field_report}${
+      args.params.paymentFieldId
     }${url.searchParams.toString()}`,
     args,
   );

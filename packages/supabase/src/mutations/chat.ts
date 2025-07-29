@@ -19,10 +19,7 @@ export async function createChat({
     }
   }
 
-  const { error, status } = await supabase
-    .from("chat")
-    .insert(data)
-    ;
+  const { error, status } = await supabase.from("chat").insert(data);
 
   if (error) {
     console.error("createChat Error", error);
@@ -30,7 +27,6 @@ export async function createChat({
 
   return { status, error };
 }
-
 
 export async function deleteChatById({
   supabase,

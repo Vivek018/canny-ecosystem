@@ -15,7 +15,7 @@ import { AttendanceBySite } from "@/components/attendance/analytics/attendance-s
 
 const getDataSource = (
   selectedRows: TransformedAttendanceDataType[],
-  storedValue: TransformedAttendanceDataType[]
+  storedValue: TransformedAttendanceDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -49,7 +49,7 @@ export default function AttendanceAnalytics() {
 
   const dataSource: TransformedAttendanceDataType[] = getDataSource(
     selectedRows,
-    storedValue
+    storedValue,
   );
 
   const transformedData: TransformedAttendanceDataType[] = dataSource.map(
@@ -62,7 +62,6 @@ export default function AttendanceAnalytics() {
       attendance: Object.entries(entry)
         .filter(([key]) => key.match(/^\d{2} \w{3} \d{4}$/))
         .map(([date, status]) => {
-
           const isPresent =
             typeof status === "object" &&
             status !== null &&
@@ -80,7 +79,7 @@ export default function AttendanceAnalytics() {
             // holiday_type: isWeeklyOff ? "weekly" : isLeave ? "paid" : "",
           };
         }),
-    })
+    }),
   );
 
   return (

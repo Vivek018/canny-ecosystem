@@ -41,7 +41,7 @@ export async function action({
         error,
         payrollId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     console.error("Update Payroll error", error);
@@ -63,10 +63,10 @@ export default function UpdatePayroll() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.run_payroll_id}${actionData.payrollId}`
+          `${cacheKeyPrefix.run_payroll_id}${actionData.payrollId}`,
         );
         clearExactCacheEntry(
-          `${cacheKeyPrefix.payroll_history_id}${actionData.payrollId}`
+          `${cacheKeyPrefix.payroll_history_id}${actionData.payrollId}`,
         );
 
         toast({

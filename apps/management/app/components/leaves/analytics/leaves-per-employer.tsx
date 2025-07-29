@@ -31,16 +31,19 @@ export function LeavesPerEmployer({
 }: {
   chartData: LeavesDataType[];
 }) {
-  const totalEmployerLeaveData = chartData.reduce((acc, row) => {
-    const email = row?.users?.email!;
+  const totalEmployerLeaveData = chartData.reduce(
+    (acc, row) => {
+      const email = row?.users?.email!;
 
-    if (!acc[email]) {
-      acc[email] = { employer: email, leaves: 0 };
-    }
-    acc[email].leaves += 1;
+      if (!acc[email]) {
+        acc[email] = { employer: email, leaves: 0 };
+      }
+      acc[email].leaves += 1;
 
-    return acc;
-  }, {} as Record<string, { employer: string; leaves: number }>);
+      return acc;
+    },
+    {} as Record<string, { employer: string; leaves: number }>,
+  );
 
   const topUsersData = Object.values(totalEmployerLeaveData)
     .sort((a, b) => b.leaves - a.leaves)

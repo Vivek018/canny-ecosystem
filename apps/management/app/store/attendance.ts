@@ -22,9 +22,9 @@ export const useAttendanceStore = create<AttendanceState>()((set) => ({
     updater:
       | TransformedAttendanceDataType[]
       | ((
-          arg0: TransformedAttendanceDataType[]
+          arg0: TransformedAttendanceDataType[],
         ) => TransformedAttendanceDataType[] | undefined)
-      | undefined
+      | undefined,
   ) =>
     set((state) => {
       return {

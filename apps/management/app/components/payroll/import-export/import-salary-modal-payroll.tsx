@@ -80,7 +80,7 @@ export const ImportSalaryPayrollModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -112,7 +112,7 @@ export const ImportSalaryPayrollModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -139,7 +139,7 @@ export const ImportSalaryPayrollModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

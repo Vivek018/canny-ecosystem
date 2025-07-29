@@ -73,30 +73,33 @@ const chartConfig = {
 export function LeavesByTime({ chartData }: { chartData: LeavesDataType[] }) {
   const yearSet = new Set<number>();
 
-  const leaveData = chartData.reduce((acc, row) => {
-    const startDate = new Date(row.start_date);
-    const endDate = row.end_date ? new Date(row.end_date) : startDate;
+  const leaveData = chartData.reduce(
+    (acc, row) => {
+      const startDate = new Date(row.start_date);
+      const endDate = row.end_date ? new Date(row.end_date) : startDate;
 
-    const currDate = new Date(startDate);
-    while (currDate <= endDate) {
-      const year = currDate.getFullYear();
-      const monthName = currDate
-        .toLocaleString("default", { month: "long" })
-        .toLowerCase();
+      const currDate = new Date(startDate);
+      while (currDate <= endDate) {
+        const year = currDate.getFullYear();
+        const monthName = currDate
+          .toLocaleString("default", { month: "long" })
+          .toLowerCase();
 
-      yearSet.add(year);
+        yearSet.add(year);
 
-      const key = yearSet.size > 1 ? `${year}` : monthName;
+        const key = yearSet.size > 1 ? `${year}` : monthName;
 
-      if (!acc[key])
-        acc[key] = { [yearSet.size > 1 ? "year" : "month"]: key, leaves: 0 };
-      acc[key].leaves += 1;
+        if (!acc[key])
+          acc[key] = { [yearSet.size > 1 ? "year" : "month"]: key, leaves: 0 };
+        acc[key].leaves += 1;
 
-      currDate.setDate(currDate.getDate() + 1);
-    }
+        currDate.setDate(currDate.getDate() + 1);
+      }
 
-    return acc;
-  }, {} as Record<string, { year?: number; month?: string; leaves: number }>);
+      return acc;
+    },
+    {} as Record<string, { year?: number; month?: string; leaves: number }>,
+  );
 
   const transformedChartData = Object.values(leaveData).map((entry, i) => ({
     ...entry,
@@ -128,8 +131,7 @@ export function LeavesByTime({ chartData }: { chartData: LeavesDataType[] }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing total leaves for{" "}
-          {yearSet.size > 1 ? "years" : "the year"}.
+          Showing total leaves for {yearSet.size > 1 ? "years" : "the year"}.
         </div>
       </CardFooter>
     </Card>

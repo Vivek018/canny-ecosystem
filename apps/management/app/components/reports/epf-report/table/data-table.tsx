@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useReportsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreReport = async () => {
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
 
       if (data) {
         setData(
-          (prevData) => [...prevData, ...(epfReportData ?? [])] as TData[]
+          (prevData) => [...prevData, ...(epfReportData ?? [])] as TData[],
         );
       }
       setFrom(to + 1);
@@ -156,7 +156,7 @@ export function DataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -190,12 +190,12 @@ export function DataTable<TData, TValue>({
                             cell.column.id === "employee_name" &&
                               "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -209,7 +209,7 @@ export function DataTable<TData, TValue>({
                   <TableCell
                     colSpan={columns.length}
                     className={cn(
-                      "h-96 bg-background grid place-items-center text-center tracking-wide"
+                      "h-96 bg-background grid place-items-center text-center tracking-wide",
                     )}
                   >
                     <div className="flex flex-col items-center gap-1">
@@ -217,7 +217,7 @@ export function DataTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -226,7 +226,7 @@ export function DataTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -254,10 +254,12 @@ export function DataTable<TData, TValue>({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as (EmployeeReportDataType & {
+        data={
+          selectedRowsData as (EmployeeReportDataType & {
             start_range: string;
             end_range: string;
-          })[]}
+          })[]
+        }
         columnVisibility={columnVisibility}
       />
     </div>

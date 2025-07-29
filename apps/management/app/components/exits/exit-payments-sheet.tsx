@@ -48,7 +48,7 @@ export function ExitPaymentsSheet({
                     "sticky left-0 min-w-12 max-w-12 bg-card z-10",
 
                   cell.column.id === "actions" &&
-                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -70,7 +70,7 @@ export function ExitPaymentsSheet({
                   cell.column.id === "employee_code" &&
                     "sticky left-12 bg-card z-10",
                   cell.column.id === "employee_name" &&
-                    "sticky left-48 bg-card z-10"
+                    "sticky left-48 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

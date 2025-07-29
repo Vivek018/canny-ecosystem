@@ -125,7 +125,7 @@ export async function getSiteNamesByProjectName({
   const { data, error } = await supabase
     .from("sites")
     .select("name, projects!inner(name)")
-    .eq("projects?.name", projectName)
+    .eq("projects.name", projectName)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
     .returns<{ name: string }[]>();

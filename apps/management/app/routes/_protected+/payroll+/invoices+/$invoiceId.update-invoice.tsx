@@ -118,7 +118,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         userOptions: null,
         payroll: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -138,14 +138,14 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const submission = parseWithZod(formData, { schema: InvoiceSchema });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -178,7 +178,7 @@ export async function action({
               message: "Invoice Updated Failed",
               error: error,
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -206,7 +206,7 @@ export async function action({
             message: "Invoice Updated Failed",
             error: error,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -276,7 +276,7 @@ export async function action({
             message: "Invoice Updated",
             error: null,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
       return json(
@@ -285,7 +285,7 @@ export async function action({
           message: "Invoice Updated Failed",
           error: error,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -316,7 +316,7 @@ export async function action({
         message: "Invoice update failed",
         error: invoiceError || proofError,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     console.error("Unexpected error in updateInvoice action:", error);
@@ -326,7 +326,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

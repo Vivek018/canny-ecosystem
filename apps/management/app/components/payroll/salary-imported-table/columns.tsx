@@ -1,4 +1,3 @@
-
 import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -9,7 +8,7 @@ import type { FieldConfig } from "@/routes/_protected+/payroll+/run-payroll+/imp
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export const ImportedDataColumns = (
-  fieldConfigs: FieldConfig[]
+  fieldConfigs: FieldConfig[],
 ): ColumnDef<any>[] => [
   {
     accessorKey: "sr_no",
@@ -34,7 +33,7 @@ export const ImportedDataColumns = (
       const displayValue =
         typeof value === "object" && value?.amount !== undefined
           ? value.amount
-          : (value ?? "--");
+          : value ?? "--";
       return <p className={displayColor}>{displayValue}</p>;
     },
   })),

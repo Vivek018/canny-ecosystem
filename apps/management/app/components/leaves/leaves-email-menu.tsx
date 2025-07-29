@@ -61,9 +61,8 @@ export default function LeavesEmailMenu({
       if (key === "employee_code") {
         exportedData[key] = element?.employees?.employee_code;
       } else if (key === "employee_name") {
-        exportedData[
-          key
-        ] = `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
+        exportedData[key] =
+          `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
       } else if (key === "email") {
         exportedData[key] = element?.users?.email ?? "";
       } else if (key === "project") {
@@ -126,7 +125,7 @@ export default function LeavesEmailMenu({
     <div
       className={cn(
         !hasPermission(role, `${emailRole}:${attribute.leaves}`) && "hidden",
-        !selectedRows.length && "hidden"
+        !selectedRows.length && "hidden",
       )}
     >
       <Dialog>

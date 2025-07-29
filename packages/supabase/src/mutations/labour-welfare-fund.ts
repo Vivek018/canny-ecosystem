@@ -24,11 +24,9 @@ export async function createLabourWelfareFund({
 
   const { error, status } = await supabase
     .from("labour_welfare_fund")
-    .insert(data)
-    ;
+    .insert(data);
 
   if (error) console.error("createLabourWelfareFund Error", error);
-
 
   return { status, error };
 }
@@ -55,8 +53,7 @@ export async function updateLabourWelfareFund({
   const { error, status } = await supabase
     .from("labour_welfare_fund")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
+    .eq("id", data.id!);
 
   if (error) console.error("updateLabourWelfareFund Error", error);
 

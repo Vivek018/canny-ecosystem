@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const exitsPromise = getExitsByCompanyId({
@@ -124,7 +124,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 clientLoader.hydrate = true;
@@ -157,14 +157,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function ExitsIndex() {
-  const {
-    exitsPromise,
-    query,
-    filters,
-    env,
-    projectPromise,
-    sitePromise,
-  } = useLoaderData<typeof loader>();
+  const { exitsPromise, query, filters, env, projectPromise, sitePromise } =
+    useLoaderData<typeof loader>();
 
   const noFilters = filters
     ? Object.values(filters).every((value) => !value)
@@ -233,7 +227,7 @@ export default function ExitsIndex() {
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-              exitsData.meta.count > LAZY_LOADING_LIMIT
+                exitsData.meta.count > LAZY_LOADING_LIMIT,
             );
 
             return (

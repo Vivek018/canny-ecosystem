@@ -65,7 +65,7 @@ export function CreatePaymentTemplateComponentDetails({
   });
 
   const targetTypeDefaultValue = (
-    fields: { name: string; value: string | null | undefined }[]
+    fields: { name: string; value: string | null | undefined }[],
   ) => {
     for (const field of fields) {
       if (field.value) {
@@ -80,7 +80,7 @@ export function CreatePaymentTemplateComponentDetails({
         paymentTemplateComponentsField
           .filter(
             (field) =>
-              (field.getFieldset() as Record<string, any>)[idKey]?.value
+              (field.getFieldset() as Record<string, any>)[idKey]?.value,
           )
           .map(() => value);
 
@@ -98,23 +98,23 @@ export function CreatePaymentTemplateComponentDetails({
 
       const mergeUniqueValues = (
         existingValues: string[],
-        newValues: (string | undefined)[]
+        newValues: (string | undefined)[],
       ): string[] => [
         ...existingValues,
         ...newValues.filter(
           (val): val is string =>
-            val !== undefined && !existingValues.includes(val)
+            val !== undefined && !existingValues.includes(val),
         ),
       ];
 
       setSelectFieldDefaultValues((prev) => ({
         paymentFieldDefaultValue: mergeUniqueValues(
           prev.paymentFieldDefaultValue,
-          paymentFieldDefaultValue
+          paymentFieldDefaultValue,
         ),
         statutoryFieldDefaultValue: mergeUniqueValues(
           prev.statutoryFieldDefaultValue,
-          statutoryFieldDefaultValue
+          statutoryFieldDefaultValue,
         ),
       }));
     }
@@ -143,7 +143,7 @@ export function CreatePaymentTemplateComponentDetails({
               onFocus: () => setMonthlyCtcAutoFocus(true),
               onBlur: () => setMonthlyCtcAutoFocus(false),
               placeholder: `Enter ${replaceUnderscore(
-                fields.monthly_ctc.name
+                fields.monthly_ctc.name,
               )}`,
               autoFocus: monthlyCtcAutoFocus,
             }}
@@ -176,7 +176,7 @@ export function CreatePaymentTemplateComponentDetails({
             key={resetKey && resetKey + 2}
             defaultValue={statutoryFieldDefaultValue}
             options={transformStringArrayIntoOptions(
-              statutoryFieldsArray as unknown as string[]
+              statutoryFieldsArray as unknown as string[],
             )}
             env={env}
             state={
@@ -209,7 +209,7 @@ export function CreatePaymentTemplateComponentDetails({
               (paymentField) =>
                 paymentField.id ===
                 (fieldSet.payment_field_id.value ??
-                  fieldSet.payment_field_id.initialValue)
+                  fieldSet.payment_field_id.initialValue),
             );
 
             if (defaultTargetType) {

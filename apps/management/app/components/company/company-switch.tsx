@@ -1,23 +1,42 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { useCompanyId } from "@/utils/company";
 import type { CompanyDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@canny_ecosystem/ui/avatar";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useLocation, useSubmit } from "@remix-run/react";
 import { useRef, useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@canny_ecosystem/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@canny_ecosystem/ui/popover";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
 } from "@canny_ecosystem/ui/command";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { hasPermission, replaceUnderscore, updateRole } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearAllCache } from "@/utils/cache";
 
-export const CompanySwitch = ({ companies }: {
+export const CompanySwitch = ({
+  companies,
+}: {
   companies: Pick<CompanyDatabaseRow, "id" | "name" | "logo">[];
 }) => {
   const { role } = useUser();
@@ -73,7 +92,7 @@ export const CompanySwitch = ({ companies }: {
             className={cn(
               "ml-2 shrink-0 opacity-75",
               !hasPermission(role, `${updateRole}:${attribute.company}`) &&
-              "hidden",
+                "hidden",
             )}
           />
         </Button>

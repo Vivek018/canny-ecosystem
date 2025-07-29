@@ -12,10 +12,7 @@ export async function createUserById({
   supabase: TypedSupabaseClient;
   data: UserDatabaseInsert;
 }) {
-  const { error, status } = await supabase
-    .from("users")
-    .insert(data)
-    ;
+  const { error, status } = await supabase.from("users").insert(data);
 
   if (error) {
     console.error("createUserById Error:", error);

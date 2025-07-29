@@ -77,7 +77,7 @@ export const ImportEmployeeProjectAssignmentModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -110,7 +110,7 @@ export const ImportEmployeeProjectAssignmentModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -137,7 +137,7 @@ export const ImportEmployeeProjectAssignmentModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

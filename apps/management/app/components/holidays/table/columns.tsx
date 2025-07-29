@@ -73,9 +73,9 @@ export const columns: ColumnDef<HolidaysDataType>[] = [
                   !hasPermission(role, `${updateRole}:${attribute.holidays}`) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.holidays}`
+                      `${deleteRole}:${attribute.holidays}`,
                     ) &&
-                    "hidden"
+                    "hidden",
                 )}
               >
                 <span className="sr-only">Open menu</span>

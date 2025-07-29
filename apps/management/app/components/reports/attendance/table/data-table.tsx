@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useReportsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreReport = async () => {
@@ -138,7 +138,7 @@ export function DataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -167,12 +167,12 @@ export function DataTable<TData, TValue>({
                             cell.column.id === "employee_code" &&
                               "sticky left-12 bg-card z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10"
+                              "sticky left-48 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -190,7 +190,7 @@ export function DataTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -199,7 +199,7 @@ export function DataTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

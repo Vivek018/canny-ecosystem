@@ -71,7 +71,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const data = submission.value;
@@ -97,7 +97,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -107,7 +107,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -137,9 +137,7 @@ export default function AddMonthlyAttendance({
       if (actionData.status === "error") {
         toast({
           title: "Error",
-          description:
-            actionData?.error?.message ??
-            actionData?.message,
+          description: actionData?.error?.message ?? actionData?.message,
           variant: "destructive",
         });
       }
@@ -206,7 +204,7 @@ export default function AddMonthlyAttendance({
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[]
+                    getYears(25, defaultYear) as unknown as string[],
                   )}
                   labelProps={{
                     children: "Year",
@@ -219,7 +217,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.working_days, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.working_days.name
+                      fields.working_days.name,
                     )}`,
                     className: "capitalize",
                   }}
@@ -232,7 +230,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.present_days, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.present_days.name
+                      fields.present_days.name,
                     )}`,
                     className: "capitalize",
                   }}
@@ -247,7 +245,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.absent_days, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.absent_days.name
+                      fields.absent_days.name,
                     )}`,
                   }}
                   labelProps={{
@@ -259,7 +257,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.paid_holidays, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_holidays.name
+                      fields.paid_holidays.name,
                     )}`,
                     className: "capitalize",
                   }}
@@ -274,7 +272,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.working_hours, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.working_hours.name
+                      fields.working_hours.name,
                     )}`,
                   }}
                   labelProps={{
@@ -286,7 +284,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.overtime_hours, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.overtime_hours.name
+                      fields.overtime_hours.name,
                     )}`,
                     className: "capitalize",
                   }}
@@ -301,7 +299,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.paid_leaves, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_leaves.name
+                      fields.paid_leaves.name,
                     )}`,
                   }}
                   labelProps={{
@@ -313,7 +311,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.casual_leaves, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.casual_leaves.name
+                      fields.casual_leaves.name,
                     )}`,
                     className: "capitalize",
                   }}

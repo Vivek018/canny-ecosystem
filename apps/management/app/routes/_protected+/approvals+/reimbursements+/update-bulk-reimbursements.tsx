@@ -1,8 +1,6 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry } from "@/utils/cache";
-import {
-  updateMultipleReimbursements,
-} from "@canny_ecosystem/supabase/mutations";
+import { updateMultipleReimbursements } from "@canny_ecosystem/supabase/mutations";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -17,7 +15,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
     const reimbursementsData = JSON.parse(
-      formData.get("reimbursementsData") as string
+      formData.get("reimbursementsData") as string,
     );
 
     const { status, error } = await updateMultipleReimbursements({
@@ -38,7 +36,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Reimbursements update failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -48,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -70,7 +68,8 @@ export default function UpdateBulkReimbursements() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

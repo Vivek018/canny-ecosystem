@@ -59,7 +59,7 @@ export function SiteCard({
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(role, `${updateRole}:${attribute.sites}`) &&
-                      "hidden"
+                      "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -73,7 +73,7 @@ export function SiteCard({
               className={cn(
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(role, `${deleteRole}:${attribute.sites}`) &&
-                  "hidden"
+                  "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -102,7 +102,7 @@ export function SiteCard({
         <div
           className={cn(
             "border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5",
-            !site.company_location?.name && "opacity-0"
+            !site.company_location?.name && "opacity-0",
           )}
         >
           {site.company_location?.name}
@@ -110,7 +110,7 @@ export function SiteCard({
         <div
           className={cn(
             "px-2.5 py-1.5 ml-auto bg-secondary text-foreground h-full items-center text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-            !site.is_active && "opacity-0"
+            !site.is_active && "opacity-0",
           )}
         >
           <Icon name="dot-filled" size="xs" />

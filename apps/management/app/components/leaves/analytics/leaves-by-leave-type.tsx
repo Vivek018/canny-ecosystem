@@ -55,7 +55,7 @@ export function LeavesByleaveType({
       type,
       leaves: count,
       fill: chartConfig[type].color,
-    })
+    }),
   );
 
   return (

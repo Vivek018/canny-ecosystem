@@ -1,8 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": [
-    "**/.env"
-  ],
+  "globalDependencies": ["**/.env"],
   "ui": "stream",
   "tasks": {
     "build": {
@@ -25,15 +23,9 @@
         "GOOGLE_GENERATIVE_AI_API_KEY",
         "OPENAI_API_KEY"
       ],
-      "inputs": [
-        ".env"
-      ],
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "build/**"
-      ]
+      "inputs": [".env"],
+      "dependsOn": ["^build"],
+      "outputs": ["build/**"]
     },
     "build:icons": {
       "outputs": []
@@ -48,9 +40,7 @@
       "outputs": []
     },
     "dev": {
-      "inputs": [
-        ".env"
-      ],
+      "inputs": [".env"],
       "persistent": true,
       "cache": false
     }

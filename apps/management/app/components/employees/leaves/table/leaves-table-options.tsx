@@ -28,9 +28,7 @@ export const LeavesOptionsDropdown = ({
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(
-      `/employees/${employeeId}/leaves/${leavesId}/update-leave`
-    );
+    navigate(`/employees/${employeeId}/leaves/${leavesId}/update-leave`);
   };
 
   return (
@@ -44,8 +42,8 @@ export const LeavesOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${updateRole}:${attribute.employeeLeaves}`
-              ) && "flex"
+                `${updateRole}:${attribute.employeeLeaves}`,
+              ) && "flex",
             )}
           >
             Update Leave
@@ -55,8 +53,8 @@ export const LeavesOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${deleteRole}:${attribute.employeeLeaves}`
-              ) && "flex"
+                `${deleteRole}:${attribute.employeeLeaves}`,
+              ) && "flex",
             )}
           />
           <DeleteLeave

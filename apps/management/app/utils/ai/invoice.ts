@@ -1,7 +1,4 @@
-import {
-  booleanArray,
-  z,
-} from "@canny_ecosystem/utils";
+import { booleanArray, z } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { GEMINI_LITE } from "./chat/constant";
@@ -11,31 +8,31 @@ export const InvoiceFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123"
+      "Full name, employee code or any identifier. Example: John Doe or EMP123",
     ),
   date_start: z
     .string()
     .optional()
     .describe(
-      "Date of Invoice start range in YYYY-MM-DD format. Example: 1990-01-01"
+      "Date of Invoice start range in YYYY-MM-DD format. Example: 1990-01-01",
     ),
   date_end: z
     .string()
     .optional()
     .describe(
-      "Date of Invoice end range in YYYY-MM-DD format. Example: 2000-12-31"
+      "Date of Invoice end range in YYYY-MM-DD format. Example: 2000-12-31",
     ),
   paid_date_start: z
     .string()
     .optional()
     .describe(
-      "Date of Invoice paid start range in YYYY-MM-DD format. Example: 1990-01-01"
+      "Date of Invoice paid start range in YYYY-MM-DD format. Example: 1990-01-01",
     ),
   paid_date_end: z
     .string()
     .optional()
     .describe(
-      "Date of Invoice Paid end range in YYYY-MM-DD format. Example: 2000-12-31"
+      "Date of Invoice Paid end range in YYYY-MM-DD format. Example: 2000-12-31",
     ),
   paid: z.enum(booleanArray).optional().describe("Is the invoice Paid."),
   service_charge: z

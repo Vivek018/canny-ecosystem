@@ -23,10 +23,7 @@ export async function createPaySequence({
     }
   }
 
-  const { error, status } = await supabase
-    .from("pay_sequence")
-    .insert(data)
-    ;
+  const { error, status } = await supabase.from("pay_sequence").insert(data);
 
   if (error) {
     console.error("createPaySequence Error:", error);

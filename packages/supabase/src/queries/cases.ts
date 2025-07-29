@@ -105,15 +105,13 @@ export async function getCasesByCompanyId({
   const query = supabase
     .from("cases")
     .select(
-      `${columns.join(
-        ","
-      )}, reported_by_project:projects!cases_reported_by_project_id_fkey(id, name), reported_on_project:projects!cases_reported_on_project_id_fkey(id, name),
+      `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_id_fkey(id, name), reported_on_project:projects!cases_reported_on_project_id_fkey(id, name),
        reported_by_employee:employees!cases_reported_by_employee_id_fkey(id, employee_code), reported_on_employee:employees!cases_reported_on_employee_id_fkey(id, employee_code),
        reported_by_site:sites!cases_reported_by_site_id_fkey(id, name, projects!sites_project_id_fkey(id)), reported_on_site:sites!cases_reported_on_site_id_fkey(id, name),
        reported_by_company:companies!cases_reported_by_company_id_fkey(id, name), reported_on_company:companies!cases_reported_on_company_id_fkey(id, name)`,
       {
         count: "exact",
-      }
+      },
     )
     .eq("company_id", companyId);
 
@@ -129,12 +127,12 @@ export async function getCasesByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `title.ilike.*${searchQueryElement}*,description.ilike.*${searchQueryElement}*`
+          `title.ilike.*${searchQueryElement}*,description.ilike.*${searchQueryElement}*`,
         );
       }
     } else {
       query.or(
-        `title.ilike.*${searchQuery}*,description.ilike.*${searchQuery}*`
+        `title.ilike.*${searchQuery}*,description.ilike.*${searchQuery}*`,
       );
     }
   }
@@ -169,7 +167,7 @@ export async function getCasesByCompanyId({
   if (location_type) {
     query.eq(
       "location_type",
-      location_type as CasesDatabaseRow["location_type"]
+      location_type as CasesDatabaseRow["location_type"],
     );
   }
   if (reported_by) {

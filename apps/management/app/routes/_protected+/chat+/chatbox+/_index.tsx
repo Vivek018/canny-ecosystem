@@ -26,14 +26,16 @@ const categoryList = [
   },
 ];
 
-
 export default function ChatCategoryIndex() {
   return (
     <div className="w-full flex-1 flex overflow-scroll">
       <div className="flex flex-col items-start justify-center gap-4 text-muted-foreground tracking-wide text-[15px] w-full p-4 sm:px-10 md:px-20 lg:px-60 overflow-scroll m-auto">
-        <h3 className="text-xl font-semibold">Please select a category to begin:</h3>
+        <h3 className="text-xl font-semibold">
+          Please select a category to begin:
+        </h3>
         <p className="-mt-4 text-sm text-muted-foreground">
-          All categories support future forecasting based on current organizational data and trends.
+          All categories support future forecasting based on current
+          organizational data and trends.
         </p>
         {categoryList.map((cat) => (
           <div key={cat.title}>
@@ -43,6 +45,5 @@ export default function ChatCategoryIndex() {
         ))}
       </div>
     </div>
-
-  )
+  );
 }

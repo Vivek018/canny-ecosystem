@@ -39,7 +39,6 @@ type DetailItemProps = {
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
-
   return (
     <div className="flex flex-row items-center gap-4 text-base">
       <h3 className="text-muted-foreground tracking-wide capitalize w-40 truncate">
@@ -77,8 +76,8 @@ export function PaySequenceCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.paySequence}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.paySequence}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -93,8 +92,8 @@ export function PaySequenceCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.paySequence}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.paySequence}`,
+                ) && "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -133,7 +132,7 @@ export function PaySequenceCard({
                 className={cn(
                   "flex items-center space-x-2 disabled:opacity-100",
                   paySequence.working_days.includes(Number.parseInt(value)) &&
-                    "bg-secondary"
+                    "bg-secondary",
                 )}
               >
                 {label}
@@ -142,15 +141,15 @@ export function PaySequenceCard({
           </ToggleGroup>
         </div>
       </CardContent>
-        <CardFooter
-          className={cn(
-            "px-3 py-2 ml-auto bg-secondary text-foreground text-base tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
-            !paySequence.is_default && "opacity-0"
-          )}
-        >
-          <Icon name="dot-filled" size="xs" />
-          Default
-        </CardFooter>
+      <CardFooter
+        className={cn(
+          "px-3 py-2 ml-auto bg-secondary text-foreground text-base tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
+          !paySequence.is_default && "opacity-0",
+        )}
+      >
+        <Icon name="dot-filled" size="xs" />
+        Default
+      </CardFooter>
     </Card>
   );
 }

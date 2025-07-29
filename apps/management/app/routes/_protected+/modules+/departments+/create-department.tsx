@@ -49,9 +49,7 @@ import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const CREATE_DEPARTMENT_TAG = "create-department";
 
-export async function loader({
-  request,
-}: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
@@ -62,7 +60,10 @@ export async function loader({
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
-    const { data, error } = await getSiteNamesByCompanyId({ supabase, companyId });
+    const { data, error } = await getSiteNamesByCompanyId({
+      supabase,
+      companyId,
+    });
 
     if (error) throw error;
 
@@ -70,7 +71,7 @@ export async function loader({
       siteOptions: data?.map((site) => ({
         label: site.name,
         pseudoLabel: site?.projects?.name,
-        value: site.id
+        value: site.id,
       })),
       companyId,
       error: null,
@@ -82,7 +83,7 @@ export async function loader({
         companyId,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -101,7 +102,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -133,7 +134,7 @@ export async function action({
 
 export default function CreateDepartment({
   updateValues,
-  siteFromUpdate
+  siteFromUpdate,
 }: {
   updateValues?: DepartmentsDatabaseUpdate | null;
   siteFromUpdate: ComboboxSelectOption[] | null | undefined;
@@ -201,7 +202,9 @@ export default function CreateDepartment({
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <input {...getInputProps(fields.company_id, { type: "hidden" })} />
+              <input
+                {...getInputProps(fields.company_id, { type: "hidden" })}
+              />
               <Field
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
@@ -217,7 +220,7 @@ export default function CreateDepartment({
               <SearchableSelectField
                 key={resetKey}
                 className="capitalize"
-                options={((updateValues ? siteFromUpdate : siteOptions)) ?? []}
+                options={(updateValues ? siteFromUpdate : siteOptions) ?? []}
                 inputProps={{
                   ...getInputProps(fields.site_id, {
                     type: "text",
@@ -230,7 +233,11 @@ export default function CreateDepartment({
                 errors={fields.site_id.errors}
               />
             </CardContent>
-            <FormButtons setResetKey={setResetKey} form={form} isSingle={true} />
+            <FormButtons
+              setResetKey={setResetKey}
+              form={form}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

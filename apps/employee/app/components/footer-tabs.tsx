@@ -1,5 +1,11 @@
 import { Button } from "@canny_ecosystem/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
@@ -14,12 +20,11 @@ export function FooterTabs({
   Link: React.ElementType;
   className?: string;
 }) {
-
   return (
     <nav
       className={cn(
         "w-full fixed bottom-0 left-0 z-50 border-t md:hidden",
-        className
+        className,
       )}
     >
       <ul className="bg-card overflow-x-scroll mx-auto flex justify-between text-sm overflow-auto no-scrollbar border-muted border-1 rounded-md h-20 p-2 pr-10">
@@ -32,13 +37,14 @@ export function FooterTabs({
               "flex items-center whitespace-nowrap text-ellipsis mx-1 text-center font-medium underline-offset-4 rounded-lg py-5 px-4 border-outset",
               "hover:bg-muted hover:out",
               item?.path && pathname.includes(item?.path) && "text-primary/80",
-              item?.path && pathname === item?.path && "text-primary no-underline hover:no-underline focus:no-underline cursor-default"
+              item?.path &&
+                pathname === item?.path &&
+                "text-primary no-underline hover:no-underline focus:no-underline cursor-default",
             )}
           >
             <span className="capitalize">{item.label}</span>
           </Link>
         ))}
-
       </ul>
 
       <DropdownMenu>
@@ -52,10 +58,7 @@ export function FooterTabs({
             <Icon name="dots-vertical" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className="w-max"
-          align="start"
-        >
+        <DropdownMenuContent className="w-max" align="start">
           <DropdownMenuGroup>
             {items?.map((item) => (
               <Link
@@ -64,16 +67,22 @@ export function FooterTabs({
                 to={item.path}
                 className={cn(
                   "block py-1 text-sm bg-card text-muted-foreground font-medium underline-offset-4 hover:bg-muted",
-                  item?.path && pathname.includes(item?.path) && "text-primary/80",
-                  item?.path && pathname === item?.path && "text-primary no-underline hover:no-underline focus:no-underline cursor-default"
+                  item?.path &&
+                    pathname.includes(item?.path) &&
+                    "text-primary/80",
+                  item?.path &&
+                    pathname === item?.path &&
+                    "text-primary no-underline hover:no-underline focus:no-underline cursor-default",
                 )}
               >
-                <DropdownMenuItem className="capitalize pr-12">{item.label}</DropdownMenuItem>
+                <DropdownMenuItem className="capitalize pr-12">
+                  {item.label}
+                </DropdownMenuItem>
               </Link>
             ))}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-    </nav >
+    </nav>
   );
 }

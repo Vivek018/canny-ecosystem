@@ -27,20 +27,20 @@ export async function action({
     const attendanceCSVFile = formData.get("attendanceCSVFile") as string;
 
     const attendanceRegisterBase64 = formData.get(
-      "attendanceRegisterBase64"
+      "attendanceRegisterBase64",
     ) as string;
 
     const attendanceRegisterBuffer = Buffer.from(
       attendanceRegisterBase64,
-      "base64"
+      "base64",
     );
 
     const attendanceHourlyRegisterBase64 = formData.get(
-      "attendanceHourlyRegisterBase64"
+      "attendanceHourlyRegisterBase64",
     ) as string;
     const attendanceHourlyRegisterBuffer = Buffer.from(
       attendanceHourlyRegisterBase64,
-      "base64"
+      "base64",
     );
 
     const emails = formData.get("to") as unknown as string;
@@ -59,7 +59,7 @@ export async function action({
           status: "error",
           message: "An unexpected error occurred",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -111,7 +111,7 @@ export async function action({
         status: "success",
         message: "Email sent successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return json(
@@ -120,7 +120,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -141,7 +141,8 @@ export default function AttdEmail() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || "Email sending failed",
+          description:
+            (actionData?.error as any)?.message || "Email sending failed",
           variant: "destructive",
         });
       }

@@ -3,11 +3,9 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
-import {
-  getExitByEmployeeId,
-} from "@canny_ecosystem/supabase/queries";
+import { getExitByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type{ ExitsRow } from "@canny_ecosystem/supabase/types";
+import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -59,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.employee_payments}${args.params.employeeId}`,
-    args
+    args,
   );
 }
 clientLoader.hydrate = true;
@@ -116,7 +114,7 @@ export default function Payments() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_payments}${employeeId}`
+                `${cacheKeyPrefix.employee_payments}${employeeId}`,
               );
               return <ErrorBoundary message="Failed to load link template" />;
             }

@@ -22,7 +22,7 @@ export function ExportBar({
   const count = data.filter(
     (leave) =>
       leave.start_date === today ||
-      (leave.start_date <= today && leave.end_date && leave.end_date >= today)
+      (leave.start_date <= today && leave.end_date && leave.end_date >= today),
   ).length;
 
   const toBeExportedData = data.map((element) => {
@@ -37,9 +37,8 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element?.employees?.employee_code;
       } else if (key === "employee_name") {
-        exportedData[
-          key
-        ] = `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
+        exportedData[key] =
+          `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
       } else if (key === "email") {
         exportedData[key] = element?.users?.email ?? "";
       } else if (key === "project") {
@@ -79,7 +78,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

@@ -15,7 +15,10 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
@@ -75,7 +78,8 @@ export default function DeleteProject() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.error?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.error?.message,
           variant: "destructive",
         });
       }

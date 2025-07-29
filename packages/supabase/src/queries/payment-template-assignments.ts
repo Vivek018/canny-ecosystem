@@ -17,10 +17,14 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
   companyId: string;
 }) {
   try {
-    const { data: templateData, error: templateError } = await getTemplateIdByEmployeeId({ supabase, employeeId });
+    const { data: templateData, error: templateError } =
+      await getTemplateIdByEmployeeId({ supabase, employeeId });
 
     if (templateError) {
-      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (templateData)", templateError);
+      console.error(
+        "getLinkedPaymentTemplateIdByEmployeeId Error (templateData)",
+        templateError,
+      );
       return { data: null, error: templateError };
     }
 
@@ -28,39 +32,57 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
       return { data: { template_id: templateData.template_id }, error: null };
     }
 
-    const { data: employeeProjectAssignment, error: employeeProjectError } = await getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId });
+    const { data: employeeProjectAssignment, error: employeeProjectError } =
+      await getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId });
 
     if (employeeProjectError) {
-      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (employeeProjectAssignment)", employeeProjectError);
+      console.error(
+        "getLinkedPaymentTemplateIdByEmployeeId Error (employeeProjectAssignment)",
+        employeeProjectError,
+      );
       return { data: null, error: employeeProjectError };
     }
 
-    const { data: sitePaymentTemplateAssignment, error: sitePaymentError } = await getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
-      supabase,
-      site_id: employeeProjectAssignment?.site_id!,
-      position: employeeProjectAssignment?.position!,
-      skill_level: employeeProjectAssignment?.skill_level!,
-    });
+    const { data: sitePaymentTemplateAssignment, error: sitePaymentError } =
+      await getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
+        supabase,
+        site_id: employeeProjectAssignment?.site_id!,
+        position: employeeProjectAssignment?.position!,
+        skill_level: employeeProjectAssignment?.skill_level!,
+      });
 
     if (sitePaymentError) {
-      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (sitePaymentTemplateAssignment)", sitePaymentError);
+      console.error(
+        "getLinkedPaymentTemplateIdByEmployeeId Error (sitePaymentTemplateAssignment)",
+        sitePaymentError,
+      );
       return { data: null, error: sitePaymentError };
     }
 
     if (sitePaymentTemplateAssignment?.template_id) {
-      return { data: { template_id: sitePaymentTemplateAssignment.template_id }, error: null };
+      return {
+        data: { template_id: sitePaymentTemplateAssignment.template_id },
+        error: null,
+      };
     }
 
-    const { data: defaultTemplateData, error: defaultTemplateError } = await getDefaultTemplateIdByCompanyId({ supabase, companyId });
+    const { data: defaultTemplateData, error: defaultTemplateError } =
+      await getDefaultTemplateIdByCompanyId({ supabase, companyId });
 
     if (defaultTemplateError) {
-      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (defaultTemplateData)", defaultTemplateError);
+      console.error(
+        "getLinkedPaymentTemplateIdByEmployeeId Error (defaultTemplateData)",
+        defaultTemplateError,
+      );
       return { data: null, error: defaultTemplateError };
     }
 
     return { data: { template_id: defaultTemplateData?.id }, error: null };
   } catch (error) {
-    console.error("getLinkedPaymentTemplateIdByEmployeeId Unexpected Error", error);
+    console.error(
+      "getLinkedPaymentTemplateIdByEmployeeId Unexpected Error",
+      error,
+    );
     return { data: null, error };
   }
 }
@@ -155,8 +177,7 @@ export async function getPaymentTemplateAssignmentById({
       >
     >();
 
-  if (error)
-    console.error("getPaymentTemplateAssignmentById Error", error);
+  if (error) console.error("getPaymentTemplateAssignmentById Error", error);
 
   return { data, error };
 }
@@ -253,15 +274,19 @@ export async function getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
     query = query.eq("skill_level", skill_level);
   }
 
-  const { data, error } = await query.maybeSingle<
-    InferredType<
-      PaymentTemplateAssignmentsDatabaseRow,
-      (typeof columns)[number]
-    >
-  >();
+  const { data, error } =
+    await query.maybeSingle<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseRow,
+        (typeof columns)[number]
+      >
+    >();
 
   if (error) {
-    console.error("getPaymentTemplateAssignmentBySiteAndPositionOrSkillType Error", error);
+    console.error(
+      "getPaymentTemplateAssignmentBySiteAndPositionOrSkillType Error",
+      error,
+    );
   }
 
   return { data, error };

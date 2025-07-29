@@ -201,16 +201,16 @@ const InvoicePDF = ({
   const allEarningFields = Array.from(
     new Set(
       data.employeeData.flatMap(
-        (emp) => emp?.earnings?.map((e) => e.name) ?? []
-      )
-    )
+        (emp) => emp?.earnings?.map((e) => e.name) ?? [],
+      ),
+    ),
   );
   const allDeductionFields = Array.from(
     new Set(
       data.employeeData.flatMap(
-        (emp) => emp?.deductions?.map((e) => e.name) ?? []
-      )
-    )
+        (emp) => emp?.deductions?.map((e) => e.name) ?? [],
+      ),
+    ),
   );
   const earningTotals: Record<string, number> = {};
   const deductionTotals: Record<string, number> = {};
@@ -257,16 +257,16 @@ const InvoicePDF = ({
     roundToNearest(
       Number(
         data?.invoiceDetails?.payroll_data?.find(
-          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF"
-        )?.amount ?? 0
-      )
+          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF",
+        )?.amount ?? 0,
+      ),
     ) +
     roundToNearest(
       Number(
         data?.invoiceDetails?.payroll_data?.find(
-          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI"
-        )?.amount ?? 0
-      )
+          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI",
+        )?.amount ?? 0,
+      ),
     );
 
   const sum = data?.invoiceDetails?.payroll_data
@@ -283,11 +283,11 @@ const InvoicePDF = ({
             (Number(
               data?.invoiceDetails?.payroll_data.reduce(
                 (sum, item) => sum + Number(item.amount),
-                0
-              )
+                0,
+              ),
             ) *
               terms.reimbursement_charge) /
-              100
+              100,
           )
         : 0;
 
@@ -295,7 +295,7 @@ const InvoicePDF = ({
     type === "salary"
       ? roundToNearest(beforeService) + roundToNearest(service_charge)
       : roundToNearest(
-          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge
+          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge,
         );
 
   const cgst =
@@ -464,14 +464,14 @@ const InvoicePDF = ({
                     data?.invoiceDetails?.payroll_data?.find(
                       (item) =>
                         item.field.trim() === "ESIC" ||
-                        item.field.trim() === "ESI"
+                        item.field.trim() === "ESI",
                     )?.amount ?? 0;
                 } else if (trimmed === "PF" || trimmed === "EPF") {
                   amount =
                     data?.invoiceDetails?.payroll_data?.find(
                       (item) =>
                         item.field.trim() === "PF" ||
-                        item.field.trim() === "EPF"
+                        item.field.trim() === "EPF",
                     )?.amount ?? 0;
                 }
 
@@ -778,7 +778,7 @@ const InvoicePDF = ({
               >
                 <Text>
                   {replaceUnderscore(
-                    employee.employeeProjectAssignmentData?.position
+                    employee.employeeProjectAssignmentData?.position,
                   )}
                 </Text>
               </View>
@@ -799,7 +799,7 @@ const InvoicePDF = ({
                   {Number(
                     employee?.earnings
                       .reduce((sum, earning) => sum + earning.amount, 0)
-                      ?.toFixed(2)
+                      ?.toFixed(2),
                   )}
                 </Text>
               </View>
@@ -818,9 +818,9 @@ const InvoicePDF = ({
                     Number(
                       employee?.deductions.reduce(
                         (sum, deduction) => sum + deduction?.amount,
-                        0
-                      )
-                    )
+                        0,
+                      ),
+                    ),
                   )}
                 </Text>
               </View>
@@ -830,15 +830,15 @@ const InvoicePDF = ({
                     Number(
                       employee?.earnings.reduce(
                         (sum, earning) => sum + earning?.amount,
-                        0
-                      )
+                        0,
+                      ),
                     ) -
                       Number(
                         employee?.deductions.reduce(
                           (sum, deduction) => sum + deduction?.amount,
-                          0
-                        )
-                      )
+                          0,
+                        ),
+                      ),
                   )}
                 </Text>
               </View>
@@ -874,10 +874,10 @@ const InvoicePDF = ({
                   data.employeeData.reduce((sum, emp) => {
                     const earningSum = emp?.earnings?.reduce(
                       (acc, d) => acc + Number(d?.amount ?? 0),
-                      0
+                      0,
                     );
                     return sum + earningSum;
-                  }, 0)
+                  }, 0),
                 )}
               </Text>
             </View>
@@ -897,11 +897,11 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const deductionSum = emp?.deductions?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0
+                        0,
                       );
                       return sum + deductionSum;
-                    }, 0)
-                  )
+                    }, 0),
+                  ),
                 )}
               </Text>
             </View>
@@ -913,20 +913,20 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const earningSum = emp?.earnings?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0
+                        0,
                       );
                       return sum + earningSum;
-                    }, 0)
+                    }, 0),
                   ) -
                     Number(
                       data.employeeData.reduce((sum, emp) => {
                         const deductionSum = emp?.deductions?.reduce(
                           (acc, d) => acc + Number(d?.amount ?? 0),
-                          0
+                          0,
                         );
                         return sum + deductionSum;
-                      }, 0)
-                    )
+                      }, 0),
+                    ),
                 )}
               </Text>
             </View>
@@ -951,8 +951,8 @@ const InvoicePDF = ({
                 label: "Basic",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "BASIC"
-                  )?.amount ?? 0
+                    (item) => item.field === "BASIC",
+                  )?.amount ?? 0,
                 ),
               },
               {
@@ -961,24 +961,24 @@ const InvoicePDF = ({
                   totalGross -
                   Number(
                     data?.invoiceDetails?.payroll_data?.find(
-                      (item) => item.field === "BASIC"
-                    )?.amount ?? 0
+                      (item) => item.field === "BASIC",
+                    )?.amount ?? 0,
                   ),
               },
               {
                 label: "P.F. (13%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "PF" || item.field === "EPF"
-                  )?.amount ?? 0
+                    (item) => item.field === "PF" || item.field === "EPF",
+                  )?.amount ?? 0,
                 ),
               },
               {
                 label: "ESIC (3.25%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "ESIC" || item.field === "ESI"
-                  )?.amount ?? 0
+                    (item) => item.field === "ESIC" || item.field === "ESI",
+                  )?.amount ?? 0,
                 ),
               },
               {
@@ -1224,7 +1224,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         invoiceId: invoiceData?.id!,
       });
     payrollDataAndOthers =
-      invoiceData?.type === "reimbursement" ? (reimb ?? []) : (exit ?? []);
+      invoiceData?.type === "reimbursement" ? reimb ?? [] : exit ?? [];
   }
 
   let contentType: string | undefined = undefined;
@@ -1453,7 +1453,7 @@ export default function PreviewInvoice() {
 
     registerData = transformReimbursementDataForPayroll(
       data,
-      data?.invoiceData?.type
+      data?.invoiceData?.type,
     );
   }
 

@@ -49,13 +49,14 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { UPDATE_LETTER_TAG } from "./$letterId_+/update-letter";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
-import {
-  attribute,
-} from "@canny_ecosystem/utils/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { useTheme } from "@/utils/theme";
-import { getLinkedPaymentTemplateIdByEmployeeId, getPaymentTemplateComponentsByTemplateId } from "@canny_ecosystem/supabase/queries";
+import {
+  getLinkedPaymentTemplateIdByEmployeeId,
+  getPaymentTemplateComponentsByTemplateId,
+} from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const CREATE_LETTER_TAG = "create-letter";
@@ -65,7 +66,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   try {
-
     const { user } = await getUserCookieOrFetchUser(request, supabase);
 
     if (
@@ -74,14 +74,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return safeRedirect(DEFAULT_ROUTE, { headers });
     }
 
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase,)
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     let templateId = null;
 
     let templateComponentData = null;
     let employeeSalaryData = null;
 
-    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({ supabase, employeeId, companyId });
+    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({
+      supabase,
+      employeeId,
+      companyId,
+    });
 
     if (!error && data) {
       templateId = data.template_id;
@@ -101,12 +105,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           acc[category] = {};
         }
 
-        if (
-          curr.target_type === "payment_field" &&
-          curr.payment_fields.name
-        ) {
-          const fieldName =
-            curr.payment_fields.name + "".replaceAll(" ", "_");
+        if (curr.target_type === "payment_field" && curr.payment_fields.name) {
+          const fieldName = curr.payment_fields.name + "".replaceAll(" ", "_");
           acc[category][fieldName] = curr.calculation_value ?? 0;
         } else {
           acc[category][curr.target_type] = curr.calculation_value ?? 0;
@@ -117,13 +117,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {} as Record<string, Record<string, number>>,
     );
 
-
     return json({ employeeSalaryData, error: null });
   } catch (error) {
     return json({
       error,
-      employeeSalaryData: null
-    })
+      employeeSalaryData: null,
+    });
   }
 }
 
@@ -183,7 +182,7 @@ export default function CreateEmployeeLetter({
   userOptionsFromUpdate?: any;
 }) {
   const [resetKey, setResetKey] = useState(Date.now());
-  const { employeeSalaryData, } = useLoaderData<typeof loader>();
+  const { employeeSalaryData } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { employeeId } = useParams();
   const { toast } = useToast();
@@ -303,9 +302,15 @@ export default function CreateEmployeeLetter({
                     ...getInputProps(fields.content, { type: "hidden" }),
                     placeholder: "Write your letter content here...",
                     defaultValue: !updateValues
-                      ? bringDefaultLetterContent(fields.letter_type.value, employeeSalaryData) ?? fields.content.value
+                      ? bringDefaultLetterContent(
+                          fields.letter_type.value,
+                          employeeSalaryData,
+                        ) ?? fields.content.value
                       : fields.content.value ??
-                      bringDefaultLetterContent(fields.letter_type.value, employeeSalaryData),
+                        bringDefaultLetterContent(
+                          fields.letter_type.value,
+                          employeeSalaryData,
+                        ),
                   }}
                   labelProps={{
                     children: "Content",

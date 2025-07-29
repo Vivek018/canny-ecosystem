@@ -87,7 +87,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.employee_overview}${args.params.employeeId}`,
-    args
+    args,
   );
 }
 
@@ -119,7 +119,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData || !env) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
               );
               return <ErrorBoundary message="Failed to load employee" />;
             }
@@ -151,7 +151,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
               );
               return (
                 <ErrorBoundary message="Failed to load employee statutory details" />
@@ -176,7 +176,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
               );
               return (
                 <ErrorBoundary message="Failed to load employee bank details" />
@@ -199,7 +199,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
               );
               return (
                 <ErrorBoundary message="Failed to load employee addresses" />
@@ -224,7 +224,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
               );
               return (
                 <ErrorBoundary message="Failed to load employee guardians details" />

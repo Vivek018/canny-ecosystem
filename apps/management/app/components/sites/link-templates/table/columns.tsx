@@ -76,9 +76,9 @@ export const columns: ColumnDef<
           currentPaymentTemplateAssignmentId={row.original.id}
           triggerChild={
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <Icon name='dots-vertical' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }

@@ -17,7 +17,10 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeeExits = ({ exitId, employeeId }: { exitId: string, employeeId: string }) => {
+export const DeleteEmployeeExits = ({
+  exitId,
+  employeeId,
+}: { exitId: string; employeeId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -77,7 +80,10 @@ export const DeleteEmployeeExits = ({ exitId, employeeId }: { exitId: string, em
           <Input
             type="text"
             value={inputValue}
-            onChange={(e) => { setInputValue(e.target.value); setInputError([]) }}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setInputError([]);
+            }}
             className="border border-input rounded-md h-10 w-full"
             placeholder="Confirm your action"
             onPaste={(e) => {
@@ -88,9 +94,7 @@ export const DeleteEmployeeExits = ({ exitId, employeeId }: { exitId: string, em
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel
-            onClick={handleCancelEmployeeExits}
-          >
+          <AlertDialogCancel onClick={handleCancelEmployeeExits}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction

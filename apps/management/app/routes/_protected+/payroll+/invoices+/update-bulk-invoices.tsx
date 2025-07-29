@@ -23,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
           message: "Invoices update failed",
           error: "Is Paid is required for Paid Date",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -45,7 +45,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Invoices update failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -55,7 +55,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -77,7 +77,8 @@ export default function UpdateBulkInvoices() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

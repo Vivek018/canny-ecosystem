@@ -38,10 +38,11 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
-import type {
-  EmployeeMonthlyAttendanceDatabaseInsert,
-} from "@canny_ecosystem/supabase/types";
-import { getEmployeesBySiteId, getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import type { EmployeeMonthlyAttendanceDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import {
+  getEmployeesBySiteId,
+  getSiteNamesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -56,10 +57,10 @@ import { Label } from "@canny_ecosystem/ui/label";
 import { AddAttendance } from "@canny_ecosystem/supabase/mutations";
 
 export const ADD_ATTENDANCES_TAG = "Add_Attendance";
-const BulkAttendanceSchema = z.object(
-  {
-    singleValue: AttendanceSchema.pick({ month: true, year: true }),
-    attendances: z.array(AttendanceSchema.pick({
+const BulkAttendanceSchema = z.object({
+  singleValue: AttendanceSchema.pick({ month: true, year: true }),
+  attendances: z.array(
+    AttendanceSchema.pick({
       employee_id: true,
       present_days: true,
       overtime_hours: true,
@@ -68,22 +69,17 @@ const BulkAttendanceSchema = z.object(
       working_hours: true,
       paid_holidays: true,
       paid_leaves: true,
-      casual_leaves: true
-    }))
-  }
-);
+      casual_leaves: true,
+    }),
+  ),
+});
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(
-      user?.role!,
-      `${createRole}:${attribute.attendance}`
-    )
-  ) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.attendance}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -92,7 +88,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const searchParams = new URLSearchParams(url.searchParams);
 
-  const { data: siteData } = await getSiteNamesByCompanyId({ supabase, companyId });
+  const { data: siteData } = await getSiteNamesByCompanyId({
+    supabase,
+    companyId,
+  });
 
   const site = searchParams.get("site") ?? "";
 
@@ -110,9 +109,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const employeeOptions = employeeData?.map((employeeData: any) => ({
     label: employeeData.employee_code as string,
-    pseudoLabel: `${employeeData?.first_name
-      } ${employeeData?.middle_name ?? ""} ${employeeData?.last_name ?? ""
-      }`,
+    pseudoLabel: `${
+      employeeData?.first_name
+    } ${employeeData?.middle_name ?? ""} ${employeeData?.last_name ?? ""}`,
     value: employeeData.id as string,
   }));
 
@@ -129,7 +128,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -138,7 +137,10 @@ export async function action({
     ...submission.value.singleValue,
   }));
 
-  const { status, error } = await AddAttendance({ supabase, data: data as unknown as EmployeeMonthlyAttendanceDatabaseInsert });
+  const { status, error } = await AddAttendance({
+    supabase,
+    data: data as unknown as EmployeeMonthlyAttendanceDatabaseInsert,
+  });
 
   if (isGoodStatus(status)) {
     return json({
@@ -179,7 +181,9 @@ export default function AddBulkAttendances() {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message ?? actionData?.message ?? "Attendance Create Failed",
+            actionData?.error?.message ??
+            actionData?.message ??
+            "Attendance Create Failed",
           variant: "destructive",
         });
       }
@@ -207,18 +211,21 @@ export default function AddBulkAttendances() {
       form.update({
         value: {
           ...form.value,
-          attendances: [...form.value?.attendances as any, initialValues.attendances]
-        }
-      })
+          attendances: [
+            ...(form.value?.attendances as any),
+            initialValues.attendances,
+          ],
+        },
+      });
     } else {
       form.update({
         value: {
           ...form.value,
-          attendances: [initialValues.attendances]
-        }
-      })
+          attendances: [initialValues.attendances],
+        },
+      });
     }
-  }
+  };
 
   const removeAttendance = (index: number) => {
     if (form.value?.attendances) {
@@ -228,11 +235,11 @@ export default function AddBulkAttendances() {
       form.update({
         value: {
           ...form.value,
-          attendances: updated
-        }
+          attendances: updated,
+        },
       });
     }
-  }
+  };
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
@@ -268,7 +275,7 @@ export default function AddBulkAttendances() {
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[]
+                    getYears(25, defaultYear) as unknown as string[],
                   )}
                   labelProps={{
                     children: "Year",
@@ -287,7 +294,7 @@ export default function AddBulkAttendances() {
                   onChange={(value) => {
                     searchParams.set("site", value);
                     if (!value.length) {
-                      searchParams.delete("site")
+                      searchParams.delete("site");
                     }
                     setSearchParams(searchParams);
                   }}
@@ -298,8 +305,15 @@ export default function AddBulkAttendances() {
               {fields?.attendances.getFieldList().map((fieldSet, index) => {
                 const field = fieldSet.getFieldset();
                 return (
-                  <div key={String(fields?.attendances.key! + index + resetKey + 4)} className="flex flex-row items-center justify-center gap-1.5">
-                    <div className="mb-6 py-[7px] px-3 border shadow rounded text-sm">{index + 1}</div>
+                  <div
+                    key={String(
+                      fields?.attendances.key! + index + resetKey + 4,
+                    )}
+                    className="flex flex-row items-center justify-center gap-1.5"
+                  >
+                    <div className="mb-6 py-[7px] px-3 border shadow rounded text-sm">
+                      {index + 1}
+                    </div>
                     <SearchableSelectField
                       key={String(resetKey + site! + index + 5)}
                       inputProps={{
@@ -311,57 +325,69 @@ export default function AddBulkAttendances() {
                     />
                     <Field
                       inputProps={{
-                        ...getInputProps(field.present_days, { type: "number" }),
-                        placeholder: 'PR Days',
+                        ...getInputProps(field.present_days, {
+                          type: "number",
+                        }),
+                        placeholder: "PR Days",
                       }}
                       errors={field.present_days.errors}
                     />
                     <Field
                       inputProps={{
-                        ...getInputProps(field.overtime_hours, { type: "number" }),
-                        placeholder: 'OT Hrs',
+                        ...getInputProps(field.overtime_hours, {
+                          type: "number",
+                        }),
+                        placeholder: "OT Hrs",
                       }}
                       errors={field.overtime_hours.errors}
                     />
                     <Field
                       inputProps={{
-                        ...getInputProps(field.working_days, { type: "number" }),
-                        placeholder: 'WO Days',
+                        ...getInputProps(field.working_days, {
+                          type: "number",
+                        }),
+                        placeholder: "WO Days",
                       }}
                       errors={field.working_days.errors}
                     />
                     <Field
                       inputProps={{
                         ...getInputProps(field.absent_days, { type: "number" }),
-                        placeholder: 'AB Days',
+                        placeholder: "AB Days",
                       }}
                       errors={field.absent_days.errors}
                     />
                     <Field
                       inputProps={{
-                        ...getInputProps(field.working_hours, { type: "number" }),
-                        placeholder: 'WO Hrs',
+                        ...getInputProps(field.working_hours, {
+                          type: "number",
+                        }),
+                        placeholder: "WO Hrs",
                       }}
                       errors={field.working_hours.errors}
                     />
                     <Field
                       inputProps={{
-                        ...getInputProps(field.paid_holidays, { type: "number" }),
-                        placeholder: 'PH Days',
+                        ...getInputProps(field.paid_holidays, {
+                          type: "number",
+                        }),
+                        placeholder: "PH Days",
                       }}
                       errors={field.paid_holidays.errors}
                     />
                     <Field
                       inputProps={{
                         ...getInputProps(field.paid_leaves, { type: "number" }),
-                        placeholder: 'PA Leaves',
+                        placeholder: "PA Leaves",
                       }}
                       errors={field.paid_leaves.errors}
                     />
                     <Field
                       inputProps={{
-                        ...getInputProps(field.casual_leaves, { type: "number" }),
-                        placeholder: 'CA Leaves',
+                        ...getInputProps(field.casual_leaves, {
+                          type: "number",
+                        }),
+                        placeholder: "CA Leaves",
                       }}
                       errors={field.casual_leaves.errors}
                     />
@@ -374,7 +400,7 @@ export default function AddBulkAttendances() {
                       <Icon name="cross" />
                     </Button>
                   </div>
-                )
+                );
               })}
               <Button
                 type="button"

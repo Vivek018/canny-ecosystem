@@ -28,7 +28,6 @@ export const DeleteLeave = ({
   employeeId: string;
   isEmployeeRoute?: boolean;
 }) => {
-
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -42,7 +41,7 @@ export const DeleteLeave = ({
   };
 
   const handleDeleteLeave = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -57,7 +56,7 @@ export const DeleteLeave = ({
           method: "post",
           action: `/employees/${employeeId}/leaves/${id}/delete-leave`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -72,7 +71,7 @@ export const DeleteLeave = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.employeeLeaves}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Leave

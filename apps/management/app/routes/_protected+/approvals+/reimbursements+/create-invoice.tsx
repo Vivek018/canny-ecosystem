@@ -110,7 +110,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.payroll_invoice}${args.params.payrollId}`,
-    args
+    args,
   );
 }
 
@@ -123,7 +123,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const selectedRowData = formData.get("selected_rows") as string;
     const selectedReimbursementData = JSON.parse(selectedRowData || "[]");
@@ -134,7 +134,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -216,7 +216,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -241,7 +241,7 @@ export default function CreateInvoiceFromRiembursement({
   function transformPayrollData(employees: any[]) {
     const total = employees.reduce(
       (sum, entry) => sum + (entry?.amount || 0),
-      0
+      0,
     );
 
     return [
@@ -340,7 +340,7 @@ export default function CreateInvoiceFromRiembursement({
                   inputProps={{
                     ...getInputProps(fields.invoice_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.invoice_number.name
+                      fields.invoice_number.name,
                     )}`,
                   }}
                   labelProps={{
@@ -364,7 +364,7 @@ export default function CreateInvoiceFromRiembursement({
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name
+                      fields.subject.name,
                     )}`,
                   }}
                   labelProps={{
@@ -395,7 +395,7 @@ export default function CreateInvoiceFromRiembursement({
                   inputProps={{
                     ...getInputProps(fields.additional_text, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.additional_text.name
+                      fields.additional_text.name,
                     )}`,
                   }}
                   labelProps={{
@@ -518,7 +518,7 @@ export default function CreateInvoiceFromRiembursement({
                   inputProps={{
                     ...getInputProps(fields.paid_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_date.name
+                      fields.paid_date.name,
                     )}`,
                   }}
                   labelProps={{
@@ -536,7 +536,7 @@ export default function CreateInvoiceFromRiembursement({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                      fields.payroll_data.value
+                      fields.payroll_data.value,
                   ),
                 }}
                 fields={[

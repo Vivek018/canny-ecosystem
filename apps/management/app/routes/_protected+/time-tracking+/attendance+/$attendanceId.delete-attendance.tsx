@@ -53,7 +53,7 @@ export async function action({
         returnTo,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({

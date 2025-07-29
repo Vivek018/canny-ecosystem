@@ -87,7 +87,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -164,15 +164,15 @@ export default function AddLeaves({
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='capitalize'>
+              <CardTitle className="capitalize">
                 {replaceUnderscore(LEAVES_TAG)}
               </CardTitle>
-              <CardDescription className='lowercase'>
+              <CardDescription className="lowercase">
                 {`${replaceUnderscore(LEAVES_TAG)} by filling this form`}
               </CardDescription>
             </CardHeader>
@@ -180,18 +180,18 @@ export default function AddLeaves({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-4'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-4">
                 <SearchableSelectField
                   key={resetKey}
-                  className='w-full capitalize flex-1 '
+                  className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    leaveTypeArray as unknown as string[]
+                    leaveTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.leave_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.leave_type.name
+                    fields.leave_type.name,
                   )}`}
                   labelProps={{
                     children: "Leave Type",
@@ -206,7 +206,7 @@ export default function AddLeaves({
                     }),
                     placeholder: "Select an authority that approved",
                   }}
-                  className='lowercase'
+                  className="lowercase"
                   options={userOptions ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
@@ -214,7 +214,7 @@ export default function AddLeaves({
                   errors={fields.user_id.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 '>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, {

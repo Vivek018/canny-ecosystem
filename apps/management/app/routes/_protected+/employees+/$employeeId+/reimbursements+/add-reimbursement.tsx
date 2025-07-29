@@ -61,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.employeeReimbursements}`
+      `${createRole}:${attribute.employeeReimbursements}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -95,7 +95,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -147,7 +147,9 @@ export default function AddReimbursements({
         toast({
           title: "Error",
           description:
-            actionData?.error?.message ?? actionData?.message ?? "Reimbursement create failed",
+            actionData?.error?.message ??
+            actionData?.message ??
+            "Reimbursement create failed",
           variant: "destructive",
         });
       }
@@ -188,7 +190,7 @@ export default function AddReimbursements({
               </CardTitle>
               <CardDescription className="lowercase">
                 {`${replaceUnderscore(
-                  REIMBURSEMENTS_TAG
+                  REIMBURSEMENTS_TAG,
                 )} by filling this form`}
               </CardDescription>
             </CardHeader>
@@ -219,13 +221,13 @@ export default function AddReimbursements({
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[]
+                    reimbursementStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name
+                    fields.status.name,
                   )}`}
                   labelProps={{
                     children: "Status",
@@ -240,7 +242,7 @@ export default function AddReimbursements({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name
+                      fields.amount.name,
                     )}`,
                     className: "",
                   }}
@@ -276,7 +278,7 @@ export default function AddReimbursements({
                     placeholder: "Select Reimbursement Type",
                   }}
                   options={transformStringArrayIntoOptions(
-                    reimbursementTypeArray as unknown as string[]
+                    reimbursementTypeArray as unknown as string[],
                   )}
                   labelProps={{
                     children: "Type",

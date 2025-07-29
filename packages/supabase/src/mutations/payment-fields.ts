@@ -25,10 +25,11 @@ export async function createPaymentField({
     }
   }
 
-  const { error, status, data: paymentFieldData } = await supabase
-    .from("payment_fields")
-    .insert(data)
-    .select("*");
+  const {
+    error,
+    status,
+    data: paymentFieldData,
+  } = await supabase.from("payment_fields").insert(data).select("*");
 
   if (error) {
     console.error("createPaymentField Error", error);
@@ -61,8 +62,7 @@ export async function updatePaymentField({
   const { error, status } = await supabase
     .from("payment_fields")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
+    .eq("id", data.id!);
 
   if (error) {
     console.error("updatePaymentField Error", error);

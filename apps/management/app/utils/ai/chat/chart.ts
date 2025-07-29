@@ -8,10 +8,14 @@ export const configSchema = z
     title: z.string().describe("Title of the chart"),
     description: z
       .string()
-      .describe("What is this chart showing? Explain the value of this visualization. Give proper meaningful description of 40 - 60 words."),
+      .describe(
+        "What is this chart showing? Explain the value of this visualization. Give proper meaningful description of 40 - 60 words.",
+      ),
     takeaway: z
       .string()
-      .describe("What is the most interesting insight or summary from the data? Give proper meaningful takeaway of 40 - 60 words."),
+      .describe(
+        "What is the most interesting insight or summary from the data? Give proper meaningful takeaway of 40 - 60 words.",
+      ),
     type: z.enum(["bar", "line", "area", "pie"]).describe("Type of chart"),
     xKey: z
       .string()
@@ -99,6 +103,6 @@ Return a single valid chart config object only.`,
     return { config: { ...config, colors } };
   } catch (e) {
     console.error(e);
-    return { config: null }
+    return { config: null };
   }
 };

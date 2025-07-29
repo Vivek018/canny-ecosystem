@@ -12,10 +12,7 @@ export async function addLeavesFromData({
   supabase: TypedSupabaseClient;
   data: LeavesDatabaseInsert;
 }) {
-  const { error, status } = await supabase
-    .from("leaves")
-    .insert(data)
-    ;
+  const { error, status } = await supabase.from("leaves").insert(data);
 
   if (error) {
     console.error("createLeavesFromData Error:", error);
@@ -74,10 +71,7 @@ export async function addLeaveTypeFromData({
   supabase: TypedSupabaseClient;
   data: LeaveTypeDatabaseInsert[];
 }) {
-  const { error, status } = await supabase
-    .from("leave_type")
-    .insert(data)
-    ;
+  const { error, status } = await supabase.from("leave_type").insert(data);
 
   if (error) {
     console.error("createLeaveTypeFromData Error:", error);

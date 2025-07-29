@@ -17,6 +17,12 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuTrigger,
+} from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -27,7 +33,28 @@ import {
   isGoodStatus,
   readRole,
 } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  formatDateTime,
+  hasPermission,
+  isGoodStatus,
+  readRole,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import {
+  type ActionFunctionArgs,
+  defer,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useParams,
+  type ClientLoaderFunctionArgs,
+} from "@remix-run/react";
 import {
   type ActionFunctionArgs,
   defer,
@@ -61,6 +88,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const query = dbData?.query ?? "";
     const config = JSON.parse(dbData?.config ?? "") ?? null;
 
+    const { data, error: sqlError } = await runGeneratedSQLQuery({
+      originalQuery: query,
+    });
     const { data, error: sqlError } = await runGeneratedSQLQuery({
       originalQuery: query,
     });
@@ -213,6 +243,7 @@ export default function Chatbox() {
       <Form method="POST">
         <CardHeader className="py-2 flex flex-row items-center justify-between gap-4">
           <p className="w-full truncate tracking-wide">{prompt}</p>
+          <p className="w-full truncate tracking-wide">{prompt}</p>
           <div className="h-11 flex-1 flex flex-row gap-2 items-center justify-end pb-2">
             <Button variant={"secondary"} onClick={handleExport}>
               <Icon name="download" size="sm" />
@@ -237,6 +268,7 @@ export default function Chatbox() {
         </CardHeader>
       </Form>
       <div className="flex-1 overflow-auto">
+        <Results results={data ?? []} chartConfig={config} columns={columns} />
         <Results results={data ?? []} chartConfig={config} columns={columns} />
       </div>
     </Card>

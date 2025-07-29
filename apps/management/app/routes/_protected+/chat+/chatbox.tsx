@@ -32,8 +32,8 @@ export async function action({ request }: ActionFunctionArgs) {
         prompt: prompt ?? "",
         query: query ?? "",
         config: config,
-        user_id: user?.id
-      }
+        user_id: user?.id,
+      };
 
       const { error } = await createChat({ supabase, data });
 
@@ -70,7 +70,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Chatbox() {
-  const actionData = useActionData<typeof action>()
+  const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -78,7 +78,9 @@ export default function Chatbox() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(cacheKeyPrefix.chatbox_employee + actionData?.prompt)
+        clearExactCacheEntry(
+          cacheKeyPrefix.chatbox_employee + actionData?.prompt,
+        );
         toast({
           title: "Success",
           description: actionData?.message,
@@ -87,8 +89,7 @@ export default function Chatbox() {
       } else {
         toast({
           title: "Error",
-          description:
-            actionData?.message,
+          description: actionData?.message,
           variant: "destructive",
         });
       }
@@ -107,5 +108,5 @@ export default function Chatbox() {
         <Outlet />
       </div>
     </section>
-  )
+  );
 }

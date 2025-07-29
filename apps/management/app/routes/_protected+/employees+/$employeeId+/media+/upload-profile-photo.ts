@@ -58,8 +58,7 @@ export default function UploadProfilePhoto() {
       } else {
         toast({
           title: "Error",
-          description:
-            actionData?.error?.message ?? actionData?.message,
+          description: actionData?.error?.message ?? actionData?.message,
           variant: "destructive",
         });
       }

@@ -67,12 +67,12 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
   const redirectedToReportedOn = getRedirectUrl(
     rowData?.reported_on,
     rowData,
-    "reported_on"
+    "reported_on",
   );
   const redirectedToReportedBy = getRedirectUrl(
     rowData?.reported_by,
     rowData,
-    "reported_by"
+    "reported_by",
   );
 
   return (
@@ -92,7 +92,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                   cell.column.id === "select" &&
                     "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                   cell.column.id === "actions" &&
-                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -104,7 +104,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
               <TableCell
                 className={cn(
                   "px-3 md:px-4 py-4 hidden md:table-cell",
-                  cell.column.id === "title" && "sticky left-12 bg-card z-10"
+                  cell.column.id === "title" && "sticky left-12 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -136,7 +136,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                 "capitalize",
                 rowData?.status === "open" && "text-emerald-400",
                 rowData?.status === "closed" && "text-red-400",
-                rowData?.status === "resolved" && "text-green-400"
+                rowData?.status === "resolved" && "text-green-400",
               )}
             >
               {rowData?.status ?? "--"}
@@ -189,7 +189,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                   rowData?.reported_on !== "company" &&
                     rowData?.reported_on !== "other" &&
                     rowData?.reported_on !== "canny" &&
-                    "text-primary/80 group-hover:text-primary cursor-pointer"
+                    "text-primary/80 group-hover:text-primary cursor-pointer",
                 )}
               >
                 {reportedOnName}
@@ -215,7 +215,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                   rowData?.reported_by !== "company" &&
                     rowData?.reported_by !== "other" &&
                     rowData?.reported_by !== "canny" &&
-                    "text-primary/80 group-hover:text-primary cursor-pointer"
+                    "text-primary/80 group-hover:text-primary cursor-pointer",
                 )}
               >
                 {reportedByName}

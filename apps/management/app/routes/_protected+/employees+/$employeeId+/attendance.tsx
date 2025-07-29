@@ -59,7 +59,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.attendance}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -109,13 +109,13 @@ export default function EmployeeAttendance() {
                   {data.map(
                     (
                       attendance: EmployeeMonthlyAttendanceDatabaseRow,
-                      index: number
+                      index: number,
                     ) => (
                       <AttendanceComponent
                         key={index.toString()}
                         attendanceData={attendance}
                       />
-                    )
+                    ),
                   )}
                 </div>
               ) : (

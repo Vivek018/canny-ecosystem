@@ -41,7 +41,7 @@ export function ImportedDataTableHeader({
             <TableHead key={id} className={cn("px-4 py-2")}>
               <Button
                 className={cn(
-                  "p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+                  "p-0 hover:bg-transparent space-x-2 disabled:opacity-100",
                 )}
                 variant="ghost"
                 disabled={true}

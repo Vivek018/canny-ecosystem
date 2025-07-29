@@ -108,7 +108,7 @@ export async function getIncidentsByCompanyId({
     .from("incidents")
     .select(
       `${columns.join(
-        ","
+        ",",
       )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
         foreignFilters ? "inner" : "left"
       }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
@@ -116,7 +116,7 @@ export async function getIncidentsByCompanyId({
       }(id, name))))`,
       {
         count: "exact",
-      }
+      },
     )
     .eq("employees.company_id", companyId);
 
@@ -135,7 +135,7 @@ export async function getIncidentsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          }
+          },
         );
       }
     } else {
@@ -143,7 +143,7 @@ export async function getIncidentsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        }
+        },
       );
     }
   }
@@ -173,12 +173,12 @@ export async function getIncidentsByCompanyId({
   }
   if (project) {
     query.eq(
-      "employees.employee_project_assignment.sites.projects?.name",
-      project
+      "employees.employee_project_assignment.sites.projects.name",
+      project,
     );
   }
   if (site) {
-    query.eq("employees.employee_project_assignment.sites?.name", site);
+    query.eq("employees.employee_project_assignment.sites.name", site);
   }
 
   const { data, count, error } = await query.range(from, to);

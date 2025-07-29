@@ -1,8 +1,6 @@
 import { Card } from "@canny_ecosystem/ui/card";
 import type { PaymentTemplateAssignmentsDatabaseRow } from "@canny_ecosystem/supabase/types";
-import {
-  formatDate,
-} from "@canny_ecosystem/utils";
+import { formatDate } from "@canny_ecosystem/utils";
 
 type DetailItemProps = {
   label: string;
@@ -10,10 +8,9 @@ type DetailItemProps = {
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
-
   return (
-    <div className='flex flex-col'>
-      <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
+    <div className="flex flex-col">
+      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
         {label}
       </h3>
       <p>{value ?? "--"}</p>
@@ -75,22 +72,21 @@ export const LinkTemplateCard = ({
     "created_at" | "updated_at"
   > | null;
 }) => {
-
   return (
-    <Card className='rounded w-full h-full p-4'>
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold'>Link Template</h2>
+    <Card className="rounded w-full h-full p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Link Template</h2>
       </div>
 
-      <div className='w-full overflow-scroll no-scrollbar'>
+      <div className="w-full overflow-scroll no-scrollbar">
         {paymentTemplateAssignmentData ? (
-          <div className='flex items-center justify-between gap-4 min-w-max'>
+          <div className="flex items-center justify-between gap-4 min-w-max">
             <LinkTemplateItem
               paymentTemplateAssignmentData={paymentTemplateAssignmentData}
             />
           </div>
         ) : (
-          <div className='text-center py-8'>
+          <div className="text-center py-8">
             <p>No link template available</p>
           </div>
         )}

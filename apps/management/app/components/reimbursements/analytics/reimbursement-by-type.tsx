@@ -64,8 +64,8 @@ export function ReimbursementByType({
         acc[type].amount += row.amount ?? 0;
         return acc;
       },
-      {}
-    )
+      {},
+    ),
   );
 
   const transformedChartData = totalTypeData.map((data, i) => ({

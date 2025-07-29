@@ -28,7 +28,7 @@ export async function createProfessionalTax({
     ...data,
     gross_salary_range: JSON.parse(data.gross_salary_range as any),
   };
-  
+
   const { error, status } = await supabase
     .from("professional_tax")
     .insert(newData);

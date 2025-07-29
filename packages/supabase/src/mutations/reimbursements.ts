@@ -80,7 +80,7 @@ export async function deleteReimbursementById({
   if (status < 200 || status >= 300) {
     console.error(
       "deleteReimbursementById Unexpected Supabase status:",
-      status
+      status,
     );
   }
 

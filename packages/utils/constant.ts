@@ -331,11 +331,12 @@ export const SUPABASE_MEDIA_URL_PREFIX =
 
 export function getFilePathFromUrl(url: string) {
   return url.startsWith(
-    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
   )
     ? url.slice(
-      `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
-    )
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
+          .length,
+      )
     : url;
 }
 

@@ -41,7 +41,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/update-active`,
-      }
+      },
     );
   };
 
@@ -55,7 +55,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/update-active`,
-      }
+      },
     );
   };
 
@@ -67,7 +67,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/events/incidents/${employee.id}/create-incident`,
-      }
+      },
     );
   };
   const handleAttendance = () => {
@@ -78,7 +78,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/add-attendance`,
-      }
+      },
     );
   };
 
@@ -91,7 +91,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleMarkAsActive}
           >
@@ -101,7 +101,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleMarkAsInactive}
           >
@@ -111,13 +111,13 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                 !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                "hidden"
+                "hidden",
             )}
           />
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleIncident}
           >
@@ -127,7 +127,7 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleAttendance}
           >
@@ -137,7 +137,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.incidents}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeleteEmployee employeeId={employee.id} />

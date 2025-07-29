@@ -1,9 +1,5 @@
-import {
-  useImportStoreForLeaves,
-} from "@/store/import";
-import type {
-  ImportLeavesDataType,
-} from "@canny_ecosystem/supabase/queries";
+import { useImportStoreForLeaves } from "@/store/import";
+import type { ImportLeavesDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +42,7 @@ export const UpdateImportedLeaves = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -57,7 +53,7 @@ export const UpdateImportedLeaves = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Leaves
@@ -107,7 +103,7 @@ export const UpdateImportedLeaves = ({
           <div className="grid grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                leaveTypeArray as unknown as string[]
+                leaveTypeArray as unknown as string[],
               )}
               value={data.leave_type ?? leaveTypeArray[0]}
               onChange={(value: string) => {

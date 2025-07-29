@@ -19,7 +19,9 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteCompanyDocument = ({ documentId }: { documentId: string }) => {
+export const DeleteCompanyDocument = ({
+  documentId,
+}: { documentId: string }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -58,7 +60,7 @@ export const DeleteCompanyDocument = ({ documentId }: { documentId: string }) =>
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.companyDocuments}`) &&
-          "flex",
+            "flex",
         )}
       >
         Delete document
@@ -67,7 +69,8 @@ export const DeleteCompanyDocument = ({ documentId }: { documentId: string }) =>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your document and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            document and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">

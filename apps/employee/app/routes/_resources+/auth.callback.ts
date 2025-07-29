@@ -34,7 +34,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       throw userError;
     }
 
-    headers.append("Set-Cookie", setUserCookie(userData)); 
+    headers.append("Set-Cookie", setUserCookie(userData));
     if (userData?.company_id?.length) {
       headers.append("Set-Cookie", setCompanyId(userData?.company_id));
     }

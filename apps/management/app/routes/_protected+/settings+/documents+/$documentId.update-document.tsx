@@ -55,7 +55,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const submission = parseWithZod(formData, {
       schema: CompanyDocumentsSchema,
@@ -64,7 +64,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -90,7 +90,7 @@ export async function action({
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -100,7 +100,7 @@ export async function action({
         error,
         returnTo: "/settings/documents",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

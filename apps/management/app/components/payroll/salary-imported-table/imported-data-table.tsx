@@ -40,7 +40,7 @@ export function ImportedDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -59,7 +59,7 @@ export function ImportedDataTable<TData, TValue>({
                       key={row.id}
                       className={cn(
                         "relative h-[40px] md:h-[45px] cursor-default select-text",
-                        isConflicting && "bg-destructive/20"
+                        isConflicting && "bg-destructive/20",
                       )}
                     >
                       {row.getVisibleCells().map((cell) => {
@@ -69,12 +69,12 @@ export function ImportedDataTable<TData, TValue>({
                             className={cn(
                               "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
                               cell.column.id === "actions" &&
-                                "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                                "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                             )}
                           >
                             {flexRender(
                               cell.column.columnDef.cell,
-                              cell.getContext()
+                              cell.getContext(),
                             )}
                           </TableCell>
                         );

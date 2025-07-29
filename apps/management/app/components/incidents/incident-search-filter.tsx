@@ -84,14 +84,12 @@ export function IncidentSearchFilter({
     date_end: searchParams.get("date_end"),
     status: searchParams.get("status") as IncidentFilters["status"],
     location_type: searchParams.get(
-      "location_type"
+      "location_type",
     ) as IncidentFilters["location_type"],
     category: searchParams.get("category") as IncidentFilters["category"],
     severity: searchParams.get("severity") as IncidentFilters["severity"],
     project: searchParams.get("project") as IncidentFilters["project"],
-    site: searchParams.get(
-      "site"
-    ) as IncidentFilters["site"],
+    site: searchParams.get("site") as IncidentFilters["site"],
   };
 
   useEffect(() => {
@@ -112,7 +110,7 @@ export function IncidentSearchFilter({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -150,7 +148,7 @@ export function IncidentSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name"
+      ([key, value]) => value?.length && key !== "name",
     ).length > 0;
 
   return (
@@ -167,7 +165,7 @@ export function IncidentSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin"
+              isSubmitting && "animate-spin",
             )}
           />
           <Input
@@ -196,9 +194,9 @@ export function IncidentSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100"
+                isOpen && "opacity-100",
               )}
             >
               <Icon name="mixer" />
@@ -423,23 +421,21 @@ export function IncidentSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {
-                  siteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
-                }
+                {siteArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

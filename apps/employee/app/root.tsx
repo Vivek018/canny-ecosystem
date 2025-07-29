@@ -120,10 +120,7 @@ function Document({
 }
 
 function App() {
-  const {
-    error,
-  } = useLoaderData<typeof loader>();
-
+  const { error } = useLoaderData<typeof loader>();
 
   if (error) return <ErrorBoundary error={error} />;
 
@@ -133,12 +130,12 @@ function App() {
   return (
     <Document nonce={nonce} theme={theme}>
       <main className="flex h-full w-full bg-background text-foreground ">
-        <div className='w-full h-full'>
+        <div className="w-full h-full">
           <Outlet />
         </div>
         <Toaster />
       </main>
-    </Document >
+    </Document>
   );
 }
 

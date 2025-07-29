@@ -42,7 +42,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
-
     const departmentPromise = getDepartmentsByCompanyId({
       supabase,
       companyId,
@@ -94,7 +93,7 @@ export default function Departments() {
               }
 
               const filteredData: DepartmentItem[] = data?.filter(
-                (item: DepartmentItem) => searchInObject(item, searchString)
+                (item: DepartmentItem) => searchInObject(item, searchString),
               );
               setTableData(filteredData);
             }, [searchString, data]);
@@ -125,12 +124,14 @@ export default function Departments() {
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.departments}`
-                        ) && "hidden"
+                          `${createRole}:${attribute.departments}`,
+                        ) && "hidden",
                       )}
                     >
                       <span>Add</span>
-                      <span className="hidden md:flex justify-end">Department</span>
+                      <span className="hidden md:flex justify-end">
+                        Department
+                      </span>
                     </Link>
                   </div>
                 </div>

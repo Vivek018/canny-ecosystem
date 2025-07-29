@@ -183,8 +183,8 @@ export default function RunPayrollIndex() {
                 Boolean(
                   meta?.count && innitial?.length
                     ? meta.count > innitial.length
-                    : false
-                )
+                    : false,
+                ),
               );
 
               const [data, setData] = useState(innitial);
@@ -196,8 +196,8 @@ export default function RunPayrollIndex() {
                   Boolean(
                     meta?.count && innitial?.length
                       ? meta.count > innitial.length
-                      : false
-                  )
+                      : false,
+                  ),
                 );
               }, [innitial]);
 
@@ -246,7 +246,7 @@ export default function RunPayrollIndex() {
                     <CommandEmpty
                       className={cn(
                         "w-full py-40 capitalize text-lg tracking-wide text-center",
-                        !isDocument && "hidden"
+                        !isDocument && "hidden",
                       )}
                     >
                       No payrolls found.

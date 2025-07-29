@@ -1,9 +1,6 @@
 import { Card } from "@canny_ecosystem/ui/card";
 import type { EmployeeProjectAssignmentDataType } from "@canny_ecosystem/supabase/queries";
-import {
-  formatDate,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
+import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 
 type DetailItemProps = {
   label: string;
@@ -31,7 +28,6 @@ export const EmployeeProjectAssignmentCard = ({
 }: {
   projectAssignment: EmployeeProjectAssignment | null;
 }) => {
-
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="flex justify-between items-center">

@@ -14,7 +14,6 @@ import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { DepartmentWithSite } from "@canny_ecosystem/supabase/queries";
 
-
 export const columns: ColumnDef<DepartmentWithSite>[] = [
   {
     accessorKey: "name",
@@ -60,13 +59,13 @@ export const columns: ColumnDef<DepartmentWithSite>[] = [
                   "h-8 w-8 p-0",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.departments}`
+                    `${updateRole}:${attribute.departments}`,
                   ) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.departments}`
+                      `${deleteRole}:${attribute.departments}`,
                     ) &&
-                    "hidden"
+                    "hidden",
                 )}
               >
                 <span className="sr-only">Open menu</span>

@@ -60,7 +60,7 @@ export function LabourWelfareFundCard({
     <Card
       key={labourWelfareFund.id}
       className={cn(
-        "w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+        "w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start",
       )}
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
@@ -78,8 +78,8 @@ export function LabourWelfareFundCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.statutoryFieldsLwf}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.statutoryFieldsLwf}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -94,8 +94,8 @@ export function LabourWelfareFundCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.statutoryFieldsLwf}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.statutoryFieldsLwf}`,
+                ) && "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />

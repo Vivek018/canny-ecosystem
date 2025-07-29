@@ -18,11 +18,7 @@ type EmployeeBankDetails = Omit<
   "created_at" | "updated_at"
 >;
 
-export const DetailItem: React.FC<DetailItemProps> = ({
-  label,
-  value,
-}) => {
-
+export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
     <div className="flex flex-col items-start">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
@@ -53,9 +49,9 @@ export const EmployeeBankDetailsCard = ({
             "bg-card",
             !hasPermission(
               role,
-              `${updateRole}:${attribute.employeeBankDetails}`
+              `${updateRole}:${attribute.employeeBankDetails}`,
             ) && "hidden",
-            !bankDetails?.employee_id && "hidden"
+            !bankDetails?.employee_id && "hidden",
           )}
         >
           <Icon name="edit" className="mr-2" />
@@ -69,9 +65,9 @@ export const EmployeeBankDetailsCard = ({
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${createRole}:${attribute.employeeBankDetails}`
+              `${createRole}:${attribute.employeeBankDetails}`,
             ) && "hidden",
-            bankDetails?.employee_id && "hidden"
+            bankDetails?.employee_id && "hidden",
           )}
         >
           <Icon name="plus-circled" className="mr-2" />

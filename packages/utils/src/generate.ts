@@ -254,7 +254,7 @@ export const styles = StyleSheet.create({
 
 export const replacePlaceholders = (
   content: string | null | undefined,
-  replacements: Record<string, any>
+  replacements: Record<string, any>,
 ) => {
   return (
     content?.replace(/\$\{(\w+)\}/g, (_, key) => {
@@ -270,7 +270,7 @@ export const replacePlaceholders = (
 
 export const bringDefaultLetterContent = (
   letterType: string | undefined,
-  data: any
+  data: any,
 ) => {
   const salaryTablemarkdownLines = [
     "| **Particulars**           | **Amount (Rs.)** |",
@@ -285,13 +285,13 @@ export const bringDefaultLetterContent = (
       salaryTablemarkdownLines.push(
         `| ${
           key.charAt(0).toUpperCase() + key.slice(1)
-        }                     | ${amount.toLocaleString()}/-           |`
+        }                     | ${amount.toLocaleString()}/-           |`,
       );
       totalGrossEarning += amount;
     }
 
     salaryTablemarkdownLines.push(
-      `| **Gross Earning**         | **${totalGrossEarning.toLocaleString()}/-**     |`
+      `| **Gross Earning**         | **${totalGrossEarning.toLocaleString()}/-**     |`,
     );
   }
 
@@ -299,7 +299,7 @@ export const bringDefaultLetterContent = (
     for (const [key, value] of Object.entries(data.deduction)) {
       const amount = value as number;
       salaryTablemarkdownLines.push(
-        `| ${key}                 | ${amount.toLocaleString()}/-           |`
+        `| ${key}                 | ${amount.toLocaleString()}/-           |`,
       );
       totalDeductions += amount;
     }
@@ -307,7 +307,7 @@ export const bringDefaultLetterContent = (
 
   const netSalary = totalGrossEarning - totalDeductions;
   salaryTablemarkdownLines.push(
-    `| **Net Salary**            | **${netSalary.toLocaleString()}/-** |`
+    `| **Net Salary**            | **${netSalary.toLocaleString()}/-** |`,
   );
 
   const salaryTableMarkdown = `\n

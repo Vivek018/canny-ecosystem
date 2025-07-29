@@ -20,11 +20,10 @@ type DetailItemProps = {
   value: string | null | undefined;
 };
 
-const DetailItem: React.FC<DetailItemProps> = ({ label, value}) => {
-
+const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
-    <div className='flex flex-col'>
-      <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
+    <div className="flex flex-col">
+      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
         {label}
       </h3>
       <p>{value ?? "--"}</p>
@@ -89,12 +88,12 @@ export const LinkTemplateCard = ({
   const { role } = useUser();
 
   return (
-    <Card className='rounded w-full h-full p-4'>
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold'>Link Template</h2>
+    <Card className="rounded w-full h-full p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Link Template</h2>
         <div>
           {paymentTemplateAssignmentData ? (
-            <div className='flex gap-4'>
+            <div className="flex gap-4">
               <Link
                 to={`/employees/${paymentTemplateAssignmentData.employee_id}/payments/${paymentTemplateAssignmentData.id}/update-link-template`}
                 className={cn(
@@ -102,11 +101,11 @@ export const LinkTemplateCard = ({
                   "bg-card",
                   !hasPermission(
                     `${role}`,
-                    `${createRole}:${attribute.employeePaymentTemplateLink}`
-                  ) && "hidden"
+                    `${createRole}:${attribute.employeePaymentTemplateLink}`,
+                  ) && "hidden",
                 )}
               >
-                <Icon name={"edit"} className='mr-2' />
+                <Icon name={"edit"} className="mr-2" />
                 Update
               </Link>
               <LinkTemplateDropdown
@@ -118,11 +117,11 @@ export const LinkTemplateCard = ({
                       "bg-card",
                       !hasPermission(
                         role,
-                        `${updateRole}:${attribute.employeePaymentTemplateLink}`
-                      ) && "hidden"
+                        `${updateRole}:${attribute.employeePaymentTemplateLink}`,
+                      ) && "hidden",
                     )}
                   >
-                    <Icon name='dots-vertical' size='xs' className='mr-1.5' />
+                    <Icon name="dots-vertical" size="xs" className="mr-1.5" />
                     <p>More Options</p>
                   </DropdownMenuTrigger>
                 }
@@ -130,32 +129,32 @@ export const LinkTemplateCard = ({
             </div>
           ) : (
             <Link
-              to='create-link-template'
+              to="create-link-template"
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "bg-card",
                 !hasPermission(
                   `${role}`,
-                  `${createRole}:${attribute.employeePaymentTemplateLink}`
-                ) && "hidden"
+                  `${createRole}:${attribute.employeePaymentTemplateLink}`,
+                ) && "hidden",
               )}
             >
-              <Icon name={"plus-circled"} className='mr-2' />
+              <Icon name={"plus-circled"} className="mr-2" />
               Create
             </Link>
           )}
         </div>
       </div>
 
-      <div className='w-full overflow-scroll no-scrollbar'>
+      <div className="w-full overflow-scroll no-scrollbar">
         {paymentTemplateAssignmentData ? (
-          <div className='flex items-center gap-4 min-w-max'>
+          <div className="flex items-center gap-4 min-w-max">
             <LinkTemplateItem
               paymentTemplateAssignmentData={paymentTemplateAssignmentData}
             />
           </div>
         ) : (
-          <div className='text-center py-8'>
+          <div className="text-center py-8">
             <p>No link template available</p>
           </div>
         )}

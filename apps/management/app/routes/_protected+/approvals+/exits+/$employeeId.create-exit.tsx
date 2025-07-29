@@ -18,6 +18,7 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useActionData, useNavigate } from "@remix-run/react";
+import { Form, json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -77,7 +78,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -91,12 +92,12 @@ export async function action({
 
     return json(
       { status: "error", message: "Exit creation failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
       { status: "error", message: "An unexpected error occurred", error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -193,7 +194,7 @@ export default function CreateExit({
                     ...getInputProps(fields.bonus, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.bonus.name
+                      fields.bonus.name,
                     )}`,
                   }}
                   labelProps={{
@@ -208,7 +209,7 @@ export default function CreateExit({
                     }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.leave_encashment.name
+                      fields.leave_encashment.name,
                     )}`,
                   }}
                   labelProps={{
@@ -221,7 +222,7 @@ export default function CreateExit({
                     ...getInputProps(fields.gratuity, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.gratuity.name
+                      fields.gratuity.name,
                     )}`,
                   }}
                   labelProps={{
@@ -234,7 +235,7 @@ export default function CreateExit({
                     ...getInputProps(fields.deduction, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.deduction.name
+                      fields.deduction.name,
                     )}`,
                   }}
                   labelProps={{
@@ -248,7 +249,7 @@ export default function CreateExit({
                   inputProps={{
                     ...getInputProps(fields.last_working_day, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.last_working_day.name
+                      fields.last_working_day.name,
                     )}`,
                   }}
                   labelProps={{
@@ -262,12 +263,12 @@ export default function CreateExit({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.final_settlement_date.name
+                      fields.final_settlement_date.name,
                     )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.final_settlement_date.name
+                      fields.final_settlement_date.name,
                     ),
                   }}
                   errors={fields.final_settlement_date.errors}
@@ -277,7 +278,7 @@ export default function CreateExit({
                 className="w-full capitalize flex-1"
                 key={resetKey}
                 options={transformStringArrayIntoOptions(
-                  reasonForExitArray as unknown as string[]
+                  reasonForExitArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.reason, { type: "text" }),

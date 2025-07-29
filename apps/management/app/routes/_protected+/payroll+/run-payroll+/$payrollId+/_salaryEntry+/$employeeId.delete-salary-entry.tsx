@@ -8,21 +8,20 @@ import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({
-  request,
-  params
-}: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const employeeId = params.employeeId;
     const payrollId = params.payrollId;
 
-    const { status, error } = await deleteSalaryEntriesFromPayrollAndEmployeeId({
-      supabase,
-      payrollId: payrollId ?? "",
-      employeeId: employeeId ?? "",
-    });
+    const { status, error } = await deleteSalaryEntriesFromPayrollAndEmployeeId(
+      {
+        supabase,
+        payrollId: payrollId ?? "",
+        employeeId: employeeId ?? "",
+      },
+    );
 
     if (isGoodStatus(status)) {
       return json({
@@ -48,7 +47,6 @@ export async function action({
   }
 }
 
-
 export default function DeleteSalaryEntry() {
   const actionData = useActionData<typeof action>();
   const { payrollId } = useParams();
@@ -68,7 +66,8 @@ export default function DeleteSalaryEntry() {
       } else {
         toast({
           title: "Error",
-          description: (actionData?.error as any)?.message || actionData?.message,
+          description:
+            (actionData?.error as any)?.message || actionData?.message,
           variant: "destructive",
         });
       }

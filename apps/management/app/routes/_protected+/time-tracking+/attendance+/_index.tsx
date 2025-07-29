@@ -92,7 +92,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const sitePromise = getSiteNamesByCompanyId({ supabase, companyId });
 
-
     return defer({
       projectPromise,
       sitePromise,
@@ -125,7 +124,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

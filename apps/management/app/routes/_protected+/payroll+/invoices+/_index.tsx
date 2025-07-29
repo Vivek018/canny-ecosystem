@@ -62,7 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const invoicePromise = await getInvoicesByCompanyId({
@@ -98,7 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         filters: null,
         env,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -107,7 +107,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.payroll_invoice}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 clientLoader.hydrate = true;
@@ -159,7 +159,7 @@ export default function Invoices() {
                       locationData?.data?.length
                         ? locationData?.data?.map(
                             (location: { name: string } | null) =>
-                              location!.name
+                              location!.name,
                           )
                         : []
                     }
