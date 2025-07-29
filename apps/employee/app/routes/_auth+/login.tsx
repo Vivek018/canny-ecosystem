@@ -53,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -67,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (error || !data) {
       return json(
         { error: error || "No employee data found", employeeId: null },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
