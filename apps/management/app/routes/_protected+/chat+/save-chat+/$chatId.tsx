@@ -11,12 +11,7 @@ import { getChatById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardHeader } from "@canny_ecosystem/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuTrigger,
-} from "@canny_ecosystem/ui/dropdown-menu";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,13 +21,7 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  deleteRole,
-  formatDateTime,
-  hasPermission,
-  isGoodStatus,
-  readRole,
-} from "@canny_ecosystem/utils";
+
 import {
   deleteRole,
   formatDateTime,
@@ -41,20 +30,6 @@ import {
   readRole,
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import {
-  type ActionFunctionArgs,
-  defer,
-  json,
-  type LoaderFunctionArgs,
-} from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigate,
-  useParams,
-  type ClientLoaderFunctionArgs,
-} from "@remix-run/react";
 import {
   type ActionFunctionArgs,
   defer,
@@ -91,9 +66,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const { data, error: sqlError } = await runGeneratedSQLQuery({
       originalQuery: query,
     });
-    const { data, error: sqlError } = await runGeneratedSQLQuery({
-      originalQuery: query,
-    });
 
     return defer({ prompt, data, config, error: sqlError ?? null });
   } catch (error) {
@@ -105,7 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.save_chat_id}${args.params.chatId}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -145,7 +117,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         returnTo,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -237,7 +209,7 @@ export default function Chatbox() {
     <Card
       className={cn(
         "w-full h-full flex flex-col overflow-hidden",
-        !data?.length && "hidden",
+        !data?.length && "hidden"
       )}
     >
       <Form method="POST">
@@ -253,7 +225,7 @@ export default function Chatbox() {
                 className={cn(
                   "h-9 px-3.5 rounded-sm bg-secondary text-secondary-foreground grid place-items-center",
                   !hasPermission(role, `${deleteRole}:${attribute.chat}`) &&
-                    "hidden",
+                    "hidden"
                 )}
               >
                 <Icon name="dots-vertical" size="sm" />
