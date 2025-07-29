@@ -77,7 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.save_chat_id}${args.params.chatId}`,
-    args
+    args,
   );
 }
 clientLoader.hydrate = true;
@@ -117,7 +117,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         returnTo,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -209,7 +209,7 @@ export default function Chatbox() {
     <Card
       className={cn(
         "w-full h-full flex flex-col overflow-hidden",
-        !data?.length && "hidden"
+        !data?.length && "hidden",
       )}
     >
       <Form method="POST">
@@ -225,7 +225,7 @@ export default function Chatbox() {
                 className={cn(
                   "h-9 px-3.5 rounded-sm bg-secondary text-secondary-foreground grid place-items-center",
                   !hasPermission(role, `${deleteRole}:${attribute.chat}`) &&
-                    "hidden"
+                    "hidden",
                 )}
               >
                 <Icon name="dots-vertical" size="sm" />
