@@ -98,7 +98,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return acc;
       },
-      {} as Record<string, Record<string, number>>
+      {} as Record<string, Record<string, number>>,
     );
 
     return json({
@@ -117,7 +117,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         employeeLetterData: null,
         employeeSalaryData: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -133,7 +133,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -157,7 +157,7 @@ export async function action({
         message: "Employee Letter update failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -166,7 +166,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

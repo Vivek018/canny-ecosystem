@@ -64,7 +64,7 @@ export const DeleteInvoice = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.invoice}`) && "flex",
-          hide && "hidden"
+          hide && "hidden",
         )}
       >
         Delete Invoice

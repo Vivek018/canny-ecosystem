@@ -164,7 +164,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 export default function ReimbursementsIndex() {
-  
   const {
     reimbursementsPromise,
     projectPromise,
@@ -194,7 +193,7 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
+                                  (project) => project!.name,
                                 )
                               : []
                           }

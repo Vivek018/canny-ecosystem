@@ -34,7 +34,7 @@ export function ExitPaymentsSheet({
         }
         className={cn(
           "relative cursor-pointer select-text",
-          row.original?.invoice_id && "bg-primary/20"
+          row.original?.invoice_id && "bg-primary/20",
         )}
       >
         {row.getVisibleCells().map((cell: any) => {

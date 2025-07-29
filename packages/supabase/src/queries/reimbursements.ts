@@ -1,7 +1,4 @@
-import {
-  defaultYear,
-  formatUTCDate,
-} from "@canny_ecosystem/utils";
+import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
@@ -170,7 +167,9 @@ export async function getReimbursementsByCompanyId({
       return new Date(Date.UTC(Number(year), Number(months[month]) - 1, 1));
     }
     if (month) {
-      return new Date(Date.UTC(Number(defaultYear), Number(months[month]) - 1, 1));
+      return new Date(
+        Date.UTC(Number(defaultYear), Number(months[month]) - 1, 1),
+      );
     }
     if (year) {
       return new Date(Date.UTC(Number(year), 0, 1));

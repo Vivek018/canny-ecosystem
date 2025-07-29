@@ -70,8 +70,8 @@ export async function action({
         Number(formData.get("bonus")) +
           Number(formData.get("leave_encashment")) +
           Number(formData.get("gratuity")) -
-          Number(formData.get("deduction"))
-      )
+          Number(formData.get("deduction")),
+      ),
     );
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
 
@@ -179,7 +179,7 @@ export default function CreateExit({
                     }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.payable_days.name
+                      fields.payable_days.name,
                     )}`,
                   }}
                   labelProps={{

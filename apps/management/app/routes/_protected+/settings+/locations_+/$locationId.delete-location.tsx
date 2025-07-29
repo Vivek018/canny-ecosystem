@@ -45,7 +45,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Location delete failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({

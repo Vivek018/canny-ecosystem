@@ -53,7 +53,7 @@ export async function action({
         returnTo,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -75,7 +75,7 @@ export default function DeleteEmployee() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`
+          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`,
         );
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         toast({

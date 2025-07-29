@@ -90,7 +90,7 @@ export function SalaryEntryDataTable<TData, TValue>({
                     className={cn(
                       "relative h-[40px] md:h-[45px] cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
-                        "bg-primary/20"
+                        "bg-primary/20",
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -106,12 +106,12 @@ export function SalaryEntryDataTable<TData, TValue>({
                             cell.column.id === "employee_code" &&
                               "sticky left-32 z-10 bg-card",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );

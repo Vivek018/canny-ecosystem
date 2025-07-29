@@ -185,7 +185,7 @@ export function ReimbursementsTable<TData, TValue>({
                     }
                     className={cn(
                       "relative cursor-default select-text",
-                      row.original?.invoice_id && "bg-primary/20"
+                      row.original?.invoice_id && "bg-primary/20",
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {

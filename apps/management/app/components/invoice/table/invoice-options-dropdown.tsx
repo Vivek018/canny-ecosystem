@@ -105,7 +105,7 @@ export const InvoiceOptionsDropdown = ({
             !hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
               !hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
               "hidden",
-            hide && "hidden"
+            hide && "hidden",
           )}
         />
 
@@ -115,7 +115,7 @@ export const InvoiceOptionsDropdown = ({
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
                 "flex",
-              hide && "hidden"
+              hide && "hidden",
             )}
             onClick={handleInvoiceUpdate}
           >
@@ -126,14 +126,14 @@ export const InvoiceOptionsDropdown = ({
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
                 "flex",
-              hide && "hidden"
+              hide && "hidden",
             )}
           />
           <DropdownMenuItem
             className={cn(
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
-                "hidden"
+                "hidden",
             )}
             onClick={() => handleDownloadProof(proofUrl, `${invoiceNumber}`)}
           >
@@ -145,7 +145,7 @@ export const InvoiceOptionsDropdown = ({
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
                 "hidden",
-              hide && "hidden"
+              hide && "hidden",
             )}
           />
           <DeleteInvoice hide={hide} invoiceId={invoiceId} />
