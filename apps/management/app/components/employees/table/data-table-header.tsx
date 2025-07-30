@@ -27,6 +27,13 @@ export const employeeColumnIdArray = [
   "skill_level",
   "start_date",
   "end_date",
+  "account_number",
+  "bank_name",
+  "aadhaar_number",
+  "pan_number",
+  "uan_number",
+  "pf_number",
+  "esic_number",
 ];
 
 export function DataTableHeader({ table, loading, className }: Props) {

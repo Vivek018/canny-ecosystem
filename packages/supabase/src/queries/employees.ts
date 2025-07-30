@@ -79,7 +79,11 @@ export type EmployeeDataType = Pick<
         name: ProjectDatabaseRow["name"];
       };
     };
-  };
+  }
+} & {
+  employee_statutory_details: Pick<EmployeeStatutoryDetailsDatabaseRow, "aadhaar_number" | "pan_number" | "uan_number" | "pf_number" | "esic_number">
+} & {
+  employee_bank_details: Pick<EmployeeBankDetailsDatabaseRow, "account_number" | "bank_name">
 };
 
 export async function getEmployeesByCompanyId({
@@ -138,14 +142,13 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          foreignFilters ? "inner" : "left"
-        }(
-        employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-          foreignFilters ? "inner" : "left"
-        }(id, name))
-      )`,
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(employee_id, assignment_type, skill_level, position, start_date, end_date,
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
+      }(id, name))
+      ),
+      employee_statutory_details!left(aadhaar_number, pan_number, uan_number, pf_number, esic_number),
+      employee_bank_details!left(account_number, bank_name)`,
       { count: "exact" },
     )
     .eq("company_id", companyId);
@@ -1016,12 +1019,10 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          foreignFilters ? "inner" : "left"
-        }(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-          foreignFilters ? "inner" : "left"
-        }(id, name))
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(employee_id, assignment_type, skill_level, position, start_date, end_date,
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
+      }(id, name))
       )`,
       { count: "exact" },
     )
