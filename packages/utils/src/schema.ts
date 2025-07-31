@@ -187,7 +187,7 @@ export const statusArray = [
 
 export const ProjectSchema = z.object({
   id: z.string().optional(),
-  name: zNumberString.min(3),
+  name: z.string().min(3),
   project_type: zNumberString.min(3).max(50),
   description: zTextArea.optional(),
   company_id: z.string(),
@@ -199,7 +199,7 @@ export const ProjectSchema = z.object({
 // Sites
 export const SiteSchema = z.object({
   id: z.string().optional(),
-  name: zString.min(3).max(50),
+  name: z.string().min(3).max(50),
   company_location_id: z.string(),
   is_active: z.boolean().default(false),
   address_line_1: z
@@ -1249,7 +1249,7 @@ export const ImportEmployeeProjectAssignmentsHeaderSchema =
 
 export const ImportSingleEmployeeProjectAssignmentsDataSchema = z.object({
   employee_code: zNumberString.min(3),
-  site: zString.min(3),
+  site: z.string().min(3),
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
