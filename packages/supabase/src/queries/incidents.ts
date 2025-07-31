@@ -112,7 +112,7 @@ export async function getIncidentsByCompanyId({
       )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
         foreignFilters ? "inner" : "left"
       }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-        foreignFilters ? "inner" : "left"
+        project ? "inner" : "left"
       }(id, name))))`,
       {
         count: "exact",

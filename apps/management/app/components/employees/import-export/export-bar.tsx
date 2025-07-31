@@ -64,6 +64,27 @@ export function ExportBar({
       } else if (key === "end_date") {
         exportedData[key] =
           element?.employee_project_assignment?.end_date ?? "";
+      } else if (key === "account_number") {
+        exportedData[key] =
+          element?.employee_bank_details?.account_number ?? "";
+      } else if (key === "bank_name") {
+        exportedData[key] =
+          element?.employee_bank_details?.bank_name ?? "";
+      } else if (key === "aadhaar_number") {
+        exportedData[key] =
+          element?.employee_statutory_details?.aadhaar_number ?? "";
+      } else if (key === "pan_number") {
+        exportedData[key] =
+          element?.employee_statutory_details?.pan_number ?? "";
+      } else if (key === "uan_number") {
+        exportedData[key] =
+          element?.employee_statutory_details?.uan_number ?? "";
+      } else if (key === "pf_number") {
+        exportedData[key] =
+          element?.employee_statutory_details?.pf_number ?? "";
+      } else if (key === "esic_number") {
+        exportedData[key] =
+          element?.employee_statutory_details?.esic_number ?? "";
       } else {
         exportedData[key] = element[key as keyof EmployeeDataType] as
           | string

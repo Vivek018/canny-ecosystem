@@ -205,7 +205,7 @@ export async function getMonthlyAttendanceByCompanyId({
     sites!${foreignFilters ? "inner" : "left"}(
       id,
       name,
-      projects!${foreignFilters ? "inner" : "left"}(id, name)
+      projects!${project ? "inner" : "left"}(id, name)
     )
   ),
   monthly_attendance:monthly_attendance!inner(
@@ -387,7 +387,7 @@ export async function getAttendanceReportByCompanyId({
         foreignFilters ? "inner" : "left"
       }(
         sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-          foreignFilters ? "inner" : "left"
+          project ? "inner" : "left"
         }(id, name))),
       attendance(
         id,

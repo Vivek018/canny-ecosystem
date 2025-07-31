@@ -227,7 +227,7 @@ export default function EmployeeAddressImportFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportEmployeeAddressDataType,
                     ),
-                  ),
+                ).map(([key, value]) => [key, String(value).trim()] as unknown as ImportEmployeeAddressDataType[]),
               );
               return cleanEntry;
             });
