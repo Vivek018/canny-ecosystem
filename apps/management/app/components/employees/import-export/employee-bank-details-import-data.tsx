@@ -115,7 +115,7 @@ export function EmployeeBankDetailsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
+          String(value).trim().toLowerCase().includes(searchString.toLowerCase()),
       ),
     );
     setTableData(filteredData);

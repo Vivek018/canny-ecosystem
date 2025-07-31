@@ -342,7 +342,7 @@ export default function PayrollImportFieldMapping() {
                     allowedFields
                       .map((field) => field.toLowerCase())
                       .includes(key.toLowerCase()),
-                  ),
+                  ).map(([key, value]) => [key, String(value).trim()]),
               );
               return cleanEntry;
             });

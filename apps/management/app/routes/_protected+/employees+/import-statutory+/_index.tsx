@@ -233,7 +233,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportEmployeeStatutoryDataType,
                     ),
-                  ),
+                ).map(([key, value]) => [key, String(value).trim()] as unknown as ImportEmployeeStatutoryDataType[]),
               );
               return cleanEntry;
             });

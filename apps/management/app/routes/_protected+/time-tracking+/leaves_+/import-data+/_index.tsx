@@ -217,7 +217,7 @@ export default function LeavesFieldMapping() {
                   )
                   .filter(([key]) =>
                     allowedFields.includes(key as keyof ImportLeavesDataType),
-                  ),
+                ).map(([key, value]) => [key, String(value).trim()]),
               );
 
               return cleanEntry;

@@ -223,7 +223,8 @@ export default function EmployeeBankDetailsImportFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportEmployeeBankDetailsDataType,
                     ),
-                  ),
+                  )
+                  .map(([key, value]) => [key, String(value).trim()]),
               );
               return cleanEntry;
             });

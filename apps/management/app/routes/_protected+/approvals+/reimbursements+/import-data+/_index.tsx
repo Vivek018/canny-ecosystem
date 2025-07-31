@@ -239,7 +239,7 @@ export default function ReimbursementFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportReimbursementDataType,
                     ),
-                  ),
+                ).map(([key, value]) => [key, String(value).trim()]),
               );
 
               return {

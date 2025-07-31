@@ -229,7 +229,7 @@ export default function EmployeeGuardiansImportFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportEmployeeGuardiansDataType,
                     ),
-                  ),
+                  ).map(([key, value]) => [key, String(value).trim()] as unknown as ImportEmployeeGuardiansDataType[]),
               );
               return cleanEntry;
             });
