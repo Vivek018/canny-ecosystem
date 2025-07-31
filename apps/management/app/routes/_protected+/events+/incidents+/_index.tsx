@@ -157,7 +157,6 @@ export default function IncidentsIndex() {
                   {(siteData) => (
                     <>
                       <IncidentSearchFilter
-                        disabled={!projectData?.data?.length && noFilters}
                         projectArray={
                           projectData?.data?.length
                             ? projectData?.data?.map((project) => project!.name)

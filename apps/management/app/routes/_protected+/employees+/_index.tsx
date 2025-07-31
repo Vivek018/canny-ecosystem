@@ -185,7 +185,6 @@ export default function EmployeesIndex() {
                   {(siteData) => (
                     <>
                       <EmployeesSearchFilter
-                        disabled={!projectData?.data?.length && noFilters}
                         projectArray={
                           projectData?.data?.length
                             ? projectData?.data?.map((project) => project!.name)
@@ -207,7 +206,7 @@ export default function EmployeesIndex() {
         </div>
         <EmployeesActions
           isEmpty={!employeesPromise}
-          // emails={}
+        // emails={}
         />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>

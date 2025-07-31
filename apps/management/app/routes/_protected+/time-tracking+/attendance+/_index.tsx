@@ -182,7 +182,6 @@ export default function Attendance() {
                 <Await resolve={sitePromise}>
                   {(siteData) => (
                     <AttendanceSearchFilter
-                      disabled={!projectData?.data?.length && noFilters}
                       projectArray={
                         projectData?.data?.map((project) => project!.name) || []
                       }
