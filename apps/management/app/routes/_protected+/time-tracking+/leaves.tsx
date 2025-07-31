@@ -319,7 +319,6 @@ export default function LeavesIndex() {
                       <Await resolve={userEmailsPromise}>
                         {(userEmailsData) => (
                           <LeavesSearchFilter
-                            disabled={noFilters}
                             isEmployeeRoute={isEmployeeRoute}
                             projectArray={
                               projectData?.data?.length

@@ -185,7 +185,6 @@ export default function PaymentFieldsReport() {
                 <Await resolve={sitePromise}>
                   {(siteData) => (
                     <PaymentFieldsReportSearchFilter
-                      disabled={noFilters}
                       projectArray={
                         projectData?.data?.map((project) => project!.name) ?? []
                       }
