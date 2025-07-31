@@ -278,7 +278,7 @@ export const accountTypeArray = ["savings", "current", "salary"] as const;
 
 export const EmployeeBankDetailsSchema = z.object({
   employee_id: z.string().optional(),
-  account_number: zNumber.min(9).max(20),
+  account_number: zNumber.min(5).max(20),
   ifsc_code: zNumberString.min(3).max(15),
   account_holder_name: zString.min(3).optional(),
   account_type: z.enum(accountTypeArray).default("savings"),
@@ -1018,7 +1018,7 @@ export const ImportEmployeeBankDetailsHeaderSchema =
 
 export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
   employee_code: zNumberString.min(3),
-  account_number: zNumber.min(9).max(20),
+  account_number: zNumber.min(5).max(20),
   ifsc_code: zNumberString.min(3).max(15),
   account_holder_name: zString.min(3).optional(),
   account_type: z.enum(accountTypeArray).default("savings"),
