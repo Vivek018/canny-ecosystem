@@ -185,7 +185,7 @@ export default function PaymentFieldsReport() {
                 <Await resolve={sitePromise}>
                   {(siteData) => (
                     <PaymentFieldsReportSearchFilter
-                      disabled={!projectData?.data?.length && noFilters}
+                      disabled={noFilters}
                       projectArray={
                         projectData?.data?.map((project) => project!.name) ?? []
                       }
@@ -200,7 +200,7 @@ export default function PaymentFieldsReport() {
           </Suspense>
           <FilterList filterList={filterList} />
         </div>
-        <ColumnVisibility disabled={!projectPromise} />
+        <ColumnVisibility />
       </div>
       <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={Promise.all([reportPromise, paymentFieldPromise])}>

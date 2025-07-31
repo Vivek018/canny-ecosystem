@@ -185,7 +185,7 @@ export default function EmployeesIndex() {
                   {(siteData) => (
                     <>
                       <EmployeesSearchFilter
-                        disabled={!projectData?.data?.length && noFilters}
+                        disabled={ noFilters}
                         projectArray={
                           projectData?.data?.length
                             ? projectData?.data?.map((project) => project!.name)
