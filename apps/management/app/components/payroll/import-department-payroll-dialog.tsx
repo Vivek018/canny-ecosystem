@@ -1,9 +1,11 @@
 import { useUser } from "@/utils/user";
+import type { PayrollFieldsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -14,8 +16,22 @@ import {
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
+import { AddSalaryEntrySheet } from "./add-salary-entry-sheet";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
-export function ImportDepartmentPayrollDialog() {
+export function ImportDepartmentPayrollDialog({
+  payrollFields,
+  salaryEntry,
+  payrollId,
+  allSiteOptions,
+  allEmployeeOptions,
+}: {
+  payrollId: string;
+  salaryEntry: any[];
+  payrollFields: PayrollFieldsDatabaseRow[];
+  allSiteOptions: ComboboxSelectOption[];
+  allEmployeeOptions: ComboboxSelectOption[];
+}) {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
   return (
@@ -23,8 +39,7 @@ export function ImportDepartmentPayrollDialog() {
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
-            "hidden",
+          !hasPermission(role, `${createRole}:${attribute.payroll}`) && "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">
@@ -36,7 +51,7 @@ export function ImportDepartmentPayrollDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_department_salary_payroll,
+              modalSearchParamNames.import_department_salary_payroll
             );
             setSearchParams(searchParams);
           }}
@@ -45,6 +60,22 @@ export function ImportDepartmentPayrollDialog() {
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Department Salary Payroll</span>
         </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <AddSalaryEntrySheet
+          triggerChild={
+            <div className="h-8 space-x-2 flex items-center px-2 hover:bg-muted">
+              <Icon name="import" size="sm" className="mb-0.5" />
+              <span>Add Salary Entry</span>
+            </div>
+          }
+          allEmployeeOptions={allEmployeeOptions}
+          allSiteOptions={allSiteOptions}
+          payrollFields={payrollFields}
+          payrollId={payrollId}
+          salaryEntry={salaryEntry}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

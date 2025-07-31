@@ -9,14 +9,18 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
   getDepartmentsByCompanyId,
+  getEmployeesBySiteId,
   getLocationsByCompanyId,
   getPayrollById,
+  getPayrollFieldByPayrollId,
   getSalaryEntriesByPayrollId,
+  getSalaryEntriesByPayrollIdForAddingSalaryEntry,
   getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
   PayrollDatabaseRow,
+  PayrollFieldsDatabaseRow,
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -46,6 +50,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
+    const url = new URL(request.url);
+    const urlSearchParams = new URLSearchParams(url.searchParams);
+
+    const site = urlSearchParams.get("site");
+
+    let allEmployeeOptions: { label: string; value: string }[] = [];
+
+    if (site?.length) {
+      const { data } = await getEmployeesBySiteId({ siteId: site, supabase });
+
+      allEmployeeOptions =
+        data?.map((employee) => ({
+          label: employee?.employee_code,
+          value: employee?.id ?? "",
+        })) ?? [];
+    }
+
     const { data: allSiteData, error: siteError } =
       await getSiteNamesByCompanyId({
         supabase,
@@ -94,12 +115,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
+    const { data: salaryEntry } =
+      await getSalaryEntriesByPayrollIdForAddingSalaryEntry({
+        payrollId: payrollId ?? "",
+        supabase,
+      });
+
+    const { data: payrollFields } = await getPayrollFieldByPayrollId({
+      payrollId: payrollId ?? "",
+      supabase,
+    });
+
     return defer({
       payrollData,
       salaryEntriesPromise,
       allSiteOptions,
       allDepartmentOptions,
       allLocationOptions,
+      salaryEntry,
+      allEmployeeOptions,
+      payrollFields,
       error: null,
       env,
     });
@@ -111,6 +146,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allSiteOptions: [],
       allDepartmentOptions: [],
       allLocationOptions: [],
+      salaryEntry: [],
+      allEmployeeOptions: [],
+      payrollFields: [],
       error,
       env: null,
     });
@@ -123,7 +161,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.run_payroll_id}${
       args.params.payrollId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -163,7 +201,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     return json(
       { status: "error", message: "Payroll update failed", redirectUrl, error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Payroll Id Action error", error);
@@ -175,7 +213,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -188,6 +226,9 @@ export default function RunPayrollId() {
     allSiteOptions,
     allDepartmentOptions,
     allLocationOptions,
+    allEmployeeOptions,
+    payrollFields,
+    salaryEntry,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -239,7 +280,7 @@ export default function RunPayrollId() {
           {({ data, error }) => {
             if (error || !data) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.run_payroll_id}${payrollId}`,
+                `${cacheKeyPrefix.run_payroll_id}${payrollId}`
               );
               return (
                 <ErrorBoundary
@@ -258,6 +299,9 @@ export default function RunPayrollId() {
                 allDepartmentOptions={allDepartmentOptions ?? []}
                 fromWhere="runpayroll"
                 allLocationOptions={allLocationOptions ?? []}
+                salaryEntry={salaryEntry as any[]}
+                payrollFields={payrollFields as PayrollFieldsDatabaseRow[]}
+                allEmployeeOptions={allEmployeeOptions}
               />
             );
           }}

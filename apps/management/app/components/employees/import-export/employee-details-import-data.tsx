@@ -17,6 +17,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
   ImportEmployeeDetailsDataSchema,
+  isGoodStatus,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
@@ -84,8 +85,8 @@ export function EmployeeDetailsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -107,11 +108,7 @@ export function EmployeeDetailsImportData({
         console.error("Employee Details", error);
       }
 
-      if (
-        status === "No new data to insert after filtering duplicates" ||
-        status === "Successfully inserted new records" ||
-        status === "Successfully processed updates and new insertions"
-      ) {
+      if (isGoodStatus(status)) {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
@@ -142,10 +139,10 @@ export function EmployeeDetailsImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
+                duplicationTypeArray as unknown as string[]
               )}
               value={importType}
               onChange={(value: string) => {

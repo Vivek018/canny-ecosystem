@@ -14,6 +14,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
   ImportEmployeeProjectAssignmentsDataSchema,
+  isGoodStatus,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
@@ -60,7 +61,7 @@ export function EmployeeProjectAssignmentsImportData({
     } catch (error) {
       console.error(
         "Employee Project Assignments Data validation error:",
-        error,
+        error
       );
 
       return false;
@@ -70,7 +71,7 @@ export function EmployeeProjectAssignmentsImportData({
   const fetchConflicts = async () => {
     try {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code,
+        (value: { employee_code: any }) => value.employee_code
       );
       const { data: employees, error: idByCodeError } =
         await getEmployeeIdsByEmployeeCodes({
@@ -82,7 +83,7 @@ export function EmployeeProjectAssignmentsImportData({
         throw idByCodeError;
       }
       const siteNames = importData.data!.map(
-        (value: { site: any }) => value.site,
+        (value: { site: any }) => value.site
       );
       const { data: sites, error: idBySiteName } = await getSiteIdsBySiteNames({
         supabase,
@@ -95,10 +96,10 @@ export function EmployeeProjectAssignmentsImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code,
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
         )?.id;
         const siteId = sites?.find(
-          (e: { name: any }) => e.name === item.site,
+          (e: { name: any }) => e.name === item.site
         )?.id;
 
         const { employee_code, site, ...rest } = item;
@@ -125,7 +126,7 @@ export function EmployeeProjectAssignmentsImportData({
     } catch (err) {
       console.error(
         "Employee Project Assignments Error fetching conflicts:",
-        err,
+        err
       );
     }
   };
@@ -141,8 +142,8 @@ export function EmployeeProjectAssignmentsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -159,11 +160,7 @@ export function EmployeeProjectAssignmentsImportData({
       if (error) {
         console.error("Employee Project Assignments ", error);
       }
-      if (
-        status === "No new data to insert after filtering duplicates" ||
-        status === "Successfully inserted new records" ||
-        status === "Successfully processed updates and new insertions"
-      ) {
+      if (isGoodStatus(status)) {
         clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
@@ -193,10 +190,10 @@ export function EmployeeProjectAssignmentsImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
+                duplicationTypeArray as unknown as string[]
               )}
               value={importType}
               onChange={(value: string) => {
