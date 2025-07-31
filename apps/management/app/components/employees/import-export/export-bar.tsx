@@ -85,7 +85,7 @@ export function ExportBar({
       } else if (key === "esic_number") {
         exportedData[key] =
           element?.employee_statutory_details?.esic_number ?? "";
-      }  else {
+      } else {
         exportedData[key] = element[key as keyof EmployeeDataType] as
           | string
           | boolean

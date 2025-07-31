@@ -1022,8 +1022,8 @@ export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
   ifsc_code: zNumberString.min(3).max(15),
   account_holder_name: zString.min(3).optional(),
   account_type: z.enum(accountTypeArray).default("savings"),
-  bank_name: zString.min(3),
-  branch_name: zNumberString.min(3).optional(),
+  bank_name: z.string().min(3),
+  branch_name: z.string().min(3).optional(),
 });
 
 export const ImportEmployeeBankDetailsDataSchema = z.object({

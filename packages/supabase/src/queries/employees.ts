@@ -144,7 +144,7 @@ export async function getEmployeesByCompanyId({
       `${columns.join(",")},
         employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
       }(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))
       ),
       employee_statutory_details!left(aadhaar_number, pan_number, uan_number, pf_number, esic_number),
@@ -1021,7 +1021,7 @@ export async function getEmployeesReportByCompanyId({
       `${columns.join(",")},
         employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
       }(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" },
