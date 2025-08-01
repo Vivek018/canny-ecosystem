@@ -33,7 +33,7 @@ export function ExportBar({
       }
       if (key === "employee_code") {
         exportedData[key] = element?.employee_code;
-      } else if (key === "full_name") {
+      } else if (key === "first_name") {
         exportedData[key] =
           `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "mobile_number") {

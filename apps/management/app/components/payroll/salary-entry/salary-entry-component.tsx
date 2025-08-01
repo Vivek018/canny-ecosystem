@@ -58,18 +58,23 @@ export function SalaryEntryComponent({
   payrollFields,
   salaryEntry,
   allEmployeeOptions,
+  allProjectOptions,
 }: {
   data: any[];
-  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
+  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at"> & {
+    site?: { name: string } | null;
+    project?: { name: string } | null;
+  };
   noButtons?: boolean;
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
   allSiteOptions: ComboboxSelectOption[];
+  allProjectOptions: ComboboxSelectOption[];
   allDepartmentOptions: ComboboxSelectOption[];
   allLocationOptions: ComboboxSelectOption[];
-  salaryEntry: any[];
-  payrollFields: PayrollFieldsDatabaseRow[];
-  allEmployeeOptions: ComboboxSelectOption[];
+  salaryEntry?: any[];
+  payrollFields?: PayrollFieldsDatabaseRow[];
+  allEmployeeOptions?: ComboboxSelectOption[];
 }) {
   const { selectedRows } = useSalaryEntriesStore();
   const { role } = useUser();
@@ -157,12 +162,29 @@ export function SalaryEntryComponent({
   };
 
   const handleUpdatePayroll = useCallback(
-    (title: string, rundate: string) => {
+    (title: string, rundate: string, link: string, linked: string) => {
       clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+
+      const payload: Record<string, any> = {
+        title,
+        run_date: rundate,
+      };
+
+      if (link === "site") {
+        payload.site_id = linked;
+        payload.project_id = null;
+      } else if (link === "project") {
+        payload.project_id = linked;
+        payload.site_id = null;
+      } else if (link === "unlink") {
+        payload.project_id = null;
+        payload.site_id = null;
+      }
+
       submit(
         {
           payrollId: payrollId ?? payrollData?.id,
-          payrollData: JSON.stringify({ title, run_date: rundate }),
+          payrollData: JSON.stringify(payload),
           failedRedirect: `/payroll/run-payroll/${payrollId}`,
         },
         {
@@ -205,6 +227,8 @@ export function SalaryEntryComponent({
         <PayrollDetailsCard
           payrollData={payrollData}
           onUpdatePayroll={handleUpdatePayroll}
+          allProjectOptions={allProjectOptions}
+          allSiteOptions={allSiteOptions}
         />
       </div>
 
@@ -251,11 +275,11 @@ export function SalaryEntryComponent({
 
         <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
           <ImportDepartmentPayrollDialog
-            payrollFields={payrollFields}
-            salaryEntry={salaryEntry}
+            payrollFields={payrollFields!}
+            salaryEntry={salaryEntry!}
             payrollId={payrollId!}
             allSiteOptions={allSiteOptions}
-            allEmployeeOptions={allEmployeeOptions}
+            allEmployeeOptions={allEmployeeOptions!}
           />
         </div>
 

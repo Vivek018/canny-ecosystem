@@ -13,6 +13,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
@@ -34,6 +35,7 @@ export function EmployeeDetailsImportData({
   companyId: string;
 }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeDetails();
   const [conflictingIndex, setConflictingIndex] =
@@ -105,12 +107,21 @@ export function EmployeeDetailsImportData({
       });
 
       if (error) {
-        console.error("Employee Details", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
 
       if (isGoodStatus(status)) {
-        clearCacheEntry(cacheKeyPrefix.employees);
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
         clearCacheEntry(cacheKeyPrefix.employee_overview);
+        clearCacheEntry(cacheKeyPrefix.employees);
         navigate("/employees");
       }
     }

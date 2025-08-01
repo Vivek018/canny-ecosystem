@@ -13,6 +13,7 @@ import {
   getLocationsByCompanyId,
   getPayrollById,
   getPayrollFieldByPayrollId,
+  getProjectNamesByCompanyId,
   getSalaryEntriesByPayrollId,
   getSalaryEntriesByPayrollIdForAddingSalaryEntry,
   getSiteNamesByCompanyId,
@@ -66,6 +67,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           value: employee?.id ?? "",
         })) ?? [];
     }
+
+    const { data: allProjectData, error: projectError } =
+      await getProjectNamesByCompanyId({
+        supabase,
+        companyId,
+      });
+    if (projectError) throw projectError;
+
+    const allProjectOptions = allProjectData?.map((siteData) => ({
+      label: siteData.name?.toLowerCase(),
+      value: siteData.id,
+    }));
 
     const { data: allSiteData, error: siteError } =
       await getSiteNamesByCompanyId({
@@ -134,6 +147,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allLocationOptions,
       salaryEntry,
       allEmployeeOptions,
+      allProjectOptions,
       payrollFields,
       error: null,
       env,
@@ -148,6 +162,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allLocationOptions: [],
       salaryEntry: [],
       allEmployeeOptions: [],
+      allProjectOptions: [],
       payrollFields: [],
       error,
       env: null,
@@ -227,6 +242,7 @@ export default function RunPayrollId() {
     allDepartmentOptions,
     allLocationOptions,
     allEmployeeOptions,
+    allProjectOptions,
     payrollFields,
     salaryEntry,
   } = useLoaderData<typeof loader>();
@@ -297,6 +313,7 @@ export default function RunPayrollId() {
                 env={env as SupabaseEnv}
                 allSiteOptions={allSiteOptions ?? []}
                 allDepartmentOptions={allDepartmentOptions ?? []}
+                allProjectOptions={allProjectOptions ?? []}
                 fromWhere="runpayroll"
                 allLocationOptions={allLocationOptions ?? []}
                 salaryEntry={salaryEntry as any[]}

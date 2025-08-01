@@ -18,6 +18,7 @@ import {
 import { useSearchParams } from "@remix-run/react";
 import { AddSalaryEntrySheet } from "./add-salary-entry-sheet";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { AddPayrollFieldSheet } from "./add-payroll-field-sheet";
 
 export function ImportDepartmentPayrollDialog({
   payrollFields,
@@ -47,22 +48,6 @@ export function ImportDepartmentPayrollDialog({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
-        <DropdownMenuItem
-          onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_department_salary_payroll
-            );
-            setSearchParams(searchParams);
-          }}
-          className="space-x-2 flex items-center"
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Department Salary Payroll</span>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
         <AddSalaryEntrySheet
           triggerChild={
             <div className="h-8 space-x-2 flex items-center px-2 hover:bg-muted">
@@ -76,6 +61,31 @@ export function ImportDepartmentPayrollDialog({
           payrollId={payrollId}
           salaryEntry={salaryEntry}
         />
+        <DropdownMenuSeparator />
+
+        <AddPayrollFieldSheet
+          triggerChild={
+            <div className="h-8 space-x-2 flex items-center px-2 hover:bg-muted">
+              <Icon name="import" size="sm" className="mb-0.5" />
+              <span>Add Payroll Field</span>
+            </div>
+          }
+          payrollId={payrollId}
+        />
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_department_salary_payroll
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Department Salary Payroll</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

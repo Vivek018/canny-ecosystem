@@ -201,7 +201,7 @@ export async function getPayrollById({
 
   const { data, error } = await supabase
     .from("payroll")
-    .select(columns.join(","))
+    .select(`${columns.join(",")},sites(name),projects(name)`)
     .eq("id", payrollId)
     .maybeSingle<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
 
@@ -762,8 +762,6 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
 
   return { data, error: null };
 }
-
-
 
 export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
   supabase,

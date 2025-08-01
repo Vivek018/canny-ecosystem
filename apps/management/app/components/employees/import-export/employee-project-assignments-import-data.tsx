@@ -28,6 +28,7 @@ import {
   getSiteIdsBySiteNames,
 } from "@canny_ecosystem/supabase/queries";
 import { createEmployeeProjectAssignmentsFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function EmployeeProjectAssignmentsImportData({
   env,
@@ -38,6 +39,7 @@ export function EmployeeProjectAssignmentsImportData({
   companyId: string;
 }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeProjectAssignments();
   const [conflictingIndex, setConflictingIndex] =
@@ -158,9 +160,20 @@ export function EmployeeProjectAssignmentsImportData({
         });
 
       if (error) {
-        console.error("Employee Project Assignments ", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
+
       if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
+        clearCacheEntry(cacheKeyPrefix.employees);
         clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }

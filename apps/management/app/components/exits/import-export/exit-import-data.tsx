@@ -12,6 +12,7 @@ import { Input } from "@canny_ecosystem/ui/input";
 import {
   duplicationTypeArray,
   ImportExitDataSchema,
+  isGoodStatus,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
@@ -22,6 +23,7 @@ import { clearCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function ExitImportData({
   env,
@@ -30,6 +32,7 @@ export function ExitImportData({
   env: SupabaseEnv;
   conflictingIndices: number[];
 }) {
+  const { toast } = useToast();
   const [importType, setImportType] = useState<string>("skip");
   const [conflictingIndex, setConflictingIndex] =
     useState<number[]>(conflictingIndices);
@@ -123,11 +126,21 @@ export function ExitImportData({
       });
 
       if (error) {
-        console.error("Employee Bank ", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
+
       if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
         clearCacheEntry(cacheKeyPrefix.exits);
-        navigate("/approvals/exits");
+        navigate("/employees");
       }
     }
   };

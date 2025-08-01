@@ -17,6 +17,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
@@ -36,6 +37,7 @@ export function EmployeeStatutoryImportData({
   conflictingIndices: number[];
 }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeStatutory();
   const [conflictingIndex, setConflictingIndex] =
@@ -131,9 +133,20 @@ export function EmployeeStatutoryImportData({
       });
 
       if (error) {
-        console.error("Employee Statutory", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
+
       if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
+        clearCacheEntry(cacheKeyPrefix.employees);
         clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }

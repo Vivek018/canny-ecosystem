@@ -23,7 +23,9 @@ export const DeleteReimbursement = ({
   id,
   employeeId,
   isEmployeeRoute,
+  hideOptions,
 }: {
+  hideOptions: boolean;
   id: string;
   employeeId: string;
   isEmployeeRoute: boolean;
@@ -41,7 +43,7 @@ export const DeleteReimbursement = ({
   };
 
   const handleDeleteReimbursement = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -56,7 +58,7 @@ export const DeleteReimbursement = ({
           method: "post",
           action: `/approvals/reimbursements/${id}/delete-reimbursement`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -72,6 +74,7 @@ export const DeleteReimbursement = ({
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.reimbursements}`) &&
             "flex",
+          hideOptions && "hidden"
         )}
       >
         Delete Reimbursement

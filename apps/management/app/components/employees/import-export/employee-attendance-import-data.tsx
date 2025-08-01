@@ -17,9 +17,11 @@ import { ImportedDataTable } from "../imported-attendance-table/imported-data-ta
 import { ImportedDataColumns } from "../imported-attendance-table/columns";
 import { createEmployeeAttendanceImportedData } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus } from "@canny_ecosystem/utils";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeAttendance();
 
@@ -31,8 +33,8 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -48,7 +50,7 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
 
     const updatedData = importData.data!.map((item: any) => {
       const employeeId = employees?.find(
-        (e) => e.employee_code === item.employee_code,
+        (e) => e.employee_code === item.employee_code
       )?.id;
       const { employee_code, ...rest } = item;
       return {
@@ -63,11 +65,22 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
     });
 
     if (error) {
-      console.error("Employee Attendance", error);
+      toast({
+        title: "Error",
+        description: JSON.stringify(error) ?? "Failed to import details",
+        variant: "destructive",
+      });
     }
+
     if (isGoodStatus(status)) {
-      clearCacheEntry(cacheKeyPrefix.attendance);
-      navigate("/time-tracking/attendance");
+      toast({
+        title: "Success",
+        description: "Details imported succesfully",
+        variant: "success",
+      });
+        clearCacheEntry(cacheKeyPrefix.employees);
+      clearCacheEntry(cacheKeyPrefix.employee_overview);
+      navigate("/employees");
     }
   };
 

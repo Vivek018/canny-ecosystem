@@ -19,12 +19,12 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteExit = ({
-  exitId,
-  hideOptions,
+export const DeletePayrollField = ({
+  id,
+  payrollId,
 }: {
-  exitId: string;
-  hideOptions: boolean;
+  id: string;
+  payrollId: string;
 }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
@@ -32,23 +32,24 @@ export const DeleteExit = ({
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelExit = () => {
+  const handleCanclePayrollField = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteExit = (
+  const handleDeletePayrollField = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
       submit(
-        {},
         {
-          method: "post",
-          action: `/approvals/exits/${exitId}/delete-exit`,
-          replace: true,
+          fieldId: id!,
+        },
+        {
+          method: "POST",
+          action: `/payroll/run-payroll/${payrollId}/delete-payroll-fields`,
         }
       );
     } else {
@@ -61,19 +62,21 @@ export const DeleteExit = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-ghost", size: "full" }),
+          buttonVariants({
+            variant: "destructive-outline",
+            className: "mr-auto",
+          }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex",
-          hideOptions && "hidden"
+          hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "flex"
         )}
       >
-        Delete Exit
+        Delete Payroll Field
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your exit
+            This action cannot be undone. This will permanently delete your User
             and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -85,6 +88,7 @@ export const DeleteExit = ({
           </p>
           <Input
             type="text"
+            autoFocus
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
@@ -100,13 +104,13 @@ export const DeleteExit = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelExit}>
+          <AlertDialogCancel onClick={handleCanclePayrollField}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteExit}
-            onSelect={handleDeleteExit}
+            onClick={handleDeletePayrollField}
+            onSelect={handleDeletePayrollField}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

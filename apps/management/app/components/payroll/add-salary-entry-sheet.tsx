@@ -16,23 +16,8 @@ import {
 } from "@canny_ecosystem/ui/combobox";
 import { Label } from "@canny_ecosystem/ui/label";
 import { Input } from "@canny_ecosystem/ui/input";
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@canny_ecosystem/ui/dialog";
-import { Icon } from "@canny_ecosystem/ui/icon";
-import {
-  componentTypeArray,
-  transformStringArrayIntoOptions,
-} from "@canny_ecosystem/utils";
-import { useSearchParams } from "@remix-run/react";
+import { Button } from "@canny_ecosystem/ui/button";
+import { useSearchParams, useSubmit } from "@remix-run/react";
 
 export function AddSalaryEntrySheet({
   triggerChild,
@@ -50,19 +35,15 @@ export function AddSalaryEntrySheet({
   allEmployeeOptions: ComboboxSelectOption[];
 }) {
   const [open, setOpen] = useState<boolean>(false);
-  const [innerOpen, setInnerOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const submit = useSubmit();
   const [site, setSite] = useState("");
   const [employee, setEmployee] = useState("");
   const [presents, setPresents] = useState("");
 
-  const [addFieldName, setAddFieldName] = useState("");
-  const [addFieldType, setAddFieldType] = useState("");
-  const [addFieldAmount, setAddFieldAmount] = useState(0);
-
   const [fieldConfigs, setFieldConfigs] = useState(() =>
     payrollFields.map((field) => ({
+      id: field.id,
       key: field.name,
       type: field.type,
       amount: 0,
@@ -71,12 +52,21 @@ export function AddSalaryEntrySheet({
 
   const handleFinalSubmit = () => {
     const finalData = {
-      payroll_id: payrollId,
       employee_id: employee,
       present_days: presents,
       salary_data: fieldConfigs,
     };
-    console.log(finalData);
+    submit(
+      {
+        payrollId: payrollId,
+        salaryEntryData: JSON.stringify(finalData),
+        failedRedirect: `/payroll/run-payroll/${payrollId}`,
+      },
+      {
+        method: "POST",
+        action: `/payroll/run-payroll/${payrollId}/add-salary-entry`,
+      }
+    );
   };
 
   return (
@@ -100,7 +90,7 @@ export function AddSalaryEntrySheet({
             <Label className="text-sm font-medium">Site</Label>
             <Combobox
               options={allSiteOptions}
-              placeholder="Select Site"
+              placeholder="Select Site first for employees"
               value={site}
               onChange={(value: string) => {
                 if (value?.length) {
@@ -139,18 +129,6 @@ export function AddSalaryEntrySheet({
                     {field.key}
                   </label>
                 </div>
-                {/* <Button
-                  variant={"ghost"}
-                  onClick={() =>
-                    setFieldConfigs((prev) =>
-                      prev.filter((f) => f.key !== field.key)
-                    )
-                  }
-                  className="p-0 h-0 text-destructive text-xs font-extrabold"
-                  title="Remove field"
-                >
-                  ✕
-                </Button> */}
               </div>
 
               <Input
@@ -167,79 +145,6 @@ export function AddSalaryEntrySheet({
               />
             </div>
           ))}
-          <Dialog open={innerOpen} onOpenChange={setInnerOpen}>
-            <DialogTrigger asChild className="mt-3">
-              <Button
-                variant={"primary-outline"}
-                className="w-full gap-2"
-                onClick={() => {
-                  setOpen(true);
-                }}
-              >
-                <Icon
-                  name="plus"
-                  size="lg"
-                  className="shrink-0 flex justify-center items-center"
-                />
-                Add Payroll Field
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader className="mb-2">
-                <DialogTitle>Add a field</DialogTitle>
-                <DialogDescription>You can add payroll field</DialogDescription>
-              </DialogHeader>
-              <Input
-                type="text"
-                placeholder="Field Name"
-                value={addFieldName}
-                onChange={(e) => {
-                  setAddFieldName(e.target.value);
-                }}
-              />
-              <Combobox
-                options={transformStringArrayIntoOptions(
-                  componentTypeArray as unknown as string[]
-                )}
-                placeholder="Select Field Type"
-                value={addFieldType}
-                onChange={(value: string) => {
-                  setAddFieldType(value);
-                }}
-              />
-              <Input
-                type="number"
-                placeholder="Field Amount"
-                value={addFieldAmount}
-                onChange={(e) => {
-                  setAddFieldAmount(Number(e.target.value));
-                }}
-              />
-              <DialogFooter className="mt-2">
-                <DialogClose
-                  className={buttonVariants({ variant: "secondary" })}
-                  onClick={() => setOpen(false)}
-                >
-                  Cancel
-                </DialogClose>
-                <Button
-                  onClick={() => {
-                    setFieldConfigs((prev) => [
-                      ...prev,
-                      {
-                        key: addFieldName as string,
-                        type: addFieldType as "earning" | "deduction",
-                        amount: addFieldAmount as number,
-                      },
-                    ]);
-                    setInnerOpen(false);
-                  }}
-                >
-                  Set
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
         <SheetFooter className="mt-auto flex-shrink-0">
           <SheetClose asChild>

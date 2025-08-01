@@ -98,7 +98,7 @@ export async function createAttendanceByPayrollImportAndGiveID({
   year: number;
   month: number;
   employee_id: string;
-  insertData: EmployeeMonthlyAttendanceDatabaseInsert;
+  insertData: Partial<EmployeeMonthlyAttendanceDatabaseInsert>;
 }) {
   const { data, error, status } = await supabase
     .from("monthly_attendance")

@@ -23,6 +23,7 @@ import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
 import { clearCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function ReimbursementImportData({
   env,
@@ -32,6 +33,7 @@ export function ReimbursementImportData({
   companyId: string;
 }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForReimbursement();
 
@@ -58,8 +60,8 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -68,7 +70,7 @@ export function ReimbursementImportData({
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
       const employeeCodes = importData.data!.map(
-        (value) => value.employee_code,
+        (value) => value.employee_code
       );
 
       const { data: employees, error: codeError } =
@@ -87,7 +89,7 @@ export function ReimbursementImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code,
+          (e) => e.employee_code === item.employee_code
         )?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
@@ -105,10 +107,22 @@ export function ReimbursementImportData({
         data: updatedData as ReimbursementInsert[],
         supabase,
       });
-      if (error) console.error("Reimbursement", error);
+      if (error) {
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
+      }
+
       if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
-        navigate("/approvals/reimbursements");
+        navigate("/employees");
       }
     }
   };

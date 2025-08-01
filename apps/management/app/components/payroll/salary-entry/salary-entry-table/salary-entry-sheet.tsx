@@ -5,7 +5,7 @@ import {
   useForm,
 } from "@conform-to/react";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { Form, useSubmit } from "@remix-run/react";
+import { Form} from "@remix-run/react";
 import {
   Sheet,
   SheetClose,
@@ -26,7 +26,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { useState } from "react";
 import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
+import { DeletePayrollField } from "../delete-payroll-field";
 
 export function SalaryEntrySheet({
   triggerChild,
@@ -41,7 +41,6 @@ export function SalaryEntrySheet({
   editable: boolean;
   payrollId: string;
 }) {
-  const submit = useSubmit();
   const name = `${employee?.first_name} ${employee?.middle_name ?? ""} ${
     employee?.last_name ?? ""
   }`;
@@ -82,18 +81,7 @@ export function SalaryEntrySheet({
     setOpen(true);
   };
 
-  const handleDeleteField = () => {
-    submit(
-      {
-        fieldId: salaryEntry?.payroll_fields.id,
-      },
-      {
-        method: "POST",
-        action: `/payroll/run-payroll/${payrollId}/delete-payroll-fields`,
-      }
-    );
-  };
-
+  
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
@@ -184,13 +172,11 @@ export function SalaryEntrySheet({
           </FormProvider>
         </div>
         <SheetFooter className="mt-auto flex-shrink-0 pl-6">
-          <Button
-            variant="destructive-outline"
-            className="mr-auto"
-            onClick={handleDeleteField}
-          >
-            Delete {salaryEntry?.payroll_fields?.name}
-          </Button>
+          <DeletePayrollField
+            id={salaryEntry?.payroll_fields.id}
+            payrollId={payrollId}
+          />
+
           <SheetClose asChild>
             <FormButtons
               form={form}
