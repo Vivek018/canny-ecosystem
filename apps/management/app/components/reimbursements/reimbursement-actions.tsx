@@ -120,6 +120,7 @@ export function ReimbursementActions({
               <AlertDialogFooter className="pt-2">
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
+                  disabled={!status?.length && !type?.length}
                   className={cn(buttonVariants({ variant: "default" }))}
                   onClick={handleUpdateBulkReimbursements}
                 >
