@@ -122,7 +122,7 @@ export function AddSalaryEntrySheet({
             </div>
           </div>
           {fieldConfigs.map((field) => (
-            <div key={field.key} className="flex flex-col relative">
+            <div key={field.key} className="flex flex-col relative gap-1">
               <div className="flex flex-row justify-between items-center">
                 <div className="flex gap-1">
                   <label className="text-sm text-muted-foreground capitalize">

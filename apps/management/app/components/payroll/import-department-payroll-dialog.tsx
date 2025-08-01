@@ -51,7 +51,7 @@ export function ImportDepartmentPayrollDialog({
         <AddSalaryEntrySheet
           triggerChild={
             <div className="h-8 space-x-2 flex items-center px-2 hover:bg-muted">
-              <Icon name="import" size="sm" className="mb-0.5" />
+              <Icon name="plus-circled" size="sm" className="mb-0.5" />
               <span>Add Salary Entry</span>
             </div>
           }
@@ -61,12 +61,10 @@ export function ImportDepartmentPayrollDialog({
           payrollId={payrollId}
           salaryEntry={salaryEntry}
         />
-        <DropdownMenuSeparator />
-
         <AddPayrollFieldSheet
           triggerChild={
             <div className="h-8 space-x-2 flex items-center px-2 hover:bg-muted">
-              <Icon name="import" size="sm" className="mb-0.5" />
+              <Icon name="plus-circled" size="sm" className="mb-0.5" />
               <span>Add Payroll Field</span>
             </div>
           }
