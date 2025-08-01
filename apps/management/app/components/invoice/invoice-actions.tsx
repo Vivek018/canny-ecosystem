@@ -106,6 +106,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
               <AlertDialogFooter className="pt-2">
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
+                  disabled={!isPaid?.length && !paidDate?.length}
                   className={cn(buttonVariants({ variant: "default" }))}
                   onClick={handleUpdateBulkInvoices}
                 >

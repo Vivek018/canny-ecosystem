@@ -295,6 +295,7 @@ export function SalaryEntryComponent({
               <AlertDialogFooter className="pt-2">
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
+                  disabled={!sites?.length && !departments?.length}
                   className={cn(buttonVariants({ variant: "default" }))}
                   onClick={handleUpdateBulkSalaryEntry}
                 >
