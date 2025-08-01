@@ -20,6 +20,7 @@ import { cacheKeyPrefix } from "@/constant";
 import { ImportedDataColumns } from "../imported-table/columns";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { createLeavesFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function LeavesImportData({
   env,
@@ -27,6 +28,7 @@ export function LeavesImportData({
   env: SupabaseEnv;
   companyId: string;
 }) {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForLeaves();
@@ -54,8 +56,8 @@ export function LeavesImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -64,7 +66,7 @@ export function LeavesImportData({
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
       const employeeCodes = importData.data!.map(
-        (value) => value.employee_code,
+        (value) => value.employee_code
       );
 
       const { data: employees, error: codeError } =
@@ -83,7 +85,7 @@ export function LeavesImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code,
+          (e) => e.employee_code === item.employee_code
         )?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
@@ -100,8 +102,20 @@ export function LeavesImportData({
         data: updatedData as LeavesDatabaseInsert[],
         supabase,
       });
-      if (error) console.error("Leaves", error);
+      if (error) {
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
+      }
+
       if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
         clearCacheEntry(cacheKeyPrefix.leaves);
         navigate("/time-tracking/leaves");
       }

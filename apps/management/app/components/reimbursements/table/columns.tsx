@@ -160,19 +160,21 @@ export const columns = ({
           key={row?.original?.id}
           reimbursementId={row?.original?.id}
           employeeId={row.original?.employee_id!}
+          hideOptions={!!row.original.invoice_id?.length}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.reimbursements}`,
+                  `${updateRole}:${attribute.reimbursements}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.reimbursements}`,
+                    `${deleteRole}:${attribute.reimbursements}`
                   ) &&
                   "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
               asChild
             >

@@ -12,6 +12,7 @@ import { Input } from "@canny_ecosystem/ui/input";
 import {
   duplicationTypeArray,
   ImportExitDataSchema,
+  isGoodStatus,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
@@ -22,6 +23,7 @@ import { clearCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function ExitImportData({
   env,
@@ -30,6 +32,7 @@ export function ExitImportData({
   env: SupabaseEnv;
   conflictingIndices: number[];
 }) {
+  const { toast } = useToast();
   const [importType, setImportType] = useState<string>("skip");
   const [conflictingIndex, setConflictingIndex] =
     useState<number[]>(conflictingIndices);
@@ -57,7 +60,7 @@ export function ExitImportData({
   const fetchConflicts = async () => {
     try {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code,
+        (value: { employee_code: any }) => value.employee_code
       );
       const { data: employees, error: idByCodeError } =
         await getEmployeeIdsByEmployeeCodes({
@@ -71,7 +74,7 @@ export function ExitImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code,
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -108,8 +111,8 @@ export function ExitImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -123,13 +126,19 @@ export function ExitImportData({
       });
 
       if (error) {
-        console.error("Employee Bank ", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
-      if (
-        status === "No new data to insert after filtering duplicates" ||
-        status === "Successfully inserted new records" ||
-        status === "Successfully processed updates and new insertions"
-      ) {
+
+      if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
         clearCacheEntry(cacheKeyPrefix.exits);
         navigate("/approvals/exits");
       }
@@ -159,10 +168,10 @@ export function ExitImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
+                duplicationTypeArray as unknown as string[]
               )}
               value={importType}
               onChange={(value: string) => {

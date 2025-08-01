@@ -13,6 +13,7 @@ import {
 import {
   ImportReimbursementDataSchema,
   ImportReimbursementHeaderSchema,
+  reimbursementStatusArray,
   reimbursementTypeArray,
 } from "@canny_ecosystem/utils";
 import {
@@ -44,14 +45,6 @@ type FieldConfig = {
 const FIELD_CONFIGS: FieldConfig[] = [
   {
     key: "employee_code",
-    required: true,
-  },
-  {
-    key: "submitted_date",
-    required: true,
-  },
-  {
-    key: "status",
     required: true,
   },
   {
@@ -93,6 +86,8 @@ export default function ReimbursementFieldMapping() {
   const [type, setType] = useState("");
   const [note, setNote] = useState("");
   const [approver, setApprover] = useState("");
+  const [status, setStatus] = useState("");
+  const [date, setDate] = useState("");
 
   const location = useLocation();
   const [file] = useState(location.state?.file);
@@ -108,7 +103,7 @@ export default function ReimbursementFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== "",
+            (header) => header !== null && header.trim() !== ""
           );
           setHeaderArray(headers);
         },
@@ -127,7 +122,7 @@ export default function ReimbursementFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
           );
 
           if (matchedHeader) {
@@ -136,7 +131,7 @@ export default function ReimbursementFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
       );
 
       setFieldMapping(initialMapping);
@@ -150,13 +145,13 @@ export default function ReimbursementFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ]),
-        ),
+          ])
+        )
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message,
+          (err) => err.message
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -176,7 +171,7 @@ export default function ReimbursementFieldMapping() {
       const result = ImportReimbursementDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`,
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -209,7 +204,7 @@ export default function ReimbursementFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
+      Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
     if (file) {
@@ -222,9 +217,7 @@ export default function ReimbursementFieldMapping() {
 
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some(
-                (value) => String(value).trim() !== "",
-              ),
+              Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -233,19 +226,22 @@ export default function ReimbursementFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== "",
+                      String(value).trim() !== ""
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportReimbursementDataType,
-                    ),
-                ).map(([key, value]) => [key, String(value).trim()]),
+                      key as keyof ImportReimbursementDataType
+                    )
+                  )
+                  .map(([key, value]) => [key, String(value).trim()])
               );
 
               return {
                 ...cleanEntry,
                 note: note,
                 type: type,
+                status: status,
+                submitted_date: date,
                 user_id: approver,
               };
             });
@@ -306,7 +302,7 @@ export default function ReimbursementFieldMapping() {
 
                 <Combobox
                   options={transformStringArrayIntoOptions(
-                    Array.from(reimbursementTypeArray),
+                    Array.from(reimbursementTypeArray)
                   )}
                   placeholder="Select Type"
                   value={type}
@@ -319,9 +315,28 @@ export default function ReimbursementFieldMapping() {
               <div className=" flex flex-col gap-1">
                 <Label className="text-sm font-medium">Note</Label>
                 <Input
-                  className=""
+                  type="text"
                   placeholder="Enter the title here"
                   onChange={(e) => setNote(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-8 mb-4">
+              <div className=" flex flex-col gap-1">
+                <Label className="text-sm font-medium">Submitted Date</Label>
+                <Input type="date" onChange={(e) => setDate(e.target.value)} />
+              </div>
+              <div className="flex  flex-col gap-1">
+                <Label className="text-sm font-medium">Status</Label>
+                <Combobox
+                  options={transformStringArrayIntoOptions(
+                    Array.from(reimbursementStatusArray)
+                  )}
+                  placeholder="Select Status"
+                  value={status}
+                  onChange={(value: string) => {
+                    setStatus(value);
+                  }}
                 />
               </div>
             </div>
@@ -346,7 +361,7 @@ export default function ReimbursementFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline",
+                        field.required && "inline"
                       )}
                     >
                       *
@@ -360,11 +375,11 @@ export default function ReimbursementFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(field.key?.toLowerCase())
                         );
                       }) ||

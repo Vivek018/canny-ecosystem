@@ -14,8 +14,8 @@ import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({ request }: ActionFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {

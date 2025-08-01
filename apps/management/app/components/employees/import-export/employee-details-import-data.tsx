@@ -13,10 +13,12 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
   ImportEmployeeDetailsDataSchema,
+  isGoodStatus,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
@@ -33,6 +35,7 @@ export function EmployeeDetailsImportData({
   companyId: string;
 }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeDetails();
   const [conflictingIndex, setConflictingIndex] =
@@ -84,8 +87,8 @@ export function EmployeeDetailsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -104,16 +107,21 @@ export function EmployeeDetailsImportData({
       });
 
       if (error) {
-        console.error("Employee Details", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
 
-      if (
-        status === "No new data to insert after filtering duplicates" ||
-        status === "Successfully inserted new records" ||
-        status === "Successfully processed updates and new insertions"
-      ) {
-        clearCacheEntry(cacheKeyPrefix.employees);
+      if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
         clearCacheEntry(cacheKeyPrefix.employee_overview);
+        clearCacheEntry(cacheKeyPrefix.employees);
         navigate("/employees");
       }
     }
@@ -142,10 +150,10 @@ export function EmployeeDetailsImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
+                duplicationTypeArray as unknown as string[]
               )}
               value={importType}
               onChange={(value: string) => {

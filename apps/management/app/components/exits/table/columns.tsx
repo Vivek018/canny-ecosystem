@@ -200,6 +200,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
         <ExitOptionsDropdown
           key={row.original.id}
           exitId={row.original.id}
+          hideOptions={!!row.original.invoice_id?.length}
           triggerChild={
             <DropdownMenuTrigger
               asChild
@@ -207,6 +208,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
                   "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

@@ -13,6 +13,7 @@ import type {
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
   ImportEmployeeAddressDataSchema,
   isGoodStatus,
@@ -23,6 +24,7 @@ import { useState, useEffect } from "react";
 
 export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeAddress();
 
@@ -49,8 +51,8 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -58,7 +60,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code,
+        (value: { employee_code: any }) => value.employee_code
       );
 
       const { data: employees, error: idByCodeError } =
@@ -73,7 +75,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code,
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -90,10 +92,22 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       });
 
       if (error) {
-        console.error("Employee Address", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
+
       if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
+        clearCacheEntry(cacheKeyPrefix.employees);
         clearCacheEntry(cacheKeyPrefix.employee_overview);
+
         navigate("/employees");
       }
     }

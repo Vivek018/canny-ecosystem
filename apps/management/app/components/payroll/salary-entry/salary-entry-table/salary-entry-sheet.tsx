@@ -5,7 +5,7 @@ import {
   useForm,
 } from "@conform-to/react";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { Form } from "@remix-run/react";
+import { Form} from "@remix-run/react";
 import {
   Sheet,
   SheetClose,
@@ -26,6 +26,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { useState } from "react";
 import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { DeletePayrollField } from "../delete-payroll-field";
 
 export function SalaryEntrySheet({
   triggerChild,
@@ -45,8 +46,9 @@ export function SalaryEntrySheet({
   }`;
 
   const [resetKey, setResetKey] = useState(Date.now());
+
   const typeOptions = transformStringArrayIntoOptions(
-    componentTypeArray as unknown as string[],
+    componentTypeArray as unknown as string[]
   );
 
   const formattedDefaultValue = {
@@ -79,6 +81,7 @@ export function SalaryEntrySheet({
     setOpen(true);
   };
 
+  
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
@@ -136,6 +139,22 @@ export function SalaryEntrySheet({
                 }}
                 errors={fields.name.errors}
               />
+              <SearchableSelectField
+                key={resetKey + 1}
+                className="capitalize"
+                options={transformStringArrayIntoOptions(
+                  componentTypeArray as unknown as string[]
+                )}
+                inputProps={{
+                  ...getInputProps(fields.type, { type: "text" }),
+                  readOnly: !editable,
+                }}
+                placeholder={`Select ${replaceUnderscore(fields.type.name)}`}
+                labelProps={{
+                  children: replaceUnderscore(fields.type.name),
+                }}
+                errors={fields.type.errors}
+              />
               <Field
                 inputProps={{
                   ...getInputProps(fields.amount, { type: "number" }),
@@ -149,26 +168,15 @@ export function SalaryEntrySheet({
                 }}
                 errors={fields.amount.errors}
               />
-              <SearchableSelectField
-                key={resetKey + 1}
-                className="capitalize"
-                options={transformStringArrayIntoOptions(
-                  componentTypeArray as unknown as string[],
-                )}
-                inputProps={{
-                  ...getInputProps(fields.type, { type: "text" }),
-                  readOnly: !editable,
-                }}
-                placeholder={`Select ${replaceUnderscore(fields.type.name)}`}
-                labelProps={{
-                  children: replaceUnderscore(fields.type.name),
-                }}
-                errors={fields.type.errors}
-              />
             </Form>
           </FormProvider>
         </div>
-        <SheetFooter className="mt-auto flex-shrink-0">
+        <SheetFooter className="mt-auto flex-shrink-0 pl-6">
+          <DeletePayrollField
+            id={salaryEntry?.payroll_fields.id}
+            payrollId={payrollId}
+          />
+
           <SheetClose asChild>
             <FormButtons
               form={form}

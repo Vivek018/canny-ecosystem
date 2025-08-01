@@ -17,10 +17,12 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
   ImportEmployeeStatutoryDataSchema,
+  isGoodStatus,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
@@ -35,6 +37,7 @@ export function EmployeeStatutoryImportData({
   conflictingIndices: number[];
 }) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForEmployeeStatutory();
   const [conflictingIndex, setConflictingIndex] =
@@ -62,7 +65,7 @@ export function EmployeeStatutoryImportData({
   const fetchConflicts = async () => {
     try {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code,
+        (value: { employee_code: any }) => value.employee_code
       );
       const { data: employees, error: idByCodeError } =
         await getEmployeeIdsByEmployeeCodes({
@@ -76,7 +79,7 @@ export function EmployeeStatutoryImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code,
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -91,7 +94,7 @@ export function EmployeeStatutoryImportData({
         {
           supabase,
           importedData: updatedData as EmployeeStatutoryDetailsDatabaseInsert[],
-        },
+        }
       );
 
       if (error) {
@@ -115,8 +118,8 @@ export function EmployeeStatutoryImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -130,13 +133,20 @@ export function EmployeeStatutoryImportData({
       });
 
       if (error) {
-        console.error("Employee Statutory", error);
+        toast({
+          title: "Error",
+          description: JSON.stringify(error) ?? "Failed to import details",
+          variant: "destructive",
+        });
       }
-      if (
-        status === "No new data to insert after filtering duplicates" ||
-        status === "Successfully inserted new records" ||
-        status === "Successfully processed updates and new insertions"
-      ) {
+
+      if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Details imported succesfully",
+          variant: "success",
+        });
+        clearCacheEntry(cacheKeyPrefix.employees);
         clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
@@ -166,10 +176,10 @@ export function EmployeeStatutoryImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
+                duplicationTypeArray as unknown as string[]
               )}
               value={importType}
               onChange={(value: string) => {

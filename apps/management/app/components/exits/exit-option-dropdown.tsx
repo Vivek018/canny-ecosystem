@@ -15,7 +15,9 @@ import { useNavigate } from "@remix-run/react";
 export const ExitOptionsDropdown = ({
   exitId,
   triggerChild,
+  hideOptions,
 }: {
+  hideOptions: boolean;
   exitId: string;
   triggerChild: React.ReactElement;
 }) => {
@@ -30,6 +32,7 @@ export const ExitOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.exits}`) && "flex",
+              hideOptions && "hidden"
             )}
             onClick={() => navigate(`/approvals/exits/${exitId}/update-exit`)}
           >
@@ -38,10 +41,10 @@ export const ExitOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex",
+              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex"
             )}
           />
-          <DeleteExit exitId={exitId} />
+          <DeleteExit exitId={exitId} hideOptions={hideOptions} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
