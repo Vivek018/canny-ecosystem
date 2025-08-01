@@ -117,7 +117,7 @@ export function LeavesImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.leaves);
-        navigate("/employees");
+        navigate("/time-tracking/leaves");
       }
     }
   };

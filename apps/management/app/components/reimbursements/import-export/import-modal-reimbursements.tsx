@@ -66,13 +66,11 @@ export const ImportReimbursementModal = () => {
   const demo: any[] | Papa.UnparseObject<any> = [
     {
       employee_code: null,
-      submitted_date: null,
-      status: null,
       amount: null,
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -104,7 +102,7 @@ export const ImportReimbursementModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >,
+                    >
                   );
                 }
               }}
@@ -131,7 +129,7 @@ export const ImportReimbursementModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
           )}
         >
           {!eligibleFileSize

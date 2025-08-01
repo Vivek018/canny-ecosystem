@@ -78,9 +78,8 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
         description: "Details imported succesfully",
         variant: "success",
       });
-        clearCacheEntry(cacheKeyPrefix.employees);
-      clearCacheEntry(cacheKeyPrefix.employee_overview);
-      navigate("/employees");
+      clearCacheEntry(cacheKeyPrefix.attendance);
+      navigate("/time-tracking/attendance");
     }
   };
 

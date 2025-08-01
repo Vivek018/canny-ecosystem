@@ -122,7 +122,7 @@ export function ReimbursementImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
-        navigate("/employees");
+        navigate("/approvals/reimbursements");
       }
     }
   };

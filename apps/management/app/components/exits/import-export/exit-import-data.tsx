@@ -140,7 +140,7 @@ export function ExitImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.exits);
-        navigate("/employees");
+        navigate("/approvals/exits");
       }
     }
   };
