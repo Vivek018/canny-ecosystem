@@ -72,12 +72,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
       in_invoice: searchParams.get("in_invoice") ?? undefined,
       month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
+      recently_added: searchParams.get("recently_added") ?? undefined,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
@@ -131,7 +132,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -193,7 +194,7 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name,
+                                  (project) => project!.name
                                 )
                               : []
                           }

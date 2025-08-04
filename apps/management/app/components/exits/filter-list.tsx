@@ -1,7 +1,11 @@
 import type { ExitFilterType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateRange,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 export type ExitFilterList = ExitFilterType & {
@@ -24,7 +28,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList?.last_working_day_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
@@ -52,7 +56,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.final_settlement_date_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
@@ -62,7 +66,8 @@ export function FilterList({ filterList }: Props) {
           formatDate(new Date(value))
         );
       }
-
+      case "recently_added":
+        return replaceUnderscore(value);
       case "project":
         return value;
 
@@ -94,7 +99,7 @@ export function FilterList({ filterList }: Props) {
         Object.entries(filterList)
           .filter(
             ([key, value]) =>
-              value !== null && value !== undefined && !key.endsWith("end"),
+              value !== null && value !== undefined && !key.endsWith("end")
           )
           .map(([key, value]) => {
             return (

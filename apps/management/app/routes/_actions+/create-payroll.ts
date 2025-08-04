@@ -38,7 +38,7 @@ export async function action({
 
     if (type === "salary-import") {
       const salaryImportData = JSON.parse(
-        formData.get("salaryImportData") as string,
+        formData.get("salaryImportData") as string
       );
 
       const transformedSalaryEntries: any[] = [];
@@ -117,7 +117,7 @@ export async function action({
         ([name, type]) => ({
           name,
           type,
-        }),
+        })
       );
 
       let totalNetAmount = 0;
@@ -195,6 +195,7 @@ export async function action({
             error: null,
           });
         }
+        
         return json({
           status: "success",
           message: message ?? "Import Salary Payroll Created Successfully",
@@ -420,7 +421,7 @@ export async function action({
         failedRedirect,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Create Payroll error", error);
@@ -439,6 +440,7 @@ export default function CreatePayroll() {
   const navigate = useNavigate();
 
   useEffect(() => {
+
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.run_payroll);

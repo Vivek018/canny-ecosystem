@@ -12,7 +12,7 @@ import { useNavigate } from "@remix-run/react";
 
 import { useState, useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, recentlyAddedFilter } from "@/constant";
 import { ImportedDataTable } from "../imported-attendance-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-attendance-table/columns";
 import { createEmployeeAttendanceImportedData } from "@canny_ecosystem/supabase/mutations";
@@ -79,7 +79,9 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
         variant: "success",
       });
       clearCacheEntry(cacheKeyPrefix.attendance);
-      navigate("/time-tracking/attendance");
+      navigate(
+        `/time-tracking/attendance?recently_added=${recentlyAddedFilter[0]}`
+      );
     }
   };
 

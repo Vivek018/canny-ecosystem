@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
 import { clearCacheEntry } from "@/utils/cache";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, recentlyAddedFilter } from "@/constant";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -140,7 +140,7 @@ export function ExitImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.exits);
-        navigate("/approvals/exits");
+        navigate(`/approvals/exits?recently_added=${recentlyAddedFilter[0]}`);
       }
     }
   };

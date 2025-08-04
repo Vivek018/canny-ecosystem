@@ -46,7 +46,7 @@ import {
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE, recentlyAddedFilter } from "@/constant";
 import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
@@ -70,7 +70,7 @@ const BulkAttendanceSchema = z.object({
       paid_holidays: true,
       paid_leaves: true,
       casual_leaves: true,
-    }),
+    })
   ),
 });
 
@@ -128,7 +128,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -187,7 +187,9 @@ export default function AddBulkAttendances() {
           variant: "destructive",
         });
       }
-      navigate("/time-tracking/attendance");
+      navigate(
+        `/time-tracking/attendance?recently_added=${recentlyAddedFilter[0]}`
+      );
     }
   }, [actionData]);
 
@@ -275,7 +277,7 @@ export default function AddBulkAttendances() {
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[],
+                    getYears(25, defaultYear) as unknown as string[]
                   )}
                   labelProps={{
                     children: "Year",
@@ -307,7 +309,7 @@ export default function AddBulkAttendances() {
                 return (
                   <div
                     key={String(
-                      fields?.attendances.key! + index + resetKey + 4,
+                      fields?.attendances.key! + index + resetKey + 4
                     )}
                     className="flex flex-row items-center justify-center gap-1.5"
                   >

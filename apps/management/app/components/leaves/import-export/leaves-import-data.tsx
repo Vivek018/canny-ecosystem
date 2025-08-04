@@ -16,7 +16,7 @@ import { useNavigate } from "@remix-run/react";
 
 import { useState, useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, recentlyAddedFilter } from "@/constant";
 import { ImportedDataColumns } from "../imported-table/columns";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { createLeavesFromImportedData } from "@canny_ecosystem/supabase/mutations";
@@ -117,7 +117,9 @@ export function LeavesImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.leaves);
-        navigate("/time-tracking/leaves");
+        navigate(
+          `/time-tracking/leaves?recently_added=${recentlyAddedFilter[0]}`
+        );
       }
     }
   };

@@ -1,7 +1,11 @@
 import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { defaultMonth, defaultYear } from "@canny_ecosystem/utils";
+import {
+  defaultMonth,
+  defaultYear,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 import { months } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
@@ -16,7 +20,7 @@ export function FilterList({ filters }: Props) {
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string },
+    {} as { [key: number]: string }
   );
 
   const defaultFilters = Object.keys(filters!).length
@@ -41,7 +45,8 @@ export function FilterList({ filters }: Props) {
       case "year":
       case "project":
       case "site":
-        return value;
+      case "recently_added":
+        return replaceUnderscore(value);
       default:
         return null;
     }

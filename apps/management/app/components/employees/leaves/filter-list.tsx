@@ -39,7 +39,8 @@ export function FilterList({ filters }: Props) {
       case "site":
       case "users":
       case "year":
-        return value;
+      case "recently_added":
+        return replaceUnderscore(value);
       default:
         return null;
     }

@@ -70,12 +70,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
       project: searchParams.get("project") ?? undefined,
       site: searchParams.get("site") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
+      recently_added: searchParams.get("recently_added") ?? undefined,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const exitsPromise = getExitsByCompanyId({
@@ -124,7 +125,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -227,7 +228,7 @@ export default function ExitsIndex() {
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT,
+                exitsData.meta.count > LAZY_LOADING_LIMIT
             );
 
             return (

@@ -74,6 +74,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       name: searchParams.get("name") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       site: searchParams.get("site") ?? undefined,
+      recently_added: searchParams.get("recently_added") ?? undefined,
     };
 
     const attendancePromise = getMonthlyAttendanceByCompanyId({
@@ -124,7 +125,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 

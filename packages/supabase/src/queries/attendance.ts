@@ -9,6 +9,7 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
+import { filterComparison } from "../../../../apps/management/app/constant";
 
 export type AttendanceDataType = Pick<
   EmployeeDatabaseRow,
@@ -161,6 +162,7 @@ export type AttendanceFilters = {
   year?: string | undefined | null;
   project?: string | undefined | null;
   site?: string | undefined | null;
+  recently_added?: string | undefined | null;
 };
 
 export async function getMonthlyAttendanceByCompanyId({
@@ -182,7 +184,7 @@ export async function getMonthlyAttendanceByCompanyId({
   const defaultMonth = today.getMonth() + 1;
   const defaultYear = today.getFullYear();
   const { from, to, sort, searchQuery, filters } = params;
-  const { month, year, project, site } = filters ?? {};
+  const { month, year, project, site, recently_added } = filters ?? {};
   const foreignFilters = project || site;
 
   const columns = [
@@ -223,7 +225,7 @@ export async function getMonthlyAttendanceByCompanyId({
     casual_leaves
   )
 `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -232,12 +234,12 @@ export async function getMonthlyAttendanceByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`,
+          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
       );
     }
   }
@@ -251,8 +253,18 @@ export async function getMonthlyAttendanceByCompanyId({
   if (project) {
     query = query.eq(
       "employee_project_assignment.sites.projects.name",
-      project,
+      project
     );
+  }
+  if (recently_added) {
+    const now = new Date();
+
+    const diff =
+      filterComparison[recently_added as keyof typeof filterComparison];
+    if (diff) {
+      const startTime = new Date(now.getTime() - diff).toISOString();
+      query.gte("created_at", startTime);
+    }
   }
 
   if (site) {
@@ -396,7 +408,7 @@ export async function getAttendanceReportByCompanyId({
         employee_id
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId)
     .eq("attendance.present", true)
@@ -416,12 +428,12 @@ export async function getAttendanceReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
       );
     }
   }
@@ -434,17 +446,17 @@ export async function getAttendanceReportByCompanyId({
     }
     const start_date = new Date(`${start_month} 1, ${start_year} 12:00:00`);
     const end_date = new Date(
-      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`,
+      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`
     );
     if (start_year)
       query.gte(
         "attendance.date",
-        formatUTCDate(start_date.toISOString().split("T")[0]),
+        formatUTCDate(start_date.toISOString().split("T")[0])
       );
     if (end_year)
       query.lte(
         "attendance.date",
-        formatUTCDate(end_date.toISOString().split("T")[0]),
+        formatUTCDate(end_date.toISOString().split("T")[0])
       );
   }
   if (project) {
@@ -467,7 +479,7 @@ export async function getAttendanceReportByCompanyId({
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string },
+    {} as { [key: number]: string }
   );
 
   const processedData = data?.map((employee) => {

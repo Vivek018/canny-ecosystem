@@ -10,6 +10,7 @@ import type {
   UserDatabaseRow,
 } from "../types";
 import { months } from "@canny_ecosystem/utils/constant";
+import { filterComparison } from "../../../../apps/management/app/constant";
 
 export type ImportReimbursementDataType = Pick<
   ReimbursementRow,
@@ -104,7 +105,9 @@ export async function getReimbursementsByCompanyId({
     in_invoice,
     month,
     year,
+    recently_added,
   } = filters ?? {};
+
   const foreignFilters = searchQuery || project || site;
 
   const columns = [
@@ -131,7 +134,7 @@ export async function getReimbursementsByCompanyId({
             project ? "inner" : "left"
           }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -150,7 +153,7 @@ export async function getReimbursementsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          },
+          }
         );
       }
     } else {
@@ -158,7 +161,7 @@ export async function getReimbursementsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        },
+        }
       );
     }
   }
@@ -168,7 +171,7 @@ export async function getReimbursementsByCompanyId({
     }
     if (month) {
       return new Date(
-        Date.UTC(Number(defaultYear), Number(months[month]) - 1, 1),
+        Date.UTC(Number(defaultYear), Number(months[month]) - 1, 1)
       );
     }
     if (year) {
@@ -202,6 +205,18 @@ export async function getReimbursementsByCompanyId({
     if (start) query.gte(field, start);
     if (end) query.lte(field, end);
   }
+
+  if (recently_added) {
+    const now = new Date();
+
+    const diff =
+      filterComparison[recently_added as keyof typeof filterComparison];
+    if (diff) {
+      const startTime = new Date(now.getTime() - diff).toISOString();
+      query.gte("created_at", startTime);
+    }
+  }
+
   if (status) {
     query.eq("status", status.toLowerCase());
   }
@@ -215,7 +230,7 @@ export async function getReimbursementsByCompanyId({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.sites.projects.name",
-      project,
+      project
     );
   }
   if (site) {
@@ -283,6 +298,7 @@ export type ReimbursementFilters = {
   in_invoice?: string | undefined | null;
   month?: string | undefined | null;
   year?: string | undefined | null;
+  recently_added?: string | undefined | null;
 };
 
 export async function getReimbursementsByEmployeeId({
@@ -322,7 +338,7 @@ export async function getReimbursementsByEmployeeId({
       `${columns.join(",")},
           employees!inner(id, first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employee_id", employeeId);
 
@@ -395,8 +411,8 @@ export async function getReimbursementEntriesForPayrollByPayrollId({
     .from("reimbursements")
     .select(
       `${columns.join(
-        ",",
-      )}, employees!left(id, first_name, middle_name, last_name, employee_code)`,
+        ","
+      )}, employees!left(id, first_name, middle_name, last_name, employee_code)`
     )
     .eq("payroll_id", payrollId)
     .order("created_at", { ascending: false })
@@ -429,8 +445,8 @@ export async function getReimbursementEntryForPayrollById({
     .from("reimbursements")
     .select(
       `${columns.join(
-        ",",
-      )}, employees!left(id,first_name, middle_name, last_name, employee_code)`,
+        ","
+      )}, employees!left(id,first_name, middle_name, last_name, employee_code)`
     )
     .eq("id", id)
     .single<ReimbursementPayrollEntriesWithEmployee>();
@@ -453,8 +469,8 @@ export async function getReimbursementEntriesByInvoiceIdForInvoicePreview({
     .from("employees")
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, reimbursements!inner(${columns.join(
-        ",",
-      )})`,
+        ","
+      )})`
     )
     .eq("reimbursements.invoice_id", invoiceId)
     .returns<ReimbursementPayrollEntriesWithEmployee[]>();

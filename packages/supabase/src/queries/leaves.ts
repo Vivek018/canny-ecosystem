@@ -11,6 +11,7 @@ import type {
   UserDatabaseRow,
 } from "../types";
 import { HARD_QUERY_LIMIT } from "../constant";
+import { filterComparison } from "../../../../apps/management/app/constant";
 
 export type ImportLeavesDataType = Pick<
   LeavesDatabaseRow,
@@ -54,6 +55,7 @@ export type LeavesFilters = {
   site?: string | undefined | null;
   users?: string | undefined | null;
   year?: string | undefined | null;
+  recently_added?: string | undefined | null;
 };
 
 export async function getLeavesByEmployeeId({
@@ -92,7 +94,7 @@ export async function getLeavesByEmployeeId({
           users!${users ? "inner" : "left"}(id,email)
       
       `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employee_id", employeeId);
 
@@ -107,11 +109,11 @@ export async function getLeavesByEmployeeId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(
-          date_end,
+          date_end
         )},end_date.gte.${formatUTCDate(date_start)}),` +
-        `and(start_date.gte.${formatUTCDate(
-          date_start,
-        )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
+          `and(start_date.gte.${formatUTCDate(
+            date_start
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
     if (year) {
@@ -182,8 +184,16 @@ export async function getLeavesByCompanyId({
   };
 }) {
   const { from, to, sort, filters } = params;
-  const { date_start, date_end, leave_type, project, site, users, year } =
-    filters ?? {};
+  const {
+    date_start,
+    date_end,
+    leave_type,
+    project,
+    site,
+    users,
+    year,
+    recently_added,
+  } = filters ?? {};
   const foreignFilters = project || site;
 
   const columns = [
@@ -200,12 +210,14 @@ export async function getLeavesByCompanyId({
     .select(
       `
         ${columns.join(",")},
-        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
-      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
-      }(id, name)))),
+        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          foreignFilters ? "inner" : "left"
+        }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+          project ? "inner" : "left"
+        }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employees.company_id", companyId);
 
@@ -220,12 +232,23 @@ export async function getLeavesByCompanyId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(
-          date_end,
+          date_end
         )},end_date.gte.${formatUTCDate(date_start)}),` +
-        `and(start_date.gte.${formatUTCDate(
-          date_start,
-        )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
+          `and(start_date.gte.${formatUTCDate(
+            date_start
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
+    }
+
+    if (recently_added) {
+      const now = new Date();
+
+      const diff =
+        filterComparison[recently_added as keyof typeof filterComparison];
+      if (diff) {
+        const startTime = new Date(now.getTime() - diff).toISOString();
+        query.gte("created_at", startTime);
+      }
     }
 
     if (leave_type) {
@@ -234,7 +257,7 @@ export async function getLeavesByCompanyId({
     if (project) {
       query.eq(
         "employees.employee_project_assignment.sites.projects.name",
-        project,
+        project
       );
     }
     if (year) {
@@ -283,7 +306,7 @@ export async function getLeaveTypeByCompanyId({
     .select(
       `
         ${columns.join(",")}
-      `,
+      `
     )
     .eq("company_id", companyId)
     .order("created_at", { ascending: true })

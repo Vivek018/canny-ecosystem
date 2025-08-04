@@ -107,7 +107,7 @@ export function PayrollActions({
               className={cn(
                 "hidden",
                 status === "approved" &&
-                  "flex flex-row justify-start gap-2 px-2 pr-1  ",
+                  "flex flex-row justify-start gap-2 px-2 pr-1",
               )}
               onClick={() =>
                 fromWhere === "runpayroll"

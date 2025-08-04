@@ -17,6 +17,7 @@ import {
 } from "../queries";
 import {
   calculateNetAmountAfterEntryCreated,
+  calculateSalaryTotalNetAmount,
   convertToNull,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
@@ -75,7 +76,7 @@ export async function createSalaryPayroll({
       total_net_amount: data.totalNetAmount,
       company_id: companyId,
     })
-    .select("id")
+    .select("id,total_employees,total_net_amount")
     .single();
 
   if (!payrollData?.id || payrollError) {
@@ -123,6 +124,7 @@ export async function createSalaryPayroll({
     console.error("createPayrollFields payroll error", salaryEntriesError);
     return { status: salaryEntriesStatus, error: salaryEntriesError };
   }
+
   if (salaryEntriesData.length === 0) {
     await deletePayroll({ id: payrollData.id, supabase });
 
@@ -131,6 +133,30 @@ export async function createSalaryPayroll({
       message: "Salary of the employees for this month already exists",
       error: "Salary Entries of this month already exists",
     };
+  }
+
+  let skipped = 0;
+  if (salaryEntriesData.length < data.salaryEntryData.length) {
+    skipped = data.salaryEntryData.length - salaryEntriesData.length;
+    const newTotalEmployees = payrollData.total_employees! - skipped;
+
+    const unSkippedEmployeeIds = salaryEntriesData.map(
+      (entry) => entry.monthly_attendance.employee_id
+    );
+
+    const unSkippedRawData = data.rawData.filter((entry) =>
+      unSkippedEmployeeIds.includes(entry.employee_id)
+    );
+
+    const newTotalNetAmount = calculateSalaryTotalNetAmount(unSkippedRawData);
+    updatePayrollById({
+      payrollId: payrollData.id,
+      supabase,
+      data: {
+        total_employees: newTotalEmployees,
+        total_net_amount: newTotalNetAmount,
+      },
+    });
   }
   const finalPayrollFieldEntries = [];
 
@@ -188,7 +214,10 @@ export async function createSalaryPayroll({
   if (isGoodStatus(salaryFieldEntriesStatus)) {
     return {
       status: "success",
-      message: "Payroll created successfully",
+      message:
+        skipped === 0
+          ? "Payroll created successfully"
+          : `Payroll created successfully with ${skipped} skipped entries`,
       error: null,
     };
   }

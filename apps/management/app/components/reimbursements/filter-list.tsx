@@ -1,7 +1,11 @@
 import type { ReimbursementFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateRange,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
@@ -26,7 +30,7 @@ export function FilterList({ filters }: Props) {
           return formatDateRange(
             new Date(value),
             new Date(filters.submitted_date_end),
-            { includeTime: false },
+            { includeTime: false }
           );
         }
         return formatDate(new Date(value));
@@ -40,7 +44,8 @@ export function FilterList({ filters }: Props) {
       case "in_payroll":
       case "month":
       case "year":
-        return value;
+      case "recently_added":
+        return replaceUnderscore(value);
       default:
         return null;
     }

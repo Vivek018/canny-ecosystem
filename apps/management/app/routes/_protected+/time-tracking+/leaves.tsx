@@ -98,6 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       site: searchParams.get("site") ?? undefined,
       users: searchParams.get("users") ?? undefined,
       year: searchParams.get("year") ?? undefined,
+      recently_added: searchParams.get("recently_added") ?? undefined,
     };
 
     const hasFilters =

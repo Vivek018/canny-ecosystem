@@ -23,8 +23,9 @@ import {
 import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
-import { defaultYear, getYears } from "@canny_ecosystem/utils";
+import { defaultYear, getYears, replaceUnderscore } from "@canny_ecosystem/utils";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+import { recentlyAddedFilter } from "@/constant";
 
 export const PLACEHOLDERS = [
   "Attendance records for March 2024 at Site 'ABC'",
@@ -74,6 +75,7 @@ export function AttendanceSearchFilter({
     year: "",
     project: "",
     site: "",
+    recently_added: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -105,6 +107,7 @@ export function AttendanceSearchFilter({
     year: searchParams.get("year"),
     project: searchParams.get("project"),
     site: searchParams.get("site"),
+    recently_added: searchParams.get("recently_added"),
   };
 
   useEffect(() => {
@@ -125,7 +128,7 @@ export function AttendanceSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -160,7 +163,7 @@ export function AttendanceSearchFilter({
         {
           action: "/time-tracking/attendance?index",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -172,7 +175,7 @@ export function AttendanceSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -189,7 +192,7 @@ export function AttendanceSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -222,7 +225,7 @@ export function AttendanceSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -353,6 +356,36 @@ export function AttendanceSearchFilter({
                     }}
                   >
                     {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Recently Added</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {recentlyAddedFilter.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.recently_added === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        recently_added: name,
+                      }));
+                    }}
+                  >
+                    {replaceUnderscore(name)}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>

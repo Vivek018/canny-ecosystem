@@ -22,7 +22,7 @@ import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
 import { clearCacheEntry } from "@/utils/cache";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, recentlyAddedFilter } from "@/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export function ReimbursementImportData({
@@ -122,7 +122,9 @@ export function ReimbursementImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
-        navigate("/approvals/reimbursements");
+        navigate(
+          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
+        );
       }
     }
   };
