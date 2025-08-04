@@ -122,7 +122,7 @@ export async function action({
 
       let totalNetAmount = 0;
 
-      totalNetAmount = calculateSalaryTotalNetAmount(salaryImportData) ?? 69;
+      totalNetAmount = calculateSalaryTotalNetAmount(salaryImportData);
 
       if (different === "different") {
         const payrollId = formData.get("payrollId") as string;

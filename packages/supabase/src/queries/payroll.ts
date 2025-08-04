@@ -58,6 +58,7 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     .from("payroll")
     .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
+    .order("created_at", { ascending: false })
     .in("status", ["pending", "submitted"]);
 
   if (searchQuery) {
@@ -134,6 +135,7 @@ export async function getApprovedPayrollsByCompanyId({
     .from("payroll")
     .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
+    .order("created_at", { ascending: false })
     .in("status", ["approved"]);
 
   if (searchQuery) {
@@ -169,8 +171,7 @@ export async function getApprovedPayrollsByCompanyId({
   }
 
   const { data, count, error } = await query
-    .range(from, to)
-    .order("created_at", { ascending: false });
+    .range(from, to);
   if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
   return { data, meta: { count: count }, error };
 }
@@ -426,8 +427,8 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   const startOfYear = filterMonth
     ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
     : new Date(
-        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
-      );
+      Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
+    );
 
   const endOfYear = filterMonth
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
