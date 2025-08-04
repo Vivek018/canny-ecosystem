@@ -39,7 +39,7 @@ export const DeletePayrollField = ({
   };
 
   const handleDeletePayrollField = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -50,7 +50,7 @@ export const DeletePayrollField = ({
         {
           method: "POST",
           action: `/payroll/run-payroll/${payrollId}/delete-payroll-fields`,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -67,7 +67,7 @@ export const DeletePayrollField = ({
             className: "mr-auto",
           }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "flex",
         )}
       >
         Delete Payroll Field

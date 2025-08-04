@@ -103,18 +103,18 @@ export function SalaryEntryComponent({
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
-    [selectedRows, data]
+    [selectedRows, data],
   );
 
   const uniqueFields = useMemo(
     () => getUniqueFields(filteredData),
-    [filteredData]
+    [filteredData],
   );
 
   const updateStatusPayroll = useCallback(
     (
       e: React.MouseEvent<HTMLButtonElement>,
-      status: PayrollDatabaseRow["status"]
+      status: PayrollDatabaseRow["status"],
     ) => {
       e.preventDefault();
       clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
@@ -131,10 +131,10 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: `/payroll/run-payroll/${payrollId}`,
-        }
+        },
       );
     },
-    [payrollId, payrollData, submit]
+    [payrollId, payrollData, submit],
   );
 
   const handleUpdateBulkSalaryEntry = () => {
@@ -157,7 +157,7 @@ export function SalaryEntryComponent({
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/update-bulk-salary-entries`,
-      }
+      },
     );
   };
 
@@ -190,31 +190,31 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: "/payroll/run-payroll/update-payroll",
-        }
+        },
       );
     },
-    [payrollId, payrollData?.id, submit]
+    [payrollId, payrollData?.id, submit],
   );
 
   const showSubmitButton = useMemo(
     () =>
       (payrollData.status === "pending" || payrollData.status === "approved") &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role]
+    [payrollData.status, role],
   );
 
   const showUndoSubmitButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role]
+    [payrollData.status, role],
   );
 
   const showApproveButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${approveRole}:${attribute.payroll}`),
-    [payrollData.status, role]
+    [payrollData.status, role],
   );
 
   return (
@@ -287,7 +287,7 @@ export function SalaryEntryComponent({
           className={cn(
             payrollData?.status === "pending" || !selectedRows.length
               ? "hidden"
-              : ""
+              : "",
           )}
           allLocationOptions={allLocationOptions}
           payrollId={payrollId ?? payrollData?.id}
@@ -301,7 +301,7 @@ export function SalaryEntryComponent({
             className={cn(
               "h-10 w-12 bg-muted/70 text-muted-foreground rounded border border-input",
               (payrollData?.status === "approved" || !selectedRows.length) &&
-                "hidden"
+                "hidden",
             )}
           >
             <Icon name="edit" className="h-[18px] w-[18px]" />

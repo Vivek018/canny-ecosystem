@@ -47,7 +47,7 @@ export function AddSalaryEntrySheet({
       key: field.name,
       type: field.type,
       amount: 0,
-    }))
+    })),
   );
 
   const handleFinalSubmit = () => {
@@ -65,7 +65,7 @@ export function AddSalaryEntrySheet({
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/add-salary-entry`,
-      }
+      },
     );
   };
 
@@ -137,8 +137,8 @@ export function AddSalaryEntrySheet({
                   const value = Number(e.target.value);
                   setFieldConfigs((prev) =>
                     prev.map((f) =>
-                      f.key === field.key ? { ...f, amount: value } : f
-                    )
+                      f.key === field.key ? { ...f, amount: value } : f,
+                    ),
                   );
                 }}
                 placeholder={"Enter Amount"}

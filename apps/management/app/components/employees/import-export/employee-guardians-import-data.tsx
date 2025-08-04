@@ -66,7 +66,7 @@ export function EmployeeGuardiansImportData({
   const fetchConflicts = async () => {
     try {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code
+        (value: { employee_code: any }) => value.employee_code,
       );
       const { data: employees, error: idByCodeError } =
         await getEmployeeIdsByEmployeeCodes({
@@ -80,7 +80,7 @@ export function EmployeeGuardiansImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code
+          (e: { employee_code: any }) => e.employee_code === item.employee_code,
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -95,7 +95,7 @@ export function EmployeeGuardiansImportData({
         {
           supabase,
           importedData: updatedData as EmployeeBankDetailsDatabaseInsert[],
-        }
+        },
       );
 
       if (error) {
@@ -119,8 +119,8 @@ export function EmployeeGuardiansImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -177,10 +177,10 @@ export function EmployeeGuardiansImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden"
+                conflictingIndex?.length > 0 ? "flex" : "hidden",
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[]
+                duplicationTypeArray as unknown as string[],
               )}
               value={importType}
               onChange={(value: string) => {

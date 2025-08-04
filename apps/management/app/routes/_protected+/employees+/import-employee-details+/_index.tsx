@@ -237,7 +237,14 @@ export default function EmployeeDetailsImportFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportEmployeeDetailsDataType,
                     ),
-                ).map(([key, value]) => [key, String(value).trim()] as unknown as ImportEmployeeDetailsDataType[]),
+                  )
+                  .map(
+                    ([key, value]) =>
+                      [
+                        key,
+                        String(value).trim(),
+                      ] as unknown as ImportEmployeeDetailsDataType[],
+                  ),
               );
               return cleanEntry;
             });

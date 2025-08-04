@@ -20,7 +20,7 @@ export function FilterList({ filters }: Props) {
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string }
+    {} as { [key: number]: string },
   );
 
   const defaultFilters = Object.keys(filters!).length

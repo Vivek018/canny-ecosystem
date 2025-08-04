@@ -206,7 +206,7 @@ export default function EmployeesIndex() {
         </div>
         <EmployeesActions
           isEmpty={!employeesPromise}
-        // emails={}
+          // emails={}
         />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>

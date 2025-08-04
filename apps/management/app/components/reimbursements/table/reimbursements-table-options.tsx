@@ -26,7 +26,6 @@ export const ReimbursementOptionsDropdown = ({
   triggerChild: React.ReactElement;
   isEmployeeRoute?: boolean;
 }) => {
-  
   const { role } = useUser();
   const navigate = useNavigate();
 
@@ -34,7 +33,7 @@ export const ReimbursementOptionsDropdown = ({
     navigate(
       isEmployeeRoute
         ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements`
-        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
+        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`,
     );
   };
 
@@ -49,9 +48,9 @@ export const ReimbursementOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${updateRole}:${attribute.reimbursements}`
+                `${updateRole}:${attribute.reimbursements}`,
               ) && "flex",
-              hideOptions && "hidden"
+              hideOptions && "hidden",
             )}
           >
             Update Reimbursement
@@ -61,9 +60,9 @@ export const ReimbursementOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${deleteRole}:${attribute.reimbursements}`
+                `${deleteRole}:${attribute.reimbursements}`,
               ) && "flex",
-              hideOptions && "hidden"
+              hideOptions && "hidden",
             )}
           />
           <DeleteReimbursement

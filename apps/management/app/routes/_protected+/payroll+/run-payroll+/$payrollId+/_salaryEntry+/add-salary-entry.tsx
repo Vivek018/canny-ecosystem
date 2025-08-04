@@ -23,20 +23,20 @@ export async function action({ request }: ActionFunctionArgs) {
     const failedRedirect = formData.get("failedRedirect") as string;
 
     const salaryEntryData = JSON.parse(
-      formData.get("salaryEntryData") as string
+      formData.get("salaryEntryData") as string,
     );
 
     const { data: payrollData } = await getPayrollById({
       payrollId,
       supabase,
     });
-   
+
     const newTotal = salaryEntryData.salary_data.reduce(
       (total: number, item: any) => {
         const amt = Number(item.amount);
         return item.type === "earning" ? total + amt : total - amt;
       },
-      0
+      0,
     );
 
     const updatedPayrollData = {
@@ -84,7 +84,7 @@ export async function action({ request }: ActionFunctionArgs) {
         payroll_field_id: entry.id,
         amount: entry.amount,
         salary_entry_id: salaryEntriesData![0]?.id ?? "",
-      })
+      }),
     );
 
     const { status: salaryFieldEntriesStatus, error: salaryFieldEntriesError } =
@@ -114,7 +114,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Salary Entry add failed",
         error: salaryEntriesError ?? salaryFieldEntriesError,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -124,7 +124,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

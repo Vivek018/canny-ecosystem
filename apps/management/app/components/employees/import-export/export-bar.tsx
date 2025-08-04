@@ -68,8 +68,7 @@ export function ExportBar({
         exportedData[key] =
           element?.employee_bank_details?.account_number ?? "";
       } else if (key === "bank_name") {
-        exportedData[key] =
-          element?.employee_bank_details?.bank_name ?? "";
+        exportedData[key] = element?.employee_bank_details?.bank_name ?? "";
       } else if (key === "aadhaar_number") {
         exportedData[key] =
           element?.employee_statutory_details?.aadhaar_number ?? "";

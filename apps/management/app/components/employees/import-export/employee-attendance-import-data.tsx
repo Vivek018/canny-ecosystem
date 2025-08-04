@@ -33,8 +33,8 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -50,7 +50,7 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
 
     const updatedData = importData.data!.map((item: any) => {
       const employeeId = employees?.find(
-        (e) => e.employee_code === item.employee_code
+        (e) => e.employee_code === item.employee_code,
       )?.id;
       const { employee_code, ...rest } = item;
       return {
@@ -80,7 +80,7 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
       });
       clearCacheEntry(cacheKeyPrefix.attendance);
       navigate(
-        `/time-tracking/attendance?recently_added=${recentlyAddedFilter[0]}`
+        `/time-tracking/attendance?recently_added=${recentlyAddedFilter[0]}`,
       );
     }
   };

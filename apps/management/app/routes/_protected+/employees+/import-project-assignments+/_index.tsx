@@ -241,7 +241,14 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportEmployeeProjectAssignmentsDataType,
                     ),
-                ).map(([key, value]) => [key, String(value).trim()] as unknown as ImportEmployeeProjectAssignmentsDataType[]),
+                  )
+                  .map(
+                    ([key, value]) =>
+                      [
+                        key,
+                        String(value).trim(),
+                      ] as unknown as ImportEmployeeProjectAssignmentsDataType[],
+                  ),
               );
               return {
                 ...cleanEntry,

@@ -202,7 +202,14 @@ export default function ExitFieldMapping() {
                   )
                   .filter(([key]) =>
                     allowedData.includes(key as keyof ImportExitDataType),
-                  ).map(([key, value]) => [key, String(value).trim()] as unknown as ImportExitDataType[]),
+                  )
+                  .map(
+                    ([key, value]) =>
+                      [
+                        key,
+                        String(value).trim(),
+                      ] as unknown as ImportExitDataType[],
+                  ),
               );
               return cleanEntry;
             });

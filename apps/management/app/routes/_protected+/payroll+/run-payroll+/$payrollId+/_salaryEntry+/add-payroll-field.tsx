@@ -24,7 +24,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const payrollId = formData.get("payrollId") as string;
 
     const payrollFieldData = JSON.parse(
-      formData.get("payrollFieldData") as string
+      formData.get("payrollFieldData") as string,
     );
 
     const { data: payrollData } = await getPayrollById({
@@ -99,7 +99,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Payroll Field add failed",
         error: payrollFieldsError ?? salaryFieldEntriesError,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -109,7 +109,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

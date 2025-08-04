@@ -56,8 +56,8 @@ export function LeavesImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -66,7 +66,7 @@ export function LeavesImportData({
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
       const employeeCodes = importData.data!.map(
-        (value) => value.employee_code
+        (value) => value.employee_code,
       );
 
       const { data: employees, error: codeError } =
@@ -85,7 +85,7 @@ export function LeavesImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code
+          (e) => e.employee_code === item.employee_code,
         )?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
@@ -118,7 +118,7 @@ export function LeavesImportData({
         });
         clearCacheEntry(cacheKeyPrefix.leaves);
         navigate(
-          `/time-tracking/leaves?recently_added=${recentlyAddedFilter[0]}`
+          `/time-tracking/leaves?recently_added=${recentlyAddedFilter[0]}`,
         );
       }
     }

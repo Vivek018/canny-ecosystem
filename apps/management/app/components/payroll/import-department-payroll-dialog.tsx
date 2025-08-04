@@ -40,7 +40,8 @@ export function ImportDepartmentPayrollDialog({
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${createRole}:${attribute.payroll}`) && "hidden"
+          !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
+            "hidden",
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">
@@ -75,7 +76,7 @@ export function ImportDepartmentPayrollDialog({
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_department_salary_payroll
+              modalSearchParamNames.import_department_salary_payroll,
             );
             setSearchParams(searchParams);
           }}

@@ -28,7 +28,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList?.last_working_day_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -56,7 +56,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.final_settlement_date_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -99,7 +99,7 @@ export function FilterList({ filterList }: Props) {
         Object.entries(filterList)
           .filter(
             ([key, value]) =>
-              value !== null && value !== undefined && !key.endsWith("end")
+              value !== null && value !== undefined && !key.endsWith("end"),
           )
           .map(([key, value]) => {
             return (

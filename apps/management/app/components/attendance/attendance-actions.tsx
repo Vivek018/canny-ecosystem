@@ -147,7 +147,9 @@ export function AttendanceActions({
               <AlertDialogFooter className="pt-2">
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  disabled={!month?.length && !year?.length && !workingDays.length}
+                  disabled={
+                    !month?.length && !year?.length && !workingDays.length
+                  }
                   className={cn(buttonVariants({ variant: "default" }))}
                   onClick={handleUpdateBulkAttendances}
                 >

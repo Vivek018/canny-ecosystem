@@ -70,7 +70,7 @@ const BulkAttendanceSchema = z.object({
       paid_holidays: true,
       paid_leaves: true,
       casual_leaves: true,
-    })
+    }),
   ),
 });
 
@@ -128,7 +128,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -188,7 +188,7 @@ export default function AddBulkAttendances() {
         });
       }
       navigate(
-        `/time-tracking/attendance?recently_added=${recentlyAddedFilter[0]}`
+        `/time-tracking/attendance?recently_added=${recentlyAddedFilter[0]}`,
       );
     }
   }, [actionData]);
@@ -277,7 +277,7 @@ export default function AddBulkAttendances() {
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[]
+                    getYears(25, defaultYear) as unknown as string[],
                   )}
                   labelProps={{
                     children: "Year",
@@ -309,7 +309,7 @@ export default function AddBulkAttendances() {
                 return (
                   <div
                     key={String(
-                      fields?.attendances.key! + index + resetKey + 4
+                      fields?.attendances.key! + index + resetKey + 4,
                     )}
                     className="flex flex-row items-center justify-center gap-1.5"
                   >

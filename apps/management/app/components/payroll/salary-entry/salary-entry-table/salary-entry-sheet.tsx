@@ -5,7 +5,7 @@ import {
   useForm,
 } from "@conform-to/react";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { Form} from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import {
   Sheet,
   SheetClose,
@@ -48,7 +48,7 @@ export function SalaryEntrySheet({
   const [resetKey, setResetKey] = useState(Date.now());
 
   const typeOptions = transformStringArrayIntoOptions(
-    componentTypeArray as unknown as string[]
+    componentTypeArray as unknown as string[],
   );
 
   const formattedDefaultValue = {
@@ -81,7 +81,6 @@ export function SalaryEntrySheet({
     setOpen(true);
   };
 
-  
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
@@ -143,7 +142,7 @@ export function SalaryEntrySheet({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  componentTypeArray as unknown as string[]
+                  componentTypeArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.type, { type: "text" }),

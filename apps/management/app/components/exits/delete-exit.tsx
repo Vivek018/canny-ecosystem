@@ -39,7 +39,7 @@ export const DeleteExit = ({
   };
 
   const handleDeleteExit = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -49,7 +49,7 @@ export const DeleteExit = ({
           method: "post",
           action: `/approvals/exits/${exitId}/delete-exit`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -64,7 +64,7 @@ export const DeleteExit = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex",
-          hideOptions && "hidden"
+          hideOptions && "hidden",
         )}
       >
         Delete Exit

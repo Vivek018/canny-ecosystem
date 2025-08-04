@@ -158,7 +158,7 @@ export function ReimbursementSearchFilter({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -193,7 +193,7 @@ export function ReimbursementSearchFilter({
         {
           action: "/approvals/reimbursements?index",
           method: "POST",
-        }
+        },
       );
     } else {
       if (prompt.length) {
@@ -205,7 +205,7 @@ export function ReimbursementSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name"
+      ([key, value]) => value?.length && key !== "name",
     ).length > 0;
 
   return (
@@ -222,7 +222,7 @@ export function ReimbursementSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin"
+              isSubmitting && "animate-spin",
             )}
           />
           <Input
@@ -255,7 +255,7 @@ export function ReimbursementSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100"
+                isOpen && "opacity-100",
               )}
             >
               <Icon name="mixer" />

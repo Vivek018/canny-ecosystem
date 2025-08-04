@@ -32,7 +32,7 @@ export const ExitOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.exits}`) && "flex",
-              hideOptions && "hidden"
+              hideOptions && "hidden",
             )}
             onClick={() => navigate(`/approvals/exits/${exitId}/update-exit`)}
           >
@@ -41,7 +41,7 @@ export const ExitOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex",
             )}
           />
           <DeleteExit exitId={exitId} hideOptions={hideOptions} />

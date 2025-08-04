@@ -30,7 +30,7 @@ export function FilterList({ filters }: Props) {
           return formatDateRange(
             new Date(value),
             new Date(filters.submitted_date_end),
-            { includeTime: false }
+            { includeTime: false },
           );
         }
         return formatDate(new Date(value));

@@ -226,7 +226,8 @@ export default function AttendanceImportFieldMapping() {
                   )
                   .filter(([key]) =>
                     allowedFields.includes(key as unknown as any),
-                ).map(([key, value]) => [key, String(value).trim()]),
+                  )
+                  .map(([key, value]) => [key, String(value).trim()]),
               );
               return cleanEntry;
             });

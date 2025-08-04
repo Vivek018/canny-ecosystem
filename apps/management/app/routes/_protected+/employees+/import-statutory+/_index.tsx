@@ -103,7 +103,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -122,7 +122,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
           );
 
           if (matchedHeader) {
@@ -131,7 +131,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>
+        {} as Record<string, string>,
       );
 
       setFieldMapping(initialMapping);
@@ -145,13 +145,13 @@ export default function EmployeeStatutoryImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -171,7 +171,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
       const result = ImportEmployeeStatutoryDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -204,7 +204,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -216,7 +216,9 @@ export default function EmployeeStatutoryImportFieldMapping() {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -225,20 +227,20 @@ export default function EmployeeStatutoryImportFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportEmployeeStatutoryDataType
-                    )
+                      key as keyof ImportEmployeeStatutoryDataType,
+                    ),
                   )
                   .map(
                     ([key, value]) =>
                       [
                         key,
                         String(value).trim(),
-                      ] as unknown as ImportEmployeeStatutoryDataType[]
-                  )
+                      ] as unknown as ImportEmployeeStatutoryDataType[],
+                  ),
               );
               return cleanEntry;
             });
@@ -249,7 +251,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
             });
 
             const employeeCodes = finalData!.map(
-              (value) => value.employee_code
+              (value) => value.employee_code,
             );
 
             const { data: employees, error: idByCodeError } =
@@ -264,7 +266,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
 
             const updatedData = finalData!.map((item: any) => {
               const employeeId = employees?.find(
-                (e) => e.employee_code === item.employee_code
+                (e) => e.employee_code === item.employee_code,
               )?.id;
 
               const { employee_code, ...rest } = item;
@@ -344,7 +346,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline"
+                        field.required && "inline",
                       )}
                     >
                       *
@@ -358,11 +360,11 @@ export default function EmployeeStatutoryImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||

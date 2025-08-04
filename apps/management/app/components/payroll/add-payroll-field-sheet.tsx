@@ -46,7 +46,7 @@ export function AddPayrollFieldSheet({
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/add-payroll-field`,
-      }
+      },
     );
   };
 
@@ -76,7 +76,7 @@ export function AddPayrollFieldSheet({
               <Label className="text-sm font-medium">Type</Label>
               <Combobox
                 options={transformStringArrayIntoOptions(
-                  componentTypeArray as unknown as string[]
+                  componentTypeArray as unknown as string[],
                 )}
                 placeholder="Select Type"
                 value={fieldType}
