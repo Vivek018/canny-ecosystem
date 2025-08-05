@@ -49,13 +49,13 @@ export function PayrollTrend({ chartData }: { chartData: any[] | null }) {
       month,
       amount: data.reduce(
         (total, item: ChartDataItem) => total + (item.total_net_amount || 0),
-        0
+        0,
       ),
-    })
+    }),
   );
   const totalAmount = trendData?.reduce(
     (amount, item) => amount + item.amount,
-    0
+    0,
   );
 
   return (

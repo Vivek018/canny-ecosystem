@@ -256,7 +256,7 @@ export const getSalaryEntriesByPayrollId = async ({
           )
         )
       )
-    `
+    `,
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -311,7 +311,7 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
           )
         )
       )
-    `
+    `,
     )
     .eq("employee_id", employeeId)
     .eq("salary_entries.payroll_id", payrollId)
@@ -381,7 +381,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   if (currentMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      currentMonthError
+      currentMonthError,
     );
 
   //For Previous Month
@@ -406,7 +406,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   if (previousMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      previousMonthError
+      previousMonthError,
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
@@ -429,13 +429,11 @@ export async function getApprovedPayrollsByCompanyIdByYears({
 
   const startOfYear = filterMonth
     ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
-    : new Date(
-        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth , 1)
-      );
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth, 1));
 
   const endOfYear = filterMonth
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
-    : new Date(Number(filterYear ?? defaultYear), defMonth , 1);
+    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
 
   const { data: payrollData, error: payrollError } = await supabase
     .from("payroll")
@@ -499,7 +497,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     ([month, data]) => ({
       month,
       data,
-    })
+    }),
   );
 
   for (const item of restData) {
@@ -582,7 +580,7 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
           )
         )
       )
-    `
+    `,
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -636,7 +634,7 @@ export async function getSalaryEntriesByEmployeeId({
           )
         )
       )
-    `
+    `,
     )
     .eq("employee_id", employeeId)
     .eq("year", filterYear)
@@ -756,7 +754,7 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
           )
         )
       )
-    `
+    `,
     )
     .eq("salary_entries.invoice_id", invoiceId);
 
@@ -787,7 +785,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
       absent_days,
       salary_entries!inner (
         id)       
-    `
+    `,
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -796,7 +794,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
   if (error)
     console.error(
       "getSalaryEntriesByPayrollIdForAddingSalaryEntry Error",
-      error
+      error,
     );
 
   return { data, error };
