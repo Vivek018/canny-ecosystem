@@ -17,10 +17,7 @@ export function PageHeader({
   company,
   user,
 }: {
-  company: Omit<
-    CompanyDatabaseRow,
-    "created_at" | "is_active"
-  > | null;
+  company: Omit<CompanyDatabaseRow, "created_at" | "is_active"> | null;
   user: Pick<UserDatabaseRow, "id" | "email" | "role" | "company_id"> | null;
 }) {
   const navigate = useNavigate();

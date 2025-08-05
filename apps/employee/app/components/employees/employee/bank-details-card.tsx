@@ -6,10 +6,7 @@ type DetailItemProps = {
   value: string | null | undefined;
 };
 
-type EmployeeBankDetails = Omit<
-  EmployeeBankDetailsDatabaseRow,
-  "created_at" 
->;
+type EmployeeBankDetails = Omit<EmployeeBankDetailsDatabaseRow, "created_at">;
 
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
@@ -27,7 +24,6 @@ export const EmployeeBankDetailsCard = ({
 }: {
   bankDetails: EmployeeBankDetails | null;
 }) => {
-
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="flex justify-between items-center">

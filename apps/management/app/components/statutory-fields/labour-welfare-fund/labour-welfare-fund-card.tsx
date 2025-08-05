@@ -50,10 +50,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 export function LabourWelfareFundCard({
   labourWelfareFund,
 }: {
-  labourWelfareFund: Omit<
-    LabourWelfareFundDatabaseRow,
-    "created_at"
-  >;
+  labourWelfareFund: Omit<LabourWelfareFundDatabaseRow, "created_at">;
 }) {
   const { role } = useUser();
   return (

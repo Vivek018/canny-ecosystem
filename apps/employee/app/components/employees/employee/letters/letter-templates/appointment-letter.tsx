@@ -17,10 +17,7 @@ export function AppointmentLetter({
   companyData,
 }: {
   data: EmployeeWithLetterDataType | null;
-  employeeAddressData: Omit<
-    EmployeeAddressDatabaseRow,
-    "created_at" 
-  > | null;
+  employeeAddressData: Omit<EmployeeAddressDatabaseRow, "created_at"> | null;
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {

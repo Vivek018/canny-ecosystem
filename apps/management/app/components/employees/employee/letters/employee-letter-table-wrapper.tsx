@@ -60,9 +60,7 @@ export function EmployeeLetterTableWrapper({
     }
   }, [error]);
 
-  const filterData = (
-    data: Omit<EmployeeLetterDataType, "created_at">[],
-  ) => {
+  const filterData = (data: Omit<EmployeeLetterDataType, "created_at">[]) => {
     return data.filter((item) =>
       Object.values(item).some((value) =>
         String(value).toLowerCase().includes(searchString.toLowerCase()),

@@ -84,10 +84,9 @@ export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
 export const ExitsCard = ({
   exitsData,
 }: {
-  exitsData: Omit<ExitsRow, "created_at" > | null;
+  exitsData: Omit<ExitsRow, "created_at"> | null;
   employeeId: string;
 }) => {
-
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">

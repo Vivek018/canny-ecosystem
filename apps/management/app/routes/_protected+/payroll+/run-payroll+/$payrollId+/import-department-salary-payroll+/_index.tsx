@@ -208,7 +208,7 @@ export default function PayrollImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -227,7 +227,7 @@ export default function PayrollImportFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
           );
 
           if (matchedHeader) {
@@ -236,7 +236,7 @@ export default function PayrollImportFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>
+        {} as Record<string, string>,
       );
 
       setFieldMapping(initialMapping);
@@ -248,8 +248,8 @@ export default function PayrollImportFieldMapping() {
       !fieldConfigs.some(
         (config) =>
           pipe(replaceUnderscore, replaceDash)(config?.key.toLowerCase()) ===
-          pipe(replaceUnderscore, replaceDash)(header.toLowerCase())
-      )
+          pipe(replaceUnderscore, replaceDash)(header.toLowerCase()),
+      ),
   );
 
   const validateMapping = () => {
@@ -259,13 +259,13 @@ export default function PayrollImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
 
         setValidationErrors(formattedErrors);
@@ -290,7 +290,7 @@ export default function PayrollImportFieldMapping() {
 
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[0]}: ${err.message}`
+          (err) => `${err.path[0]}: ${err.message}`,
         );
 
         setValidationErrors(formattedErrors);
@@ -324,7 +324,7 @@ export default function PayrollImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -341,7 +341,9 @@ export default function PayrollImportFieldMapping() {
 
           const finalData = results?.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -350,14 +352,14 @@ export default function PayrollImportFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
                   .filter(([key]) =>
                     allowedFields
                       .map((field) => field.toLowerCase())
-                      .includes(key.toLowerCase())
+                      .includes(key.toLowerCase()),
                   )
-                  .map(([key, value]) => [key, String(value).trim()])
+                  .map(([key, value]) => [key, String(value).trim()]),
               );
               return cleanEntry;
             });
@@ -506,7 +508,7 @@ export default function PayrollImportFieldMapping() {
                       <sub
                         className={cn(
                           "hidden text-primary mt-1",
-                          field.required && "inline"
+                          field.required && "inline",
                         )}
                       >
                         *
@@ -516,7 +518,7 @@ export default function PayrollImportFieldMapping() {
                       variant={"ghost"}
                       onClick={() =>
                         setFieldConfigs((prev) =>
-                          prev.filter((f) => f.key !== field.key)
+                          prev.filter((f) => f.key !== field.key),
                         )
                       }
                       className="p-0 h-0 text-destructive text-xs font-extrabold"
@@ -534,11 +536,11 @@ export default function PayrollImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||
@@ -595,7 +597,7 @@ export default function PayrollImportFieldMapping() {
                 />
                 <Combobox
                   options={transformStringArrayIntoOptions(
-                    componentTypeArray as unknown as string[]
+                    componentTypeArray as unknown as string[],
                   )}
                   placeholder="Select Field Type"
                   value={addFieldValueType}

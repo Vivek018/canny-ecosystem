@@ -20,7 +20,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 
 type EmployeeStatutoryDetails = Omit<
   EmployeeStatutoryDetailsDatabaseRow,
-  "created_at" 
+  "created_at"
 >;
 
 export const EmployeeStatutoryCard: React.FC<{

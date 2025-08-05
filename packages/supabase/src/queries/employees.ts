@@ -923,7 +923,7 @@ export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
 
 export type EmployeeProjectAssignmentDataType = Omit<
   EmployeeProjectAssignmentDatabaseRow,
-  "created_at" 
+  "created_at"
 > & {
   sites: {
     id: string;

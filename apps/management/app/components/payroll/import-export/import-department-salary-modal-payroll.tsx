@@ -56,7 +56,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
         `/payroll/run-payroll/${payrollId}/import-department-salary-payroll`,
         {
           state: { file: selectedFile },
-        }
+        },
       );
     }
   };
@@ -85,7 +85,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -117,7 +117,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -144,7 +144,7 @@ export const ImportDepartmentSalaryPayrollModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

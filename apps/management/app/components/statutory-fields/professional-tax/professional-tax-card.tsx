@@ -62,10 +62,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 export function ProfessionalTaxCard({
   professionalTax,
 }: {
-  professionalTax: Omit<
-    ProfessionalTaxDatabaseRow,
-    "created_at"
-  >;
+  professionalTax: Omit<ProfessionalTaxDatabaseRow, "created_at">;
 }) {
   const { role } = useUser();
   const grossSalaryRangeJson =

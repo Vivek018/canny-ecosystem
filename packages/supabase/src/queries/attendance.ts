@@ -8,9 +8,12 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
-import { defaultMonth, defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
+import {
+  defaultMonth,
+  defaultYear,
+  formatUTCDate,
+} from "@canny_ecosystem/utils";
 import { filterComparison } from "../constant";
-
 
 export type AttendanceDataType = Pick<
   EmployeeDatabaseRow,

@@ -282,10 +282,7 @@ export async function seedRequisitesForEmployeeCreation({
                   ? DEFAULT_TERMINATION_LETTER
                   : null;
 
-    const letterData: Omit<
-      EmployeeLetterDatabaseInsert,
-      "created_at"
-    > = {
+    const letterData: Omit<EmployeeLetterDatabaseInsert, "created_at"> = {
       letter_type: letterType,
       subject: faker.lorem.sentence(3),
       date: faker.date.past().toISOString(),

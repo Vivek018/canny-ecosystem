@@ -9,7 +9,7 @@ type DetailItemProps = {
 
 type EmployeeProjectAssignment = Omit<
   EmployeeProjectAssignmentDataType,
-  "created_at" 
+  "created_at"
 >;
 
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {

@@ -13,7 +13,7 @@ interface FilterControlsProps {
   selectedSiteIds: string[];
   selectedDeptIds: string[];
   onFieldChange: (fields: string[]) => void;
-  payrollData: Omit<PayrollDatabaseRow, "created_at" >;
+  payrollData: Omit<PayrollDatabaseRow, "created_at">;
 }
 
 export const FilterControls = React.memo<FilterControlsProps>(

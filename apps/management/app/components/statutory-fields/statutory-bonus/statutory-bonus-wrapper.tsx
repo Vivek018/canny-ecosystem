@@ -28,10 +28,7 @@ export function StatutoryBonusWrapper({
   data,
   error,
 }: {
-  data: Omit<
-    StatutoryBonusDatabaseRow,
-    "created_at" | "is_default"
-  > | null;
+  data: Omit<StatutoryBonusDatabaseRow, "created_at" | "is_default"> | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

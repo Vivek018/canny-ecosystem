@@ -304,5 +304,3 @@ export function numberToWordsIndian(num: number) {
 }
 
 export const recentlyAddedFilter = Object.keys(filterComparison);
-
-

@@ -43,7 +43,7 @@ export function getValidDateForInput(date: string | Date | undefined): string {
 export function getAutoTimeDifference(
   startDate: string | Date | undefined | null,
   endDate: string | Date | undefined | null,
-  unit: "days" | "months" | "years" = "days"
+  unit: "days" | "months" | "years" = "days",
 ): number | null {
   const start = startDate
     ? startDate instanceof Date && isValid(startDate)
@@ -109,7 +109,7 @@ export function formatDateTime(date: Date | string | number) {
 
 export function getYears(
   numberOfYears = 30,
-  currentYear: number | null = defaultYear
+  currentYear: number | null = defaultYear,
 ) {
   if (numberOfYears <= 0) {
     throw new Error("Number of years must be greater than 0");
@@ -134,7 +134,7 @@ export const formatDateToMonthYear = (dateString: string | number | Date) => {
 export const calculateDateRange = (
   range: string,
   monthName: string | number | null | undefined,
-  yearValue: string | number | undefined
+  yearValue: string | number | undefined,
 ) => {
   const rangeNumber = Number.parseInt(String(range), 10);
   const monthNumber = monthName ? months[monthName] : defaultMonth;

@@ -34,10 +34,7 @@ export function EPFWrapper({
   data,
   error,
 }: {
-  data: Omit<
-    EmployeeProvidentFundDatabaseRow,
-    "created_at"
-  > | null;
+  data: Omit<EmployeeProvidentFundDatabaseRow, "created_at"> | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

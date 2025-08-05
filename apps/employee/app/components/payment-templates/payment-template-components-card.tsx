@@ -9,7 +9,7 @@ export const PaymentTemplateComponentsCard = ({
   returnTo,
 }: {
   paymentTemplateComponents:
-    | Omit<PaymentTemplateComponentType, "created_at" >[]
+    | Omit<PaymentTemplateComponentType, "created_at">[]
     | PaymentTemplateComponentType[]
     | null
     | undefined;

@@ -22,7 +22,7 @@ export function UserMenu({
   dropdownContentRef,
   Link,
 }: {
-  userData: Omit<UserDatabaseRow, "created_at" >;
+  userData: Omit<UserDatabaseRow, "created_at">;
   isExpanded?: boolean;
   dropdownContentRef?: React.RefObject<HTMLDivElement>;
   Link: React.ElementType;

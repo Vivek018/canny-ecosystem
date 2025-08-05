@@ -34,10 +34,7 @@ export function ESIWrapper({
   data,
   error,
 }: {
-  data: Omit<
-    EmployeeStateInsuranceDatabaseRow,
-    "created_at"
-  > | null;
+  data: Omit<EmployeeStateInsuranceDatabaseRow, "created_at"> | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

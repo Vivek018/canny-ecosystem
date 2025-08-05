@@ -1,6 +1,4 @@
-import type {
-  ImportEmployeeProjectAssignmentsDataType,
-} from "@canny_ecosystem/supabase/queries";
+import type { ImportEmployeeProjectAssignmentsDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";

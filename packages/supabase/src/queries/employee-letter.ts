@@ -92,7 +92,7 @@ export async function getEmployeeLetterById({
 
 export type EmployeeWithLetterDataType = Omit<
   EmployeeLetterDatabaseRow,
-  "created_at" 
+  "created_at"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,

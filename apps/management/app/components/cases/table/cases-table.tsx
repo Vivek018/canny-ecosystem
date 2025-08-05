@@ -114,9 +114,7 @@ export function CasesTable<TData, TValue>({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(
-      rowArray as Omit<CasesDatabaseRow, "created_at">[],
-    );
+    setSelectedRows(rowArray as Omit<CasesDatabaseRow, "created_at">[]);
   }, [rowSelection]);
 
   useEffect(() => {
@@ -204,12 +202,7 @@ export function CasesTable<TData, TValue>({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={
-          selectedRowsData as Omit<
-            CasesDatabaseRow,
-            "created_at" 
-          >[]
-        }
+        data={selectedRowsData as Omit<CasesDatabaseRow, "created_at">[]}
       />
     </div>
   );

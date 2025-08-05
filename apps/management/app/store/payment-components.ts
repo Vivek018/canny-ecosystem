@@ -11,14 +11,11 @@ import type {
 import { create } from "zustand";
 
 type StatutoryFieldsType = {
-  epf?: Omit<
-    EmployeeProvidentFundDatabaseRow,
-    "created_at" 
-  > | null;
+  epf?: Omit<EmployeeProvidentFundDatabaseRow, "created_at"> | null;
   esi?: EmployeeStateInsuranceDataType | null;
   bonus?: StatutoryBonusDataType | null;
-  pt?: Omit<ProfessionalTaxDatabaseRow, "created_at" > | null;
-  lwf?: Omit<LabourWelfareFundDatabaseRow, "created_at" > | null;
+  pt?: Omit<ProfessionalTaxDatabaseRow, "created_at"> | null;
+  lwf?: Omit<LabourWelfareFundDatabaseRow, "created_at"> | null;
 };
 
 interface PaymentComponentsState {

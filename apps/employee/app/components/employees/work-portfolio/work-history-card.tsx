@@ -23,10 +23,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   );
 };
 
-type EmployeeWorkHistory = Omit<
-  EmployeeWorkHistoryDatabaseRow,
-  "created_at" 
->;
+type EmployeeWorkHistory = Omit<EmployeeWorkHistoryDatabaseRow, "created_at">;
 
 export const WorkHistoryItem = ({
   workHistory,

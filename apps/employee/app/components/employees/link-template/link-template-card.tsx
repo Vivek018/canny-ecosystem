@@ -23,7 +23,7 @@ export const LinkTemplateItem = ({
 }: {
   paymentTemplateAssignmentData: Omit<
     PaymentTemplateAssignmentsDatabaseRow,
-     "created_at"
+    "created_at"
   >;
 }) => {
   return (
@@ -69,7 +69,7 @@ export const LinkTemplateCard = ({
 }: {
   paymentTemplateAssignmentData: Omit<
     PaymentTemplateAssignmentsDatabaseRow,
-    "created_at" 
+    "created_at"
   > | null;
 }) => {
   return (

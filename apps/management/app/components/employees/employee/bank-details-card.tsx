@@ -13,10 +13,7 @@ type DetailItemProps = {
   value: string | null | undefined;
 };
 
-type EmployeeBankDetails = Omit<
-  EmployeeBankDetailsDatabaseRow,
-  "created_at"
->;
+type EmployeeBankDetails = Omit<EmployeeBankDetailsDatabaseRow, "created_at">;
 
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
