@@ -14,6 +14,7 @@ import {
   EMPLOYEE_RESTRICTED_VALUE,
   ESI_EMPLOYEE_CONTRIBUTION,
   ESI_MAX_LIMIT,
+  roundToNearest,
 } from "@canny_ecosystem/utils";
 import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 
@@ -28,12 +29,12 @@ export function getSelectedPaymentComponentFromField<
   field: T | undefined | null;
   monthlyCtc: number;
   priortizedComponent?:
-    | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
+    | Omit<PaymentTemplateComponentDatabaseRow, "created_at">
     | null
     | undefined;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   if (!field) return null;
@@ -70,7 +71,7 @@ export function getSelectedPaymentComponentFromField<
 }
 
 export function getEPFComponentFromField<
-  T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">,
+  T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at">,
 >({
   field,
   value,
@@ -80,7 +81,7 @@ export function getEPFComponentFromField<
   value: number;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   if (!field) return null;
@@ -110,7 +111,7 @@ export function getESIComponentFromField<
   value: number;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   if (!field) return null;
@@ -132,7 +133,7 @@ export function getESIComponentFromField<
 export function getPTComponentFromField<
   T extends Omit<
     ProfessionalTaxDatabaseRow,
-    "gross_salary_range" | "created_at" | "updated_at"
+    "gross_salary_range" | "created_at"
   > & {
     gross_salary_range: any;
   },
@@ -145,7 +146,7 @@ export function getPTComponentFromField<
   value: number;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   if (!field) return null;
@@ -178,7 +179,7 @@ export function getPTComponentFromField<
 }
 
 export function getLWFComponentFromField<
-  T extends Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">,
+  T extends Omit<LabourWelfareFundDatabaseRow, "created_at">,
 >({
   field,
   existingComponent,
@@ -186,7 +187,7 @@ export function getLWFComponentFromField<
   field: T | null | undefined;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   if (!field) return null;
@@ -223,7 +224,7 @@ export function getBonusComponentFromField<T extends StatutoryBonusDataType>({
   value: number;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   if (!field) return null;
@@ -249,7 +250,7 @@ export function getValueforEPF({
   epf,
   values,
 }: {
-  epf: Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">;
+  epf: Omit<EmployeeProvidentFundDatabaseRow, "created_at">;
   values: { [key: string]: number };
 }) {
   let value = 0;
@@ -319,10 +320,10 @@ export function calculateProRataAmount({
 }
 
 export function calculateSalaryTotalNetAmount(
-  salaryDataArray: Record<string, any>[],
+  salaryDataArray: Record<string, any>[]
 ): number {
-  let totalNetPay = 0;
-
+  let allEarnings = 0;
+  let allDeductions = 0;
   for (const employeeData of salaryDataArray) {
     for (const value of Object.values(employeeData)) {
       if (
@@ -333,15 +334,15 @@ export function calculateSalaryTotalNetAmount(
       ) {
         const amount = Number(value.amount) || 0;
         if (value.type === "earning") {
-          totalNetPay += amount;
+          allEarnings += amount;
         } else if (value.type === "deduction") {
-          totalNetPay -= amount;
+          allDeductions += amount;
         }
       }
     }
   }
 
-  return totalNetPay;
+  return (roundToNearest(allEarnings) - roundToNearest(allDeductions));
 }
 
 export const calculateNetAmountAfterEntryCreated = (employee: any): number => {
@@ -360,7 +361,7 @@ export const calculateNetAmountAfterEntryCreated = (employee: any): number => {
 };
 
 export const calculateFieldTotalsWithNetPay = (
-  employees: any[],
+  employees: any[]
 ): Record<string, { amount: number; type: string } | number> => {
   const fieldTotals: Record<string, { amount: number; type: string }> = {};
   let gross = 0;
@@ -420,17 +421,17 @@ export const getUniqueFields = (data: any[]): string[] => {
   }
 
   const orderedEarnings = preferredEarningOrder.filter((f) =>
-    earningFields.has(f),
+    earningFields.has(f)
   );
   const remainingEarnings = [...earningFields.keys()].filter(
-    (f) => !preferredEarningOrder.includes(f),
+    (f) => !preferredEarningOrder.includes(f)
   );
 
   const orderedDeductions = preferredDeductionOrder.filter((f) =>
-    deductionFields.has(f),
+    deductionFields.has(f)
   );
   const remainingDeductions = [...deductionFields.keys()].filter(
-    (f) => !preferredDeductionOrder.includes(f),
+    (f) => !preferredDeductionOrder.includes(f)
   );
 
   return [

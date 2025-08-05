@@ -36,7 +36,7 @@ export function EPFWrapper({
 }: {
   data: Omit<
     EmployeeProvidentFundDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   > | null;
   error: Error | null | { message: string };
 }) {

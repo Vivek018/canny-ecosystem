@@ -272,10 +272,9 @@ export default function RunPayrollIndex() {
                               >
                                 <PayrollCard
                                   data={
-                                    payroll as unknown as Omit<
-                                      PayrollDatabaseRow,
-                                      "updated_at"
-                                    >
+                                    payroll as unknown as 
+                                      PayrollDatabaseRow
+                                    
                                   }
                                   key={payroll.id}
                                 />

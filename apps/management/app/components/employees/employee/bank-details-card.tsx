@@ -15,7 +15,7 @@ type DetailItemProps = {
 
 type EmployeeBankDetails = Omit<
   EmployeeBankDetailsDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at"
 >;
 
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {

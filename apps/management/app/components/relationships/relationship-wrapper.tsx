@@ -8,7 +8,7 @@ export function RelationshipWrapper({
   data,
   error,
 }: {
-  data: Omit<RelationshipWithCompany, "created_at" | "updated_at">[] | null;
+  data: Omit<RelationshipWithCompany, "created_at">[] | null;
   error: Error | null | { message: string };
 }) {
   const { toast } = useToast();

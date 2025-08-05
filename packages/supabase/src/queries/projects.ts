@@ -45,7 +45,7 @@ export async function getProjectsByCompanyId({
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<Omit<ProjectDatabaseRow, "created_at" | "updated_at">[]>();
+    .returns<Omit<ProjectDatabaseRow, "created_at">[]>();
 
   if (error) {
     console.error("getProjectsByCompanyId Error", error);
@@ -98,7 +98,7 @@ export async function getProjectById({
     .from("projects")
     .select(columns.join(","))
     .eq("id", id)
-    .single<Omit<ProjectDatabaseRow, "created_at" | "updated_at">>();
+    .single<Omit<ProjectDatabaseRow, "created_at">>();
 
   if (error) {
     console.error("getProjectById Error", error);

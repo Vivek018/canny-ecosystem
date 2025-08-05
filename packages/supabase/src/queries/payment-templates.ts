@@ -216,7 +216,7 @@ export async function getDefaultTemplateIdByCompanyId({
 
 export type PaymentTemplateComponentType = Omit<
   PaymentTemplateComponentDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at" 
 > & {
   payment_fields: Pick<
     PaymentFieldDatabaseRow,
@@ -283,6 +283,6 @@ export type PaymentTemplateWithComponentsType = Pick<
 > & {
   payment_template_components?: Omit<
     PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at" 
   >[];
 };

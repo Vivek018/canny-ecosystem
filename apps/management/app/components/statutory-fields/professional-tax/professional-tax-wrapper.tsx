@@ -24,7 +24,7 @@ export function ProfessionalTaxWrapper({
   data,
   error,
 }: {
-  data: Omit<ProfessionalTaxDatabaseRow, "created_at" | "updated_at">[] | null;
+  data: Omit<ProfessionalTaxDatabaseRow, "created_at">[] | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

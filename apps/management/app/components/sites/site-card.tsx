@@ -34,7 +34,7 @@ import { useUser } from "@/utils/user";
 export function SiteCard({
   site,
 }: {
-  site: Omit<SitesWithLocation, "created_at" | "updated_at">;
+  site: Omit<SitesWithLocation, "created_at">;
 }) {
   const { role } = useUser();
 

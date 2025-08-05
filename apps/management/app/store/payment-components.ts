@@ -13,12 +13,12 @@ import { create } from "zustand";
 type StatutoryFieldsType = {
   epf?: Omit<
     EmployeeProvidentFundDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at" 
   > | null;
   esi?: EmployeeStateInsuranceDataType | null;
   bonus?: StatutoryBonusDataType | null;
-  pt?: Omit<ProfessionalTaxDatabaseRow, "created_at" | "updated_at"> | null;
-  lwf?: Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at"> | null;
+  pt?: Omit<ProfessionalTaxDatabaseRow, "created_at" > | null;
+  lwf?: Omit<LabourWelfareFundDatabaseRow, "created_at" > | null;
 };
 
 interface PaymentComponentsState {

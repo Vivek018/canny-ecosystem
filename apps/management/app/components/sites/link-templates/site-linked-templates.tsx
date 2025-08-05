@@ -12,7 +12,7 @@ export function SiteLinkedTemplates({
   linkedTemplates,
 }: {
   linkedTemplates:
-    | Omit<PaymentTemplateAssignmentsType[], "created_at" | "updated_at">
+    | Omit<PaymentTemplateAssignmentsType[], "created_at">
     | null
     | undefined;
 }) {

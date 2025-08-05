@@ -36,7 +36,7 @@ export function ESIWrapper({
 }: {
   data: Omit<
     EmployeeStateInsuranceDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   > | null;
   error: Error | null | { message: string };
 }) {

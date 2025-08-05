@@ -38,7 +38,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 
 type EmployeeAddress = Omit<
   EmployeeAddressDatabaseRow,
-  "country" | "created_at" | "updated_at"
+  "country" | "created_at" 
 >;
 
 export const AddressItem = ({ address }: { address: EmployeeAddress }) => {

@@ -8,8 +8,9 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
-import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
-import { filterComparison } from "../../../../apps/management/app/constant";
+import { defaultMonth, defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
+import { filterComparison } from "../constant";
+
 
 export type AttendanceDataType = Pick<
   EmployeeDatabaseRow,
@@ -180,9 +181,6 @@ export async function getMonthlyAttendanceByCompanyId({
     filters?: AttendanceFilters;
   };
 }) {
-  const today = new Date();
-  const defaultMonth = today.getMonth() + 1;
-  const defaultYear = today.getFullYear();
   const { from, to, sort, searchQuery, filters } = params;
   const { month, year, project, site, recently_added } = filters ?? {};
   const foreignFilters = project || site;

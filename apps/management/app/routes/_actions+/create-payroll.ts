@@ -217,7 +217,7 @@ export async function action({
 
     //   const allSalaryEntries: Omit<
     //     SalaryEntriesDatabaseRow,
-    //     "id" | "created_at" | "updated_at" | "payroll_id"
+    //     "id" | "created_at" | "payroll_id"
     //   >[] = [];
 
     //   const uniqueEmployeeIds = new Set<string>();

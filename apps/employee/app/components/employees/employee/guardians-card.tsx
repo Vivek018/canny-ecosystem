@@ -26,7 +26,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 
 type EmployeeGuardian = Omit<
   EmployeeGuardianDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at" 
 >;
 
 export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {

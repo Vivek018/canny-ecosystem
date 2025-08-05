@@ -9,7 +9,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 export function PayrollCard({
   data,
 }: {
-  data: Omit<PayrollDatabaseRow, "updated_at">;
+  data: PayrollDatabaseRow;
 }) {
   const is_approved = data.status === "approved";
 

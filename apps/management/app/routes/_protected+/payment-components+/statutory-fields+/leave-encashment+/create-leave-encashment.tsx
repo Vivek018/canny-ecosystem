@@ -196,7 +196,7 @@ export default function CreateLeaveEncashment({
                     type: "number",
                   }),
                   autoFocus: true,
-                  placeholder: replaceUnderscore(fields.eligible_years.name),
+                  placeholder: replaceUnderscore(fields.eligible_years.name)!,
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -232,7 +232,7 @@ export default function CreateLeaveEncashment({
                   autoFocus: true,
                   placeholder: replaceUnderscore(
                     fields.encashment_multiplier.name,
-                  ),
+                  )!,
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -252,7 +252,7 @@ export default function CreateLeaveEncashment({
                   autoFocus: true,
                   placeholder: replaceUnderscore(
                     fields.max_encashable_leaves.name,
-                  ),
+                  )!,
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -272,7 +272,7 @@ export default function CreateLeaveEncashment({
                   autoFocus: true,
                   placeholder: replaceUnderscore(
                     fields.max_encashment_amount.name,
-                  ),
+                  )!,
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -292,7 +292,7 @@ export default function CreateLeaveEncashment({
                   autoFocus: true,
                   placeholder: replaceUnderscore(
                     fields.working_days_per_year.name,
-                  ),
+                  )!,
                   className: "capitalize",
                 }}
                 labelProps={{

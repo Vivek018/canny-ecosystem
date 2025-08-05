@@ -284,7 +284,7 @@ export async function seedRequisitesForEmployeeCreation({
 
     const letterData: Omit<
       EmployeeLetterDatabaseInsert,
-      "created_at" | "updated_at"
+      "created_at"
     > = {
       letter_type: letterType,
       subject: faker.lorem.sentence(3),

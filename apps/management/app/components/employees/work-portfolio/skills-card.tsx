@@ -49,7 +49,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 
 type EmployeeSkill = Omit<
   EmployeeSkillDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at"
 >;
 
 export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {

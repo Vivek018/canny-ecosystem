@@ -19,7 +19,7 @@ export function PageHeader({
 }: {
   company: Omit<
     CompanyDatabaseRow,
-    "created_at" | "updated_at" | "is_active"
+    "created_at" | "is_active"
   > | null;
   user: Pick<UserDatabaseRow, "id" | "email" | "role" | "company_id"> | null;
 }) {

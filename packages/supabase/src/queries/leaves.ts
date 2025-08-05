@@ -10,8 +10,7 @@ import type {
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
-import { HARD_QUERY_LIMIT } from "../constant";
-import { filterComparison } from "../../../../apps/management/app/constant";
+import { filterComparison, HARD_QUERY_LIMIT } from "../constant";
 
 export type ImportLeavesDataType = Pick<
   LeavesDatabaseRow,

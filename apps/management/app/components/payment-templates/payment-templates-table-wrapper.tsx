@@ -13,7 +13,7 @@ export function PaymentTemplatesTableWrapper({
   error,
   searchString,
 }: {
-  data: Omit<PaymentTemplateDatabaseRow, "created_at" | "updated_at">[] | null;
+  data: Omit<PaymentTemplateDatabaseRow, "created_at">[] | null;
   error: Error | null | { message: string };
   searchString: string;
 }) {

@@ -7,6 +7,13 @@ import { ImportedEmployeeOptionsDropdown } from "./imported-table-options";
 
 export const ImportedDataColumns: ColumnDef<ImportEmployeeAddressDataType>[] = [
   {
+    accessorKey: "sr_no",
+    header: "Sr No.",
+    cell: ({ row }) => {
+      return <p className="truncate ">{row.index + 1}</p>;
+    },
+  },
+  {
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {

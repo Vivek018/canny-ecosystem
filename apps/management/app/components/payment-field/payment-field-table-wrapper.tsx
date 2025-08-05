@@ -12,7 +12,7 @@ export function PaymentFieldTableWrapper({
   error,
   searchString,
 }: {
-  data: Omit<PaymentFieldDataType, "created_at" | "updated_at">[] | null;
+  data: Omit<PaymentFieldDataType, "created_at">[] | null;
   error: Error | null | { message: string };
   searchString: string;
 }) {

@@ -16,7 +16,7 @@ export function Sidebar({
 }: {
   className: string;
   theme: Theme;
-  user: Omit<UserDatabaseRow, "created_at" | "updated_at">;
+  user: Omit<UserDatabaseRow, "created_at">;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { pathname } = useLocation();

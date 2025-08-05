@@ -272,7 +272,7 @@ export async function getRelationshipsByCompanyId({
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<Omit<RelationshipWithCompany, "created_at" | "updated_at">[]>();
+    .returns<Omit<RelationshipWithCompany, "created_at">[]>();
 
   if (error) {
     console.error("getRelationshipsByCompanyId Error", error);
@@ -308,7 +308,7 @@ export async function getRelationshipById({
     .select(columns.join(","))
     .eq("id", id)
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
-    .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
+    .single<Omit<RelationshipWithCompany, "created_at">>();
 
   if (error) {
     console.error("getRelationshipById Error", error);

@@ -21,6 +21,7 @@ import {
   AttendanceSchema,
   getYears,
   defaultYear,
+  defaultMonth,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -263,6 +264,7 @@ export default function AddBulkAttendances() {
                   inputProps={{
                     ...getInputProps(singleField.month, { type: "text" }),
                     placeholder: "Select Month",
+                    defaultValue: defaultMonth.toString(),
                   }}
                   options={payoutMonths}
                   labelProps={{
@@ -275,6 +277,7 @@ export default function AddBulkAttendances() {
                   inputProps={{
                     ...getInputProps(singleField.year, { type: "text" }),
                     placeholder: "Select Year",
+                    defaultValue: defaultYear.toString(),
                   }}
                   options={transformStringArrayIntoOptions(
                     getYears(25, defaultYear) as unknown as string[],

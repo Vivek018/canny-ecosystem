@@ -42,7 +42,7 @@ const DetailItem: React.FC<DetailItemProps> = ({
 export function SampleEPFCalculationCard({
   data,
 }: {
-  data: Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">;
+  data: Omit<EmployeeProvidentFundDatabaseRow, "created_at">;
 }) {
   const employeeEPFPercentage =
     data?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE;

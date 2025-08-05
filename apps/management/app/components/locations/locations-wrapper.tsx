@@ -26,7 +26,7 @@ export function LocationsWrapper({
   data,
   error,
 }: {
-  data: Omit<LocationDatabaseRow, "created_at" | "updated_at">[] | null;
+  data: Omit<LocationDatabaseRow, "created_at">[] | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

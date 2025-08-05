@@ -69,18 +69,19 @@ export const ImportSalaryPayrollModal = () => {
       total_days: null,
       present_days: null,
       basic: null,
+      da: null,
       hra: null,
       lta: null,
+      ot_amount: null,
       bonus: null,
-      others: null,
+      leave_salary: null,
       pf: null,
       esic: null,
       pt: null,
-      lwf: null,
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -112,7 +113,7 @@ export const ImportSalaryPayrollModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >,
+                    >
                   );
                 }
               }}
@@ -139,7 +140,7 @@ export const ImportSalaryPayrollModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
           )}
         >
           {!eligibleFileSize

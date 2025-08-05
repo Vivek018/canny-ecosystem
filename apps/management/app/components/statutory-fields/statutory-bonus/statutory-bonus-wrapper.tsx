@@ -30,7 +30,7 @@ export function StatutoryBonusWrapper({
 }: {
   data: Omit<
     StatutoryBonusDatabaseRow,
-    "created_at" | "updated_at" | "is_default"
+    "created_at" | "is_default"
   > | null;
   error: Error | null | { message: string };
 }) {

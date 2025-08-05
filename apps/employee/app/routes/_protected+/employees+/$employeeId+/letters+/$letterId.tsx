@@ -29,8 +29,8 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 
 export type CompanyInfoDataType = {
-  data: Omit<CompanyDatabaseUpdate, "created_at" | "updated_at"> | null;
-  locationData: Omit<LocationDatabaseRow, "created_at" | "updated_at"> | null;
+  data: Omit<CompanyDatabaseUpdate, "created_at"> | null;
+  locationData: Omit<LocationDatabaseRow, "created_at"> | null;
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {

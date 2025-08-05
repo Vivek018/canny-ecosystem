@@ -636,7 +636,7 @@ export async function getDefaultEmployeeAddressesByEmployeeId({
     .order("created_at", { ascending: false })
     .limit(SINGLE_QUERY_LIMIT)
     .single<InferredType<
-      Omit<EmployeeAddressDatabaseRow, "created_at" | "updated_at">,
+      Omit<EmployeeAddressDatabaseRow, "created_at">,
       (typeof columns)[number]
     > | null>();
 
@@ -923,7 +923,7 @@ export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
 
 export type EmployeeProjectAssignmentDataType = Omit<
   EmployeeProjectAssignmentDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at" 
 > & {
   sites: {
     id: string;

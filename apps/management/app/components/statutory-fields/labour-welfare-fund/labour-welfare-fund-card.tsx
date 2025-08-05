@@ -52,7 +52,7 @@ export function LabourWelfareFundCard({
 }: {
   labourWelfareFund: Omit<
     LabourWelfareFundDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   const { role } = useUser();

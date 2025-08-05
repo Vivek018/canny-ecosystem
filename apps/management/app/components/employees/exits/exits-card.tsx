@@ -88,7 +88,7 @@ export const ExitsCard = ({
   exitsData,
   employeeId,
 }: {
-  exitsData: Omit<ExitsRow, "created_at" | "updated_at"> | null;
+  exitsData: Omit<ExitsRow, "created_at"> | null;
   employeeId: string;
 }) => {
   const { role } = useUser();

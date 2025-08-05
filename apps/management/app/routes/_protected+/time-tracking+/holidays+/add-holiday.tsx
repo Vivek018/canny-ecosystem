@@ -77,14 +77,14 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const holidaysData = submission.value;
 
   const { status, error } = await addHolidaysFromData({
     supabase,
-    data: holidaysData,
+    data: holidaysData as unknown as HolidaysDatabaseUpdate[],
   });
 
   if (isGoodStatus(status)) {

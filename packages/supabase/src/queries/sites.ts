@@ -43,7 +43,7 @@ export async function getSitesByCompanyId({
     .eq("company_id", companyId)
     .limit(MID_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<Omit<SitesWithLocation, "created_at" | "updated_at">[]>();
+    .returns<Omit<SitesWithLocation, "created_at">[]>();
 
   if (error) {
     console.error("getSitesByCompanyId Error", error);
@@ -106,7 +106,7 @@ export async function getSitesByProjectId({
     .eq("project_id", projectId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<Omit<SitesWithLocation, "created_at" | "updated_at">[]>();
+    .returns<Omit<SitesWithLocation, "created_at">[]>();
 
   if (error) {
     console.error("getSitesByProjectId Error", error);
@@ -166,7 +166,7 @@ export async function getSiteById({
     .from("sites")
     .select(columns.join(","))
     .eq("id", id)
-    .single<Omit<SitesWithLocation, "created_at" | "updated_at">>();
+    .single<Omit<SitesWithLocation, "created_at">>();
 
   if (error) {
     console.error("getSiteById Error", error);

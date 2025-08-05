@@ -23,7 +23,7 @@ export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 export const EmployeeDetailsCard: React.FC<{
   employee: Omit<
     EmployeeDatabaseRow,
-    "fts_vector" | "nationality" | "created_at" | "updated_at"
+    "fts_vector" | "nationality" | "created_at" 
   >;
 }> = ({ employee }) => {
   return (

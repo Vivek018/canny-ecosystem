@@ -29,7 +29,7 @@ import type { ProjectDatabaseRow } from "@canny_ecosystem/supabase/types";
 export function ProjectCard({
   project,
 }: {
-  project: Omit<ProjectDatabaseRow, "created_at" | "updated_at">;
+  project: Omit<ProjectDatabaseRow, "created_at">;
 }) {
   const { role } = useUser();
 

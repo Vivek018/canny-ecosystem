@@ -117,7 +117,7 @@ export async function updatePaymentTemplateWithComponents({
   templateData: PaymentTemplateDatabaseUpdate;
   templateComponentsData?: Omit<
     PaymentTemplateComponentDatabaseUpdate,
-    "created_at" | "updated_at"
+    "created_at"
   >[];
   bypassAuth?: boolean;
 }) {
@@ -312,7 +312,7 @@ export async function updateMultiPaymentTemplateComponents({
   supabase: TypedSupabaseClient;
   dataArray: Omit<
     PaymentTemplateComponentDatabaseUpdate,
-    "created_at" | "updated_at"
+    "created_at"
   >[];
   bypassAuth?: boolean;
 }) {
@@ -350,7 +350,7 @@ export async function updateMultiPaymentTemplateComponentsWithCreation({
   templateId: string;
   dataArray: Omit<
     PaymentTemplateComponentDatabaseUpdate,
-    "created_at" | "updated_at"
+    "created_at"
   >[];
   bypassAuth?: boolean;
 }) {

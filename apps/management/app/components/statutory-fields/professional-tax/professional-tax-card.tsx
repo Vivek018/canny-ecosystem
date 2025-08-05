@@ -64,7 +64,7 @@ export function ProfessionalTaxCard({
 }: {
   professionalTax: Omit<
     ProfessionalTaxDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at"
   >;
 }) {
   const { role } = useUser();

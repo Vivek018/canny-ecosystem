@@ -115,7 +115,7 @@ export function CasesTable<TData, TValue>({
       rowArray.push(row.original);
     }
     setSelectedRows(
-      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[],
+      rowArray as Omit<CasesDatabaseRow, "created_at">[],
     );
   }, [rowSelection]);
 
@@ -207,7 +207,7 @@ export function CasesTable<TData, TValue>({
         data={
           selectedRowsData as Omit<
             CasesDatabaseRow,
-            "created_at" | "updated_at"
+            "created_at" 
           >[]
         }
       />

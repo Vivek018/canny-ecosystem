@@ -1,5 +1,4 @@
 import type {
-  ImportEmployeeDetailsDataType,
   ImportEmployeeProjectAssignmentsDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -10,6 +9,13 @@ import { ImportedEmployeeProjectAssignmentsOptionsDropdown } from "./imported-ta
 
 export const ImportedDataColumns: ColumnDef<ImportEmployeeProjectAssignmentsDataType>[] =
   [
+    {
+      accessorKey: "sr_no",
+      header: "Sr No.",
+      cell: ({ row }) => {
+        return <p className="truncate ">{row.index + 1}</p>;
+      },
+    },
     {
       accessorKey: "employee_code",
       header: "Employee Code",

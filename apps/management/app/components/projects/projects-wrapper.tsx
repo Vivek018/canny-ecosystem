@@ -10,7 +10,7 @@ export function ProjectsWrapper({
   data,
   error,
 }: {
-  data: Omit<ProjectDatabaseRow, "created_at" | "updated_at">[] | null;
+  data: Omit<ProjectDatabaseRow, "created_at">[] | null;
   error: Error | null | { message: string };
 }) {
   const { toast } = useToast();

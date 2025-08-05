@@ -1,7 +1,6 @@
 import { Card } from "@canny_ecosystem/ui/card";
 import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
-import { useUser } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -84,12 +83,10 @@ export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
 
 export const ExitsCard = ({
   exitsData,
-  employeeId,
 }: {
-  exitsData: Omit<ExitsRow, "created_at" | "updated_at"> | null;
+  exitsData: Omit<ExitsRow, "created_at" > | null;
   employeeId: string;
 }) => {
-  const { role } = useUser();
 
   return (
     <Card className="rounded w-full h-full p-4">

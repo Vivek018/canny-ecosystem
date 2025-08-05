@@ -22,7 +22,7 @@ export const ProjectOptionsDropdown = ({
   project,
   triggerChild,
 }: {
-  project: Omit<ProjectDatabaseRow, "created_at" | "updated_at">;
+  project: Omit<ProjectDatabaseRow, "created_at">;
   triggerChild: React.ReactElement;
 }) => {
   const submit = useSubmit();

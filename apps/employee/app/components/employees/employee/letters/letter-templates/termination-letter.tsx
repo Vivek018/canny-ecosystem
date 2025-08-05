@@ -19,7 +19,7 @@ export function TerminationLetter({
   data: EmployeeWithLetterDataType | null;
   employeeAddressData: Omit<
     EmployeeAddressDatabaseRow,
-    "created_at" | "updated_at"
+    "created_at" 
   > | null;
   companyData: CompanyInfoDataType | null;
 }) {

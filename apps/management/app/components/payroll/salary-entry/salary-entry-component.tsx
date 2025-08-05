@@ -61,7 +61,7 @@ export function SalaryEntryComponent({
   allProjectOptions,
 }: {
   data: any[];
-  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at"> & {
+  payrollData: Omit<PayrollDatabaseRow, "created_at" > & {
     site?: { name: string } | null;
     project?: { name: string } | null;
   };

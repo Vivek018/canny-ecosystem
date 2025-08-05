@@ -84,7 +84,7 @@ export default function AttendanceImportFieldMapping() {
   const [file] = useState(location.state?.file);
   const [headerArray, setHeaderArray] = useState<string[]>([]);
   const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
-  const [month, setMonth] = useState(defaultMonth + 1);
+  const [month, setMonth] = useState(defaultMonth);
   const [year, setYear] = useState(defaultYear);
 
   const [errors, setErrors] = useState<Record<string, string>>({});

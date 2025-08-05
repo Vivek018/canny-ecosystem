@@ -44,7 +44,7 @@ import { useState } from "react";
 export function LocationCard({
   location,
 }: {
-  location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
+  location: Omit<LocationDatabaseRow, "created_at">;
 }) {
   const { role } = useUser();
   const [open, setOpen] = useState(false);

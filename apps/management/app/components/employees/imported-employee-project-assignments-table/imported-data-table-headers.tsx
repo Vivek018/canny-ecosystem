@@ -10,6 +10,7 @@ type Props = {
 
 // make sure the order is same as header order
 export const ImportEmployeeProjectAssignmentsDataArray = [
+  "sr_no",
   "employee_code",
   "site",
   "assignment_type",

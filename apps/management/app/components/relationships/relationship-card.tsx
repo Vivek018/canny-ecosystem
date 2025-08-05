@@ -40,7 +40,7 @@ import { useUser } from "@/utils/user";
 export function RelationshipCard({
   relationship,
 }: {
-  relationship: Omit<RelationshipWithCompany, "created_at" | "updated_at">;
+  relationship: Omit<RelationshipWithCompany, "created_at">;
 }) {
   const { role } = useUser();
 

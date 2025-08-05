@@ -19,7 +19,7 @@ export function FilterList({ filters }: { filters: DashboardFilters }) {
   const defaultFilters = Object.keys(filters!).length
     ? filters
     : {
-        month: monthNames[defaultMonth + 2],
+        month: monthNames[defaultMonth],
         year: defaultYear.toString(),
       };
 

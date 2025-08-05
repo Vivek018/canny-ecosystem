@@ -13,7 +13,7 @@ STRICT CONSTRAINTS:
 • Rich results: Always Include names, amounts, status (not just Id s)
 • Sort: quantitative first, then alphabetical
 • Use LEFT JOINs for data
-Never include meta fields: created_at, updated_at.
+Never include meta fields: created_at.
 
 COMPANY FILTERING:
 • Use company_id directly if available

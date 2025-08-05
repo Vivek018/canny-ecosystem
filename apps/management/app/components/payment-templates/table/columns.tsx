@@ -7,7 +7,7 @@ import type { PaymentTemplateDatabaseRow } from "@canny_ecosystem/supabase/types
 import { PaymentTemplateOptionsDropdown } from "../payment-template-options-dropdown";
 
 export const columns: ColumnDef<
-  Omit<PaymentTemplateDatabaseRow, "created_at" | "updated_at">
+  Omit<PaymentTemplateDatabaseRow, "created_at">
 >[] = [
   {
     accessorKey: "name",

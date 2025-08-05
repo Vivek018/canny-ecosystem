@@ -29,7 +29,7 @@ export function GratuityWrapper({
   data,
   error,
 }: {
-  data: Omit<GratuityDatabaseRow, "created_at" | "updated_at"> | null;
+  data: Omit<GratuityDatabaseRow, "created_at"> | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

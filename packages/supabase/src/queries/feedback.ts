@@ -14,7 +14,6 @@ export type FeedbackDatabaseType = Pick<
   | "message"
   | "created_at"
   | "severity"
-  | "updated_at"
 > & {
   users: {
     id: UserDatabaseRow["id"];

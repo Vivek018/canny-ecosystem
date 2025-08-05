@@ -11,7 +11,7 @@ export function SitesWrapper({
   data,
   error,
 }: {
-  data: Omit<SitesWithLocation, "created_at" | "updated_at">[] | null;
+  data: Omit<SitesWithLocation, "created_at">[] | null;
   error: Error | null | { message: string };
 }) {
   const { toast } = useToast();

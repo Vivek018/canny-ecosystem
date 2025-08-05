@@ -29,7 +29,7 @@ export function LeaveEncashmentWrapper({
   data,
   error,
 }: {
-  data: Omit<LeaveEncashmentDatabaseRow, "created_at" | "updated_at"> | null;
+  data: Omit<LeaveEncashmentDatabaseRow, "created_at"> | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

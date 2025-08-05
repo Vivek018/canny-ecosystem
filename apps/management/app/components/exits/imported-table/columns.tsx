@@ -8,6 +8,13 @@ import type { ImportExitDataType } from "@canny_ecosystem/supabase/queries";
 
 export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
   {
+    accessorKey: "sr_no",
+    header: "Sr No.",
+    cell: ({ row }) => {
+      return <p className="truncate ">{row.index + 1}</p>;
+    },
+  },
+  {
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {

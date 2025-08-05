@@ -5,7 +5,6 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { useUser } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -25,7 +24,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 
 type EmployeeSkill = Omit<
   EmployeeSkillDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at"
 >;
 
 export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
@@ -55,7 +54,6 @@ export const EmployeeSkillsCard = ({
 }: {
   employeeSkills: EmployeeSkill[] | null;
 }) => {
-  const { role } = useUser();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">

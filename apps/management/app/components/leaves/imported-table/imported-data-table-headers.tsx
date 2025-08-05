@@ -10,6 +10,7 @@ type Props = {
 
 // make sure the order is same as header order
 export const ImportLeavesDataArray = [
+  "sr_no",
   "employee_code",
   "start_date",
   "end_date",

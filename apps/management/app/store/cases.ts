@@ -7,9 +7,9 @@ interface CaseState {
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;
   rowSelection: Record<string, boolean>;
-  selectedRows: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];
+  selectedRows: Omit<CasesDatabaseRow, "created_at">[];
   setSelectedRows: (
-    updater: Updater<Omit<CasesDatabaseRow, "created_at" | "updated_at">[]>,
+    updater: Updater<Omit<CasesDatabaseRow, "created_at">[]>,
   ) => void;
 }
 

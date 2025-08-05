@@ -1,12 +1,5 @@
 import { Card } from "@canny_ecosystem/ui/card";
-import { Icon } from "@canny_ecosystem/ui/icon";
-import { buttonVariants } from "@canny_ecosystem/ui/button";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link, useParams } from "@remix-run/react";
 import type { EmployeeBankDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { createRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUser } from "@/utils/user";
-import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -15,7 +8,7 @@ type DetailItemProps = {
 
 type EmployeeBankDetails = Omit<
   EmployeeBankDetailsDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at" 
 >;
 
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
@@ -34,8 +27,6 @@ export const EmployeeBankDetailsCard = ({
 }: {
   bankDetails: EmployeeBankDetails | null;
 }) => {
-  const { role } = useUser();
-  const { employeeId } = useParams();
 
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">

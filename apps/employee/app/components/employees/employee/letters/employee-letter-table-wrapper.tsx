@@ -8,7 +8,7 @@ import { cacheKeyPrefix } from "@/constant";
 import { DataTable } from "./table/data-table";
 
 const sortData = (
-  data: Omit<EmployeeLetterDataType, "created_at" | "updated_at">[],
+  data: Omit<EmployeeLetterDataType, "created_at">[],
   sortType: string,
 ) => {
   if (!sortType) return data;
@@ -41,7 +41,7 @@ export function EmployeeLetterTableWrapper({
   error,
   searchString,
 }: {
-  data: Omit<EmployeeLetterDataType, "created_at" | "updated_at">[] | null;
+  data: Omit<EmployeeLetterDataType, "created_at">[] | null;
   error: Error | null | { message: string };
   searchString: string;
 }) {
@@ -61,7 +61,7 @@ export function EmployeeLetterTableWrapper({
   }, [error]);
 
   const filterData = (
-    data: Omit<EmployeeLetterDataType, "created_at" | "updated_at">[],
+    data: Omit<EmployeeLetterDataType, "created_at" >[],
   ) => {
     return data.filter((item) =>
       Object.values(item).some((value) =>

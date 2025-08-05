@@ -7,7 +7,7 @@ import type { PaymentTemplateAssignmentsDatabaseRow } from "@canny_ecosystem/sup
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export const columns: ColumnDef<
-  Omit<PaymentTemplateAssignmentsDatabaseRow, "created_at" | "updated_at">
+  Omit<PaymentTemplateAssignmentsDatabaseRow, "created_at">
 >[] = [
   {
     accessorKey: "name",

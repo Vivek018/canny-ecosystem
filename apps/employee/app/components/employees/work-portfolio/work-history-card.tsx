@@ -6,7 +6,6 @@ import {
 } from "@canny_ecosystem/ui/card";
 import type { EmployeeWorkHistoryDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
-import { useUser } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -26,7 +25,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 
 type EmployeeWorkHistory = Omit<
   EmployeeWorkHistoryDatabaseRow,
-  "created_at" | "updated_at"
+  "created_at" 
 >;
 
 export const WorkHistoryItem = ({
@@ -72,7 +71,6 @@ export const EmployeeWorkHistoriesCard = ({
 }: {
   employeeWorkHistories: EmployeeWorkHistory[] | null;
 }) => {
-  const { role } = useUser();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
