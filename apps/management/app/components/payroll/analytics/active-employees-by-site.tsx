@@ -50,7 +50,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
           fill: `hsl(var(--chart-${index + 1}))`,
           sites,
         };
-      },
+      }
     );
 
     return finalData;
@@ -63,7 +63,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
   return (
     <Card className="flex flex-col gap-20">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Employees by Project</CardTitle>
+        <CardTitle>Employees by Module</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -118,7 +118,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Hover over a project to see site-wise active employees.
+          Hover over a module to see active employees.
         </div>
       </CardFooter>
     </Card>

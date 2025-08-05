@@ -1,4 +1,8 @@
-import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
+import {
+  defaultMonth,
+  defaultYear,
+  formatUTCDate,
+} from "@canny_ecosystem/utils";
 import type {
   InferredType,
   InvoiceDatabaseRow,
@@ -113,14 +117,14 @@ export async function getInvoicesByCompanyId({
     .select(
       `${columns.join(",")},company_locations!${
         company_location ? "inner" : "left"
-      }(id,name)`,
+      }(id,name)`
     )
     .eq("company_id", companyId)
     .order("created_at", { ascending: false });
 
   if (searchQuery) {
     query.or(
-      `invoice_number.ilike.*${searchQuery}*,subject.ilike.*${searchQuery}*`,
+      `invoice_number.ilike.*${searchQuery}*,subject.ilike.*${searchQuery}*`
     );
   }
   const dateFilters = [
@@ -215,19 +219,17 @@ export async function getInvoicesByCompanyIdForDashboard({
   filters?: DashboardFilters | null;
 }) {
   const columns = ["is_paid", "date"] as const;
-  const defMonth = new Date().getMonth();
+  const defMonth = defaultMonth - 1;
   const filterMonth = filters?.month && Number(months[filters.month]);
   const filterYear = filters?.year && Number(filters.year);
 
   const startOfYear = filterMonth
     ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
-    : new Date(
-        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1),
-      );
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth, 1));
 
   const endOfYear = filterMonth
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
-    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
 
   const { data, error } = await supabase
     .from("invoice")
@@ -268,7 +270,7 @@ export async function getInvoicesByCompanyIdForDashboard({
     ([month, data]) => ({
       month,
       data,
-    }),
+    })
   );
 
   return { data: groupedByMonth, error: null };
@@ -284,7 +286,7 @@ export async function getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements
   filters?: DashboardFilters;
 }) {
   const columns = ["paid_date", "payroll_data"] as const;
-  const defMonth = new Date().getMonth();
+  const defMonth = defaultMonth - 1;
   const filterMonth = filters?.month && Number(months[filters.month]);
   const filterYear = filters?.year && Number(filters.year);
 
@@ -310,7 +312,7 @@ export async function getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements
   if (currentMonthError)
     console.error(
       "getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements Error",
-      currentMonthError,
+      currentMonthError
     );
 
   //For Previous Month
@@ -336,7 +338,7 @@ export async function getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements
   if (previousMonthError)
     console.error(
       "getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements Error",
-      previousMonthError,
+      previousMonthError
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
