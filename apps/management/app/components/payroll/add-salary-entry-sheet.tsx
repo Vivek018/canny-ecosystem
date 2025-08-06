@@ -21,15 +21,13 @@ import { useSearchParams, useSubmit } from "@remix-run/react";
 
 export function AddSalaryEntrySheet({
   triggerChild,
-  salaryEntry,
   allEmployeeOptions,
   payrollFields,
   payrollId,
   allSiteOptions,
 }: {
   triggerChild: React.ReactNode;
-  salaryEntry: any;
-  payrollFields: PayrollFieldsDatabaseRow[];
+  payrollFields: Omit<PayrollFieldsDatabaseRow, "created_at" | "payroll_id">[];
   payrollId: string;
   allSiteOptions: ComboboxSelectOption[];
   allEmployeeOptions: ComboboxSelectOption[];
@@ -73,7 +71,7 @@ export function AddSalaryEntrySheet({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         asChild
-        className={cn("cursor-pointer py-2", !salaryEntry && "hidden")}
+        className={cn("cursor-pointer py-2")}
       >
         {triggerChild}
       </SheetTrigger>

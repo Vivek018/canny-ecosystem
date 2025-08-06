@@ -56,7 +56,6 @@ export function SalaryEntryComponent({
   allDepartmentOptions,
   allLocationOptions,
   payrollFields,
-  salaryEntry,
   allEmployeeOptions,
   allProjectOptions,
 }: {
@@ -72,7 +71,6 @@ export function SalaryEntryComponent({
   allProjectOptions: ComboboxSelectOption[];
   allDepartmentOptions: ComboboxSelectOption[];
   allLocationOptions: ComboboxSelectOption[];
-  salaryEntry?: any[];
   payrollFields?: PayrollFieldsDatabaseRow[];
   allEmployeeOptions?: ComboboxSelectOption[];
 }) {
@@ -276,7 +274,6 @@ export function SalaryEntryComponent({
         <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
           <ImportDepartmentPayrollDialog
             payrollFields={payrollFields!}
-            salaryEntry={salaryEntry!}
             payrollId={payrollId!}
             allSiteOptions={allSiteOptions}
             allEmployeeOptions={allEmployeeOptions!}
