@@ -226,7 +226,7 @@ export async function getMonthlyAttendanceByCompanyId({
     casual_leaves
   )
 `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -235,12 +235,12 @@ export async function getMonthlyAttendanceByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`,
+          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
       );
     }
   }
@@ -254,7 +254,7 @@ export async function getMonthlyAttendanceByCompanyId({
   if (project) {
     query = query.eq(
       "employee_project_assignment.sites.projects.name",
-      project,
+      project
     );
   }
   if (recently_added) {
@@ -287,21 +287,18 @@ export async function getMonthlyAttendanceByCompanyId({
     ];
 
     const employeeCols = ["first_name", "employee_code"];
+    const siteProjectCols = ["site_name", "project_name"];
 
-    if (monthlyAttendanceCols.includes(column)) {
-      query = query.order(column, {
-        ascending: direction === "asc",
-        referencedTable: "monthly_attendance",
-        nullsFirst: false,
-      });
-    } else if (employeeCols.includes(column)) {
+    if (
+      employeeCols.includes(column) &&
+      !siteProjectCols.includes(column) &&
+      !monthlyAttendanceCols.includes(column)
+    ) {
       query = query.order(column, {
         ascending: direction === "asc",
       });
     } else {
-      query = query.order(column, {
-        ascending: direction === "asc",
-      });
+      query = query.order("employee_code", { ascending: true });
     }
   } else {
     query = query.order("employee_code", { ascending: true });
@@ -331,6 +328,8 @@ export async function getMonthlyAttendanceByCompanyId({
       "casual_leaves",
     ];
 
+    const employeeCols = ["first_name", "employee_code"];
+
     if (monthlyAttendanceCols.includes(column)) {
       transformedData.sort((a, b) => {
         const aValue = a.monthly_attendance?.[column] ?? 0;
@@ -340,6 +339,38 @@ export async function getMonthlyAttendanceByCompanyId({
           return aValue - bValue;
         }
         return bValue - aValue;
+      });
+    } else if (column === "site_name") {
+      transformedData.sort((a, b) => {
+        const aValue = a.employee_project_assignment?.sites?.name || "";
+        const bValue = b.employee_project_assignment?.sites?.name || "";
+
+        if (direction === "asc") {
+          return aValue.localeCompare(bValue);
+        }
+        return bValue.localeCompare(aValue);
+      });
+    } else if (column === "project_name") {
+      transformedData.sort((a, b) => {
+        const aValue =
+          a.employee_project_assignment?.sites?.projects?.name || "";
+        const bValue =
+          b.employee_project_assignment?.sites?.projects?.name || "";
+
+        if (direction === "asc") {
+          return aValue.localeCompare(bValue);
+        }
+        return bValue.localeCompare(aValue);
+      });
+    } else if (employeeCols.includes(column)) {
+      transformedData.sort((a, b) => {
+        const aValue = a[column] || "";
+        const bValue = b[column] || "";
+
+        if (direction === "asc") {
+          return aValue.localeCompare(bValue);
+        }
+        return bValue.localeCompare(aValue);
       });
     }
   }
@@ -409,7 +440,7 @@ export async function getAttendanceReportByCompanyId({
         employee_id
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId)
     .eq("attendance.present", true)
@@ -429,12 +460,12 @@ export async function getAttendanceReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
       );
     }
   }
@@ -447,17 +478,17 @@ export async function getAttendanceReportByCompanyId({
     }
     const start_date = new Date(`${start_month} 1, ${start_year} 12:00:00`);
     const end_date = new Date(
-      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`,
+      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`
     );
     if (start_year)
       query.gte(
         "attendance.date",
-        formatUTCDate(start_date.toISOString().split("T")[0]),
+        formatUTCDate(start_date.toISOString().split("T")[0])
       );
     if (end_year)
       query.lte(
         "attendance.date",
-        formatUTCDate(end_date.toISOString().split("T")[0]),
+        formatUTCDate(end_date.toISOString().split("T")[0])
       );
   }
   if (project) {
@@ -480,7 +511,7 @@ export async function getAttendanceReportByCompanyId({
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string },
+    {} as { [key: number]: string }
   );
 
   const processedData = data?.map((employee) => {

@@ -1,7 +1,5 @@
 import { LabelList, RadialBar, RadialBarChart } from "recharts";
-import { useMemo, useState } from "react";
-
-import { AttendanceProjectFilter } from "./attendance-project-filter";
+import { useMemo} from "react";
 import {
   Card,
   CardContent,
@@ -21,7 +19,7 @@ const chartConfig = {
     label: "Presents",
     color: "hsl(var(--chart-5))",
   },
-  project: {
+  site: {
     label: "Site",
     color: "hsl(var(--chart-5))",
   },
@@ -29,50 +27,35 @@ const chartConfig = {
 
 export function AttendanceBySite({
   chartData,
-  projectArray,
 }: {
   chartData: TransformedAttendanceDataType[];
-  projectArray: string[];
 }) {
-  const [project, setProject] = useState<string>();
-
   const trendData = useMemo(() => {
-    const filteredData = chartData.filter((row) => row.project === project);
+    const siteMap = new Map<string, number>();
 
-    if (filteredData.length === 0) return [];
-    return filteredData
-      .map((row) => {
-        const totalPresents = (row.attendance ?? []).reduce(
-          (count, entry) => count + (entry.present ? 1 : 0),
-          0,
-        );
+    for (const row of chartData) {
+      const site = row.site || "Unknown";
+      const presentDays = row.attendance_summary?.present_days ?? 0;
 
-        return {
-          site: row.site,
-          presents: totalPresents,
-        };
-      })
+      siteMap.set(site, (siteMap.get(site) || 0) + presentDays);
+    }
+
+    return Array.from(siteMap.entries())
+      .map(([site, presents]) => ({ site, presents }))
       .sort((a, b) => b.presents - a.presents)
       .slice(0, 5);
-  }, [chartData, project]);
+  }, [chartData]);
 
   return (
     <Card className="flex flex-col">
-      <div className="flex justify-between p-2 relative items-start">
-        <CardHeader className="flex-1 flex flex-col items-center pt-3">
-          <CardTitle>Site Attendance</CardTitle>
-          <CardDescription>
-            {project
-              ? `Attendance by site for ${project}`
-              : "Select project to see attendance by sites"}
-          </CardDescription>
-        </CardHeader>
-        <AttendanceProjectFilter
-          projectArray={projectArray}
-          setProject={setProject}
-        />
-      </div>
-      {project ? (
+      <CardHeader className="flex items-center justify-center pt-3">
+        <CardTitle>Site Attendance</CardTitle>
+        <CardDescription>
+          Top 5 sites by total present days
+        </CardDescription>
+      </CardHeader>
+
+      {trendData.length > 0 ? (
         <CardContent className="flex-1 pb-0 pt-2">
           <ChartContainer
             config={chartConfig}
@@ -106,7 +89,7 @@ export function AttendanceBySite({
         </CardContent>
       ) : (
         <div className="flex justify-center items-center text-muted-foreground mt-10">
-          Select the Project first
+          No attendance data available
         </div>
       )}
     </Card>

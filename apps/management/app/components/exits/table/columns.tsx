@@ -29,7 +29,6 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     ),
   },
   {
-    enableSorting: false,
     enableHiding: false,
     accessorKey: "employee_code",
     header: "Employee Code",
@@ -42,7 +41,6 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
@@ -57,7 +55,6 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
@@ -70,7 +67,6 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "site",
     header: "Site",
     cell: ({ row }) => {
@@ -162,6 +158,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
   {
     accessorKey: "net_pay",
     header: "Net Amount",
+
     cell: ({ row }) => {
       function calculateNetAmount(employees: any): Record<string, number> {
         return {
@@ -208,7 +205,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">
