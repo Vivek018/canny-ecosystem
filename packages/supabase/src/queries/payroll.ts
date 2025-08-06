@@ -221,7 +221,7 @@ export const getSalaryEntriesByPayrollId = async ({
   supabase: TypedSupabaseClient;
   payrollId: string;
 }) => {
-  const query = supabase
+  const { data, error } = await supabase
     .from("monthly_attendance")
     .select(
       `
@@ -259,8 +259,6 @@ export const getSalaryEntriesByPayrollId = async ({
     `,
     )
     .eq("salary_entries.payroll_id", payrollId);
-
-  const { data, error } = await query;
 
   if (error) console.error("getSalaryEntriesByPayrollId Error", error);
 

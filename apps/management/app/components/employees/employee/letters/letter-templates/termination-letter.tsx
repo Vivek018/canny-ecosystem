@@ -22,9 +22,8 @@ export function TerminationLetter({
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
-    employeeName: `${data?.employees.first_name} ${
-      data?.employees.middle_name ?? ""
-    } ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.first_name} ${data?.employees?.middle_name ?? ""
+      } ${data?.employees?.last_name}`,
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",
     employeeJoiningDate:
@@ -78,7 +77,7 @@ export function TerminationLetter({
                 <Text>To,</Text>
                 <Text style={styles.boldText}>
                   {data.employees.first_name}{" "}
-                  {data.employees.middle_name ?? " "} {data.employees.last_name}
+                  {data.employees?.middle_name ?? " "} {data.employees.last_name}
                   ,
                 </Text>
                 <Text>{employeeAddressData?.address_line_1},</Text>
