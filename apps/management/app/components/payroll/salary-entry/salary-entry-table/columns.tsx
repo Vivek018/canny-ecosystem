@@ -50,7 +50,7 @@ export const salaryEntryColumns = ({
       accessorKey: "sr_no",
       header: "Sr No.",
       sortingFn: (a, b) => a.index - b.index,
-      cell: ({ row }) => <p className={cn("truncate w-12")}>{row.index + 1}</p>,
+      cell: ({ row }) => <p className={cn("truncate")}>{row.index + 1}</p>,
     },
     {
       id: "employee_code",

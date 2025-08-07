@@ -10,21 +10,23 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  type Row,
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { type RefObject, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SalaryTableHeader } from "./data-table-header";
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ExportBar } from "../../export-bar";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 import { roundToNearest } from "@canny_ecosystem/utils";
-import type { Virtualizer } from "@tanstack/react-virtual";
+
+import {
+  useVirtualizer,
+} from '@tanstack/react-virtual'
 
 interface SalaryEntryTableProps<TData, TValue> {
-  parentRef: RefObject<HTMLDivElement>;
-  virtualizer: Virtualizer<HTMLDivElement, Element>;
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   totalNet: number;
@@ -32,8 +34,6 @@ interface SalaryEntryTableProps<TData, TValue> {
 }
 
 export function SalaryEntryDataTable<TData, TValue>({
-  parentRef,
-  virtualizer,
   columns,
   data,
   totalNet,
@@ -69,13 +69,31 @@ export function SalaryEntryDataTable<TData, TValue>({
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
 
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
+    count: rows.length,
+    estimateSize: () => 40,
+    getScrollElement: () => parentRef.current,
+    measureElement:
+      typeof window !== 'undefined' &&
+        navigator.userAgent.indexOf('Firefox') === -1
+        ? element => element?.getBoundingClientRect().height
+        : undefined,
+    overscan: 0,
+  })
+
   return (
-    <div ref={parentRef}  className="relative h-40 border rounded overflow-auto">
+    <div className="border rounded max-h-fit overflow-auto">
       <div
+        ref={parentRef}
         className={cn(
-          "relative overflow-x-auto rounded",
+          "relative rounded overflow-auto",
         )}
-        style={{ height: `${virtualizer.getTotalSize()}px` }}
+        style={{
+          height: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
+          minHeight: "40px",
+        }}
       >
         <Table>
           <SalaryTableHeader
@@ -83,13 +101,17 @@ export function SalaryEntryDataTable<TData, TValue>({
             className={cn(!tableLength && "hidden")}
             uniqueFields={uniqueFields}
           />
-          <TableBody>
+          <TableBody className="" style={{
+            height: `${rowVirtualizer.getTotalSize()}px`
+          }}>
             {tableLength ? (
-              virtualizer.getVirtualItems().map((virtualRow, index) => {
-                const row = rows[virtualRow.index];
+              rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const row = rows[virtualRow.index] as Row<any>;
                 return (
                   <TableRow
                     key={row.id}
+                    data-index={virtualRow.index}
+                    ref={node => rowVirtualizer.measureElement(node)}
                     data-state={
                       (row.getIsSelected() &&
                         row.original?.salary_entries?.invoice_id &&
@@ -97,12 +119,10 @@ export function SalaryEntryDataTable<TData, TValue>({
                       (row.getIsSelected() && "selected")
                     }
                     style={{
-                      height: `${virtualRow.size}px`,
-                      transform: `translateY(${virtualRow.start - index * virtualRow.size
-                        }px)`,
+                      transform: `translateY(${virtualRow.start}px)`,
                     }}
                     className={cn(
-                      "relative h-[40px] md:h-[45px] cursor-default select-text",
+                      "absolute flex cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
                       "bg-primary/20",
                     )}
@@ -112,11 +132,11 @@ export function SalaryEntryDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 hidden md:table-cell",
+                            "px-3 md:px-4 py-4 my-auto hidden md:table-cell",
                             cell.column.id === "select" &&
                             "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "sr_no" &&
-                            "sticky left-12 bg-card z-10",
+                            "sticky left-12 bg-card min-w-20 max-w-20 z-10",
                             cell.column.id === "employee_code" &&
                             "sticky left-32 z-10 bg-card",
                             cell.column.id === "actions" &&

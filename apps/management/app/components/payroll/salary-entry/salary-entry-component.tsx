@@ -87,8 +87,6 @@ export function SalaryEntryComponent({
     navigation.state === "submitting" || navigation.state === "loading";
 
   const {
-    parentRef,
-    virtualizer,
     siteOptions,
     departmentOptions,
     filteredData,
@@ -219,7 +217,7 @@ export function SalaryEntryComponent({
 
   return (
     <section className="p-4 flex flex-col max-h-full gap-4">
-      {/* <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <PayrollSummaryCard
           totals={totals}
           hasSelectedRows={selectedRows.length > 0}
@@ -338,14 +336,12 @@ export function SalaryEntryComponent({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div> */}
+      </div>
 
       {disable ? (
         <LoadingSpinner className="my-20" />
       ) : (
         <SalaryEntryDataTable
-          parentRef={parentRef}
-          virtualizer={virtualizer}
           data={filteredData}
           columns={salaryEntryColumns({
             uniqueFields,

@@ -97,7 +97,7 @@ export function SalaryTableHeader({
               key={id}
               className={cn(
                 "px-4 py-2",
-                id === "sr_no" && "sticky left-12 bg-card z-10",
+                id === "sr_no" && "sticky left-12 bg-card min-w-20 max-w-20 z-10",
                 id === "employee_code" && "sticky left-32 bg-card z-10",
               )}
             >
@@ -108,7 +108,6 @@ export function SalaryTableHeader({
                 onClick={() => sort(id)}
               >
                 <span className="capitalize">{columnName(id)}</span>
-
                 <Icon
                   name="chevron-up"
                   className={cn(
