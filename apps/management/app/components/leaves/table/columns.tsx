@@ -33,7 +33,6 @@ export const columns = (
     enableHiding: false,
   },
   {
-    enableHiding: false,
     enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
@@ -52,8 +51,6 @@ export const columns = (
     ),
   },
   {
-    enableSorting: false,
-
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => (
@@ -71,8 +68,6 @@ export const columns = (
     ),
   },
   {
-    enableSorting: false,
-
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
@@ -83,8 +78,6 @@ export const columns = (
     },
   },
   {
-    enableSorting: false,
-
     accessorKey: "site",
     header: "Site",
     cell: ({ row }) => {
@@ -139,7 +132,6 @@ export const columns = (
     },
   },
   {
-    enableSorting: false,
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {

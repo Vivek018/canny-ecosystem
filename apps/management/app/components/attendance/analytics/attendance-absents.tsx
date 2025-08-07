@@ -17,10 +17,10 @@ import { useMemo } from "react";
 import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const chartConfig = {
-  amount: {
+  absents: {
     label: "Absents",
   },
-  employer: {
+  employee_code: {
     label: "Employee",
     color: "hsl(var(--chart-1))",
   },
@@ -36,13 +36,7 @@ export function AttendanceAbsentees({
 
     for (const row of chartData) {
       const employee_code = row.employee_code;
-      const attendanceRecords = row.attendance ?? [];
-
-      const totalAbsents = attendanceRecords.reduce(
-        (count: number, entry: { present: boolean }) =>
-          count + (!entry.present ? 1 : 0),
-        0,
-      );
+      const totalAbsents = row.attendance_summary?.absent_days ?? 0;
 
       grouped[employee_code] = totalAbsents;
     }

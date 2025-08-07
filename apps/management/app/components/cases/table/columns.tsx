@@ -109,7 +109,6 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "amount_given",
     header: "Amount Given",
     cell: ({ row }) => {
@@ -117,7 +116,6 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "amount_received",
     header: "Amount Received",
     cell: ({ row }) => {
@@ -127,7 +125,6 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "court_case_reference",
     header: "Court Case Reference",
     cell: ({ row }) => {

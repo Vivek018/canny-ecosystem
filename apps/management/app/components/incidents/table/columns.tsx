@@ -30,7 +30,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     enableHiding: false,
   },
   {
-    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
@@ -42,7 +41,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
@@ -56,7 +54,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
@@ -69,7 +66,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "site",
     header: "Site",
     cell: ({ row }) => {
@@ -89,7 +85,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
@@ -134,7 +129,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => {
@@ -142,7 +136,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "severity",
     header: "Severity",
     cell: ({ row }) => {
@@ -150,7 +143,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -158,7 +150,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "medical_diagnosis",
     header: "Medical Diagnosis",
     cell: ({ row }) => {
@@ -171,7 +162,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "action_taken",
     header: "Action Taken",
     cell: ({ row }) => {

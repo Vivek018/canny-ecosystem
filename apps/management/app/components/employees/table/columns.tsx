@@ -109,7 +109,6 @@ export const columns = ({
     },
   },
   {
-    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
@@ -121,7 +120,6 @@ export const columns = ({
     },
   },
   {
-    enableSorting: false,
     accessorKey: "site_name",
     header: "Site",
     cell: ({ row }) => {
