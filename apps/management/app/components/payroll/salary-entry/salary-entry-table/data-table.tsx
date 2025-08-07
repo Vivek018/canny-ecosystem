@@ -83,7 +83,7 @@ export function SalaryEntryDataTable<TData, TValue>({
   })
 
   return (
-    <div className="border rounded max-h-fit overflow-auto">
+    <div className={cn("border rounded max-h-fit overflow-auto", !tableLength && "border-none")}>
       <div
         ref={parentRef}
         className={cn(
