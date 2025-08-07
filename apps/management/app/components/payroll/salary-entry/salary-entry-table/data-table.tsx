@@ -73,14 +73,14 @@ export function SalaryEntryDataTable<TData, TValue>({
 
   const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: rows.length,
-    estimateSize: () => 40,
+    estimateSize: () => 10,
     getScrollElement: () => parentRef.current,
     measureElement:
       typeof window !== 'undefined' &&
         navigator.userAgent.indexOf('Firefox') === -1
         ? element => element?.getBoundingClientRect().height
         : undefined,
-    overscan: 0,
+    overscan: 2,
   })
 
   return (
@@ -132,13 +132,15 @@ export function SalaryEntryDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 my-auto hidden md:table-cell",
+                            "px-3 md:px-4 py-4 hidden md:flex items-center min-w-24 max-w-24",
                             cell.column.id === "select" &&
-                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-5",
                             cell.column.id === "sr_no" &&
                             "sticky left-12 bg-card min-w-20 max-w-20 z-10",
                             cell.column.id === "employee_code" &&
-                            "sticky left-32 z-10 bg-card",
+                            "sticky left-32 z-10 min-w-36 max-w-36 bg-card",
+                            cell.column.id === "name" &&
+                            "min-w-52 max-w-52",
                             cell.column.id === "actions" &&
                             "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}

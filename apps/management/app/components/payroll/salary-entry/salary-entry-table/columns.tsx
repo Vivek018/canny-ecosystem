@@ -62,7 +62,7 @@ export const salaryEntryColumns = ({
           String(b.getValue("employee_code") ?? ""),
         ),
       cell: ({ row }) => (
-        <p className="truncate w-28">
+        <p className="truncate">
           {row.original?.employee.employee_code ?? "--"}
         </p>
       ),
@@ -99,7 +99,7 @@ export const salaryEntryColumns = ({
         return (
           <SalaryEntrySiteDepartmentSheet
             triggerChild={
-              <p className="truncate ">
+              <p className="truncate">
                 {row.original.salary_entries?.site?.name ?? "--"}
               </p>
             }
