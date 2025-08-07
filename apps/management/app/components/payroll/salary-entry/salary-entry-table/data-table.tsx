@@ -72,14 +72,14 @@ export function SalaryEntryDataTable<TData, TValue>({
 
   const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: rows.length,
-    estimateSize: () => 10,
+    estimateSize: () => 7,
     getScrollElement: () => parentRef.current,
     measureElement:
       typeof window !== 'undefined' &&
         navigator.userAgent.indexOf('Firefox') === -1
         ? element => element?.getBoundingClientRect().height
         : undefined,
-    overscan: 2,
+    overscan: 1,
   })
 
   return (
@@ -97,7 +97,7 @@ export function SalaryEntryDataTable<TData, TValue>({
         <table className="w-full bg-card shadow text-sm">
           <SalaryTableHeader
             table={table}
-            className={cn("sticky top-0 z-20", !tableLength && "hidden")}
+            className={cn("sticky z-10 top-0", !tableLength && "hidden")}
             uniqueFields={uniqueFields}
           />
           <TableBody style={{
@@ -131,9 +131,9 @@ export function SalaryEntryDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 hidden md:flex items-center min-w-24 max-w-24",
+                            "px-3 md:px-4 py-2 hidden md:flex items-center min-w-24 max-w-24",
                             cell.column.id === "select" &&
-                            "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-5",
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-3",
                             cell.column.id === "sr_no" &&
                             "sticky left-12 bg-card min-w-20 max-w-20 z-10",
                             cell.column.id === "employee_code" &&

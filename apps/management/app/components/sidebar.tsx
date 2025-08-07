@@ -36,7 +36,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed flex h-full flex-col overflow-hidden w-20 z-20 bg-background border-r transition-[width]",
+        "fixed flex h-full flex-col overflow-hidden w-20 z-50 bg-background border-r transition-[width]",
         isExpanded && "w-60 shadow-2xl dark:shadow-foreground/10",
         className,
       )}
