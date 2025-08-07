@@ -77,7 +77,7 @@ export function SalaryTableHeader({
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
+      <TableRow className="h-[45px] bg-card">
         <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={

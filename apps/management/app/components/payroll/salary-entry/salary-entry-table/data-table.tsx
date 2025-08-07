@@ -1,6 +1,5 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
-  Table,
   TableBody,
   TableCell,
   TableRow,
@@ -95,13 +94,13 @@ export function SalaryEntryDataTable<TData, TValue>({
           minHeight: "40px",
         }}
       >
-        <Table>
+        <table className="w-full bg-card shadow text-sm">
           <SalaryTableHeader
             table={table}
-            className={cn(!tableLength && "hidden")}
+            className={cn("sticky top-0 z-20", !tableLength && "hidden")}
             uniqueFields={uniqueFields}
           />
-          <TableBody className="" style={{
+          <TableBody style={{
             height: `${rowVirtualizer.getTotalSize()}px`
           }}>
             {tableLength ? (
@@ -163,7 +162,7 @@ export function SalaryEntryDataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-        </Table>
+        </table>
       </div>
       <ExportBar
         totalNet={roundToNearest(totalNet)}
