@@ -15,6 +15,7 @@ import type {
 } from "../types";
 import type { DashboardFilters } from "./exits";
 import { months } from "@canny_ecosystem/utils/constant";
+import { SOFT_QUERY_LIMIT } from "../constant";
 
 export type PayrollFilters = {
   date_start?: string | undefined | null;
@@ -258,7 +259,7 @@ export const getSalaryEntriesByPayrollId = async ({
       )
     `,
     )
-    .eq("salary_entries.payroll_id", payrollId);
+    .eq("salary_entries.payroll_id", payrollId).limit(SOFT_QUERY_LIMIT);
 
   if (error) console.error("getSalaryEntriesByPayrollId Error", error);
 
@@ -679,7 +680,7 @@ export async function getPayrollFieldByPayrollId({
   supabase: TypedSupabaseClient;
   payrollId: string;
 }) {
-  const columns = ["id", "name", "type"] as const;
+  const columns = ["id", "name", "type", "payroll_id", "created_at"] as const;
 
   const { data, error } = await supabase
     .from("payroll_fields")
