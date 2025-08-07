@@ -1,11 +1,22 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useRef } from "react";
 import { searchInObject } from "@canny_ecosystem/utils";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 export const useSalaryData = (data: any[]) => {
   const [searchString, setSearchString] = useState("");
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [selectedDeptIds, setSelectedDeptIds] = useState<string[]>([]);
+
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: data?.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 40,
+    overscan: 20,
+    enabled: true,
+  });
 
   // Memoize options to prevent recalculation
   const { siteOptions, departmentOptions } = useMemo(() => {
@@ -93,6 +104,8 @@ export const useSalaryData = (data: any[]) => {
   );
 
   return {
+    parentRef,
+    virtualizer,
     siteOptions,
     departmentOptions,
     filteredData,

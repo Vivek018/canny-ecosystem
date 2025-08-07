@@ -82,7 +82,7 @@ export const FilterControls = React.memo<FilterControlsProps>(
     const showFilters = siteOptions.length > 0 || departmentOptions.length > 0;
 
     return (
-      <div className="w-full flex items-center justify-between gap-3 pb-4">
+      <div className="w-full flex items-center justify-between gap-3">
         <div className={cn("w-2/3", !showFilters && "hidden")}>
           <MultiSelectCombobox
             label="Groups"

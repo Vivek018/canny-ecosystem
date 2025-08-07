@@ -15,7 +15,6 @@ import {
   getPayrollFieldByPayrollId,
   getProjectNamesByCompanyId,
   getSalaryEntriesByPayrollId,
-  getSalaryEntriesByPayrollIdForAddingSalaryEntry,
   getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -128,12 +127,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
-    const { data: salaryEntry } =
-      await getSalaryEntriesByPayrollIdForAddingSalaryEntry({
-        payrollId: payrollId ?? "",
-        supabase,
-      });
-
     const { data: payrollFields } = await getPayrollFieldByPayrollId({
       payrollId: payrollId ?? "",
       supabase,
@@ -145,7 +138,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allSiteOptions,
       allDepartmentOptions,
       allLocationOptions,
-      salaryEntry,
       allEmployeeOptions,
       allProjectOptions,
       payrollFields,
@@ -160,7 +152,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allSiteOptions: [],
       allDepartmentOptions: [],
       allLocationOptions: [],
-      salaryEntry: [],
       allEmployeeOptions: [],
       allProjectOptions: [],
       payrollFields: [],
@@ -244,7 +235,6 @@ export default function RunPayrollId() {
     allEmployeeOptions,
     allProjectOptions,
     payrollFields,
-    salaryEntry,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -316,7 +306,6 @@ export default function RunPayrollId() {
                 allProjectOptions={allProjectOptions ?? []}
                 fromWhere="runpayroll"
                 allLocationOptions={allLocationOptions ?? []}
-                salaryEntry={salaryEntry as any[]}
                 payrollFields={payrollFields as PayrollFieldsDatabaseRow[]}
                 allEmployeeOptions={allEmployeeOptions}
               />
