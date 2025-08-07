@@ -29,7 +29,6 @@ export function SalaryTableHeader({
     "period",
     ...uniqueFields.map((field) => field),
     "net_amount",
-    "actions",
   ];
 
   const [sortingOrder, setSortingOrder] = useState("");
@@ -78,7 +77,7 @@ export function SalaryTableHeader({
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
+      <TableRow className="h-[45px] bg-card">
         <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
@@ -96,9 +95,10 @@ export function SalaryTableHeader({
             <TableHead
               key={id}
               className={cn(
-                "px-4 py-2",
-                id === "sr_no" && "sticky left-12 bg-card z-10",
-                id === "employee_code" && "sticky left-32 bg-card z-10",
+                "px-4 py-2 min-w-24 max-w-24",
+                id === "sr_no" && "sticky left-12 bg-card min-w-20 max-w-20 z-10",
+                id === "employee_code" && "sticky left-32 bg-card z-10 min-w-36 max-w-36",
+                id === "name" && "min-w-52",
               )}
             >
               <Button
@@ -108,7 +108,6 @@ export function SalaryTableHeader({
                 onClick={() => sort(id)}
               >
                 <span className="capitalize">{columnName(id)}</span>
-
                 <Icon
                   name="chevron-up"
                   className={cn(

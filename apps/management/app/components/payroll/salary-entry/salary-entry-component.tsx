@@ -56,7 +56,6 @@ export function SalaryEntryComponent({
   allDepartmentOptions,
   allLocationOptions,
   payrollFields,
-  salaryEntry,
   allEmployeeOptions,
   allProjectOptions,
 }: {
@@ -72,7 +71,6 @@ export function SalaryEntryComponent({
   allProjectOptions: ComboboxSelectOption[];
   allDepartmentOptions: ComboboxSelectOption[];
   allLocationOptions: ComboboxSelectOption[];
-  salaryEntry?: any[];
   payrollFields?: PayrollFieldsDatabaseRow[];
   allEmployeeOptions?: ComboboxSelectOption[];
 }) {
@@ -218,8 +216,8 @@ export function SalaryEntryComponent({
   );
 
   return (
-    <section className="p-4">
-      <div className="mb-5 grid grid-cols-2 gap-4">
+    <section className="p-4 flex flex-col max-h-full gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <PayrollSummaryCard
           totals={totals}
           hasSelectedRows={selectedRows.length > 0}
@@ -276,7 +274,6 @@ export function SalaryEntryComponent({
         <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
           <ImportDepartmentPayrollDialog
             payrollFields={payrollFields!}
-            salaryEntry={salaryEntry!}
             payrollId={payrollId!}
             allSiteOptions={allSiteOptions}
             allEmployeeOptions={allEmployeeOptions!}

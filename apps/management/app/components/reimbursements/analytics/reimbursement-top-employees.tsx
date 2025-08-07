@@ -39,7 +39,7 @@ export function ReimbursementTopEmployees({
 }: { chartData: ReimbursementDataType[] }) {
   const employeeTotals = chartData.reduce(
     (acc, row) => {
-      const employee_name = `${row.employees.first_name}_${row.employees.middle_name || ""}_${row.employees.last_name}`;
+      const employee_name = `${row?.employees?.first_name}_${row.employees?.middle_name || ""}_${row?.employees?.last_name}`;
       acc[employee_name] = (acc[employee_name] || 0) + (row.amount || 0);
       return acc;
     },

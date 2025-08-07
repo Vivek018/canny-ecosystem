@@ -404,7 +404,7 @@ export async function getEmployeeIdsByEmployeeCodes({
 
   const foundCodes = data.map((e) => e.employee_code);
   const missing = employeeCodes.filter((code) => !foundCodes.includes(code));
-  if (missing) {
+  if (missing?.length) {
     console.log("Missing employee codes:", missing);
   }
 

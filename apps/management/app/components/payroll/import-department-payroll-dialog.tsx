@@ -22,14 +22,12 @@ import { AddPayrollFieldSheet } from "./add-payroll-field-sheet";
 
 export function ImportDepartmentPayrollDialog({
   payrollFields,
-  salaryEntry,
   payrollId,
   allSiteOptions,
   allEmployeeOptions,
 }: {
   payrollId: string;
-  salaryEntry: any[];
-  payrollFields: PayrollFieldsDatabaseRow[];
+  payrollFields: Omit<PayrollFieldsDatabaseRow, "created_at" | "payroll_id">[];
   allSiteOptions: ComboboxSelectOption[];
   allEmployeeOptions: ComboboxSelectOption[];
 }) {
@@ -41,7 +39,7 @@ export function ImportDepartmentPayrollDialog({
         asChild
         className={cn(
           !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
-            "hidden",
+          "hidden",
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">
@@ -60,7 +58,6 @@ export function ImportDepartmentPayrollDialog({
           allSiteOptions={allSiteOptions}
           payrollFields={payrollFields}
           payrollId={payrollId}
-          salaryEntry={salaryEntry}
         />
         <AddPayrollFieldSheet
           triggerChild={

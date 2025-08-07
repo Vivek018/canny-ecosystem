@@ -146,8 +146,8 @@ export async function deleteMultipleReimbursements({
 
   if (!reimbursementIds || reimbursementIds.length === 0) {
     return {
-      status: 400,
-      error: "No Reimbursements IDs provided",
+      status: 500,
+      error: { message: "No Reimbursements IDs provided" }
     };
   }
 

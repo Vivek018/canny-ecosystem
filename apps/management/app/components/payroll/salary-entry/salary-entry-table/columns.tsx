@@ -50,7 +50,7 @@ export const salaryEntryColumns = ({
       accessorKey: "sr_no",
       header: "Sr No.",
       sortingFn: (a, b) => a.index - b.index,
-      cell: ({ row }) => <p className={cn("truncate w-12")}>{row.index + 1}</p>,
+      cell: ({ row }) => <p className={cn("truncate")}>{row.index + 1}</p>,
     },
     {
       id: "employee_code",
@@ -62,7 +62,7 @@ export const salaryEntryColumns = ({
           String(b.getValue("employee_code") ?? ""),
         ),
       cell: ({ row }) => (
-        <p className="truncate w-28">
+        <p className="truncate">
           {row.original?.employee.employee_code ?? "--"}
         </p>
       ),
@@ -99,7 +99,7 @@ export const salaryEntryColumns = ({
         return (
           <SalaryEntrySiteDepartmentSheet
             triggerChild={
-              <p className="truncate ">
+              <p className="truncate">
                 {row.original.salary_entries?.site?.name ?? "--"}
               </p>
             }

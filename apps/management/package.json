@@ -30,6 +30,7 @@
     "@remix-run/react": "^2.15.3",
     "@remix-run/serve": "^2.15.3",
     "@tanstack/react-table": "^8.20.5",
+    "@tanstack/react-virtual": "^3.13.12",
     "address": "^2.0.3",
     "agents": "^0.0.94",
     "ai": "^4.3.16",
