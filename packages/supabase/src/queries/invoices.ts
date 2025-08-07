@@ -119,7 +119,7 @@ export async function getInvoicesByCompanyId({
     .select(
       `${columns.join(",")},company_locations!${
         company_location ? "inner" : "left"
-      }(id,name)`
+      }(id,name)`,
     )
     .eq("company_id", companyId);
 
@@ -145,7 +145,7 @@ export async function getInvoicesByCompanyId({
 
   if (searchQuery) {
     query.or(
-      `invoice_number.ilike.*${searchQuery}*,subject.ilike.*${searchQuery}*`
+      `invoice_number.ilike.*${searchQuery}*,subject.ilike.*${searchQuery}*`,
     );
   }
 
@@ -307,7 +307,7 @@ export async function getInvoicesByCompanyIdForDashboard({
     ([month, data]) => ({
       month,
       data,
-    })
+    }),
   );
 
   return { data: groupedByMonth, error: null };
@@ -349,7 +349,7 @@ export async function getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements
   if (currentMonthError)
     console.error(
       "getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements Error",
-      currentMonthError
+      currentMonthError,
     );
 
   //For Previous Month
@@ -375,7 +375,7 @@ export async function getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements
   if (previousMonthError)
     console.error(
       "getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements Error",
-      previousMonthError
+      previousMonthError,
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };

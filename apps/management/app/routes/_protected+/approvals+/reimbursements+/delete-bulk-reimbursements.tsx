@@ -15,7 +15,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
     const reimbursementDeleteData = JSON.parse(
-      formData.get("reimbursementDeleteData") as string
+      formData.get("reimbursementDeleteData") as string,
     );
 
     const ids = reimbursementDeleteData
@@ -41,7 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Reimbursements Delete failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -51,7 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

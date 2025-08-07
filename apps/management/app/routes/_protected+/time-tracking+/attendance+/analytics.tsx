@@ -27,7 +27,7 @@ export default function AttendanceAnalytics() {
         working_hours: entry?.monthly_attendance?.working_hours ?? 0,
         overtime_hours: entry?.monthly_attendance?.overtime_hours ?? 0,
       },
-    })
+    }),
   );
 
   return (

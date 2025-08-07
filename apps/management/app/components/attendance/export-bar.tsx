@@ -65,17 +65,17 @@ export function ExportBar({
   });
 
   function calculateAvgPresence(data: any) {
-  let totalP = 0;
-  let totalEmployees = 0;
+    let totalP = 0;
+    let totalEmployees = 0;
 
-  for (const employee of data) {
-    const presentDays = employee.monthly_attendance?.present_days ?? 0;
-    totalP += presentDays;
-    totalEmployees++;
+    for (const employee of data) {
+      const presentDays = employee.monthly_attendance?.present_days ?? 0;
+      totalP += presentDays;
+      totalEmployees++;
+    }
+
+    return totalEmployees > 0 ? (totalP / totalEmployees).toFixed(2) : "0";
   }
-
-  return totalEmployees > 0 ? (totalP / totalEmployees).toFixed(2) : "0";
-}
 
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -87,7 +87,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Attendances - ${formatDateTime(Date.now())}`
+      `Attendances - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);
@@ -100,7 +100,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
@@ -109,9 +109,7 @@ export function ExportBar({
       <div className="h-full flex justify-center items-center gap-2">
         <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
           Avg Present Days:{" "}
-          <span className="ml-1.5">
-            {calculateAvgPresence(data)}
-          </span>
+          <span className="ml-1.5">{calculateAvgPresence(data)}</span>
         </div>
         <Button
           onClick={handleExport}

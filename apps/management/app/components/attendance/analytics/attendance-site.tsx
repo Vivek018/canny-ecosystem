@@ -1,5 +1,5 @@
 import { LabelList, RadialBar, RadialBarChart } from "recharts";
-import { useMemo} from "react";
+import { useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -50,9 +50,7 @@ export function AttendanceBySite({
     <Card className="flex flex-col">
       <CardHeader className="flex items-center justify-center pt-3">
         <CardTitle>Site Attendance</CardTitle>
-        <CardDescription>
-          Top 5 sites by total present days
-        </CardDescription>
+        <CardDescription>Top 5 sites by total present days</CardDescription>
       </CardHeader>
 
       {trendData.length > 0 ? (

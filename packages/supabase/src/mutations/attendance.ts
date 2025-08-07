@@ -178,7 +178,6 @@ export async function updateMultipleAttendances({
   return { error: null, status: 200 };
 }
 
-
 export async function deleteMultipleAttendances({
   supabase,
   attendanceIds,

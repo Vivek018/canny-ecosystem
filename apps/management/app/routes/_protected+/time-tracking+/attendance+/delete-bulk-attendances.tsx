@@ -1,8 +1,6 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry } from "@/utils/cache";
-import {
-  deleteMultipleAttendances,
-} from "@canny_ecosystem/supabase/mutations";
+import { deleteMultipleAttendances } from "@canny_ecosystem/supabase/mutations";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -17,7 +15,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
     const attendancesDeleteData = JSON.parse(
-      formData.get("attendancesDeleteData") as string
+      formData.get("attendancesDeleteData") as string,
     );
 
     const ids = attendancesDeleteData
@@ -42,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Attendances Delete failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -52,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

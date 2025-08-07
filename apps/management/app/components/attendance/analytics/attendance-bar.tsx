@@ -50,7 +50,9 @@ export function AttendanceBars({
         <CardTitle>
           Employee Attendance (Max Employees: {MAX_EMPLOYEES})
         </CardTitle>
-        <CardDescription>Showing total present days per employee</CardDescription>
+        <CardDescription>
+          Showing total present days per employee
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

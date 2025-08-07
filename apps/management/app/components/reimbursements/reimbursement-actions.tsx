@@ -60,7 +60,7 @@ export function ReimbursementActions({
       {
         method: "POST",
         action: "/approvals/reimbursements/update-bulk-reimbursements",
-      }
+      },
     );
   };
 
@@ -74,10 +74,9 @@ export function ReimbursementActions({
       {
         method: "POST",
         action: "/approvals/reimbursements/delete-bulk-reimbursements",
-      }
+      },
     );
   };
-
 
   return (
     <div className="gap-4 hidden md:flex">
@@ -89,7 +88,7 @@ export function ReimbursementActions({
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows?.length && "hidden"
+            !selectedRows?.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/reimbursements/analytics")}
@@ -101,7 +100,7 @@ export function ReimbursementActions({
             <AlertDialogTrigger
               className={cn(
                 "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden"
+                !selectedRows.length && "hidden",
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -115,7 +114,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Status</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementStatusArray as unknown as string[]
+                      reimbursementStatusArray as unknown as string[],
                     )}
                     value={status}
                     onChange={(e) => setStatus(e)}
@@ -125,7 +124,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Type</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementTypeArray as unknown as string[]
+                      reimbursementTypeArray as unknown as string[],
                     )}
                     value={type}
                     onChange={(e) => setType(e)}
@@ -150,7 +149,7 @@ export function ReimbursementActions({
             <AlertDialogTrigger
               className={cn(
                 "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden"
+                !selectedRows.length && "hidden",
               )}
             >
               <Icon name="trash" className="h-[18px] w-[18px]" />
@@ -163,7 +162,7 @@ export function ReimbursementActions({
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   className={cn(
-                    buttonVariants({ variant: "destructive-outline" })
+                    buttonVariants({ variant: "destructive-outline" }),
                   )}
                   onClick={handleDeleteBulkReimbursements}
                 >
