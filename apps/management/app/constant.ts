@@ -201,6 +201,7 @@ export const cacheKeyPrefix = {
   payroll_invoice: "payroll-invoice",
   departments_main: "departments_main",
   departments: "departments",
+  payee: "payee",
 };
 
 export const SALARY_SLIP_TITLE = "Form IV B [Rule 26(2)(b)]";
@@ -274,7 +275,7 @@ export function numberToWordsIndian(num: number) {
       if (remainder > 0) {
         const groupName = i > 0 ? units[i] : ""; // Add lakh, crore, etc.
         parts.unshift(
-          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
         );
       }
       n = Math.floor(n / (i === 0 ? 1000 : 100)); // Reduce the number based on the group
@@ -294,7 +295,7 @@ export function numberToWordsIndian(num: number) {
   // Split integer and decimal parts
   const [integerPart, decimalPart] = num.toString().split(".");
   const integerWords = convertIntegerToWordsIndian(
-    Number.parseInt(integerPart, 10),
+    Number.parseInt(integerPart, 10)
   );
   const decimalWords = decimalPart
     ? `point ${convertDecimalPart(decimalPart)}`
