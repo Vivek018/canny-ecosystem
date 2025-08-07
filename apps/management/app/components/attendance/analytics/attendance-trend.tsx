@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -12,14 +12,16 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const chartConfig = {
-  presents: {
-    label: "Presents",
-    color: "hsl(var(--chart-1))",
-  },
+  present_days: { label: "Present", color: "hsl(var(--chart-2))" },
+  absent_days: { label: "Absent", color: "hsl(var(--chart-5))" },
+  overtime_hours: { label: "Overtime Hours", color: "hsl(var(--chart-1))" },
+  paid_leaves: { label: "Paid Leave", color: "hsl(var(--chart-4))" },
+  casual_leaves: { label: "Casual Leave", color: "hsl(var(--chart-3))" },
+  paid_holidays: { label: "Paid Holiday", color: "hsl(var(--chart-9))" },
 } satisfies ChartConfig;
 
 export function AttendanceTrend({
@@ -27,111 +29,59 @@ export function AttendanceTrend({
 }: {
   chartData: TransformedAttendanceDataType[];
 }) {
-  const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>("presents");
+  const totalData = useMemo(() => {
+    const totals: Record<string, number> = {};
 
-  const trendData = useMemo(() => {
-    const grouped: Record<string, number> = {};
+    for (const field of Object.keys(chartConfig)) {
+      totals[field] = 0;
+    }
 
     for (const row of chartData) {
-      const attendance = row.attendance ?? [];
+      const summary = row.attendance_summary;
+      if (!summary) continue;
 
-      for (const entry of attendance as { date: string; present: boolean }[]) {
-        if (entry.date) {
-          const date = new Date(entry.date).toLocaleDateString("en-CA");
-          grouped[date] = (grouped[date] ?? 0) + Number(entry.present ?? false);
-        }
+      for (const key of Object.keys(chartConfig)) {
+        totals[key] += summary[key as keyof typeof summary] ?? 0;
       }
     }
 
-    const result = Object.entries(grouped).map(([date, presents]) => ({
-      date,
-      presents,
+    return Object.entries(totals).map(([key, value]) => ({
+      name: chartConfig[key as keyof typeof chartConfig].label,
+      key,
+      value,
     }));
-
-    return result.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-    );
   }, [chartData]);
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6">
-          <CardTitle>Attendance Trend Over Time</CardTitle>
-          <CardDescription>
-            Showing total presents over the period.
-          </CardDescription>
-        </div>
-        <div className="flex">
-          {["presents"].map((key) => {
-            const chart = key as keyof typeof chartConfig;
-            return (
-              <button
-                key={chart}
-                data-active={activeChart === chart}
-                className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                onClick={() => setActiveChart(chart)}
-                type="button"
-              >
-                <span className="text-xs text-muted-foreground">
-                  {chartConfig[chart]?.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Company-wide Attendance Summary</CardTitle>
+        <CardDescription>
+          Showing total count per attendance field
+        </CardDescription>
       </CardHeader>
-      <CardContent className="px-2 sm:px-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <LineChart
-            accessibilityLayer
-            data={trendData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) =>
-                new Date(value).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })
-              }
-            />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  className="w-[160px]"
-                  nameKey="presents"
-                  labelFormatter={(value) =>
-                    new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <BarChart data={totalData} width={600} height={300}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+            <Bar
+              dataKey="value"
+              radius={[4, 4, 0, 0]}
+              label={{ position: "top" }}
+            >
+              {totalData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index.toString()}`}
+                  fill={
+                    chartConfig[entry.key as keyof typeof chartConfig].color
                   }
                 />
-              }
-            />
-            <Line
-              dataKey={activeChart}
-              type="monotone"
-              stroke={chartConfig[activeChart].color}
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
+              ))}
+            </Bar>
+          </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>

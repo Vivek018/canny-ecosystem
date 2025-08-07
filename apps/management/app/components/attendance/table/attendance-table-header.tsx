@@ -10,26 +10,26 @@ type Props = {
   className?: string;
   loading?: boolean;
 };
+export const AttendanceColumnIdArray = [
+  "employee_code",
+  "first_name",
+  "project_name",
+  "site_name",
+  "month",
+  "year",
+  "working_days",
+  "present_days",
+  "absent_days",
+  "working_hours",
+  "overtime_hours",
+  "paid_holidays",
+  "paid_leaves",
+  "casual_leaves",
+];
 
 export function AttendanceTableHeader({ table, className, loading }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const AttendanceColumnIdArray = [
-    "employee_code",
-    "first_name",
-    "project_name",
-    "site_name",
-    "month",
-    "year",
-    "working_days",
-    "present_days",
-    "absent_days",
-    "working_hours",
-    "overtime_hours",
-    "paid_holidays",
-    "paid_leaves",
-    "casual_leaves",
-  ];
   const sortParam = searchParams.get("sort");
   const [column, value] = sortParam ? sortParam.split(":") : [];
 

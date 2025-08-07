@@ -76,7 +76,7 @@ export default function Documents() {
   }
 
   return (
-    <section className="w-full px-0">
+    <section className="p-4 w-full px-0">
       <div className="w-full mb-6">
         <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={documentsPromise}>

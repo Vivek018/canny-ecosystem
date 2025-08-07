@@ -67,8 +67,8 @@ export type ProjectDatabaseUpdate =
 
 // Sites
 export type SiteDatabaseRow = Database["public"]["Tables"]["sites"]["Row"];
-export type SiteDatabaseInsert = Database["public"]["Tables"]["sitesrt"];
-export type SiteDatabaseUpdate = Database["public"]["Tables"]["siteste"];
+export type SiteDatabaseInsert = Database["public"]["Tables"]["sites"];
+export type SiteDatabaseUpdate = Database["public"]["Tables"]["sites"];
 
 // Pay Sequences
 export type PaySequenceDatabaseRow =
@@ -369,3 +369,9 @@ export type PayrollFieldsDatabaseInsert =
   Database["public"]["Tables"]["payroll_fields"]["Insert"];
 export type PayrollFieldsDatabaseUpdate =
   Database["public"]["Tables"]["payroll_fields"]["Update"];
+
+export type PayeeDatabaseRow = Database["public"]["Tables"]["payee"]["Row"];
+export type PayeeDatabaseInsert =
+  Database["public"]["Tables"]["payee"]["Insert"];
+export type PayeeDatabaseUpdate =
+  Database["public"]["Tables"]["payee"]["Update"];

@@ -3,6 +3,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
+import { AttendanceColumnIdArray } from "./table/attendance-table-header";
 
 export function ExportBar({
   rows,
@@ -15,81 +16,70 @@ export function ExportBar({
   className: string;
   columnVisibility: VisibilityState;
 }) {
-  const allHeaders = new Set<string>();
-  const dateHeaders = new Set<string>();
+  const toBeExportedData = data.map((element: any) => {
+    const exportedData: {
+      [key: (typeof AttendanceColumnIdArray)[number]]:
+        | string
+        | number
+        | boolean;
+    } = {};
 
-  for (const entry of data) {
-    for (const key of Object.keys(entry)) {
-      if (columnVisibility[key] !== false) {
-        allHeaders.add(key);
-        if (
-          ![
-            "employee_id",
-            "employee_code",
-            "employee_name",
-            "project",
-            "site",
-          ].includes(key)
-        ) {
-          dateHeaders.add(key);
-        }
+    for (const key of AttendanceColumnIdArray) {
+      if (columnVisibility[key] === false) {
+        continue;
+      }
+      if (key === "employee_code") {
+        exportedData[key] = element?.employee_code;
+      } else if (key === "first_name") {
+        exportedData[key] =
+          `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
+      } else if (key === "project_name") {
+        exportedData[key] =
+          element?.employee_project_assignment?.sites?.projects?.name;
+      } else if (key === "site_name") {
+        exportedData[key] = element?.employee_project_assignment?.sites?.name;
+      } else if (key === "month") {
+        exportedData[key] = element?.monthly_attendance?.month;
+      } else if (key === "year") {
+        exportedData[key] = element?.monthly_attendance?.year;
+      } else if (key === "present_days") {
+        exportedData[key] = element?.monthly_attendance?.present_days;
+      } else if (key === "absent_days") {
+        exportedData[key] = element?.monthly_attendance?.absent_days;
+      } else if (key === "working_days") {
+        exportedData[key] = element?.monthly_attendance?.working_days;
+      } else if (key === "working_hours") {
+        exportedData[key] = element?.monthly_attendance?.working_hours;
+      } else if (key === "overtime_hours") {
+        exportedData[key] = element?.monthly_attendance?.overtime_hours;
+      } else if (key === "paid_holidays") {
+        exportedData[key] = element?.monthly_attendance?.paid_holidays;
+      } else if (key === "paid_leaves") {
+        exportedData[key] = element?.monthly_attendance?.paid_leaves;
+      } else if (key === "casual_leaves") {
+        exportedData[key] = element?.monthly_attendance?.casual_leaves;
       }
     }
-  }
 
-  const sortedDateHeaders = [...dateHeaders].sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
-  );
+    return exportedData;
+  });
 
-  const formattedData: any[] | Papa.UnparseObject<any> = [];
-
-  for (const entry of data) {
-    const {
-      employee_id,
-      employee_code,
-      employee_name,
-      project,
-      site,
-      ...attendance
-    } = entry;
-
-    const fixedFields = { employee_code, employee_name, project, site };
-
-    const formattedEntry: Record<string, string> = { ...fixedFields };
-
-    for (const date of sortedDateHeaders) {
-      const dayData = attendance[date];
-      formattedEntry[date] = dayData ? `${dayData.present}` : "";
-    }
-
-    formattedData.push(formattedEntry);
-  }
-
-  function calculateMonthlyAvgPresence(data: any) {
-    let totalDays = 0;
+  function calculateAvgPresence(data: any) {
     let totalP = 0;
+    let totalEmployees = 0;
 
     for (const employee of data) {
-      for (const key in employee) {
-        if (
-          !["employee_code", "employee_name", "project", "site"].includes(key)
-        ) {
-          if (employee[key] !== "WOF") {
-            totalDays++;
-            if (employee[key] === "P") {
-              totalP++;
-            }
-          }
-        }
-      }
+      const presentDays = employee.monthly_attendance?.present_days ?? 0;
+      totalP += presentDays;
+      totalEmployees++;
     }
 
-    return totalDays > 0 ? ((totalP / totalDays) * 100).toFixed(2) : 0;
+    return totalEmployees > 0 ? (totalP / totalEmployees).toFixed(2) : "0";
   }
 
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const csv = Papa.unparse(formattedData);
+    const csv = Papa.unparse(toBeExportedData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -119,9 +109,7 @@ export function ExportBar({
       <div className="h-full flex justify-center items-center gap-2">
         <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
           Avg Present Days:{" "}
-          <span className="ml-1.5">
-            {calculateMonthlyAvgPresence(formattedData)} %
-          </span>
+          <span className="ml-1.5">{calculateAvgPresence(data)}</span>
         </div>
         <Button
           onClick={handleExport}

@@ -46,6 +46,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const page = 0;
     const searchParams = new URLSearchParams(url.searchParams);
+    const sortParam = searchParams.get("sort");
     const query = searchParams.get("name") ?? null;
 
     const filters: InvoiceFilters = {
@@ -73,6 +74,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
         filters,
         searchQuery: query ?? undefined,
+        sort: sortParam?.split(":") as [string, "asc" | "desc"],
       },
     });
     const locationPromise = await getLocationsForSelectByCompanyId({

@@ -1,5 +1,4 @@
 import { CompanyDetailsWrapper } from "@/components/company/company-details-wrapper";
-import { DeleteCompany } from "@/components/company/delete-company";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
@@ -79,9 +78,9 @@ export default function SettingGeneral() {
                     data={resolvedData.data}
                     error={resolvedData.error}
                   />
-                  <DeleteCompany
+                  {/* <DeleteCompany
                     companyId={resolvedData.data?.id as unknown as string}
-                  />
+                  /> */}
                 </>
               );
             }}

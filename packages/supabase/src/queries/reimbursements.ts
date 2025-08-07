@@ -126,45 +126,54 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!${
-            foreignFilters ? "inner" : "left"
-          }(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-            foreignFilters ? "inner" : "left"
-          }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-            project ? "inner" : "left"
-          }(id, name)))),
-          users!${users ? "inner" : "left"}(id,email)`,
+        employees!${
+          foreignFilters ? "inner" : "left"
+        }(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          foreignFilters ? "inner" : "left"
+        }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
+          project ? "inner" : "left"
+        }(id, name)))),
+        users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" },
     )
     .eq("company_id", companyId);
 
   if (sort) {
     const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
+    const reimbursementCols = [
+      "note",
+      "status",
+      "type",
+      "amount",
+      "submitted_date",
+    ];
+
+    if (reimbursementCols.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
   } else {
     query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");
-    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
-      for (const searchQueryElement of searchQueryArray) {
+    if (searchQueryArray.length > 0 && searchQueryArray.length <= 3) {
+      for (const part of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
-          {
-            referencedTable: "employees",
-          },
+          `first_name.ilike.*${part}*,middle_name.ilike.*${part}*,last_name.ilike.*${part}*,employee_code.ilike.*${part}*`,
+          { referencedTable: "employees" },
         );
       }
     } else {
       query.or(
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-        {
-          referencedTable: "employees",
-        },
+        { referencedTable: "employees" },
       );
     }
   }
+
   const finalStartDate = () => {
     if (month && year) {
       return new Date(Date.UTC(Number(year), Number(months[month]) - 1, 1));
@@ -208,7 +217,6 @@ export async function getReimbursementsByCompanyId({
 
   if (recently_added) {
     const now = new Date();
-
     const diff =
       filterComparison[recently_added as keyof typeof filterComparison];
     if (diff) {
@@ -217,37 +225,106 @@ export async function getReimbursementsByCompanyId({
     }
   }
 
-  if (status) {
-    query.eq("status", status.toLowerCase());
-  }
-
-  if (users) {
-    query.eq("users.email", users);
-  }
-  if (type) {
-    query.eq("type", type);
-  }
-  if (project) {
+  if (status) query.eq("status", status.toLowerCase());
+  if (users) query.eq("users.email", users);
+  if (type) query.eq("type", type);
+  if (project)
     query.eq(
       "employees.employee_project_assignment.sites.projects.name",
       project,
     );
-  }
-  if (site) {
-    query.eq("employees.employee_project_assignment.sites.name", site);
-  }
-
+  if (site) query.eq("employees.employee_project_assignment.sites.name", site);
   if (in_invoice !== undefined && in_invoice !== null) {
-    if (in_invoice === "true") {
-      query.not("invoice_id", "is", null);
-    } else {
-      query.is("invoice_id", null);
-    }
+    if (in_invoice === "true") query.not("invoice_id", "is", null);
+    else query.is("invoice_id", null);
   }
 
   const { data, count, error } = await query.range(from, to);
   if (error) {
     console.error("getReimbursementsByCompanyId Error", error);
+  }
+
+  if (sort && data) {
+    const [column, direction] = sort;
+
+    const employeeCols = ["employee_name", "employee_code"];
+    const reimbursementCols = [
+      "note",
+      "status",
+      "type",
+      "amount",
+      "submitted_date",
+    ];
+
+    if (employeeCols.includes(column)) {
+      if (column === "employee_name") {
+        data.sort((a: any, b: any) => {
+          const aValue = a.employees?.first_name || "";
+          const bValue = b.employees?.first_name || "";
+          return direction === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        });
+      }
+      data.sort((a: any, b: any) => {
+        const aValue = a.employees?.[column] || "";
+        const bValue = b.employees?.[column] || "";
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    } else if (column === "email") {
+      data.sort((a: any, b: any) => {
+        const aValue = a.users?.email || "";
+        const bValue = b.users?.email || "";
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    } else if (column === "amount") {
+      data.sort((a: any, b: any) => {
+        const aValue = Number(a.amount) || 0;
+        const bValue = Number(b.amount) || 0;
+        return direction === "asc" ? aValue - bValue : bValue - aValue;
+      });
+    } else if (column === "submitted_date") {
+      data.sort((a: any, b: any) => {
+        const aValue = new Date(a.submitted_date || 0).getTime();
+        const bValue = new Date(b.submitted_date || 0).getTime();
+        return direction === "asc" ? aValue - bValue : bValue - aValue;
+      });
+    } else if (column === "project_name") {
+      data.sort((a: any, b: any) => {
+        const aValue =
+          a.employees?.employee_project_assignment?.sites?.projects?.name || "";
+        const bValue =
+          b.employees?.employee_project_assignment?.sites?.projects?.name || "";
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    } else if (column === "site_name") {
+      data.sort((a: any, b: any) => {
+        const aValue =
+          a.employees?.employee_project_assignment?.sites?.name || "";
+        const bValue =
+          b.employees?.employee_project_assignment?.sites?.name || "";
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    } else if (
+      reimbursementCols.includes(column) &&
+      !["amount", "submitted_date"].includes(column)
+    ) {
+      data.sort((a: any, b: any) => {
+        const aValue = String(a[column] || "");
+        const bValue = String(b[column] || "");
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    }
   }
 
   return { data, meta: { count }, error };
@@ -332,7 +409,7 @@ export async function getReimbursementsByEmployeeId({
     "company_id",
   ] as const;
 
-  const query = supabase
+  let query = supabase
     .from("reimbursements")
     .select(
       `${columns.join(",")},
@@ -344,9 +421,22 @@ export async function getReimbursementsByEmployeeId({
 
   if (sort) {
     const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
+
+    const reimbursementCols = [
+      "note",
+      "status",
+      "type",
+      "amount",
+      "submitted_date",
+    ];
+
+    if (reimbursementCols.includes(column)) {
+      query = query.order(column, { ascending: direction === "asc" });
+    } else {
+      query = query.order("created_at", { ascending: false });
+    }
   } else {
-    query.order("created_at", { ascending: false });
+    query = query.order("created_at", { ascending: false });
   }
 
   if (filters) {
@@ -371,9 +461,78 @@ export async function getReimbursementsByEmployeeId({
       query.eq("users.email", users);
     }
   }
+
   const { data, count, error } = await query.range(from, to);
+
   if (error) {
     console.error("getReimbursementsByEmployeeId Error", error);
+  }
+  if (sort && data) {
+    const [column, direction] = sort;
+
+    const employeeCols = ["first_name", "last_name", "employee_code"];
+    const reimbursementCols = [
+      "note",
+      "status",
+      "type",
+      "amount",
+      "submitted_date",
+    ];
+
+    if (employeeCols.includes(column)) {
+      data.sort((a: any, b: any) => {
+        const aValue = a.employees?.[column] || "";
+        const bValue = b.employees?.[column] || "";
+
+        if (direction === "asc") {
+          return aValue.localeCompare(bValue);
+        }
+        return bValue.localeCompare(aValue);
+      });
+    } else if (column === "email") {
+      data.sort((a: any, b: any) => {
+        const aValue = a.users?.email || "";
+        const bValue = b.users?.email || "";
+
+        if (direction === "asc") {
+          return aValue.localeCompare(bValue);
+        }
+        return bValue.localeCompare(aValue);
+      });
+    } else if (column === "amount") {
+      data.sort((a: any, b: any) => {
+        const aValue = Number(a.amount) || 0;
+        const bValue = Number(b.amount) || 0;
+
+        if (direction === "asc") {
+          return aValue - bValue;
+        }
+        return bValue - aValue;
+      });
+    } else if (column === "submitted_date") {
+      data.sort((a: any, b: any) => {
+        const aValue = new Date(a.submitted_date || 0).getTime();
+        const bValue = new Date(b.submitted_date || 0).getTime();
+
+        if (direction === "asc") {
+          return aValue - bValue;
+        }
+        return bValue - aValue;
+      });
+    } else if (
+      reimbursementCols.includes(column) &&
+      !["amount", "submitted_date"].includes(column)
+    ) {
+      data.sort((a: any, b: any) => {
+        const aValue = String(a[column] || "");
+        const bValue = String(b[column] || "");
+
+        if (direction === "asc") {
+          return aValue.localeCompare(bValue);
+        }
+        return bValue.localeCompare(aValue);
+      });
+    }
   }
 
   return { data, meta: { count: count }, error };

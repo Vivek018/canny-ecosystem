@@ -74,6 +74,20 @@ export function AttendanceActions({
     );
   };
 
+  const handleDeleteBulkAttendances = () => {
+    clearCacheEntry(`${cacheKeyPrefix.attendance}`);
+    submit(
+      {
+        attendancesDeleteData: JSON.stringify(selectedRows),
+        failedRedirect: "/time-tracking/attendance",
+      },
+      {
+        method: "POST",
+        action: "/time-tracking/attendance/delete-bulk-attendances",
+      },
+    );
+  };
+
   return (
     <div className="gap-4 hidden md:flex">
       <div className="flex gap-2">
@@ -154,6 +168,34 @@ export function AttendanceActions({
                   onClick={handleUpdateBulkAttendances}
                 >
                   Update
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+        <div className="h-full">
+          <AlertDialog>
+            <AlertDialogTrigger
+              className={cn(
+                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
+                !selectedRows.length && "hidden",
+              )}
+            >
+              <Icon name="trash" className="h-[18px] w-[18px]" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Bulk Attendance</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="pt-2">
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className={cn(
+                    buttonVariants({ variant: "destructive-outline" }),
+                  )}
+                  onClick={handleDeleteBulkAttendances}
+                >
+                  Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

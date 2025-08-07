@@ -125,3 +125,41 @@ export async function updateMultipleReimbursements({
 
   return { error: null, status: 200 };
 }
+
+export async function deleteMultipleReimbursements({
+  supabase,
+  reimbursementIds,
+}: {
+  supabase: TypedSupabaseClient;
+  reimbursementIds: string[];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  if (!reimbursementIds || reimbursementIds.length === 0) {
+    return {
+      status: 400,
+      error: "No Reimbursements IDs provided",
+    };
+  }
+
+  const { error, status } = await supabase
+    .from("reimbursements")
+    .delete()
+    .in("id", reimbursementIds);
+
+  if (error) {
+    console.error("Error deleting reimbursements:", error);
+    return { error, status };
+  }
+
+  return { error: null, status };
+}

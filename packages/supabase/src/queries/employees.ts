@@ -163,7 +163,21 @@ export async function getEmployeesByCompanyId({
 
   if (sort) {
     const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
+    const baseCols = [
+      "first_name",
+      "last_name",
+      "employee_code",
+      "date_of_birth",
+      "education",
+      "gender",
+      "primary_mobile_number",
+    ];
+
+    if (baseCols.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
   } else {
     query.order("created_at", { ascending: false });
   }
@@ -222,6 +236,37 @@ export async function getEmployeesByCompanyId({
     console.error("getEmployeesByCompanyId Error", error);
   }
 
+  if (sort && data) {
+    const [column, direction] = sort;
+
+    if (["project_name", "site_name"].includes(column)) {
+      data.sort((a: any, b: any) => {
+        const aValue =
+          column === "project_name"
+            ? a.employee_project_assignment?.sites?.projects?.name || ""
+            : a.employee_project_assignment?.sites?.name || "";
+
+        const bValue =
+          column === "project_name"
+            ? b.employee_project_assignment?.sites?.projects?.name || ""
+            : b.employee_project_assignment?.sites?.name || "";
+
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    } else if (
+      ["assignment_type", "position", "skill_level"].includes(column)
+    ) {
+      data.sort((a: any, b: any) => {
+        const aValue = a.employee_project_assignment?.[column] || "";
+        const bValue = b.employee_project_assignment?.[column] || "";
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    }
+  }
   return {
     data,
     meta: { count: count },

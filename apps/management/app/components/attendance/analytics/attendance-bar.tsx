@@ -30,12 +30,8 @@ export function AttendanceBars({
   chartData: TransformedAttendanceDataType[];
 }) {
   const trendData = useMemo(() => {
-    return chartData.map(({ employee_code, attendance }) => {
-      const totalPresents = (attendance ?? []).reduce(
-        (total: number, entry: { present: any }) =>
-          total + (entry.present ? 1 : 0),
-        0,
-      );
+    return chartData.map(({ employee_code, attendance_summary }) => {
+      const totalPresents = attendance_summary?.present_days ?? 0;
 
       return {
         employee_code,
@@ -52,15 +48,17 @@ export function AttendanceBars({
     <Card>
       <CardHeader>
         <CardTitle>
-          Employee Attendance (Max Employees: {MAX_EMPLOYEES} )
+          Employee Attendance (Max Employees: {MAX_EMPLOYEES})
         </CardTitle>
-        <CardDescription>Showing total presents per employee</CardDescription>
+        <CardDescription>
+          Showing total present days per employee
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart data={limitedTrendData} width={600} height={300}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="employee_code" tickFormatter={(value) => value} />
+            <XAxis dataKey="employee_code" />
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar

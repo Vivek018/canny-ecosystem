@@ -177,3 +177,41 @@ export async function updateMultipleAttendances({
 
   return { error: null, status: 200 };
 }
+
+export async function deleteMultipleAttendances({
+  supabase,
+  attendanceIds,
+}: {
+  supabase: TypedSupabaseClient;
+  attendanceIds: string[];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  if (!attendanceIds || attendanceIds.length === 0) {
+    return {
+      status: 400,
+      error: "No attendance IDs provided",
+    };
+  }
+
+  const { error, status } = await supabase
+    .from("monthly_attendance")
+    .delete()
+    .in("id", attendanceIds);
+
+  if (error) {
+    console.error("Error deleting attendances:", error);
+    return { error, status };
+  }
+
+  return { error: null, status };
+}

@@ -32,19 +32,17 @@ export function AttendanceByProjects({
   chartData: TransformedAttendanceDataType[];
 }) {
   const trendData = useMemo(() => {
-    return chartData
-      .map((row) => {
-        const totalPresents = (row.attendance ?? []).reduce(
-          (count, entry: { present: boolean }) =>
-            count + (entry.present ? 1 : 0),
-          0,
-        );
+    const projectMap = new Map<string, number>();
 
-        return {
-          project: row.project,
-          presents: totalPresents,
-        };
-      })
+    for (const row of chartData) {
+      const project = row.project || "Unknown";
+      const presentDays = row.attendance_summary?.present_days ?? 0;
+
+      projectMap.set(project, (projectMap.get(project) || 0) + presentDays);
+    }
+
+    return Array.from(projectMap.entries())
+      .map(([project, presents]) => ({ project, presents }))
       .sort((a, b) => b.presents - a.presents)
       .slice(0, 5);
   }, [chartData]);

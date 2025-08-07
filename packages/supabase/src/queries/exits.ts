@@ -141,30 +141,50 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        employees!inner(
+          first_name, middle_name, last_name, employee_code,
+          employee_project_assignment!employee_project_assignments_employee_id_fkey!${
             foreignFilters ? "inner" : "left"
-          }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-            project ? "inner" : "left"
-          }(id, name))))`,
+          }(
+            sites!${foreignFilters ? "inner" : "left"}(
+              id, name, 
+              projects!${project ? "inner" : "left"}(id, name)
+            )
+          )
+        )`,
       { count: "exact" },
     )
     .eq("employees.company_id", companyId);
 
-  // Sorting
+  const simpleSortable = [
+    "payable_days",
+    "last_working_day",
+    "final_settlement_date",
+    "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
+    "note",
+  ];
+
   if (sort) {
     const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
+    if (simpleSortable.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
   } else {
     query.order("created_at", { ascending: false });
   }
 
-  // Full-text search
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");
-    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
-      for (const searchQueryElement of searchQueryArray) {
+    if (searchQueryArray.length <= 3) {
+      for (const element of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${element}*,middle_name.ilike.*${element}*,last_name.ilike.*${element}*,employee_code.ilike.*${element}*`,
           {
             referencedTable: "employees",
           },
@@ -199,9 +219,9 @@ export const getExitsByCompanyId = async ({
   }
 
   if (reason) query.eq("reason", reason.toLowerCase());
+
   if (recently_added) {
     const now = new Date();
-
     const diff =
       filterComparison[recently_added as keyof typeof filterComparison];
     if (diff) {
@@ -226,13 +246,48 @@ export const getExitsByCompanyId = async ({
       query.is("invoice_id", null);
     }
   }
+
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
     console.error("getExits Error", error);
   }
 
-  return { data, meta: { count: count }, error };
+  if (sort && data) {
+    const [column, direction] = sort;
+
+    const getNestedValue = (exit: any) => {
+      switch (column) {
+        case "employee_name":
+          return exit.employees?.first_name || "";
+        case "employee_code":
+          return exit.employees?.employee_code || "";
+        case "site":
+          return exit.employees?.employee_project_assignment?.sites?.name || "";
+        case "project":
+          return (
+            exit.employees?.employee_project_assignment?.sites?.projects
+              ?.name || ""
+          );
+        default:
+          return null;
+      }
+    };
+
+    if (
+      ["employee_name", "employee_code", "site", "project"].includes(column)
+    ) {
+      data.sort((a: any, b: any) => {
+        const aValue = getNestedValue(a);
+        const bValue = getNestedValue(b);
+        return direction === "asc"
+          ? String(aValue).localeCompare(String(bValue))
+          : String(bValue).localeCompare(String(aValue));
+      });
+    }
+  }
+
+  return { data, meta: { count }, error };
 };
 
 export const getExitsById = async ({

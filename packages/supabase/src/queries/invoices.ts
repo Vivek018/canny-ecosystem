@@ -78,9 +78,11 @@ export async function getInvoicesByCompanyId({
     from: number;
     searchQuery?: string;
     filters?: InvoiceFilters | null;
+    sort?: [string, "asc" | "desc"];
   };
 }) {
-  const { from, to, filters, searchQuery } = params;
+  const { from, to, filters, searchQuery, sort } = params;
+
   const {
     date_start,
     date_end,
@@ -119,14 +121,34 @@ export async function getInvoicesByCompanyId({
         company_location ? "inner" : "left"
       }(id,name)`,
     )
-    .eq("company_id", companyId)
-    .order("created_at", { ascending: false });
+    .eq("company_id", companyId);
+
+  if (sort) {
+    const sortableColumns = [
+      "date",
+      "paid_date",
+      "invoice_number",
+      "created_at",
+      "include_charge",
+      "is_paid",
+      "subject",
+    ];
+    const [column, direction] = sort;
+    if (sortableColumns.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
+  } else {
+    query.order("created_at", { ascending: false });
+  }
 
   if (searchQuery) {
     query.or(
       `invoice_number.ilike.*${searchQuery}*,subject.ilike.*${searchQuery}*`,
     );
   }
+
   const dateFilters = [
     { field: "date", start: date_start, end: date_end },
     {
@@ -153,15 +175,30 @@ export async function getInvoicesByCompanyId({
   if (paid) {
     query.eq("is_paid", Boolean(paid));
   }
+
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
     console.error("getInvoicesByCompanyId Error", error);
   }
 
+  if (sort && data) {
+    const [column, direction] = sort;
+
+    if (column === "location") {
+      data.sort((a: any, b: any) => {
+        const aValue = a.company_locations?.name || "";
+        const bValue = b.company_locations?.name || "";
+        return direction === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    }
+  }
+
   return {
     data,
-    meta: { count: count },
+    meta: { count },
     error,
   };
 }

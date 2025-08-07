@@ -59,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return await clientCaching(
     `${cacheKeyPrefix.employee_document}${args.params.employeeId}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -77,14 +77,14 @@ export default function Documents() {
   }
 
   return (
-    <section className="w-full px-0">
+    <section className="w-full py-4">
       <div className="w-full mb-6">
         <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={documentsPromise}>
             {(resolvedData) => {
               if (!resolvedData || !resolvedData.data) {
                 clearExactCacheEntry(
-                  `${cacheKeyPrefix.employee_document}${employeeId}`,
+                  `${cacheKeyPrefix.employee_document}${employeeId}`
                 );
                 return <ErrorBoundary message="Failed to fetch documents" />;
               }
@@ -103,8 +103,8 @@ export default function Documents() {
                         "flex items-center gap-1 whitespace-nowrap",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.employeeDocuments}`,
-                        ) && "hidden",
+                          `${createRole}:${attribute.employeeDocuments}`
+                        ) && "hidden"
                       )}
                     >
                       <span>Add Document</span>
@@ -113,7 +113,7 @@ export default function Documents() {
                   <CommandEmpty
                     className={cn(
                       "w-full py-40 capitalize text-lg tracking-wide text-center",
-                      !isDocument && "hidden",
+                      !isDocument && "hidden"
                     )}
                   >
                     No document found.

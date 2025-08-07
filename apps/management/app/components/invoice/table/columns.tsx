@@ -38,7 +38,6 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "subject",
     header: "Subject",
     cell: ({ row }) => {
@@ -61,7 +60,6 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "location",
     header: "Location",
     cell: ({ row }) => {
@@ -73,7 +71,6 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
@@ -85,7 +82,6 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "service_charge",
     header: "Is Service Charge Included",
     cell: ({ row }) => {
@@ -97,7 +93,6 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "is_paid",
     header: "Is Paid",
     cell: ({ row }) => {
@@ -107,7 +102,6 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     },
   },
   {
-    enableSorting: false,
     accessorKey: "paid_date",
     header: "Paid Date",
     cell: ({ row }) => {

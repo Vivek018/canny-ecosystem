@@ -11,12 +11,6 @@ import {
   hasPermission,
   updateRole,
 } from "@canny_ecosystem/utils";
-import {
-  deleteRole,
-  getMonthName,
-  hasPermission,
-  updateRole,
-} from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -51,7 +45,6 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
-    // enableSorting: false,
     accessorKey: "first_name",
     header: "Employee Name",
     cell: ({ row }) => (
@@ -68,22 +61,20 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
-    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => (
-      <p className="truncate">
+      <p className="truncate w-32">
         {row.original?.employee_project_assignment?.sites?.projects?.name ??
           "--"}
       </p>
     ),
   },
   {
-    enableSorting: false,
     accessorKey: "site_name",
     header: "Site",
     cell: ({ row }) => (
-      <p className="truncate">
+      <p className="truncate w-32">
         {row.original?.employee_project_assignment?.sites?.name ?? "--"}
       </p>
     ),
@@ -100,7 +91,6 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
   },
   {
     enableSorting: false,
-
     accessorKey: "year",
     header: "Year",
     cell: ({ row }) => (

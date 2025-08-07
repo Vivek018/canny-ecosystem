@@ -64,6 +64,20 @@ export function ReimbursementActions({
     );
   };
 
+  const handleDeleteBulkReimbursements = () => {
+    clearCacheEntry(`${cacheKeyPrefix.reimbursements}`);
+    submit(
+      {
+        reimbursementDeleteData: JSON.stringify(selectedRows),
+        failedRedirect: "/approvals/reimbursements",
+      },
+      {
+        method: "POST",
+        action: "/approvals/reimbursements/delete-bulk-reimbursements",
+      },
+    );
+  };
+
   return (
     <div className="gap-4 hidden md:flex">
       <div className="flex gap-2">
@@ -125,6 +139,34 @@ export function ReimbursementActions({
                   onClick={handleUpdateBulkReimbursements}
                 >
                   Update
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+        <div className="h-full">
+          <AlertDialog>
+            <AlertDialogTrigger
+              className={cn(
+                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
+                !selectedRows.length && "hidden",
+              )}
+            >
+              <Icon name="trash" className="h-[18px] w-[18px]" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Bulk Reimbursements</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="pt-2">
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className={cn(
+                    buttonVariants({ variant: "destructive-outline" }),
+                  )}
+                  onClick={handleDeleteBulkReimbursements}
+                >
+                  Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

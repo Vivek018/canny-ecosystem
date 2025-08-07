@@ -107,13 +107,17 @@ export async function getIncidentsByCompanyId({
   const query = supabase
     .from("incidents")
     .select(
-      `${columns.join(
-        ",",
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        foreignFilters ? "inner" : "left"
-      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
-      }(id, name))))`,
+      `
+        ${columns.join(",")},
+        employees!inner(
+          id, company_id, first_name, middle_name, last_name, employee_code,
+          employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"}(
+            sites!${foreignFilters ? "inner" : "left"}(
+              id, name, projects!${project ? "inner" : "left"}(id, name)
+            )
+          )
+        )
+      `,
       {
         count: "exact",
       },
@@ -121,56 +125,55 @@ export async function getIncidentsByCompanyId({
     .eq("employees.company_id", companyId);
 
   if (sort) {
+    const simpleSortable = [
+      "date",
+      "title",
+      "location_type",
+      "location",
+      "category",
+      "severity",
+      "status",
+      "description",
+      "medical_diagnosis",
+      "action_taken",
+    ];
     const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
+    if (simpleSortable.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
   } else {
     query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");
-    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
-      for (const searchQueryElement of searchQueryArray) {
+    if (searchQueryArray.length > 0 && searchQueryArray.length <= 3) {
+      for (const q of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
-          {
-            referencedTable: "employees",
-          },
+          `first_name.ilike.*${q}*,middle_name.ilike.*${q}*,last_name.ilike.*${q}*,employee_code.ilike.*${q}*`,
+          { referencedTable: "employees" },
         );
       }
     } else {
       query.or(
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-        {
-          referencedTable: "employees",
-        },
+        { referencedTable: "employees" },
       );
     }
   }
 
-  const dateFilters = [
-    {
-      field: "date",
-      start: date_start,
-      end: date_end,
-    },
-  ];
+  const dateFilters = [{ field: "date", start: date_start, end: date_end }];
   for (const { field, start, end } of dateFilters) {
     if (start) query.gte(field, formatUTCDate(start));
     if (end) query.lte(field, formatUTCDate(end));
   }
-  if (status) {
-    query.eq("status", status);
-  }
-  if (location_type) {
-    query.eq("location_type", location_type);
-  }
-  if (category) {
-    query.eq("category", category);
-  }
-  if (severity) {
-    query.eq("severity", severity);
-  }
+
+  if (status) query.eq("status", status);
+  if (location_type) query.eq("location_type", location_type);
+  if (category) query.eq("category", category);
+  if (severity) query.eq("severity", severity);
   if (project) {
     query.eq(
       "employees.employee_project_assignment.sites.projects.name",
@@ -182,10 +185,48 @@ export async function getIncidentsByCompanyId({
   }
 
   const { data, count, error } = await query.range(from, to);
+
   if (error) {
     console.error("getIncidentsByCompanyId Error", error);
   }
-  return { data, meta: { count: count }, error };
+
+  if (sort && data) {
+    const [column, direction] = sort;
+
+    const getNestedValue = (incident: any) => {
+      switch (column) {
+        case "employee_name":
+          return incident.employees?.first_name || "";
+        case "employee_code":
+          return incident.employees?.employee_code || "";
+        case "site":
+          return (
+            incident.employees?.employee_project_assignment?.sites?.name || ""
+          );
+        case "project":
+          return (
+            incident.employees?.employee_project_assignment?.sites?.projects
+              ?.name || ""
+          );
+        default:
+          return null;
+      }
+    };
+
+    if (
+      ["employee_name", "employee_code", "site", "project"].includes(column)
+    ) {
+      data.sort((a: any, b: any) => {
+        const aValue = getNestedValue(a);
+        const bValue = getNestedValue(b);
+        return direction === "asc"
+          ? String(aValue).localeCompare(String(bValue))
+          : String(bValue).localeCompare(String(aValue));
+      });
+    }
+  }
+
+  return { data, meta: { count }, error };
 }
 
 export async function getIncidentsById({
