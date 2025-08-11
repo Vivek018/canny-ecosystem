@@ -27,6 +27,7 @@ import {
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
+import { DeleteBulkReimbursements } from "./delete-bulk-reimmbursements";
 
 export function ReimbursementActions({
   isEmpty,
@@ -60,21 +61,7 @@ export function ReimbursementActions({
       {
         method: "POST",
         action: "/approvals/reimbursements/update-bulk-reimbursements",
-      },
-    );
-  };
-
-  const handleDeleteBulkReimbursements = () => {
-    clearCacheEntry(`${cacheKeyPrefix.reimbursements}`);
-    submit(
-      {
-        reimbursementDeleteData: JSON.stringify(selectedRows),
-        failedRedirect: "/approvals/reimbursements",
-      },
-      {
-        method: "POST",
-        action: "/approvals/reimbursements/delete-bulk-reimbursements",
-      },
+      }
     );
   };
 
@@ -88,19 +75,35 @@ export function ReimbursementActions({
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows?.length && "hidden",
+            !selectedRows?.length && "hidden"
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/reimbursements/analytics")}
         >
           <Icon name="chart" className="h-[18px] w-[18px]" />
         </Button>
+        <ReimbursementMenu
+          env={env}
+          selectedRows={selectedRows}
+          className={
+            selectedRows?.length
+              ? "bg-muted/70 text-muted-foreground"
+              : "hidden"
+          }
+        />
+        <div
+          className={cn(
+            "border border-dotted border-r-muted-foreground",
+            !selectedRows.length && "hidden"
+          )}
+        />
+
         <div className="h-full">
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
                 "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
+                !selectedRows.length && "hidden"
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -114,7 +117,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Status</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementStatusArray as unknown as string[],
+                      reimbursementStatusArray as unknown as string[]
                     )}
                     value={status}
                     onChange={(e) => setStatus(e)}
@@ -124,7 +127,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Type</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementTypeArray as unknown as string[],
+                      reimbursementTypeArray as unknown as string[]
                     )}
                     value={type}
                     onChange={(e) => setType(e)}
@@ -145,42 +148,8 @@ export function ReimbursementActions({
           </AlertDialog>
         </div>
         <div className="h-full">
-          <AlertDialog>
-            <AlertDialogTrigger
-              className={cn(
-                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
-              )}
-            >
-              <Icon name="trash" className="h-[18px] w-[18px]" />
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Bulk Reimbursements</AlertDialogTitle>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="pt-2">
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className={cn(
-                    buttonVariants({ variant: "destructive-outline" }),
-                  )}
-                  onClick={handleDeleteBulkReimbursements}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <DeleteBulkReimbursements selectedRows={selectedRows} />
         </div>
-        <ReimbursementMenu
-          env={env}
-          selectedRows={selectedRows}
-          className={
-            selectedRows?.length
-              ? "bg-muted/70 text-muted-foreground"
-              : "hidden"
-          }
-        />
       </div>
     </div>
   );

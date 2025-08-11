@@ -22,7 +22,7 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
   },
   {
     accessorKey: "invoice_number",
-    header: "Invoice Number",
+    header: "Invoice Numer",
     cell: ({ row }) => {
       return (
         <Link
@@ -30,8 +30,8 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
           prefetch="intent"
           className="group"
         >
-          <p className="truncate text-primary/80 group-hover:text-primary w-38 capitalize">{`${replaceUnderscore(
-            row.original?.invoice_number,
+          <p className="truncate text-primary/80 group-hover:text-primary capitalize">{`${replaceUnderscore(
+            row.original?.invoice_number
           )}`}</p>
         </Link>
       );
@@ -42,7 +42,7 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     header: "Subject",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-52 capitalize">
+        <p className="truncate capitalize">
           {replaceUnderscore(row.original?.subject ?? "--")}
         </p>
       );
@@ -53,13 +53,14 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     header: "Invoice Date",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-20">
+        <p className="truncate ">
           {new Date(row.original?.date).toLocaleDateString("en-IN") ?? "--"}
         </p>
       );
     },
   },
   {
+    enableSorting: false,
     accessorKey: "location",
     header: "Location",
     cell: ({ row }) => {

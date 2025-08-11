@@ -253,39 +253,7 @@ export const getExitsByCompanyId = async ({
     console.error("getExits Error", error);
   }
 
-  if (sort && data) {
-    const [column, direction] = sort;
-
-    const getNestedValue = (exit: any) => {
-      switch (column) {
-        case "employee_name":
-          return exit.employees?.first_name || "";
-        case "employee_code":
-          return exit.employees?.employee_code || "";
-        case "site":
-          return exit.employees?.employee_project_assignment?.sites?.name || "";
-        case "project":
-          return (
-            exit.employees?.employee_project_assignment?.sites?.projects
-              ?.name || ""
-          );
-        default:
-          return null;
-      }
-    };
-
-    if (
-      ["employee_name", "employee_code", "site", "project"].includes(column)
-    ) {
-      data.sort((a: any, b: any) => {
-        const aValue = getNestedValue(a);
-        const bValue = getNestedValue(b);
-        return direction === "asc"
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue));
-      });
-    }
-  }
+  
 
   return { data, meta: { count }, error };
 };

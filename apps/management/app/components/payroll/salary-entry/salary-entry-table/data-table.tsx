@@ -1,9 +1,5 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@canny_ecosystem/ui/table";
+import { TableBody, TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import {
   type ColumnDef,
   flexRender,
@@ -14,16 +10,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
-
 import { SalaryTableHeader } from "./data-table-header";
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ExportBar } from "../../export-bar";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 import { roundToNearest } from "@canny_ecosystem/utils";
-
-import {
-  useVirtualizer,
-} from '@tanstack/react-virtual'
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 interface SalaryEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -52,7 +44,7 @@ export function SalaryEntryDataTable<TData, TValue>({
     state: { sorting, rowSelection },
   });
 
-  const { rows } = table.getRowModel()
+  const { rows } = table.getRowModel();
 
   useEffect(() => {
     const rowArray = [];
@@ -68,27 +60,30 @@ export function SalaryEntryDataTable<TData, TValue>({
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
 
-  const parentRef = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: rows.length,
     estimateSize: () => 7,
     getScrollElement: () => parentRef.current,
     measureElement:
-      typeof window !== 'undefined' &&
-        navigator.userAgent.indexOf('Firefox') === -1
-        ? element => element?.getBoundingClientRect().height
+      typeof window !== "undefined" &&
+      navigator.userAgent.indexOf("Firefox") === -1
+        ? (element) => element?.getBoundingClientRect().height
         : undefined,
     overscan: 1,
-  })
+  });
 
   return (
-    <div className={cn("border rounded max-h-fit overflow-auto", !tableLength && "border-none")}>
+    <div
+      className={cn(
+        "border rounded max-h-fit overflow-hidden",
+        !tableLength && "border-none"
+      )}
+    >
       <div
         ref={parentRef}
-        className={cn(
-          "relative rounded overflow-auto",
-        )}
+        className={cn("relative rounded overflow-auto")}
         style={{
           height: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "40px",
@@ -100,9 +95,11 @@ export function SalaryEntryDataTable<TData, TValue>({
             className={cn("sticky z-10 top-0", !tableLength && "hidden")}
             uniqueFields={uniqueFields}
           />
-          <TableBody style={{
-            height: `${rowVirtualizer.getTotalSize()}px`
-          }}>
+          <TableBody
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+            }}
+          >
             {tableLength ? (
               rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const row = rows[virtualRow.index] as Row<any>;
@@ -110,7 +107,7 @@ export function SalaryEntryDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-index={virtualRow.index}
-                    ref={node => rowVirtualizer.measureElement(node)}
+                    ref={(node) => rowVirtualizer.measureElement(node)}
                     data-state={
                       (row.getIsSelected() &&
                         row.original?.salary_entries?.invoice_id &&
@@ -123,7 +120,7 @@ export function SalaryEntryDataTable<TData, TValue>({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
-                      "bg-primary/20",
+                        "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -133,20 +130,19 @@ export function SalaryEntryDataTable<TData, TValue>({
                           className={cn(
                             "px-3 md:px-4 py-2 hidden md:flex items-center min-w-24 max-w-24",
                             cell.column.id === "select" &&
-                            "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-3",
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-3",
                             cell.column.id === "sr_no" &&
-                            "sticky left-12 bg-card min-w-20 max-w-20 z-10",
+                              "sticky left-12 bg-card min-w-20 max-w-20 z-10",
                             cell.column.id === "employee_code" &&
-                            "sticky left-32 z-10 min-w-36 max-w-36 bg-card",
-                            cell.column.id === "name" &&
-                            "min-w-52 max-w-52",
+                              "sticky left-32 z-10 min-w-36 max-w-36 bg-card",
+                            cell.column.id === "name" && "min-w-52 max-w-52",
                             cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );

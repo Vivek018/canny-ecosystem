@@ -147,45 +147,7 @@ export async function getLeavesByEmployeeId({
     console.error("getLeavesByEmployeeId Error", error);
   }
 
-  if (sort && data) {
-    const [column, direction] = sort;
-
-    const getNestedValue = (leave: any) => {
-      switch (column) {
-        case "employee_name":
-          return leave.employees?.first_name || "";
-        case "employee_code":
-          return leave.employees?.employee_code || "";
-        case "site":
-          return (
-            leave.employees?.employee_project_assignment?.sites?.name || ""
-          );
-        case "project":
-          return (
-            leave.employees?.employee_project_assignment?.sites?.projects
-              ?.name || ""
-          );
-        case "email":
-          return leave.users?.email || "";
-        default:
-          return null;
-      }
-    };
-
-    if (
-      ["employee_name", "employee_code", "site", "project", "email"].includes(
-        column,
-      )
-    ) {
-      data.sort((a: any, b: any) => {
-        const aValue = getNestedValue(a);
-        const bValue = getNestedValue(b);
-        return direction === "asc"
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue));
-      });
-    }
-  }
+  
 
   return { data, meta: { count }, error };
 }

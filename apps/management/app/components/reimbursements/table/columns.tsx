@@ -35,6 +35,7 @@ export const columns = ({
     enableHiding: false,
   },
   {
+    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
@@ -46,11 +47,12 @@ export const columns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "employee_name",
     header: "Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">
+        <p className="truncate">
           {`${row.original.employees?.first_name} ${
             row.original.employees?.middle_name ?? ""
           } ${row.original.employees?.last_name ?? ""}`}
@@ -59,6 +61,7 @@ export const columns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
@@ -73,6 +76,7 @@ export const columns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "site_name",
     header: "Site",
     cell: ({ row }) => {
@@ -137,6 +141,7 @@ export const columns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
@@ -162,14 +167,14 @@ export const columns = ({
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.reimbursements}`,
+                  `${updateRole}:${attribute.reimbursements}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.reimbursements}`,
+                    `${deleteRole}:${attribute.reimbursements}`
                   ) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
               asChild
             >

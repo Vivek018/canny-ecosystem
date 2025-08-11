@@ -32,6 +32,7 @@ import { cacheKeyPrefix } from "@/constant";
 import { useState } from "react";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { DeleteBulkAttendances } from "./delete-bulk-attendances";
 
 export function AttendanceActions({
   isEmpty,
@@ -70,21 +71,7 @@ export function AttendanceActions({
       {
         method: "POST",
         action: "/time-tracking/attendance/update-bulk-attendances",
-      },
-    );
-  };
-
-  const handleDeleteBulkAttendances = () => {
-    clearCacheEntry(`${cacheKeyPrefix.attendance}`);
-    submit(
-      {
-        attendancesDeleteData: JSON.stringify(selectedRows),
-        failedRedirect: "/time-tracking/attendance",
-      },
-      {
-        method: "POST",
-        action: "/time-tracking/attendance/delete-bulk-attendances",
-      },
+      }
     );
   };
 
@@ -104,7 +91,7 @@ export function AttendanceActions({
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows.length && "hidden",
+            !selectedRows.length && "hidden"
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/time-tracking/attendance/analytics")}
@@ -116,12 +103,18 @@ export function AttendanceActions({
           companyName={companyName}
           companyAddress={companyAddress}
         />
+        <div
+          className={cn(
+            "border border-dotted border-r-muted-foreground",
+            !selectedRows.length && "hidden"
+          )}
+        />
         <div className="h-full">
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
                 "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
+                !selectedRows.length && "hidden"
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -143,7 +136,7 @@ export function AttendanceActions({
                   <Label className="text-sm font-medium">Year</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      getYears(25, defaultYear) as unknown as string[],
+                      getYears(25, defaultYear) as unknown as string[]
                     )}
                     value={year}
                     onChange={(e) => setYear(e)}
@@ -174,32 +167,7 @@ export function AttendanceActions({
           </AlertDialog>
         </div>
         <div className="h-full">
-          <AlertDialog>
-            <AlertDialogTrigger
-              className={cn(
-                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
-              )}
-            >
-              <Icon name="trash" className="h-[18px] w-[18px]" />
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Bulk Attendance</AlertDialogTitle>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="pt-2">
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className={cn(
-                    buttonVariants({ variant: "destructive-outline" }),
-                  )}
-                  onClick={handleDeleteBulkAttendances}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <DeleteBulkAttendances selectedRows={selectedRows} />
         </div>
       </div>
     </div>

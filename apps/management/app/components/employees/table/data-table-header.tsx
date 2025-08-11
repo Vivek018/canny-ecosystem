@@ -77,7 +77,7 @@ export function DataTableHeader({ table, loading, className }: Props) {
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
+      <TableRow className="h-[45px] bg-card">
         <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
@@ -96,9 +96,14 @@ export function DataTableHeader({ table, loading, className }: Props) {
               <TableHead
                 key={id}
                 className={cn(
-                  "px-4 py-2",
-                  id === "employee_code" && "sticky left-12 bg-card z-10",
-                  id === "full_name" && "sticky w-full left-48 bg-card z-10",
+                  "px-4 py-2 min-w-32 max-w-32",
+                  (id.endsWith("name") || id.endsWith("number")) &&
+                    "min-w-48 max-w-48",
+                  id === "employee_code" && "sticky left-12 bg-card z-10 min-w-36 max-w-36",
+                  id === "first_name" &&
+                    "sticky bg-card left-48 min-w-52 max-w-52",
+                  id === "account_number" && "min-w-48 max-w-48",
+                  id === "bank_name" && "min-w-72 max-w-72"
                 )}
               >
                 <Button
@@ -116,14 +121,14 @@ export function DataTableHeader({ table, loading, className }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

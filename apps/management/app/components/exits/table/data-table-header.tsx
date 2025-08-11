@@ -68,7 +68,7 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
+      <TableRow className="h-[45px] bg-card">
         <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
@@ -87,14 +87,16 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
               <TableHead
                 key={id}
                 className={cn(
-                  "px-4 py-2",
-                  id === "employee_code" && "sticky left-12 bg-card z-10",
+                  "px-4 py-2 min-w-36 max-w-36",
+                  id === "employee_code" &&
+                    "sticky  left-12 bg-card z-10 min-w-32 max-w-32",
                   id === "employee_name" &&
-                    "sticky w-full left-48 bg-card z-10",
+                    "sticky left-44 bg-card z-10 min-w-40 max-w-40",
+                  id === "final_settlement_date" && " min-w-40 max-w-40"
                 )}
               >
                 <Button
-                  className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+                  className="p-0 hover:bg-transparent space-x-1 disabled:opacity-100"
                   variant="ghost"
                   disabled={!isEnableSorting(id)}
                   onClick={(e) => {
@@ -108,14 +110,14 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

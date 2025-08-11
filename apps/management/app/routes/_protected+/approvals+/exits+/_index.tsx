@@ -76,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const exitsPromise = getExitsByCompanyId({
@@ -125,7 +125,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -167,7 +167,7 @@ export default function ExitsIndex() {
   const filterList = { ...filters, name: query };
 
   return (
-    <section className="p-4">
+    <section className="p-4 overflow-hidden">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4">
           <Suspense fallback={<LoadingSpinner className="ml-10" />}>
@@ -228,7 +228,7 @@ export default function ExitsIndex() {
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT,
+                exitsData.meta.count > LAZY_LOADING_LIMIT
             );
 
             return (

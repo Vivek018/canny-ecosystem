@@ -190,41 +190,7 @@ export async function getIncidentsByCompanyId({
     console.error("getIncidentsByCompanyId Error", error);
   }
 
-  if (sort && data) {
-    const [column, direction] = sort;
-
-    const getNestedValue = (incident: any) => {
-      switch (column) {
-        case "employee_name":
-          return incident.employees?.first_name || "";
-        case "employee_code":
-          return incident.employees?.employee_code || "";
-        case "site":
-          return (
-            incident.employees?.employee_project_assignment?.sites?.name || ""
-          );
-        case "project":
-          return (
-            incident.employees?.employee_project_assignment?.sites?.projects
-              ?.name || ""
-          );
-        default:
-          return null;
-      }
-    };
-
-    if (
-      ["employee_name", "employee_code", "site", "project"].includes(column)
-    ) {
-      data.sort((a: any, b: any) => {
-        const aValue = getNestedValue(a);
-        const bValue = getNestedValue(b);
-        return direction === "asc"
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue));
-      });
-    }
-  }
+  
 
   return { data, meta: { count }, error };
 }

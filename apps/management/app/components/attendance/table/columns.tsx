@@ -38,7 +38,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
         prefetch="intent"
         className="group"
       >
-        <p className="truncate text-primary/80 w-28">
+        <p className="truncate text-primary/80">
           {row.original?.employee_code ?? "--"}
         </p>
       </Link>
@@ -53,7 +53,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
         prefetch="intent"
         className="group"
       >
-        <p className="truncate text-primary/80 w-48">
+        <p className="truncate text-primary/80">
           {row.original?.first_name ?? ""} {row.original?.middle_name ?? ""}{" "}
           {row.original?.last_name ?? ""}
         </p>
@@ -61,20 +61,22 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => (
-      <p className="truncate w-32">
+      <p className="truncate">
         {row.original?.employee_project_assignment?.sites?.projects?.name ??
           "--"}
       </p>
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "site_name",
     header: "Site",
     cell: ({ row }) => (
-      <p className="truncate w-32">
+      <p className="truncate">
         {row.original?.employee_project_assignment?.sites?.name ?? "--"}
       </p>
     ),
@@ -187,15 +189,15 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
               className={cn(
                 (!hasPermission(
                   role,
-                  `${updateRole}:${attribute.attendance}`,
+                  `${updateRole}:${attribute.attendance}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.attendance}`,
+                    `${deleteRole}:${attribute.attendance}`
                   )) ||
                   !row.original?.monthly_attendance?.id
                   ? "hidden"
-                  : "flex",
+                  : "flex"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

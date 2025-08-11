@@ -41,7 +41,7 @@ export const columns: ColumnDef<PayeeType>[] = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.type}</p>;
+      return <p className="truncate capitalize">{row.original?.type}</p>;
     },
   },
   {

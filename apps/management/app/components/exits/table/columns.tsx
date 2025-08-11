@@ -29,23 +29,24 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     ),
   },
   {
-    enableHiding: false,
+    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-28 cursor-pointer">
+        <p className="truncate text-primary/80 cursor-pointer">
           {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
     },
   },
   {
+    enableSorting: false,
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-48 cursor-pointer">
+        <p className="truncate text-primary/80 cursor-pointer">
           {`${row.original?.employees?.first_name} ${
             row.original?.employees?.middle_name ?? ""
           }
@@ -55,6 +56,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
+    enableSorting: false,
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
@@ -67,6 +69,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
+    enableSorting: false,
     accessorKey: "site",
     header: "Site",
     cell: ({ row }) => {
@@ -156,6 +159,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
+    enableSorting: false,
     accessorKey: "net_pay",
     header: "Net Amount",
 
@@ -205,7 +209,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

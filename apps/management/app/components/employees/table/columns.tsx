@@ -37,7 +37,6 @@ export const columns = ({
     enableHiding: false,
   },
   {
-    enableHiding: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
@@ -109,22 +108,24 @@ export const columns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate capitalize">
           {row.original?.employee_project_assignment?.sites?.projects?.name}
         </p>
       );
     },
   },
   {
+    enableSorting: false,
     accessorKey: "site_name",
     header: "Site",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate capitalize">
           {row.original?.employee_project_assignment?.sites?.name}
         </p>
       );
@@ -138,7 +139,7 @@ export const columns = ({
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
+            row.original?.employee_project_assignment?.assignment_type ?? ""
           )}
         </p>
       );
@@ -150,9 +151,9 @@ export const columns = ({
     header: "Position",
     cell: ({ row }) => {
       return (
-        <p className="w-40 truncate capitalize">
+        <p className=" truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position ?? "",
+            row.original?.employee_project_assignment?.position ?? ""
           )}
         </p>
       );
@@ -164,9 +165,9 @@ export const columns = ({
     header: "Skill Level",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
+            row.original?.employee_project_assignment?.skill_level ?? ""
           )}
         </p>
       );
@@ -178,10 +179,10 @@ export const columns = ({
     header: "Date of joining",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_project_assignment?.start_date &&
             (formatDate(
-              row.original?.employee_project_assignment?.start_date,
+              row.original?.employee_project_assignment?.start_date
             ) as any)}
         </p>
       );
@@ -193,10 +194,10 @@ export const columns = ({
     header: "Date of leaving",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_project_assignment?.end_date &&
             (formatDate(
-              row.original?.employee_project_assignment?.end_date,
+              row.original?.employee_project_assignment?.end_date
             ) as any)}
         </p>
       );
@@ -208,7 +209,7 @@ export const columns = ({
     header: "Account Number",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_bank_details?.account_number}
         </p>
       );
@@ -220,7 +221,7 @@ export const columns = ({
     header: "Bank Name",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate ">
           {row.original?.employee_bank_details?.bank_name}
         </p>
       );
@@ -232,7 +233,7 @@ export const columns = ({
     header: "Aadhaar Number",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate ">
           {row.original?.employee_statutory_details?.aadhaar_number}
         </p>
       );
@@ -244,7 +245,7 @@ export const columns = ({
     header: "Pan Number",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_statutory_details?.pan_number}
         </p>
       );
@@ -256,7 +257,7 @@ export const columns = ({
     header: "UAN Number",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_statutory_details?.uan_number}
         </p>
       );
@@ -268,7 +269,7 @@ export const columns = ({
     header: "PF Number",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_statutory_details?.pf_number}
         </p>
       );
@@ -280,7 +281,7 @@ export const columns = ({
     header: "ESIC Number",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="w-max capitalize truncate">
           {row.original?.employee_statutory_details?.esic_number}
         </p>
       );
@@ -307,9 +308,9 @@ export const columns = ({
                 !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employees}`,
+                    `${deleteRole}:${attribute.employees}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

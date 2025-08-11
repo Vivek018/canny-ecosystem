@@ -33,7 +33,7 @@ clientLoader.hydrate = true;
 export default function Payroll() {
   const { pathname } = useLocation();
   return (
-    <section className="flex flex-col h-full overflow-hidden">
+    <section className="flex flex-col h-full">
       <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
