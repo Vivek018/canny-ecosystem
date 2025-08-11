@@ -190,8 +190,6 @@ export async function getIncidentsByCompanyId({
     console.error("getIncidentsByCompanyId Error", error);
   }
 
-  
-
   return { data, meta: { count }, error };
 }
 

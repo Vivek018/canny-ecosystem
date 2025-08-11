@@ -93,7 +93,7 @@ export function AttendanceTableHeader({ table, className, loading }: Props) {
                   id === "first_name" &&
                     "sticky left-44 bg-card z-10 min-w-48 max-w-48",
                   id === "project_name" && "min-w-32 max-w-32",
-                  id === "site_name" && "min-w-32 max-w-32"
+                  id === "site_name" && "min-w-32 max-w-32",
                 )}
               >
                 <Button
@@ -111,14 +111,14 @@ export function AttendanceTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

@@ -99,11 +99,12 @@ export function DataTableHeader({ table, loading, className }: Props) {
                   "px-4 py-2 min-w-32 max-w-32",
                   (id.endsWith("name") || id.endsWith("number")) &&
                     "min-w-48 max-w-48",
-                  id === "employee_code" && "sticky left-12 bg-card z-10 min-w-36 max-w-36",
+                  id === "employee_code" &&
+                    "sticky left-12 bg-card z-10 min-w-36 max-w-36",
                   id === "first_name" &&
                     "sticky bg-card left-48 min-w-52 max-w-52",
                   id === "account_number" && "min-w-48 max-w-48",
-                  id === "bank_name" && "min-w-72 max-w-72"
+                  id === "bank_name" && "min-w-72 max-w-72",
                 )}
               >
                 <Button
@@ -121,14 +122,14 @@ export function DataTableHeader({ table, loading, className }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

@@ -39,7 +39,7 @@ export function ImportDepartmentPayrollDialog({
         asChild
         className={cn(
           !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
-          "hidden",
+            "hidden",
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">

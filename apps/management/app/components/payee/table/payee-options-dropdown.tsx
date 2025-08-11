@@ -36,7 +36,7 @@ export const PayeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.settingPayee}`) &&
-                "flex"
+                "flex",
             )}
             onClick={handleEdit}
           >
@@ -46,7 +46,7 @@ export const PayeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.settingPayee}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeletePayee id={id} role={role} />

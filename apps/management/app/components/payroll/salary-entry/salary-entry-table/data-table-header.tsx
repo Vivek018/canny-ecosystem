@@ -96,8 +96,10 @@ export function SalaryTableHeader({
               key={id}
               className={cn(
                 "px-4 py-2 min-w-24 max-w-24",
-                id === "sr_no" && "sticky left-12 bg-card min-w-20 max-w-20 z-10",
-                id === "employee_code" && "sticky left-32 bg-card z-10 min-w-36 max-w-36",
+                id === "sr_no" &&
+                  "sticky left-12 bg-card min-w-20 max-w-20 z-10",
+                id === "employee_code" &&
+                  "sticky left-32 bg-card z-10 min-w-36 max-w-36",
                 id === "name" && "min-w-52",
               )}
             >

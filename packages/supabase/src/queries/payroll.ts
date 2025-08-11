@@ -259,7 +259,8 @@ export const getSalaryEntriesByPayrollId = async ({
       )
     `,
     )
-    .eq("salary_entries.payroll_id", payrollId).limit(SOFT_QUERY_LIMIT);
+    .eq("salary_entries.payroll_id", payrollId)
+    .limit(SOFT_QUERY_LIMIT);
 
   if (error) console.error("getSalaryEntriesByPayrollId Error", error);
 

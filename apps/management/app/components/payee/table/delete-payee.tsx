@@ -38,7 +38,7 @@ export const DeletePayee = ({
   };
 
   const handleDeletePayee = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -48,7 +48,7 @@ export const DeletePayee = ({
           method: "post",
           action: `${id}/delete-payee`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -63,7 +63,7 @@ export const DeletePayee = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
           hasPermission(role, `${deleteRole}:${attribute.settingPayee}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Payee

@@ -37,7 +37,7 @@ export const DeleteBulkAttendances = ({
   };
 
   const handleDeleteBulkAttendances = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -50,7 +50,7 @@ export const DeleteBulkAttendances = ({
         {
           method: "POST",
           action: "/time-tracking/attendance/delete-bulk-attendances",
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -63,7 +63,7 @@ export const DeleteBulkAttendances = ({
       <AlertDialogTrigger
         className={cn(
           "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-destructive",
-          !selectedRows.length && "hidden"
+          !selectedRows.length && "hidden",
         )}
       >
         <Icon name="trash" className="h-[18px] w-[18px]" />

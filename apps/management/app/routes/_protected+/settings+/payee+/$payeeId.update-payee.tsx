@@ -14,9 +14,7 @@ import {
   PayeeSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import {
-  getPayeeById,
-} from "@canny_ecosystem/supabase/queries";
+import { getPayeeById } from "@canny_ecosystem/supabase/queries";
 import { updatePayeeById } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
@@ -62,7 +60,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         payeeData: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -81,7 +79,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -109,7 +107,7 @@ export async function action({
         message: "Failed to update payee",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

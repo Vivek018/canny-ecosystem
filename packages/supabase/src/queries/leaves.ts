@@ -147,8 +147,6 @@ export async function getLeavesByEmployeeId({
     console.error("getLeavesByEmployeeId Error", error);
   }
 
-  
-
   return { data, meta: { count }, error };
 }
 

@@ -76,8 +76,8 @@ export function ExperienceLetter({
                 <Text>To,</Text>
                 <Text style={styles.boldText}>
                   {data.employees.first_name}{" "}
-                  {data.employees?.middle_name ?? " "} {data.employees.last_name}
-                  ,
+                  {data.employees?.middle_name ?? " "}{" "}
+                  {data.employees.last_name},
                 </Text>
                 <Text>{employeeAddressData?.address_line_1},</Text>
                 <Text>

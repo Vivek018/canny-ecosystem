@@ -253,8 +253,6 @@ export const getExitsByCompanyId = async ({
     console.error("getExits Error", error);
   }
 
-  
-
   return { data, meta: { count }, error };
 };
 

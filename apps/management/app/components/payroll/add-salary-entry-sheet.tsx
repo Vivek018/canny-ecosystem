@@ -69,10 +69,7 @@ export function AddSalaryEntrySheet({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        asChild
-        className={cn("cursor-pointer py-2")}
-      >
+      <SheetTrigger asChild className={cn("cursor-pointer py-2")}>
         {triggerChild}
       </SheetTrigger>
       <SheetContent className="flex flex-col w-[600px] h-full">

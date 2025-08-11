@@ -139,7 +139,7 @@ export const columns = ({
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? ""
+            row.original?.employee_project_assignment?.assignment_type ?? "",
           )}
         </p>
       );
@@ -153,7 +153,7 @@ export const columns = ({
       return (
         <p className=" truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position ?? ""
+            row.original?.employee_project_assignment?.position ?? "",
           )}
         </p>
       );
@@ -167,7 +167,7 @@ export const columns = ({
       return (
         <p className="w-max capitalize truncate">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? ""
+            row.original?.employee_project_assignment?.skill_level ?? "",
           )}
         </p>
       );
@@ -182,7 +182,7 @@ export const columns = ({
         <p className="w-max capitalize truncate">
           {row.original?.employee_project_assignment?.start_date &&
             (formatDate(
-              row.original?.employee_project_assignment?.start_date
+              row.original?.employee_project_assignment?.start_date,
             ) as any)}
         </p>
       );
@@ -197,7 +197,7 @@ export const columns = ({
         <p className="w-max capitalize truncate">
           {row.original?.employee_project_assignment?.end_date &&
             (formatDate(
-              row.original?.employee_project_assignment?.end_date
+              row.original?.employee_project_assignment?.end_date,
             ) as any)}
         </p>
       );
@@ -308,9 +308,9 @@ export const columns = ({
                 !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employees}`
+                    `${deleteRole}:${attribute.employees}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

@@ -36,7 +36,7 @@ export async function action({
         error: "Invalid payee ID",
         redirectUrl: "/settings/payee",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -51,7 +51,7 @@ export async function action({
           error,
           redirectUrl: "/settings/payee",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -69,7 +69,7 @@ export async function action({
         error,
         redirectUrl: "/settings/payee",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
