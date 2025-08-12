@@ -174,7 +174,7 @@ export default function Attendance() {
   const noFilters = Object.values(filters ?? {}).every((value) => !value);
 
   return (
-    <section className="py-4 overflow-hidden">
+    <section className="p-4 overflow-hidden">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<LoadingSpinner className="mt-20" />}>

@@ -230,7 +230,7 @@ export default function LeavesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-4">
+    <section className="p-4">
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={leaveTypePromise}>

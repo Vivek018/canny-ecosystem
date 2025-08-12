@@ -167,7 +167,7 @@ export default function AddMonthlyAttendance({
   });
 
   return (
-    <section className="flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className="flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 p-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>

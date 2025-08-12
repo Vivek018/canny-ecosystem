@@ -34,7 +34,7 @@ export default function TimeTracking() {
   const { pathname } = useLocation();
 
   return (
-    <section>
+    <section className="flex flex-col h-full">
       <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
@@ -49,9 +49,7 @@ export default function TimeTracking() {
           Link={Link}
         />
       </div>
-      <div className="px-4">
-        <Outlet />
-      </div>
+      <Outlet />
     </section>
   );
 }
