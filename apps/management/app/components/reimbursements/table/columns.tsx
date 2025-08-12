@@ -145,7 +145,7 @@ export const columns = ({
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+      return <p className="truncate">{row.original?.users?.email ?? "--"}</p>;
     },
   },
   {

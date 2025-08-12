@@ -31,18 +31,30 @@ export function AttendanceBySite({
   chartData: TransformedAttendanceDataType[];
 }) {
   const trendData = useMemo(() => {
-    const siteMap = new Map<string, number>();
+    const siteTotals = new Map<
+      string,
+      { totalPresents: number; count: number }
+    >();
 
     for (const row of chartData) {
       const site = row.site || "Unknown";
       const presentDays = row.attendance_summary?.present_days ?? 0;
 
-      siteMap.set(site, (siteMap.get(site) || 0) + presentDays);
+      if (!siteTotals.has(site)) {
+        siteTotals.set(site, { totalPresents: 0, count: 0 });
+      }
+
+      const data = siteTotals.get(site)!;
+      data.totalPresents += presentDays;
+      data.count += 1;
     }
 
-    return Array.from(siteMap.entries())
-      .map(([site, presents]) => ({ site, presents }))
-      .sort((a, b) => b.presents - a.presents)
+    return Array.from(siteTotals.entries())
+      .map(([site, { totalPresents, count }]) => ({
+        site,
+        presents: count > 0 ? Number((totalPresents / count).toFixed(2)) : 0,
+      }))
+      .sort((a, b) => a.presents - b.presents)
       .slice(0, 5);
   }, [chartData]);
 

@@ -55,8 +55,8 @@ export function AttendanceBars({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart data={limitedTrendData} width={600} height={300}>
+        <ChartContainer className="w-full h-[300px]" config={chartConfig}>
+          <BarChart data={limitedTrendData} width={600} height={200}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="employee_code" />
             <YAxis />

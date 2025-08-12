@@ -24,16 +24,30 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
   const [activeChart, setActiveChart] =
     useState<keyof typeof chartConfig>("amount");
 
-  const trendData = chartData
-    .map((row: any) => ({
-      date: row.final_settlement_date,
-      amount: row.bonus + row.gratuity + row.leave_encashment - row.deduction,
-    }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const trendData = Object.values(
+    chartData.reduce(
+      (acc: Record<string, { date: string; amount: number }>, row: any) => {
+        const date = row.final_settlement_date;
+        const amount =
+          (row.bonus || 0) +
+          (row.gratuity || 0) +
+          (row.leave_encashment || 0) -
+          (row.deduction || 0);
+
+        if (!acc[date]) {
+          acc[date] = { date, amount: 0 };
+        }
+        acc[date].amount += amount;
+
+        return acc;
+      },
+      {}
+    )
+  ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const total = useMemo(
     () => ({ amount: trendData.reduce((acc, curr) => acc + curr.amount, 0) }),
-    [],
+    []
   );
 
   return (

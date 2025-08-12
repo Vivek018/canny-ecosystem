@@ -44,13 +44,15 @@ export function ReimbursementActions({
   const submit = useSubmit();
 
   const handleUpdateBulkReimbursements = () => {
-    const updates = selectedRows.map((entry: any) => {
-      return {
+    const updates = selectedRows
+      .filter((entry: any) => !entry.invoice_id?.length)
+      .map((entry: any) => ({
         id: entry.id,
         status: status && status.trim() !== "" ? status : null,
         type: type && type.trim() !== "" ? type : null,
-      };
-    });
+      }));
+
+    if (!updates.length) return;
 
     clearCacheEntry(`${cacheKeyPrefix.reimbursements}`);
     submit(
@@ -61,7 +63,7 @@ export function ReimbursementActions({
       {
         method: "POST",
         action: "/approvals/reimbursements/update-bulk-reimbursements",
-      },
+      }
     );
   };
 
@@ -71,11 +73,11 @@ export function ReimbursementActions({
         <ColumnVisibility disabled={isEmpty} />
         <ReimbursementAdd />
         <Button
-          variant="outline"
+          variant="muted"
           size="icon"
           className={cn(
-            "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows?.length && "hidden",
+            "h-10 w-10  border border-input",
+            !selectedRows?.length && "hidden"
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/reimbursements/analytics")}
@@ -85,16 +87,16 @@ export function ReimbursementActions({
         <ReimbursementMenu
           env={env}
           selectedRows={selectedRows}
-          className={
-            selectedRows?.length
-              ? "bg-muted/70 text-muted-foreground"
-              : "hidden"
-          }
+          className={cn(
+            buttonVariants({ variant: "muted", size: "icon" }),
+            "h-10 w-10  border border-input",
+            !selectedRows.length && "hidden"
+          )}
         />
         <div
           className={cn(
             "border border-dotted border-r-muted-foreground",
-            !selectedRows.length && "hidden",
+            !selectedRows.length && "hidden"
           )}
         />
 
@@ -102,8 +104,12 @@ export function ReimbursementActions({
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
-                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
+                buttonVariants({
+                  variant: "muted",
+                  size: "icon",
+                }),
+                "h-10 w-10 border border-input",
+                !selectedRows.length && "hidden"
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -117,7 +123,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Status</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementStatusArray as unknown as string[],
+                      reimbursementStatusArray as unknown as string[]
                     )}
                     value={status}
                     onChange={(e) => setStatus(e)}
@@ -127,7 +133,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Type</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementTypeArray as unknown as string[],
+                      reimbursementTypeArray as unknown as string[]
                     )}
                     value={type}
                     onChange={(e) => setType(e)}
@@ -147,9 +153,7 @@ export function ReimbursementActions({
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        <div className="h-full">
-          <DeleteBulkReimbursements selectedRows={selectedRows} />
-        </div>
+        <DeleteBulkReimbursements selectedRows={selectedRows} />
       </div>
     </div>
   );

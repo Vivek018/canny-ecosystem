@@ -92,6 +92,7 @@ export function ReimbursementsTableHeader({
                   id === "employee_code" && "sticky left-12 bg-card z-10",
                   id === "employee_name" &&
                     "sticky left-44 bg-card z-10 min-w-48 max-w-48",
+                  id === "email" && " min-w-60 max-w-60"
                 )}
               >
                 <Button
@@ -108,14 +109,14 @@ export function ReimbursementsTableHeader({
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

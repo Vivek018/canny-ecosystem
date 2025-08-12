@@ -49,18 +49,23 @@ export function AttendanceActions({
   const [year, setYear] = useState("");
   const [workingDays, setWorkingDays] = useState("");
   const submit = useSubmit();
-  let updates: any[] = [];
 
   const handleUpdateBulkAttendances = () => {
-    updates = selectedRows.map((entry: any) => {
-      return {
-        id: entry.monthly_attendance.id,
-        month: month && month.trim() !== "" ? month : null,
-        year: year && year.trim() !== "" ? year : null,
-        working_days:
-          workingDays && workingDays.trim() !== "" ? workingDays : null,
-      };
-    });
+    const updates = selectedRows
+      .filter(
+        (entry: any) =>
+          !entry.monthly_attendance?.salary_entries?.invoice_id?.length
+      )
+      .map((entry: any) => {
+        return {
+          id: entry.monthly_attendance.id,
+          month: month && month.trim() !== "" ? month : null,
+          year: year && year.trim() !== "" ? year : null,
+          working_days:
+            workingDays && workingDays.trim() !== "" ? workingDays : null,
+        };
+      });
+    if (!updates.length) return;
 
     clearCacheEntry(`${cacheKeyPrefix.attendance}`);
     submit(
@@ -71,7 +76,7 @@ export function AttendanceActions({
       {
         method: "POST",
         action: "/time-tracking/attendance/update-bulk-attendances",
-      },
+      }
     );
   };
 
@@ -86,35 +91,36 @@ export function AttendanceActions({
         emails={userEmails}
         columnVisibility={columnVisibility}
       /> */}
+        <AttendanceMenu
+          selectedRows={selectedRows}
+          companyName={companyName}
+          companyAddress={companyAddress}
+        />
         <Button
-          variant="outline"
+          variant="muted"
           size="icon"
           className={cn(
-            "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows.length && "hidden",
+            "h-10 w-10 border border-input",
+            !selectedRows.length && "hidden"
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/time-tracking/attendance/analytics")}
         >
           <Icon name="chart" className="h-[18px] w-[18px]" />
         </Button>
-        <AttendanceMenu
-          selectedRows={selectedRows}
-          companyName={companyName}
-          companyAddress={companyAddress}
-        />
         <div
           className={cn(
             "border border-dotted border-r-muted-foreground",
-            !selectedRows.length && "hidden",
+            !selectedRows.length && "hidden"
           )}
         />
         <div className="h-full">
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
-                "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
+                buttonVariants({ variant: "muted", size: "icon" }),
+                "h-10 w-10  border border-input",
+                !selectedRows.length && "hidden"
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -136,7 +142,7 @@ export function AttendanceActions({
                   <Label className="text-sm font-medium">Year</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      getYears(25, defaultYear) as unknown as string[],
+                      getYears(25, defaultYear) as unknown as string[]
                     )}
                     value={year}
                     onChange={(e) => setYear(e)}
@@ -166,9 +172,7 @@ export function AttendanceActions({
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        <div className="h-full">
-          <DeleteBulkAttendances selectedRows={selectedRows} />
-        </div>
+        <DeleteBulkAttendances selectedRows={selectedRows} />
       </div>
     </div>
   );

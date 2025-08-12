@@ -96,11 +96,13 @@ export function AttendanceMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         asChild
-        className={
-          selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined
-        }
+        className={selectedRows?.length ? "" : undefined}
       >
-        <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10  border border-input"
+        >
           <Icon name="plus" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
@@ -129,7 +131,7 @@ export function AttendanceMenu({
           <div
             className={cn(
               "flex flex-col gap-1",
-              !selectedRows?.length && "hidden",
+              !selectedRows?.length && "hidden"
             )}
           >
             <AttendanceRegister
@@ -148,7 +150,7 @@ export function AttendanceMenu({
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
               "hidden",
-            !selectedRows.length && "hidden",
+            !selectedRows.length && "hidden"
           )}
         />
         <DropdownMenuItem
@@ -158,7 +160,7 @@ export function AttendanceMenu({
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
               "hidden",
-            "space-x-2 flex items-center",
+            "space-x-2 flex items-center"
           )}
         >
           <Icon name="plus-circled" size="sm" />
@@ -168,7 +170,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+              "hidden"
           )}
         />
         <DropdownMenuItem
@@ -179,7 +181,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+              "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />

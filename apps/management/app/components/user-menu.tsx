@@ -46,7 +46,7 @@ export function UserMenu({
         <div
           className={cn(
             "flex flex-col items-start group-hover:opacity-70 group-hover:dark:opacity-100 gap-0.5",
-            !isExpanded && "hidden",
+            !isExpanded && "hidden"
           )}
         >
           <span className="truncate w-40 text-start">
@@ -84,9 +84,6 @@ export function UserMenu({
           <DropdownMenuGroup>
             <Link prefetch="intent" to="/user/account">
               <DropdownMenuItem>Account</DropdownMenuItem>
-            </Link>
-            <Link prefetch="intent" to="/user/help">
-              <DropdownMenuItem>Help</DropdownMenuItem>
             </Link>
             <Link prefetch="intent" to="/user/feedback-form">
               <DropdownMenuItem>Feedback</DropdownMenuItem>

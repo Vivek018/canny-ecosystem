@@ -48,7 +48,7 @@ export function AttendanceTrend({
     return Object.entries(totals).map(([key, value]) => ({
       name: chartConfig[key as keyof typeof chartConfig].label,
       key,
-      value,
+      value: (value / chartData.length).toFixed(2),
     }));
   }, [chartData]);
 
@@ -56,12 +56,10 @@ export function AttendanceTrend({
     <Card>
       <CardHeader>
         <CardTitle>Company-wide Attendance Summary</CardTitle>
-        <CardDescription>
-          Showing total count per attendance field
-        </CardDescription>
+        <CardDescription>Showing average per attendance field</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer className="w-full h-[300px]" config={chartConfig}>
           <BarChart data={totalData} width={600} height={300}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />

@@ -25,20 +25,31 @@ const chartConfig = {
 
 export function ReimbursementTrend({
   chartData,
-}: { chartData: ReimbursementDataType[] }) {
+}: {
+  chartData: ReimbursementDataType[];
+}) {
   const [activeChart, setActiveChart] =
     useState<keyof typeof chartConfig>("amount");
 
-  const trendData = chartData.map((row) => ({
-    date: row.submitted_date,
-    amount: row.amount,
-  }));
+  const trendData = Object.values(
+    chartData.reduce(
+      (acc: Record<string, { date: string; amount: number }>, row) => {
+        const date = row.submitted_date!;
+        if (!acc[date!]) {
+          acc[date!] = { date, amount: 0 };
+        }
+        acc[date!].amount += row.amount || 0;
+        return acc;
+      },
+      {}
+    )
+  ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const total = useMemo(
     () => ({
       amount: trendData.reduce((acc, curr) => acc + (curr.amount || 0), 0),
     }),
-    [],
+    []
   );
 
   return (

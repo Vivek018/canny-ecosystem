@@ -81,7 +81,7 @@ export const columns: ColumnDef<UsersType>[] = [
     header: "Email",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28">
+        <p className="truncate">
           {replaceUnderscore(row.original?.email ?? "--")}
         </p>
       );
