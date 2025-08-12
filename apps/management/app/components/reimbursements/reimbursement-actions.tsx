@@ -63,7 +63,7 @@ export function ReimbursementActions({
       {
         method: "POST",
         action: "/approvals/reimbursements/update-bulk-reimbursements",
-      }
+      },
     );
   };
 
@@ -77,7 +77,7 @@ export function ReimbursementActions({
           size="icon"
           className={cn(
             "h-10 w-10  border border-input",
-            !selectedRows?.length && "hidden"
+            !selectedRows?.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/reimbursements/analytics")}
@@ -90,13 +90,13 @@ export function ReimbursementActions({
           className={cn(
             buttonVariants({ variant: "muted", size: "icon" }),
             "h-10 w-10  border border-input",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
         />
         <div
           className={cn(
             "border border-dotted border-r-muted-foreground",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
         />
 
@@ -109,7 +109,7 @@ export function ReimbursementActions({
                   size: "icon",
                 }),
                 "h-10 w-10 border border-input",
-                !selectedRows.length && "hidden"
+                !selectedRows.length && "hidden",
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -123,7 +123,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Status</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementStatusArray as unknown as string[]
+                      reimbursementStatusArray as unknown as string[],
                     )}
                     value={status}
                     onChange={(e) => setStatus(e)}
@@ -133,7 +133,7 @@ export function ReimbursementActions({
                   <Label className="text-sm font-medium">Type</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      reimbursementTypeArray as unknown as string[]
+                      reimbursementTypeArray as unknown as string[],
                     )}
                     value={type}
                     onChange={(e) => setType(e)}

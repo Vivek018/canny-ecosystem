@@ -41,13 +41,13 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
 
         return acc;
       },
-      {}
-    )
+      {},
+    ),
   ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const total = useMemo(
     () => ({ amount: trendData.reduce((acc, curr) => acc + curr.amount, 0) }),
-    []
+    [],
   );
 
   return (
