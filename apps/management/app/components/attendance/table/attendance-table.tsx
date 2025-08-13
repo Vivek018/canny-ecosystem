@@ -184,7 +184,13 @@ export function AttendanceTable({
                     data-index={virtualRow.index}
                     ref={(node) => rowVirtualizer.measureElement(node)}
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+                    data-state={
+                      (row.getIsSelected() &&
+                        row.original?.monthly_attendance?.salary_entries
+                          ?.invoice_id &&
+                        "both") ||
+                      (row.getIsSelected() && "selected")
+                    }
                     style={{
                       transform: `translateY(${virtualRow.start}px)`,
                     }}

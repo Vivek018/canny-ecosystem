@@ -226,7 +226,7 @@ export async function getMonthlyAttendanceByCompanyId({
         salary_entries:salary_entries!left(id,invoice_id)
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -235,27 +235,28 @@ export async function getMonthlyAttendanceByCompanyId({
     if (searchQueryArray.length > 0 && searchQueryArray.length <= 3) {
       for (const element of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${element}%,middle_name.ilike.%${element}%,last_name.ilike.%${element}%,employee_code.ilike.%${element}%)`,
+          `or(first_name.ilike.%${element}%,middle_name.ilike.%${element}%,last_name.ilike.%${element}%,employee_code.ilike.%${element}%)`
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
       );
     }
   }
 
   const effectiveMonth = month ? Number(months[month]) : defaultMonth;
   const effectiveYear = year ? Number(year) : defaultYear;
-  query = query
-    .eq("monthly_attendance.month", effectiveMonth)
-    .eq("monthly_attendance.year", effectiveYear);
 
-  // 🌐 Filters
+  if (!filters) {
+    query = query
+      .eq("monthly_attendance.month", effectiveMonth)
+      .eq("monthly_attendance.year", effectiveYear);
+  }
   if (project) {
     query = query.eq(
       "employee_project_assignment.sites.projects.name",
-      project,
+      project
     );
   }
 
@@ -269,7 +270,7 @@ export async function getMonthlyAttendanceByCompanyId({
       filterComparison[recently_added as keyof typeof filterComparison];
     if (diff) {
       const startTime = new Date(now.getTime() - diff).toISOString();
-      query = query.gte("created_at", startTime);
+      query = query.gte("monthly_attendance.created_at", startTime);
     }
   }
 
@@ -360,7 +361,7 @@ export async function getAttendanceReportByCompanyId({
         employee_id
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId)
     .eq("attendance.present", true)
@@ -380,12 +381,12 @@ export async function getAttendanceReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
       );
     }
   }
@@ -398,17 +399,17 @@ export async function getAttendanceReportByCompanyId({
     }
     const start_date = new Date(`${start_month} 1, ${start_year} 12:00:00`);
     const end_date = new Date(
-      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`,
+      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`
     );
     if (start_year)
       query.gte(
         "attendance.date",
-        formatUTCDate(start_date.toISOString().split("T")[0]),
+        formatUTCDate(start_date.toISOString().split("T")[0])
       );
     if (end_year)
       query.lte(
         "attendance.date",
-        formatUTCDate(end_date.toISOString().split("T")[0]),
+        formatUTCDate(end_date.toISOString().split("T")[0])
       );
   }
   if (project) {
@@ -431,7 +432,7 @@ export async function getAttendanceReportByCompanyId({
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string },
+    {} as { [key: number]: string }
   );
 
   const processedData = data?.map((employee) => {
