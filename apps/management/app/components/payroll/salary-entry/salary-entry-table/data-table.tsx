@@ -78,7 +78,7 @@ export function SalaryEntryDataTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none"
+        !tableLength && "border-none",
       )}
     >
       <div
@@ -120,7 +120,7 @@ export function SalaryEntryDataTable<TData, TValue>({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
-                        "bg-primary/20"
+                        "bg-primary/20",
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -137,12 +137,12 @@ export function SalaryEntryDataTable<TData, TValue>({
                               "sticky left-32 z-10 min-w-36 max-w-36 bg-card",
                             cell.column.id === "name" && "min-w-52 max-w-52",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );

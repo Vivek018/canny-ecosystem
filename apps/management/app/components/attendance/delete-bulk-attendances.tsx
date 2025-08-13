@@ -37,11 +37,11 @@ export const DeleteBulkAttendances = ({
   };
 
   const handleDeleteBulkAttendances = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     const updates = selectedRows.filter(
       (entry: any) =>
-        !entry.monthly_attendance?.salary_entries?.invoice_id?.length
+        !entry.monthly_attendance?.salary_entries?.invoice_id?.length,
     );
     if (!updates.length) return;
 
@@ -56,7 +56,7 @@ export const DeleteBulkAttendances = ({
         {
           method: "POST",
           action: "/time-tracking/attendance/delete-bulk-attendances",
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -70,7 +70,7 @@ export const DeleteBulkAttendances = ({
         className={cn(
           buttonVariants({ variant: "destructive-outline", size: "icon" }),
           "h-10 w-10",
-          !selectedRows.length && "hidden"
+          !selectedRows.length && "hidden",
         )}
       >
         <Icon name="trash" className="h-[18px] w-[18px]" />

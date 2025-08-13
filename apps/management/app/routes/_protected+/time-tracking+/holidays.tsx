@@ -81,7 +81,7 @@ export default function Holidays() {
 
             useEffect(() => {
               const filteredData = data?.filter((item) =>
-                searchInObject(item, searchString)
+                searchInObject(item, searchString),
               );
 
               setTableData(filteredData ?? []);
@@ -114,8 +114,8 @@ export default function Holidays() {
                       "flex items-center gap-1",
                       !hasPermission(
                         role,
-                        `${createRole}:${attribute.holidays}`
-                      ) && "hidden"
+                        `${createRole}:${attribute.holidays}`,
+                      ) && "hidden",
                     )}
                   >
                     <span>Add</span>
