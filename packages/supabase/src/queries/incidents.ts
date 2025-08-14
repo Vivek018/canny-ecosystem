@@ -32,7 +32,7 @@ export type IncidentsDatabaseType = Pick<
   | "severity"
   | "status"
   | "description"
-  | "medical_diagnosis"
+  | "diagnosis"
   | "action_taken"
 > & {
   employees: Pick<
@@ -100,7 +100,7 @@ export async function getIncidentsByCompanyId({
     "severity",
     "status",
     "description",
-    "medical_diagnosis",
+    "diagnosis",
     "action_taken",
   ] as const;
 
@@ -120,7 +120,7 @@ export async function getIncidentsByCompanyId({
       `,
       {
         count: "exact",
-      },
+      }
     )
     .eq("employees.company_id", companyId);
 
@@ -134,7 +134,7 @@ export async function getIncidentsByCompanyId({
       "severity",
       "status",
       "description",
-      "medical_diagnosis",
+      "diagnosis",
       "action_taken",
     ];
     const [column, direction] = sort;
@@ -153,13 +153,13 @@ export async function getIncidentsByCompanyId({
       for (const q of searchQueryArray) {
         query.or(
           `first_name.ilike.*${q}*,middle_name.ilike.*${q}*,last_name.ilike.*${q}*,employee_code.ilike.*${q}*`,
-          { referencedTable: "employees" },
+          { referencedTable: "employees" }
         );
       }
     } else {
       query.or(
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-        { referencedTable: "employees" },
+        { referencedTable: "employees" }
       );
     }
   }
@@ -177,7 +177,7 @@ export async function getIncidentsByCompanyId({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.sites.projects.name",
-      project,
+      project
     );
   }
   if (site) {
@@ -211,7 +211,7 @@ export async function getIncidentsById({
     "severity",
     "status",
     "description",
-    "medical_diagnosis",
+    "diagnosis",
     "action_taken",
   ] as const;
 

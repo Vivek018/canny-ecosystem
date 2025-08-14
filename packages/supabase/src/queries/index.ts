@@ -31,3 +31,4 @@ export * from "./invoices";
 export * from "./chat";
 export * from "./notifications";
 export * from "./payee";
+export * from "./vehicles";

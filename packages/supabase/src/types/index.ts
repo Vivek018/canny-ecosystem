@@ -375,3 +375,17 @@ export type PayeeDatabaseInsert =
   Database["public"]["Tables"]["payee"]["Insert"];
 export type PayeeDatabaseUpdate =
   Database["public"]["Tables"]["payee"]["Update"];
+
+export type VehiclesDatabaseRow =
+  Database["public"]["Tables"]["vehicles"]["Row"];
+export type VehiclesDatabaseInsert =
+  Database["public"]["Tables"]["vehicles"]["Insert"];
+export type VehiclesDatabaseUpdate =
+  Database["public"]["Tables"]["vehicles"]["Update"];
+
+export type VehiclesInsuranceDatabaseRow =
+  Database["public"]["Tables"]["vehicle_insurance_details"]["Row"];
+export type VehiclesInsuranceDatabaseInsert =
+  Database["public"]["Tables"]["vehicle_insurance_details"]["Insert"];
+export type VehiclesInsuranceDatabaseUpdate =
+  Database["public"]["Tables"]["vehicle_insurance_details"]["Update"];

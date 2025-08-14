@@ -167,7 +167,7 @@ export function seedEmployeeSkills(): Omit<
 }
 
 export function seedEmployeeAttendance(
-  employeeId: string,
+  employeeId: string
 ): EmployeeMonthlyAttendanceDatabaseInsert[] {
   const today = new Date();
   const oneYearAgo = new Date();
@@ -284,7 +284,7 @@ export function seedEmployeeAccidents(employeeId: string) {
       description: faker.lorem.words(5),
       location: faker.location.streetAddress(),
       location_type: locationTypeArray[faker.number.int({ min: 0, max: 1 })],
-      medical_diagnosis: faker.lorem.words(5),
+      diagnosis: faker.lorem.words(5),
       severity: severityTypeArray[faker.number.int({ min: 0, max: 1 })],
       status:
         statusArray[faker.number.int({ min: 0, max: statusArray.length - 1 })],

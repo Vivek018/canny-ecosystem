@@ -28,3 +28,4 @@ export * from "./pay-sequence";
 export * from "./invoices";
 export * from "./chat";
 export * from "./payee";
+export * from "./vehicles";

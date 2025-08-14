@@ -150,13 +150,13 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     },
   },
   {
-    accessorKey: "medical_diagnosis",
-    header: "Medical Diagnosis",
+    accessorKey: "diagnosis",
+    header: "Diagnosis",
     cell: ({ row }) => {
       return (
         <Previewer
-          label={"Medical Diagnosis"}
-          description={row.original?.medical_diagnosis ?? "--"}
+          label={"Diagnosis"}
+          description={row.original?.diagnosis ?? "--"}
         />
       );
     },
@@ -191,9 +191,9 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.incidents}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.incidents}`,
+                    `${deleteRole}:${attribute.incidents}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
               asChild
             >

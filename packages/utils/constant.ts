@@ -169,6 +169,8 @@ export const attribute = {
   companyDocuments: "company_documents",
   invoice: "invoice",
   departments: "departments",
+  vehicles: "vehicles",
+  vehicle_insurance: "vehicle_insurance",
 };
 
 export const months: { [key: string]: number } = {
@@ -332,11 +334,10 @@ export const SUPABASE_MEDIA_URL_PREFIX =
 
 export function getFilePathFromUrl(url: string) {
   return url.startsWith(
-    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
   )
     ? url.slice(
-        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
-          .length,
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
       )
     : url;
 }
