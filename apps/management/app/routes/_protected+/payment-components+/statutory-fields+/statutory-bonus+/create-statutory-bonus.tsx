@@ -48,7 +48,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.statutoryFieldsStatutoryBonus}`
+      `${createRole}:${attribute.statutoryFieldsStatutoryBonus}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -72,7 +72,7 @@ export const action = async ({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -101,7 +101,7 @@ export const action = async ({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -181,7 +181,7 @@ export default function CreateStatutoryBonus({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  statutoryBonusPayFrequencyArray as unknown as string[]
+                  statutoryBonusPayFrequencyArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),

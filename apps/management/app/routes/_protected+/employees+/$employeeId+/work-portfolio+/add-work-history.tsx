@@ -61,7 +61,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.employeeWorkHistory}`
+      `${createRole}:${attribute.employeeWorkHistory}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -75,7 +75,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
           message: "Invalid employee id",
           employeeId: null,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
         error,
         employeeId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -114,7 +114,7 @@ export async function action({
           message: "Invalid employee id",
           returnTo: "/employees",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -125,7 +125,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -156,7 +156,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/work-portfolio`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -197,7 +197,7 @@ export default function AddEmployeeWorkHistory({
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -244,7 +244,7 @@ export default function AddEmployeeWorkHistory({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  positionArray as unknown as string[]
+                  positionArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.position, { type: "text" }),
@@ -260,7 +260,7 @@ export default function AddEmployeeWorkHistory({
                   ...getInputProps(fields.company_name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.company_name.name
+                    fields.company_name.name,
                   )}`,
                 }}
                 labelProps={{
@@ -284,11 +284,11 @@ export default function AddEmployeeWorkHistory({
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name
+                      fields.start_date.name,
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue
+                      fields.start_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -302,11 +302,11 @@ export default function AddEmployeeWorkHistory({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name
+                      fields.end_date.name,
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue
+                      fields.end_date.initialValue,
                     ),
                   }}
                   labelProps={{

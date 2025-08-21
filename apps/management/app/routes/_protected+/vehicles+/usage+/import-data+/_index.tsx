@@ -25,7 +25,7 @@ import {
 import type { z } from "zod";
 
 import { useImportStoreForVehicleUsage } from "@/store/import";
-import { cn } from "@canny_ecosystem/ui/utils/cn"; 
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Label } from "@canny_ecosystem/ui/label";
 import { VehicleUsageImportData } from "@/components/vehicles/usage/import-export/vehicle-usage-import-data";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
@@ -90,7 +90,7 @@ export default function VehicleUsageFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -109,7 +109,7 @@ export default function VehicleUsageFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
           );
 
           if (matchedHeader) {
@@ -118,7 +118,7 @@ export default function VehicleUsageFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>
+        {} as Record<string, string>,
       );
 
       setFieldMapping(initialMapping);
@@ -132,13 +132,13 @@ export default function VehicleUsageFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -158,7 +158,7 @@ export default function VehicleUsageFieldMapping() {
       const result = ImportVehicleUsageDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -191,7 +191,7 @@ export default function VehicleUsageFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -204,7 +204,9 @@ export default function VehicleUsageFieldMapping() {
 
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -213,10 +215,10 @@ export default function VehicleUsageFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
                   .filter(([key]) => allowedFields.includes(key as any))
-                  .map(([key, value]) => [key, String(value).trim()])
+                  .map(([key, value]) => [key, String(value).trim()]),
               );
 
               return { ...cleanEntry, month, year };
@@ -312,7 +314,7 @@ export default function VehicleUsageFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline"
+                        field.required && "inline",
                       )}
                     >
                       *
@@ -326,11 +328,11 @@ export default function VehicleUsageFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||

@@ -71,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -90,7 +90,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -119,7 +119,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -205,7 +205,7 @@ export default function CreateEmployeeStateInsurance({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[]
+                  deductionCycleArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
@@ -231,7 +231,7 @@ export default function CreateEmployeeStateInsurance({
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.employee_contribution.name
+                      fields.employee_contribution.name,
                     ),
                   }}
                   errors={fields.employee_contribution.errors}
@@ -251,7 +251,7 @@ export default function CreateEmployeeStateInsurance({
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.employer_contribution.name
+                      fields.employer_contribution.name,
                     ),
                   }}
                   errors={fields.employer_contribution.errors}

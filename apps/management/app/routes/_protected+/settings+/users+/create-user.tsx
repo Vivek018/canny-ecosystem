@@ -99,7 +99,7 @@ export async function loader({
         siteOptions: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -118,7 +118,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -162,7 +162,7 @@ export default function CreateUser({
   const [resetKey, setResetKey] = useState(Date.now());
   const [searchParams, setSearchParams] = useSearchParams();
   const [supervisor, setSupervisor] = useState(
-    updateValues ? updateValues.role : ""
+    updateValues ? updateValues.role : "",
   );
   const initialValues = updateValues ?? getInitialValueFromZod(UserSchema);
 
@@ -229,7 +229,7 @@ export default function CreateUser({
                     ...getInputProps(fields.first_name, { type: "text" }),
                     autoFocus: true,
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.first_name.name
+                      fields.first_name.name,
                     )}`,
                   }}
                   labelProps={{
@@ -241,7 +241,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.last_name, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.last_name.name
+                      fields.last_name.name,
                     )}`,
                   }}
                   labelProps={{
@@ -256,7 +256,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.email, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.email.name
+                      fields.email.name,
                     )}`,
                   }}
                   labelProps={{
@@ -268,7 +268,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.mobile_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.mobile_number.name
+                      fields.mobile_number.name,
                     )}`,
                   }}
                   labelProps={{
@@ -282,7 +282,7 @@ export default function CreateUser({
                 key={resetKey}
                 className="mb-2"
                 options={transformStringArrayIntoOptions(
-                  userRoles as unknown as string[]
+                  userRoles as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.role, { type: "text" }),

@@ -128,7 +128,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         employeeOptions: [],
         vehicleData: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -149,7 +149,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
 
     const submission = parseWithZod(formData, {
@@ -159,12 +159,11 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
     if (submission.value.photo) {
-
       if (
         oldVehicleData?.registration_number !==
         submission.value.registration_number
@@ -193,7 +192,7 @@ export async function action({
             message: "Vehicle Updated Failed",
             error: error,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -221,7 +220,7 @@ export async function action({
           message: "Vehicle Updated Failed",
           error: error,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (
@@ -291,7 +290,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Vehicle update failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -301,7 +300,7 @@ export async function action({
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

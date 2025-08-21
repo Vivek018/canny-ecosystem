@@ -39,7 +39,7 @@ export const DeleteInsurance = ({
   };
 
   const handleDeleteInsurance = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -49,7 +49,7 @@ export const DeleteInsurance = ({
           method: "post",
           action: `/vehicles/vehicle/${vehicleId}/${insuranceId}/delete-vehicle-insurance`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -64,7 +64,7 @@ export const DeleteInsurance = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.vehicle_insurance}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Address

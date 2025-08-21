@@ -53,7 +53,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
 
     if (!vehicleId) {
@@ -71,7 +71,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     if (submission.value.document) {

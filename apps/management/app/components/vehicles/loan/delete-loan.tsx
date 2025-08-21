@@ -33,7 +33,7 @@ export const DeleteLoan = ({ vehicleId }: { vehicleId: string }) => {
   };
 
   const handleDeleteLoan = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -43,7 +43,7 @@ export const DeleteLoan = ({ vehicleId }: { vehicleId: string }) => {
           method: "post",
           action: `/vehicles/vehicle/${vehicleId}/delete-vehicle-loan`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -58,7 +58,7 @@ export const DeleteLoan = ({ vehicleId }: { vehicleId: string }) => {
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.vehicle_loan}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Address

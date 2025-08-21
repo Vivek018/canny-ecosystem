@@ -76,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -99,7 +99,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -121,7 +121,7 @@ export async function action({
         message: "Payment Field creation failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -130,7 +130,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -224,13 +224,13 @@ export default function CreatePaymentField({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  paymentTypeArray as unknown as string[]
+                  paymentTypeArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_type, { type: "text" }),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.payment_type.name
+                  fields.payment_type.name,
                 )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.payment_type.name),
@@ -242,13 +242,13 @@ export default function CreatePaymentField({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  calculationTypeArray as unknown as string[]
+                  calculationTypeArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.calculation_type, { type: "text" }),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.calculation_type.name
+                  fields.calculation_type.name,
                 )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.calculation_type.name),
@@ -263,7 +263,7 @@ export default function CreatePaymentField({
                   placeholder: `Enter ${replaceUnderscore(
                     fields.calculation_type.value === calculationTypeArray[0]
                       ? fields.amount.name
-                      : "Percentage"
+                      : "Percentage",
                   )}`,
                   disabled: fields.payment_type.value === paymentTypeArray[1],
                 }}
@@ -271,7 +271,7 @@ export default function CreatePaymentField({
                   children: replaceUnderscore(
                     fields.calculation_type.value === calculationTypeArray[0]
                       ? fields.amount.name
-                      : "percentage"
+                      : "percentage",
                   ),
                 }}
                 errors={fields.amount.errors}
@@ -287,7 +287,7 @@ export default function CreatePaymentField({
                     : undefined
                 }
                 className={cn(
-                  fields.payment_type.value === paymentTypeArray[1] && "hidden"
+                  fields.payment_type.value === paymentTypeArray[1] && "hidden",
                 )}
               />
 

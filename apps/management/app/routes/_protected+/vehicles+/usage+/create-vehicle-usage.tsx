@@ -90,7 +90,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -203,7 +203,7 @@ export default function AddVehicleUsage({
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[]
+                    getYears(25, defaultYear) as unknown as string[],
                   )}
                   labelProps={{
                     children: "Year",
@@ -232,7 +232,7 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.kilometers.name
+                      fields.kilometers.name,
                     )}`,
                     className: "",
                   }}
@@ -247,7 +247,7 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.fuel_in_liters.name
+                      fields.fuel_in_liters.name,
                     )}`,
                     className: "",
                   }}
@@ -265,7 +265,7 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.fuel_amount.name
+                      fields.fuel_amount.name,
                     )}`,
                     className: "",
                   }}
@@ -280,7 +280,7 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.toll_amount.name
+                      fields.toll_amount.name,
                     )}`,
                     className: "",
                   }}
@@ -297,13 +297,13 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.maintainance_amount.name
+                      fields.maintainance_amount.name,
                     )}`,
                     className: "",
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.maintainance_amount.name
+                      fields.maintainance_amount.name,
                     ),
                   }}
                   errors={fields.maintainance_amount.errors}

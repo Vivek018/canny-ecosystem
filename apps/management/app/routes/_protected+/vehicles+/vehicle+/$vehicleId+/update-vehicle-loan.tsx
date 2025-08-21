@@ -71,7 +71,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         vehicleId,
         vehicleLoanData: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -92,7 +92,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const submission = parseWithZod(formData, {
       schema: VehiclesLoanSchema,
@@ -101,7 +101,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     if (submission.value.document) {
@@ -129,7 +129,7 @@ export async function action({
           message: "Loan Updated Failed",
           error: error,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -158,7 +158,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

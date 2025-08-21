@@ -119,8 +119,8 @@ export const VehicleInsuranceItem = ({
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.vehicle_insurance}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.vehicle_insurance}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -137,9 +137,9 @@ export const VehicleInsuranceItem = ({
                 !insurance.document &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.vehicle_insurance}`
+                    `${deleteRole}:${attribute.vehicle_insurance}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -150,15 +150,15 @@ export const VehicleInsuranceItem = ({
                   className={cn(
                     (!hasPermission(
                       role,
-                      `${updateRole}:${attribute.vehicle_insurance}`
+                      `${updateRole}:${attribute.vehicle_insurance}`,
                     ) ||
                       !insurance.document) &&
-                      "hidden"
+                      "hidden",
                   )}
                   onClick={() =>
                     handleDownloadDocument(
                       insurance?.document as string,
-                      `${insurance.insurance_number}`
+                      `${insurance.insurance_number}`,
                     )
                   }
                 >
@@ -186,13 +186,13 @@ export const VehicleInsuranceItem = ({
       </CardContent>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold"
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
         )}
       >
         <p
           className={cn(
             "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
-            !formatDate(insurance?.start_date) && "hidden"
+            !formatDate(insurance?.start_date) && "hidden",
           )}
         >
           <Icon name="clock" size="xs" className="scale-x-[-1]" />
@@ -201,7 +201,7 @@ export const VehicleInsuranceItem = ({
         <p
           className={cn(
             "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
-            !formatDate(insurance?.end_date) && "hidden"
+            !formatDate(insurance?.end_date) && "hidden",
           )}
         >
           <Icon name="clock" size="xs" />
@@ -227,7 +227,7 @@ export const VehicleInsuranceCard = ({
             to={
               hasPermission(
                 role,
-                `${createRole}:${attribute.vehicle_insurance}`
+                `${createRole}:${attribute.vehicle_insurance}`,
               )
                 ? "add-vehicle-insurance"
                 : DEFAULT_ROUTE
@@ -237,8 +237,8 @@ export const VehicleInsuranceCard = ({
               "bg-card",
               !hasPermission(
                 role,
-                `${createRole}:${attribute.vehicle_insurance}`
-              ) && "hidden"
+                `${createRole}:${attribute.vehicle_insurance}`,
+              ) && "hidden",
             )}
           >
             <Icon name="plus-circled" className="mr-2" />

@@ -145,13 +145,13 @@ export const columns: ColumnDef<PayeeType>[] = [
                   "h-8 w-8 p-0",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingPayee}`
+                    `${updateRole}:${attribute.settingPayee}`,
                   ) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.settingPayee}`
+                      `${deleteRole}:${attribute.settingPayee}`,
                     ) &&
-                    "hidden"
+                    "hidden",
                 )}
               >
                 <span className="sr-only">Open menu</span>

@@ -28,7 +28,7 @@ export function VehicleUsageAdd() {
           asChild
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.vehicle_usage}`) &&
-              "hidden"
+              "hidden",
           )}
         >
           <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
@@ -50,7 +50,7 @@ export function VehicleUsageAdd() {
             onClick={() => {
               searchParams.set(
                 "step",
-                modalSearchParamNames.import_vehicle_usage
+                modalSearchParamNames.import_vehicle_usage,
               );
               setSearchParams(searchParams);
             }}

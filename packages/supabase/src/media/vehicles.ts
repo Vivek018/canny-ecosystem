@@ -43,7 +43,7 @@ export async function addOrUpdateVehicleWithPhoto({
       {
         supabase,
         documentName: vehicleData.registration_number!,
-      }
+      },
     );
 
     if (existingData?.photo) {
@@ -77,7 +77,7 @@ export async function addOrUpdateVehicleWithPhoto({
             ...vehicleData,
             photo: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
           },
-        }
+        },
       );
 
       if (insertError) {
@@ -305,7 +305,7 @@ export async function deleteVehicleInsuranceDocument({
     {
       supabase,
       documentName,
-    }
+    },
   );
   if (!data || error) return { status: 400, error };
 

@@ -29,7 +29,7 @@ export async function action({ request }: ActionFunctionArgs) {
           message: "Salary Entry update failed",
           error: submission.error,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
     const finalData = {
@@ -56,7 +56,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Salary Entry update failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -66,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

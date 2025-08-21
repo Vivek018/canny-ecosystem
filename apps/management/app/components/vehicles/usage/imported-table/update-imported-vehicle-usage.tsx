@@ -1,9 +1,5 @@
-import {
-  useImportStoreForVehicleUsage,
-} from "@/store/import";
-import type {
-  ImportVehicleUsageDataType,
-} from "@canny_ecosystem/supabase/queries";
+import { useImportStoreForVehicleUsage } from "@/store/import";
+import type { ImportVehicleUsageDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,9 +13,7 @@ import {
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  ImportSingleVehicleUsageDataSchema,
-} from "@canny_ecosystem/utils";
+import { ImportSingleVehicleUsageDataSchema } from "@canny_ecosystem/utils";
 import { useState } from "react";
 
 export const UpdateImportedVehicleUsage = ({
@@ -43,7 +37,7 @@ export const UpdateImportedVehicleUsage = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item: any, index: any) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -54,7 +48,7 @@ export const UpdateImportedVehicleUsage = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Usage

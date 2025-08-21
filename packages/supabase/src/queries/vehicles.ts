@@ -207,7 +207,7 @@ export async function getVehicleInsuranceDocumentUrlByInsuranceNumber({
   if (error)
     console.error(
       "getVehicleInsuranceDocumentUrlByInsuranceNumber Error",
-      error
+      error,
     );
 
   return { data, error };
@@ -274,7 +274,7 @@ export async function getVehicleUsageByVehicleId({
     .select(
       `${columns.join(",")},
           vehicles!inner(id, registration_number,sites!inner(id,name))`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("vehicle_id", vehicleId);
 
@@ -338,7 +338,7 @@ export async function getVehicleUsageByCompanyId({
     .select(
       `${columns.join(",")},
           vehicles!inner(id, registration_number,sites!inner(id,name))`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("vehicles.company_id", companyId);
 

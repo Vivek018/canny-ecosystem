@@ -94,7 +94,7 @@ export const VehicleLoanItem = ({ loan }: { loan: VehicleLoan }) => {
                 onClick={() =>
                   handleDownloadDocument(
                     loan?.document as string,
-                    `${loan?.vehicle_id}`
+                    `${loan?.vehicle_id}`,
                   )
                 }
               >
@@ -132,8 +132,8 @@ export const VehicleLoanCard = ({
                       "bg-card",
                       !hasPermission(
                         role,
-                        `${updateRole}:${attribute.vehicle_loan}`
-                      ) && "hidden"
+                        `${updateRole}:${attribute.vehicle_loan}`,
+                      ) && "hidden",
                     )}
                   >
                     <Icon name="edit" className="mr-2" />
@@ -145,7 +145,7 @@ export const VehicleLoanCard = ({
                     to={
                       hasPermission(
                         role,
-                        `${createRole}:${attribute.vehicle_loan}`
+                        `${createRole}:${attribute.vehicle_loan}`,
                       )
                         ? "add-vehicle-loan"
                         : DEFAULT_ROUTE
@@ -155,8 +155,8 @@ export const VehicleLoanCard = ({
                       "bg-card",
                       !hasPermission(
                         role,
-                        `${createRole}:${attribute.vehicle_loan}`
-                      ) && "hidden"
+                        `${createRole}:${attribute.vehicle_loan}`,
+                      ) && "hidden",
                     )}
                   >
                     <Icon name="plus-circled" className="mr-2" />

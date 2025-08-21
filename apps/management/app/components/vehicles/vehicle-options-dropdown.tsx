@@ -30,7 +30,7 @@ export const VehicleOptionsDropdown = ({
       {
         method: "POST",
         action: `/events/incidents/${vehicle.id}/create-incident-vehicle`,
-      }
+      },
     );
   };
   return (
@@ -41,7 +41,7 @@ export const VehicleOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleIncident}
           >
@@ -50,7 +50,7 @@ export const VehicleOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
-                "hidden"
+                "hidden",
             )}
           />
           <DeleteVehicle vehicleId={vehicle.id} />

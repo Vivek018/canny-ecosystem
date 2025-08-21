@@ -138,7 +138,7 @@ export async function getIncidentsByCompanyId({
       `,
       {
         count: "exact",
-      }
+      },
     )
     .eq("company_id", companyId);
 
@@ -171,13 +171,13 @@ export async function getIncidentsByCompanyId({
       for (const q of searchQueryArray) {
         query.or(
           `first_name.ilike.*${q}*,middle_name.ilike.*${q}*,last_name.ilike.*${q}*,employee_code.ilike.*${q}*`,
-          { referencedTable: "employees" }
+          { referencedTable: "employees" },
         );
       }
     } else {
       query.or(
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-        { referencedTable: "employees" }
+        { referencedTable: "employees" },
       );
     }
   }
@@ -195,7 +195,7 @@ export async function getIncidentsByCompanyId({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.sites.projects.name",
-      project
+      project,
     );
   }
   if (site) {

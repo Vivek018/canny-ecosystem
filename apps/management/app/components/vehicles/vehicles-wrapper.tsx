@@ -6,7 +6,6 @@ import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import type { VehiclesDatabaseRow } from "@canny_ecosystem/supabase/types";
 
-
 export function VehiclesWrapper({
   data,
   error,

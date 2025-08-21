@@ -55,8 +55,8 @@ export function VehicleUsageImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -64,7 +64,7 @@ export function VehicleUsageImportData({
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const numbers = importData.data!.map(
-        (value) => value.registration_number
+        (value) => value.registration_number,
       );
 
       const { data: employees, error: numberError } =
@@ -77,14 +77,14 @@ export function VehicleUsageImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const regNumber = employees?.find(
-          (e) => e.registration_number === item.registration_number
+          (e) => e.registration_number === item.registration_number,
         )?.id;
 
         const { registration_number, ...rest } = item;
 
         return {
           ...rest,
-          ...(regNumber ? { vehicle_id: regNumber } : {})
+          ...(regNumber ? { vehicle_id: regNumber } : {}),
         };
       });
 
@@ -108,9 +108,7 @@ export function VehicleUsageImportData({
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.vehicle_usage);
-        navigate(
-          `/vehicles/usage?recently_added=${recentlyAddedFilter[0]}`
-        );
+        navigate(`/vehicles/usage?recently_added=${recentlyAddedFilter[0]}`);
       }
     }
   };

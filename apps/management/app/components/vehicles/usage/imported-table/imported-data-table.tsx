@@ -35,7 +35,7 @@ export function ImportedDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -63,12 +63,12 @@ export function ImportedDataTable<TData, TValue>({
                                 : cell.getValue() === "pending" &&
                                   "text-muted-foreground"),
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );

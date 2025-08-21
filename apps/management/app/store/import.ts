@@ -134,7 +134,7 @@ export const useImportStoreForLeaves = create<ImportStateForLeaves>()(
   (set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
-  })
+  }),
 );
 
 type ImportStateForReimbursementPayroll = {
@@ -167,7 +167,7 @@ export const useImportStoreForExitPayroll = create<ImportStateForExitPayroll>()(
   (set) => ({
     importData: { title: "", data: [] },
     setImportData: (importData) => set({ importData }),
-  })
+  }),
 );
 
 type ImportStateForSalaryPayroll = {
@@ -207,7 +207,7 @@ export const useImportStoreForAttendance = create<ImportStateForAttendance>()(
   (set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
-  })
+  }),
 );
 
 type ImportStateForVehicleUsage = {

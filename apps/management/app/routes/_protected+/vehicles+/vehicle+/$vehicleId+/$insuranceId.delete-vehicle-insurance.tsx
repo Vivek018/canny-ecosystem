@@ -68,7 +68,7 @@ export async function action({
         error: proofError || error,
         vehicleId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -78,7 +78,7 @@ export async function action({
         error,
         vehicleId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

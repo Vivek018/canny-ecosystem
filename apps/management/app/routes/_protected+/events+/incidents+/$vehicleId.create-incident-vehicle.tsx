@@ -80,7 +80,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const data = submission.value;
@@ -106,7 +106,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -116,7 +116,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -233,7 +233,7 @@ export default function RegisterIncidentVehicle({
                   key={resetKey}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    locationTypeArray as unknown as string[]
+                    locationTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.location_type, { type: "text" }),
@@ -259,7 +259,7 @@ export default function RegisterIncidentVehicle({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  categoryOfIncidentArray as unknown as string[]
+                  categoryOfIncidentArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.category, { type: "text" }),
@@ -275,7 +275,7 @@ export default function RegisterIncidentVehicle({
                   key={resetKey + 2}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    severityTypeArray as unknown as string[]
+                    severityTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.severity, { type: "text" }),
@@ -290,7 +290,7 @@ export default function RegisterIncidentVehicle({
                   key={resetKey + 3}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[]
+                    statusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),

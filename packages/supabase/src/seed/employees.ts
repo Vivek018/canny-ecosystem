@@ -167,7 +167,7 @@ export function seedEmployeeSkills(): Omit<
 }
 
 export function seedEmployeeAttendance(
-  employeeId: string
+  employeeId: string,
 ): EmployeeMonthlyAttendanceDatabaseInsert[] {
   const today = new Date();
   const oneYearAgo = new Date();

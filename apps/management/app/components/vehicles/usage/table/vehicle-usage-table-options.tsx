@@ -39,7 +39,7 @@ export const VehicleUsageOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.vehicle_usage}`) &&
-                "flex"
+                "flex",
             )}
           >
             Update Usage
@@ -48,13 +48,10 @@ export const VehicleUsageOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.vehicle_usage}`) &&
-                "flex"
+                "flex",
             )}
           />
-          <DeleteVehicleUsage
-            id={vehicleUsageId}
-            vehicleId={vehicleId}
-          />
+          <DeleteVehicleUsage id={vehicleUsageId} vehicleId={vehicleId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

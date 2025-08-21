@@ -39,7 +39,7 @@ export const DeleteVehicleUsage = ({
   };
 
   const handleDeleteVehicleUsage = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -52,7 +52,7 @@ export const DeleteVehicleUsage = ({
           method: "post",
           action: `/vehicles/usage/${id}/delete-vehicle-usage`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -67,7 +67,7 @@ export const DeleteVehicleUsage = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.vehicle_usage}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Usage

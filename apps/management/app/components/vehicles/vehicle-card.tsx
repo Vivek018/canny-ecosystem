@@ -64,8 +64,8 @@ export function VehicleCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.vehicles}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.vehicles}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -86,13 +86,13 @@ export function VehicleCard({
       </CardHeader>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold"
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
         )}
       >
         <p
           className={cn(
             "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
-            !formatDate(vehicle?.start_date) && "hidden"
+            !formatDate(vehicle?.start_date) && "hidden",
           )}
         >
           <Icon name="clock" size="xs" className="scale-x-[-1]" />
@@ -101,7 +101,7 @@ export function VehicleCard({
         <p
           className={cn(
             "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
-            !formatDate(vehicle?.end_date) && "hidden"
+            !formatDate(vehicle?.end_date) && "hidden",
           )}
         >
           <Icon name="clock" size="xs" />

@@ -33,7 +33,7 @@ export const DeleteVehicle = ({ vehicleId }: { vehicleId: string }) => {
   };
 
   const handleDeleteVehicle = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -43,7 +43,7 @@ export const DeleteVehicle = ({ vehicleId }: { vehicleId: string }) => {
           method: "post",
           action: `/vehicles/vehicle/${vehicleId}/delete-vehicle`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -57,7 +57,7 @@ export const DeleteVehicle = ({ vehicleId }: { vehicleId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.vehicles}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.vehicles}`) && "flex",
         )}
       >
         Delete Vehicle
