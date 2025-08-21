@@ -10,6 +10,7 @@ type Props = {
 
 // make sure the order is same as header order
 export const payeeDataArray = [
+  "payee_code",
   "name",
   "type",
   "fixed_amount",

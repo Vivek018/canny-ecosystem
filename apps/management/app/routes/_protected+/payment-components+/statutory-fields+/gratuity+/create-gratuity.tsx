@@ -51,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.statutoryFieldsGraduity}`,
+      `${createRole}:${attribute.statutoryFieldsGraduity}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -68,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -87,7 +87,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -116,7 +116,7 @@ export async function action({
         message: "Failed to create Gratuity",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -190,10 +190,8 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(fields.eligibility_years.name),
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.eligibility_years.name),
                 }}
                 errors={fields.eligibility_years.errors}
@@ -206,12 +204,10 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.present_day_per_year.name,
+                    fields.present_day_per_year.name
                   ),
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.present_day_per_year.name),
                 }}
                 errors={fields.present_day_per_year.errors}
@@ -224,14 +220,12 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.payment_days_per_year.name,
+                    fields.payment_days_per_year.name
                   ),
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(
-                    fields.payment_days_per_year.name,
+                    fields.payment_days_per_year.name
                   ),
                 }}
                 errors={fields.payment_days_per_year.errors}
@@ -244,12 +238,10 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.max_multiply_limit.name,
+                    fields.max_multiply_limit.name
                   ),
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.max_multiply_limit.name),
                 }}
                 errors={fields.max_multiply_limit.errors}
@@ -260,10 +252,8 @@ export default function CreateGratuity({
                   ...getInputProps(fields.max_amount_limit, { type: "number" }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(fields.max_amount_limit.name),
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.max_amount_limit.name),
                 }}
                 errors={fields.max_amount_limit.errors}

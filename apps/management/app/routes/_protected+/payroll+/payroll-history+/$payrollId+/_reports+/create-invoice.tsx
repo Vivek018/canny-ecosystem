@@ -111,7 +111,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.payroll_invoice}${args.params.payrollId}`,
-    args,
+    args
   );
 }
 
@@ -124,7 +124,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
     const selectedRowData = formData.get("selected_rows") as string;
     const selectedSalaryEntriesData = JSON.parse(selectedRowData || "[]");
@@ -135,7 +135,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -219,7 +219,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -266,7 +266,58 @@ export default function CreateInvoice({
 
     const includeAll = includedFields.includes("all");
 
-    return Object.entries(fieldTotals).map(([field, data]) => {
+    const preferredEarningsOrder = ["BASIC", "DA", "HRA"];
+    const preferredDeductionsOrder = ["PF", "ESIC", "PT"];
+
+    const earnings: Array<{
+      field: string;
+      data: (typeof fieldTotals)[string];
+    }> = [];
+    const deductions: Array<{
+      field: string;
+      data: (typeof fieldTotals)[string];
+    }> = [];
+    const others: Array<{ field: string; data: (typeof fieldTotals)[string] }> =
+      [];
+
+    for (const [field, data] of Object.entries(fieldTotals)) {
+      if (data.type === "earning") {
+        earnings.push({ field, data });
+      } else if (data.type === "deduction") {
+        deductions.push({ field, data });
+      } else {
+        others.push({ field, data });
+      }
+    }
+
+    function orderFields(
+      fieldsArr: Array<{ field: string; data: (typeof fieldTotals)[string] }>,
+      preferredOrder: string[]
+    ) {
+      const map = new Map(fieldsArr.map((e) => [e.field, e]));
+      const ordered: Array<{
+        field: string;
+        data: (typeof fieldTotals)[string];
+      }> = [];
+      for (const field of preferredOrder) {
+        if (map.has(field)) {
+          ordered.push(map.get(field)!);
+        }
+      }
+      for (const e of fieldsArr) {
+        if (!preferredOrder.includes(e.field)) {
+          ordered.push(e);
+        }
+      }
+      return ordered;
+    }
+
+    const orderedEarnings = orderFields(earnings, preferredEarningsOrder);
+    const orderedDeductions = orderFields(deductions, preferredDeductionsOrder);
+
+    const orderedFields = [...orderedEarnings, ...orderedDeductions, ...others];
+
+    return orderedFields.map(({ field, data }) => {
       let amount = data.rawAmount;
       const fieldKey = field.trim().toLowerCase();
 
@@ -284,6 +335,7 @@ export default function CreateInvoice({
       };
     });
   }
+
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -370,7 +422,7 @@ export default function CreateInvoice({
                   inputProps={{
                     ...getInputProps(fields.invoice_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.invoice_number.name,
+                      fields.invoice_number.name
                     )}`,
                   }}
                   labelProps={{
@@ -394,7 +446,7 @@ export default function CreateInvoice({
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name,
+                      fields.subject.name
                     )}`,
                   }}
                   labelProps={{
@@ -424,7 +476,7 @@ export default function CreateInvoice({
                   inputProps={{
                     ...getInputProps(fields.additional_text, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.additional_text.name,
+                      fields.additional_text.name
                     )}`,
                   }}
                   labelProps={{
@@ -546,7 +598,7 @@ export default function CreateInvoice({
                   inputProps={{
                     ...getInputProps(fields.paid_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_date.name,
+                      fields.paid_date.name
                     )}`,
                   }}
                   labelProps={{
@@ -564,7 +616,7 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                      fields.payroll_data.value,
+                      fields.payroll_data.value
                   ),
                 }}
                 fields={[

@@ -4,7 +4,7 @@ import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 
 type DetailItemProps = {
   label: string;
-  value: string | number | null | undefined;
+  value: string | number | null | undefined | any;
 };
 
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {

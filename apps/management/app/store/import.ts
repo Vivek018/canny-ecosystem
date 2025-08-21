@@ -10,6 +10,7 @@ import type {
   ImportLeavesDataType,
   ImportSalaryPayrollDataType,
   ImportEmployeeProjectAssignmentsDataType,
+  ImportVehicleUsageDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { create } from "zustand";
 
@@ -133,7 +134,7 @@ export const useImportStoreForLeaves = create<ImportStateForLeaves>()(
   (set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
-  }),
+  })
 );
 
 type ImportStateForReimbursementPayroll = {
@@ -166,7 +167,7 @@ export const useImportStoreForExitPayroll = create<ImportStateForExitPayroll>()(
   (set) => ({
     importData: { title: "", data: [] },
     setImportData: (importData) => set({ importData }),
-  }),
+  })
 );
 
 type ImportStateForSalaryPayroll = {
@@ -206,5 +207,16 @@ export const useImportStoreForAttendance = create<ImportStateForAttendance>()(
   (set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
-  }),
+  })
 );
+
+type ImportStateForVehicleUsage = {
+  importData: { data: ImportVehicleUsageDataType[] };
+  setImportData: (importData: { data: ImportVehicleUsageDataType[] }) => void;
+};
+
+export const useImportStoreForVehicleUsage =
+  create<ImportStateForVehicleUsage>()((set) => ({
+    importData: { data: [] },
+    setImportData: (importData) => set({ importData }),
+  }));

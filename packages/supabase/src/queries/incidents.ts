@@ -7,6 +7,7 @@ import type {
   EmployeeProjectAssignmentDatabaseRow,
   SiteDatabaseRow,
   ProjectDatabaseRow,
+  VehiclesDatabaseRow,
 } from "../types";
 
 export type IncidentFilters = {
@@ -24,6 +25,8 @@ export type IncidentFilters = {
 export type IncidentsDatabaseType = Pick<
   IncidentsDatabaseRow,
   | "id"
+  | "employee_id"
+  | "vehicle_id"
   | "title"
   | "date"
   | "location_type"
@@ -34,15 +37,11 @@ export type IncidentsDatabaseType = Pick<
   | "description"
   | "diagnosis"
   | "action_taken"
+  | "company_id"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
-    | "id"
-    | "first_name"
-    | "middle_name"
-    | "last_name"
-    | "employee_code"
-    | "company_id"
+    "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
     employee_project_assignment: Pick<
       EmployeeProjectAssignmentDatabaseRow,
@@ -55,6 +54,20 @@ export type IncidentsDatabaseType = Pick<
           id: ProjectDatabaseRow["id"];
           name: ProjectDatabaseRow["name"];
         };
+      };
+    };
+  };
+} & {
+  vehicles: Pick<
+    VehiclesDatabaseRow,
+    "id" | "registration_number" | "name" | "site_id"
+  > & {
+    sites: {
+      id: SiteDatabaseRow["id"];
+      name: SiteDatabaseRow["name"];
+      projects: {
+        id: ProjectDatabaseRow["id"];
+        name: ProjectDatabaseRow["name"];
       };
     };
   };
@@ -93,6 +106,8 @@ export async function getIncidentsByCompanyId({
   const columns = [
     "id",
     "date",
+    "employee_id",
+    "vehicle_id",
     "title",
     "location_type",
     "location",
@@ -102,6 +117,7 @@ export async function getIncidentsByCompanyId({
     "description",
     "diagnosis",
     "action_taken",
+    "company_id",
   ] as const;
 
   const query = supabase
@@ -109,20 +125,22 @@ export async function getIncidentsByCompanyId({
     .select(
       `
         ${columns.join(",")},
-        employees!inner(
-          id, company_id, first_name, middle_name, last_name, employee_code,
+        employees!left(
+          id, first_name, middle_name, last_name, employee_code,
           employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"}(
             sites!${foreignFilters ? "inner" : "left"}(
               id, name, projects!${project ? "inner" : "left"}(id, name)
             )
           )
-        )
+        ),vehicles!left(id,name,registration_number,sites!${foreignFilters ? "inner" : "left"}(
+              id, name, projects!${project ? "inner" : "left"}(id, name)
+            ))
       `,
       {
         count: "exact",
       }
     )
-    .eq("employees.company_id", companyId);
+    .eq("company_id", companyId);
 
   if (sort) {
     const simpleSortable = [
@@ -203,6 +221,7 @@ export async function getIncidentsById({
   const columns = [
     "id",
     "employee_id",
+    "vehicle_id",
     "date",
     "title",
     "location_type",
@@ -213,6 +232,7 @@ export async function getIncidentsById({
     "description",
     "diagnosis",
     "action_taken",
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase

@@ -48,7 +48,7 @@ export function SalaryEntrySheet({
   const [resetKey, setResetKey] = useState(Date.now());
 
   const typeOptions = transformStringArrayIntoOptions(
-    componentTypeArray as unknown as string[],
+    componentTypeArray as unknown as string[]
   );
 
   const formattedDefaultValue = {
@@ -130,7 +130,7 @@ export function SalaryEntrySheet({
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
                   placeholder: "Enter field name",
-                  className: "capitalize",
+
                   readOnly: !editable,
                 }}
                 labelProps={{
@@ -142,7 +142,7 @@ export function SalaryEntrySheet({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  componentTypeArray as unknown as string[],
+                  componentTypeArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.type, { type: "text" }),
@@ -159,7 +159,7 @@ export function SalaryEntrySheet({
                   ...getInputProps(fields.amount, { type: "number" }),
                   autoFocus: true,
                   placeholder: "Enter amount",
-                  className: "capitalize",
+
                   readOnly: !editable,
                 }}
                 labelProps={{

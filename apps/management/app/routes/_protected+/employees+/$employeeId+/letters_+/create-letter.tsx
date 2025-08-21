@@ -114,7 +114,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return acc;
       },
-      {} as Record<string, Record<string, number>>,
+      {} as Record<string, Record<string, number>>
     );
 
     return json({ employeeSalaryData, error: null });
@@ -137,7 +137,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
     const employeeLetterData = submission.value;
@@ -160,7 +160,7 @@ export async function action({
         message: "Employee Letter creation failed",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -169,7 +169,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -251,13 +251,13 @@ export default function CreateEmployeeLetter({
                   key={resetKey}
                   className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    employeeLetterTypesArray as unknown as string[],
+                    employeeLetterTypesArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.letter_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.letter_type.name,
+                    fields.letter_type.name
                   )}`}
                   labelProps={{
                     children: "Letter Type",
@@ -284,9 +284,8 @@ export default function CreateEmployeeLetter({
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name,
+                      fields.subject.name
                     )}`,
-                    className: "capitalize",
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.subject.name),
@@ -302,15 +301,15 @@ export default function CreateEmployeeLetter({
                     ...getInputProps(fields.content, { type: "hidden" }),
                     placeholder: "Write your letter content here...",
                     defaultValue: !updateValues
-                      ? bringDefaultLetterContent(
+                      ? (bringDefaultLetterContent(
                           fields.letter_type.value,
-                          employeeSalaryData,
-                        ) ?? fields.content.value
-                      : fields.content.value ??
+                          employeeSalaryData
+                        ) ?? fields.content.value)
+                      : (fields.content.value ??
                         bringDefaultLetterContent(
                           fields.letter_type.value,
-                          employeeSalaryData,
-                        ),
+                          employeeSalaryData
+                        )),
                   }}
                   labelProps={{
                     children: "Content",
@@ -363,7 +362,7 @@ export default function CreateEmployeeLetter({
                     fields.include_employee_signature,
                     {
                       type: "checkbox",
-                    },
+                    }
                   )}
                   labelProps={{
                     children: "Include Employee Signature",

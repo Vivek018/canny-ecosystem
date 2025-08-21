@@ -24,6 +24,7 @@ import RegisterIncident from "./$employeeId.create-incident";
 import { updateIncidentById } from "@canny_ecosystem/supabase/mutations";
 import { getIncidentsById } from "@canny_ecosystem/supabase/queries";
 import type { IncidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import RegisterIncidentVehicle from "./$vehicleId.create-incident-vehicle";
 
 export const UPDATE_INCIDENTS_TAG = "Update-Incident";
 
@@ -65,7 +66,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const data = { ...submission.value, id: submission.value.id ?? incidentId };
@@ -129,5 +130,9 @@ export default function UpdateIncidents() {
     }
   }, [actionData]);
 
-  return <RegisterIncident updateValues={updatableData} />;
+  return updatableData?.vehicle_id ? (
+    <RegisterIncidentVehicle updateValues={updatableData} />
+  ) : (
+    <RegisterIncident updateValues={updatableData} />
+  );
 }

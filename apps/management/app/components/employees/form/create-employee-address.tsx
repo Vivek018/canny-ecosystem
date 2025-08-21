@@ -50,7 +50,6 @@ export function CreateEmployeeAddress({
             ...getInputProps(fields.address_type, { type: "text" }),
             autoFocus: true,
             placeholder: `Enter ${replaceUnderscore(fields.address_type.name)}`,
-            className: "capitalize",
           }}
           labelProps={{
             children: replaceUnderscore(fields.address_type.name),
@@ -89,7 +88,7 @@ export function CreateEmployeeAddress({
           <Field
             inputProps={{
               ...getInputProps(fields.city, { type: "text" }),
-              className: "capitalize",
+
               placeholder: `Enter ${fields.city.name}`,
             }}
             labelProps={{
@@ -112,7 +111,7 @@ export function CreateEmployeeAddress({
           <Field
             inputProps={{
               ...getInputProps(fields.pincode, { type: "text" }),
-              className: "capitalize",
+
               placeholder: `Enter ${replaceUnderscore(fields.pincode.name)}`,
             }}
             labelProps={{
@@ -125,7 +124,7 @@ export function CreateEmployeeAddress({
           <Field
             inputProps={{
               ...getInputProps(fields.latitude, { type: "number" }),
-              className: "capitalize",
+
               placeholder: `Enter ${fields.latitude.name}`,
             }}
             labelProps={{
@@ -136,7 +135,7 @@ export function CreateEmployeeAddress({
           <Field
             inputProps={{
               ...getInputProps(fields.longitude, { type: "number" }),
-              className: "capitalize",
+
               placeholder: `Enter ${replaceUnderscore(fields.longitude.name)}`,
             }}
             labelProps={{

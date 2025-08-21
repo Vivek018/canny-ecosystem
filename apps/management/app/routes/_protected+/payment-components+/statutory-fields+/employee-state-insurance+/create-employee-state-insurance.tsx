@@ -71,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -90,7 +90,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -119,7 +119,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -194,10 +194,8 @@ export default function CreateEmployeeStateInsurance({
                   ...getInputProps(fields.esi_number, { type: "text" }),
                   autoFocus: true,
                   placeholder: "00-00-000000-000-0000",
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.esi_number.name),
                 }}
                 errors={fields.esi_number.errors}
@@ -207,7 +205,7 @@ export default function CreateEmployeeStateInsurance({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[],
+                  deductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
@@ -230,12 +228,10 @@ export default function CreateEmployeeStateInsurance({
                     disabled: true,
                     autoFocus: true,
                     placeholder: "Enter number",
-                    className: "capitalize",
                   }}
                   labelProps={{
-                    className: "capitalize",
                     children: replaceUnderscore(
-                      fields.employee_contribution.name,
+                      fields.employee_contribution.name
                     ),
                   }}
                   errors={fields.employee_contribution.errors}
@@ -252,12 +248,10 @@ export default function CreateEmployeeStateInsurance({
                     disabled: true,
                     autoFocus: true,
                     placeholder: "Enter number",
-                    className: "capitalize",
                   }}
                   labelProps={{
-                    className: "capitalize",
                     children: replaceUnderscore(
-                      fields.employer_contribution.name,
+                      fields.employer_contribution.name
                     ),
                   }}
                   errors={fields.employer_contribution.errors}
@@ -274,10 +268,8 @@ export default function CreateEmployeeStateInsurance({
                 disabled: true,
                 autoFocus: true,
                 placeholder: "Enter number",
-                className: "capitalize",
               }}
               labelProps={{
-                className: "capitalize",
                 children: replaceUnderscore(fields.max_limit.name),
               }}
               errors={fields.max_limit.errors}

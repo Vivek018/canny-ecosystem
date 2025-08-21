@@ -71,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -90,7 +90,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -119,7 +119,7 @@ export async function action({
         message: "Failed to create Employee Provident Fund",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -195,10 +195,8 @@ export default function CreateEmployeeProvidentFund({
                   ...getInputProps(fields.epf_number, { type: "text" }),
                   autoFocus: true,
                   placeholder: "AA/AAA/0000000/XXX",
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.epf_number.name),
                 }}
                 errors={fields.epf_number.errors}
@@ -208,7 +206,7 @@ export default function CreateEmployeeProvidentFund({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[],
+                  deductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
@@ -226,7 +224,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.restrict_employee_contribution,
                   {
                     type: "checkbox",
-                  },
+                  }
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employee_contribution.id,
@@ -240,7 +238,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.restrict_employer_contribution,
                   {
                     type: "checkbox",
-                  },
+                  }
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employer_contribution.id,
@@ -256,7 +254,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.include_employer_contribution,
                   {
                     type: "checkbox",
-                  },
+                  }
                 )}
                 labelProps={{
                   htmlFor: fields.include_employer_contribution.id,
@@ -273,7 +271,7 @@ export default function CreateEmployeeProvidentFund({
                           fields.include_employer_edli_contribution,
                           {
                             type: "checkbox",
-                          },
+                          }
                         ),
                         disabled: !form.value?.include_employer_contribution,
                       }}

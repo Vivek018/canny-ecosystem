@@ -55,10 +55,10 @@ export function VehiclePageHeader({
     }
     const formData = new FormData();
     formData.set("file", file);
-    formData.set("returnTo", `/vehicles/${vehicle.id}/overview`);
+    formData.set("returnTo", `/vehicles/vehicle/${vehicle.id}/overview`);
     submit(formData, {
       method: "post",
-      action: `/vehicles/${vehicle.id}/media/upload-profile-photo`,
+      action: `/vehicles/vehicle/${vehicle.id}/media/upload-profile-photo`,
       encType: "multipart/form-data",
     });
     clearExactCacheEntry(`${cacheKeyPrefix.vehicle_overview}${vehicle.id}`);
@@ -114,7 +114,7 @@ export function VehiclePageHeader({
         <div className="flex flex-row items-start gap-3">
           <Link
             prefetch="intent"
-            to={`/vehicles/${vehicle.id}/update-vehicle`}
+            to={`/vehicles/vehicle/${vehicle.id}/update-vehicle`}
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",

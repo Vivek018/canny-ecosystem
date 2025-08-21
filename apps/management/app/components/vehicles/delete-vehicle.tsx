@@ -41,7 +41,7 @@ export const DeleteVehicle = ({ vehicleId }: { vehicleId: string }) => {
         {},
         {
           method: "post",
-          action: `/vehicles/${vehicleId}/delete-vehicle`,
+          action: `/vehicles/vehicle/${vehicleId}/delete-vehicle`,
           replace: true,
         }
       );

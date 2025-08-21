@@ -14,6 +14,7 @@ export async function getPayeeById({
 }) {
   const columns = [
     "id",
+    "payee_code",
     "company_id",
     "name",
     "type",
@@ -51,6 +52,7 @@ export async function getPayeesByCompanyId({
   const columns = [
     "id",
     "company_id",
+    "payee_code",
     "name",
     "type",
     "fixed_amount",

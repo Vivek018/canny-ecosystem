@@ -134,7 +134,7 @@ type DataType = {
 
 function chunkArray(array: any, size: number) {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size),
+    array.slice(i * size, i * size + size)
   );
 }
 
@@ -161,11 +161,11 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
           {chunk.map((emp: any, i: number) => {
             const earningsTotal = emp.earnings.reduce(
               (acc: number, e: any) => acc + e.amount,
-              0,
+              0
             );
             const deductionTotal = emp.deductions.reduce(
               (acc: number, d: any) => acc + d.amount,
-              0,
+              0
             );
             const netAmount = earningsTotal - deductionTotal;
 
@@ -267,7 +267,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                       ]}
                     >
                       {replaceUnderscore(
-                        emp.employeeProjectAssignmentData.position,
+                        emp.employeeProjectAssignmentData.position
                       )}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>ESI No.</Text>
@@ -320,7 +320,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp?.employeeProjectAssignmentData?.start_date,
+                          emp?.employeeProjectAssignmentData?.start_date
                         )}
                       </>
                     </Text>
@@ -355,7 +355,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                   {Array.from({
                     length: Math.max(
                       emp.earnings.length,
-                      emp.deductions.length,
+                      emp.deductions.length
                     ),
                   }).map((_, idx) => (
                     <View style={styles.row} key={idx.toString()}>
@@ -499,27 +499,46 @@ export default function SalarySlips() {
       pincode: location?.pincode,
     };
 
-    interface EmployeeEarningsOrDeductions {
-      name: string;
-      amount: number;
-    }
+    const preferredEarningOrder = ["BASIC", "DA", "HRA"];
+    const preferredDeductionOrder = ["PF", "ESIC", "PT"];
 
     const employeeData: any[] = data.payrollDataAndOthers.map((emp: any) => {
-      const earnings: EmployeeEarningsOrDeductions[] = [];
-      const deductions: EmployeeEarningsOrDeductions[] = [];
-
+      const earningFields = new Map<string, true>();
+      const deductionFields = new Map<string, true>();
+      const earningsMap: Record<string, number> = {};
+      const deductionsMap: Record<string, number> = {};
       for (const entry of emp.salary_entries.salary_field_values) {
-        const entryItem: EmployeeEarningsOrDeductions = {
-          name: entry.payroll_fields.name,
-          amount: entry.amount,
-        };
-
-        if (entry.payroll_fields?.type === "earning") {
-          earnings.push(entryItem);
-        } else if (entry.payroll_fields?.type === "deduction") {
-          deductions.push(entryItem);
+        const name = entry?.payroll_fields?.name;
+        const type = entry?.payroll_fields?.type ?? "earning";
+        if (!name) continue;
+        if (type === "deduction") {
+          if (!deductionFields.has(name)) deductionFields.set(name, true);
+          deductionsMap[name] = entry?.amount;
+        } else {
+          if (!earningFields.has(name)) earningFields.set(name, true);
+          earningsMap[name] = entry?.amount;
         }
       }
+
+      const orderedEarnings = preferredEarningOrder.filter((f) =>
+        earningFields.has(f)
+      );
+      const remainingEarnings = [...earningFields.keys()].filter(
+        (f) => !preferredEarningOrder.includes(f)
+      );
+      const orderedDeductions = preferredDeductionOrder.filter((f) =>
+        deductionFields.has(f)
+      );
+      const remainingDeductions = [...deductionFields.keys()].filter(
+        (f) => !preferredDeductionOrder.includes(f)
+      );
+
+      const earnings = [...orderedEarnings, ...remainingEarnings].map(
+        (name) => ({ name, amount: earningsMap[name] })
+      );
+      const deductions = [...orderedDeductions, ...remainingDeductions].map(
+        (name) => ({ name, amount: deductionsMap[name] })
+      );
 
       return {
         employeeData: {
@@ -600,7 +619,6 @@ export default function SalarySlips() {
       employeeData,
     };
   }
-
   const slipData = transformData(updatedData);
 
   if (!isDocument) return <div>Loading...</div>;

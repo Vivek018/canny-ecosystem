@@ -29,12 +29,17 @@ export async function action({ request }: ActionFunctionArgs) {
           message: "Salary Entry update failed",
           error: submission.error,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
+    const finalData = {
+      id: submission.value.id,
+      site_id: submission.value.site_id ?? null,
+      department_id: submission.value.department_id ?? null,
+    };
 
     const { status, error } = await updateSalaryEntryById({
-      data: submission.value,
+      data: finalData,
       supabase,
     });
 
@@ -51,7 +56,7 @@ export async function action({ request }: ActionFunctionArgs) {
         message: "Salary Entry update failed",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -61,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

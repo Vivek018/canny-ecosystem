@@ -124,16 +124,16 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
   const uniqueEarningFields = Array.from(
     new Set(
       data.employeeData.flatMap((emp: any) =>
-        emp.earnings.map((e: any) => e.name),
-      ),
-    ),
+        emp.earnings.map((e: any) => e.name)
+      )
+    )
   );
   const uniqueDeductingFields = Array.from(
     new Set(
       data.employeeData.flatMap((emp: any) =>
-        emp.deductions.map((e: any) => e.name),
-      ),
-    ),
+        emp.deductions.map((e: any) => e.name)
+      )
+    )
   );
 
   return (
@@ -410,7 +410,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
 
               <Text style={{ textTransform: "capitalize" }}>
                 {replaceUnderscore(
-                  employee?.employeeProjectAssignmentData?.position,
+                  employee?.employeeProjectAssignmentData?.position
                 )}
                 <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
               </Text>
@@ -532,14 +532,14 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .reduce((sum, earning) => sum + earning.amount, 0)
-                    ?.toFixed(2),
+                    ?.toFixed(2)
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>0</Text>
@@ -594,7 +594,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .reduce((sum, earning) => sum + earning?.amount, 0)
-                    ?.toFixed(2),
+                    ?.toFixed(2)
                 )}
               </Text>
             </View>
@@ -609,13 +609,13 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                   Number(
                     employee?.earnings
                       .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2),
+                      ?.toFixed(2)
                   ) -
                     Number(
                       employee?.deductions
                         .reduce((sum, earning) => sum + earning?.amount, 0)
-                        ?.toFixed(2),
-                    ),
+                        ?.toFixed(2)
+                    )
                 )}
               </Text>
             </View>
@@ -683,7 +683,7 @@ export default function SalaryRegister() {
   const updatedData = {
     ...data,
     payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1: any) =>
-      selectedRows.some((emp2: any) => emp2.employee.id === emp1.employee.id),
+      selectedRows.some((emp2: any) => emp2.employee.id === emp1.employee.id)
     ),
   };
 
@@ -703,27 +703,46 @@ export default function SalaryRegister() {
       pincode: location?.pincode,
     };
 
-    interface EmployeeEarningsOrDeductions {
-      name: string;
-      amount: number;
-    }
+    const preferredEarningOrder = ["BASIC", "DA", "HRA"];
+    const preferredDeductionOrder = ["PF", "ESIC", "PT"];
 
     const employeeData: any[] = data.payrollDataAndOthers.map((emp: any) => {
-      const earnings: EmployeeEarningsOrDeductions[] = [];
-      const deductions: EmployeeEarningsOrDeductions[] = [];
-
+      const earningFields = new Map<string, true>();
+      const deductionFields = new Map<string, true>();
+      const earningsMap: Record<string, number> = {};
+      const deductionsMap: Record<string, number> = {};
       for (const entry of emp.salary_entries.salary_field_values) {
-        const entryItem: EmployeeEarningsOrDeductions = {
-          name: entry.payroll_fields.name,
-          amount: entry.amount,
-        };
-
-        if (entry.payroll_fields?.type === "earning") {
-          earnings.push(entryItem);
-        } else if (entry.payroll_fields?.type === "deduction") {
-          deductions.push(entryItem);
+        const name = entry?.payroll_fields?.name;
+        const type = entry?.payroll_fields?.type ?? "earning";
+        if (!name) continue;
+        if (type === "deduction") {
+          if (!deductionFields.has(name)) deductionFields.set(name, true);
+          deductionsMap[name] = entry?.amount;
+        } else {
+          if (!earningFields.has(name)) earningFields.set(name, true);
+          earningsMap[name] = entry?.amount;
         }
       }
+
+      const orderedEarnings = preferredEarningOrder.filter((f) =>
+        earningFields.has(f)
+      );
+      const remainingEarnings = [...earningFields.keys()].filter(
+        (f) => !preferredEarningOrder.includes(f)
+      );
+      const orderedDeductions = preferredDeductionOrder.filter((f) =>
+        deductionFields.has(f)
+      );
+      const remainingDeductions = [...deductionFields.keys()].filter(
+        (f) => !preferredDeductionOrder.includes(f)
+      );
+
+      const earnings = [...orderedEarnings, ...remainingEarnings].map(
+        (name) => ({ name, amount: earningsMap[name] })
+      );
+      const deductions = [...orderedDeductions, ...remainingDeductions].map(
+        (name) => ({ name, amount: deductionsMap[name] })
+      );
 
       return {
         employeeData: {

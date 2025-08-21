@@ -20,6 +20,7 @@ export const modalSearchParamNames = {
   import_exit_payroll: "import-exit-payroll",
   import_department_salary_payroll: "import-department-salary-payroll",
   import_salary_payroll: "import-salary-payroll",
+  import_vehicle_usage: "import-vehicle-usage",
 };
 
 export const statesAndUTs = [
@@ -171,6 +172,8 @@ export const attribute = {
   departments: "departments",
   vehicles: "vehicles",
   vehicle_insurance: "vehicle_insurance",
+  vehicle_loan: "vehicle_loan",
+  vehicle_usage: "vehicle_usage",
 };
 
 export const months: { [key: string]: number } = {

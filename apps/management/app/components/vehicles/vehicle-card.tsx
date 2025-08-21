@@ -40,7 +40,7 @@ export function VehicleCard({
       <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
         <div className="flex flex-col items-start gap-1">
           <CardTitle className="text-lg tracking-wide gap-1 hover:text-primary cursor-pointer">
-            <Link to={`/vehicles/${vehicle.id}/overview`}>
+            <Link to={`/vehicles/vehicle/${vehicle.id}/overview`}>
               {vehicle?.registration_number}
             </Link>
           </CardTitle>

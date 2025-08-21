@@ -13,10 +13,6 @@ type Props = {
 
 // make sure the order is same as header order
 export const IncidentsColumnIdArray = [
-  "employee_code",
-  "employee_name",
-  "project",
-  "site",
   "title",
   "description",
   "date",
@@ -27,6 +23,12 @@ export const IncidentsColumnIdArray = [
   "status",
   "diagnosis",
   "action_taken",
+  "employee_code",
+  "employee_name",
+  "vehicle_number",
+  "vehicle_name",
+  "project",
+  "site",
 ];
 
 export function IncidentsTableHeader({ table, className, loading }: Props) {

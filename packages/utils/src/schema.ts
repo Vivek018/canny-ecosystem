@@ -1605,7 +1605,9 @@ export const categoryOfIncidentArray = [
 
 export const IncidentSchema = z.object({
   id: z.string().optional(),
-  employee_id: z.string(),
+  company_id: z.string(),
+  vehicle_id: z.string().optional(),
+  employee_id: z.string().optional(),
   date: z.string().default(currentDate),
   title: zString.min(3).max(30),
   location_type: z.enum(locationTypeArray).default("onsite"),
@@ -1614,8 +1616,8 @@ export const IncidentSchema = z.object({
   severity: z.enum(severityTypeArray).default("moderate"),
   status: z.enum(statusArray).default("active"),
   description: zTextArea.max(500),
-  diagnosis: z.string().optional(),
-  action_taken: z.string().optional(),
+  diagnosis: zTextArea.max(500).optional(),
+  action_taken: zTextArea.max(500).optional(),
 });
 
 export const leaveTypeArray = [
@@ -1920,6 +1922,7 @@ export const DepartmentsSchema = z.object({
 export const PayeeSchema = z.object({
   id: z.string().uuid().optional(),
   company_id: z.string(),
+  payee_code: zNumberString.min(3),
   name: zString.max(20),
   account_number: zNumber.min(5).max(20),
   ifsc_code: zNumberString.min(3).max(15),
@@ -1958,7 +1961,7 @@ export const VehiclesSchema = z.object({
   vehicle_type: z.enum(vehicleTypeArray).default("passenger"),
   driver_id: z.string(),
   site_id: z.string(),
-  photo: zFile.optional(), 
+  photo: zFile.optional(),
 });
 
 export const VehiclesInsuranceSchema = z.object({
@@ -1971,12 +1974,20 @@ export const VehiclesInsuranceSchema = z.object({
   end_date: z.string(),
   document: zFile.optional(),
 });
-
+export const VehiclesLoanSchema = z.object({
+  vehicle_id: z.string(),
+  bank_name: z.string().min(3),
+  amount: z.number(),
+  interest: z.number(),
+  monthly_emi: z.number(),
+  period: z.string(),
+  start_date: z.string(),
+  end_date: z.string().optional(),
+  document: zFile.optional(),
+});
 export const VehicleUsageSchema = z.object({
   id: z.string().optional(),
   vehicle_id: z.string(),
-  insurance_number: z.string().min(3),
-  insurance_company: z.string().min(3),
   kilometers: z.number(),
   fuel_in_liters: z.number(),
   fuel_amount: z.number(),
@@ -1984,4 +1995,77 @@ export const VehicleUsageSchema = z.object({
   maintainance_amount: z.number().optional(),
   month: z.number().min(1).max(12).default(defaultMonth),
   year: z.number().default(defaultYear),
+});
+
+export const ImportVehicleUsageHeaderSchema = z
+  .object({
+    registration_number: z.string(),
+    kilometers: z.string().optional(),
+    fuel_in_liters: z.string().optional(),
+    fuel_amount: z.string().optional(),
+    toll_amount: z.string().optional(),
+    maintainance_amount: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.registration_number,
+        data.kilometers,
+        data.fuel_in_liters,
+        data.fuel_amount,
+        data.toll_amount,
+        data.maintainance_amount,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "registration_number",
+        "kilometers",
+        "fuel_in_liters",
+        "fuel_amount",
+        "toll_amount",
+        "maintainance_amount",
+      ],
+    }
+  );
+
+export const ImportSingleVehicleUsageDataSchema = z.object({
+  registration_number: zNumberString,
+  month: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  year: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  kilometers: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  fuel_in_liters: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  fuel_amount: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  toll_amount: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  maintainance_amount: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+});
+
+export const ImportVehicleUsageDataSchema = z.object({
+  data: z.array(ImportSingleVehicleUsageDataSchema),
 });

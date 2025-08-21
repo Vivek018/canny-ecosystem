@@ -19,6 +19,7 @@ import { SalaryEntrySheet } from "./salary-entry-sheet";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { SalaryEntrySiteDepartmentSheet } from "./salary-entry-site-department-sheet";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { Link } from "@remix-run/react";
 
 export const salaryEntryColumns = ({
   data,
@@ -59,12 +60,14 @@ export const salaryEntryColumns = ({
       accessorFn: (row) => row.employee.employee_code,
       sortingFn: (a, b) =>
         String(a.getValue("employee_code") ?? "").localeCompare(
-          String(b.getValue("employee_code") ?? ""),
+          String(b.getValue("employee_code") ?? "")
         ),
       cell: ({ row }) => (
-        <p className="truncate">
-          {row.original?.employee.employee_code ?? "--"}
-        </p>
+        <Link to={`/employees/${row.original.employee.id}`}>
+          <p className="truncate text-primary cursor-pointer">
+            {row.original?.employee.employee_code ?? "--"}
+          </p>
+        </Link>
       ),
     },
     {
@@ -77,14 +80,16 @@ export const salaryEntryColumns = ({
         }`,
       sortingFn: (a, b) =>
         String(a.getValue("name") ?? "").localeCompare(
-          String(b.getValue("name") ?? ""),
+          String(b.getValue("name") ?? "")
         ),
       cell: ({ row }) => (
-        <p className="truncate capitalize w-52">{`${
-          row.original?.employee.first_name ?? ""
-        } ${row.original?.employee.middle_name ?? ""} ${
-          row.original?.employee.last_name ?? ""
-        }`}</p>
+        <Link to={`/employees/${row.original.employee.id}`}>
+          <p className="truncate capitalize w-52 text-primary cursor-pointer">{`${
+            row.original?.employee.first_name ?? ""
+          } ${row.original?.employee.middle_name ?? ""} ${
+            row.original?.employee.last_name ?? ""
+          }`}</p>
+        </Link>
       ),
     },
     {
@@ -93,7 +98,7 @@ export const salaryEntryColumns = ({
       accessorFn: (row) => row.salary_entries?.site?.name,
       sortingFn: (a, b) =>
         String(a.getValue("site") ?? "").localeCompare(
-          String(b.getValue("site") ?? ""),
+          String(b.getValue("site") ?? "")
         ),
       cell: ({ row }) => {
         return (
@@ -119,7 +124,7 @@ export const salaryEntryColumns = ({
       accessorFn: (row) => row.salary_entries?.department?.name,
       sortingFn: (a, b) =>
         String(a.getValue("department") ?? "").localeCompare(
-          String(b.getValue("department") ?? ""),
+          String(b.getValue("department") ?? "")
         ),
       cell: ({ row }) => {
         return (
@@ -171,7 +176,7 @@ export const salaryEntryColumns = ({
         `${getMonthNameFromNumber(row.month, true)} ${row.year}`,
       sortingFn: (a, b) =>
         String(a.getValue("period") ?? "").localeCompare(
-          String(b.getValue("period") ?? ""),
+          String(b.getValue("period") ?? "")
         ),
       cell: ({ row }) => (
         <p className="truncate">
@@ -186,7 +191,7 @@ export const salaryEntryColumns = ({
       accessorFn: (row: any) =>
         row.salary_entries.salary_field_values.find(
           (entry: any) =>
-            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase(),
+            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase()
         )?.amount ?? 0,
       sortingFn: (a: any, b: any) =>
         (a.getValue(fieldName) ?? 0) - (b.getValue(fieldName) ?? 0),
@@ -194,7 +199,7 @@ export const salaryEntryColumns = ({
       cell: ({ row }: { row: { original: (typeof data)[0] } }) => {
         const valueObj = row.original.salary_entries.salary_field_values.find(
           (entry: any) =>
-            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase(),
+            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase()
         );
 
         const displayColor =
@@ -252,9 +257,9 @@ export const salaryEntryColumns = ({
                   !hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.employees}`,
+                      `${deleteRole}:${attribute.employees}`
                     ) &&
-                    "hidden",
+                    "hidden"
                 )}
               >
                 <Button variant="ghost" className="h-8 w-8 p-0">

@@ -389,3 +389,17 @@ export type VehiclesInsuranceDatabaseInsert =
   Database["public"]["Tables"]["vehicle_insurance_details"]["Insert"];
 export type VehiclesInsuranceDatabaseUpdate =
   Database["public"]["Tables"]["vehicle_insurance_details"]["Update"];
+
+export type VehiclesUsageDatabaseRow =
+  Database["public"]["Tables"]["vehicle_usage"]["Row"];
+export type VehiclesUsageDatabaseInsert =
+  Database["public"]["Tables"]["vehicle_usage"]["Insert"];
+export type VehiclesUsageDatabaseUpdate =
+  Database["public"]["Tables"]["vehicle_usage"]["Update"];
+
+export type VehiclesLoanDetailsDatabaseRow =
+  Database["public"]["Tables"]["loan_details"]["Row"];
+export type VehiclesLoanDetailsDatabaseInsert =
+  Database["public"]["Tables"]["loan_details"]["Insert"];
+export type VehiclesLoanDetailsDatabaseUpdate =
+  Database["public"]["Tables"]["loan_details"]["Update"];

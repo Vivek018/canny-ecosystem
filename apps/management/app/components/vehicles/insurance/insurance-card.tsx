@@ -113,7 +113,7 @@ export const VehicleInsuranceItem = ({
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/vehicles/${insurance.vehicle_id}/${insurance.id}/update-vehicle-insurance`}
+                  to={`/vehicles/vehicle/${insurance.vehicle_id}/${insurance.id}/update-vehicle-insurance`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",

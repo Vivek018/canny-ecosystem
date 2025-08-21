@@ -47,7 +47,7 @@ export const DeleteInsurance = ({
         {},
         {
           method: "post",
-          action: `/vehicles/${vehicleId}/${insuranceId}/delete-vehicle-insurance`,
+          action: `/vehicles/vehicle/${vehicleId}/${insuranceId}/delete-vehicle-insurance`,
           replace: true,
         }
       );

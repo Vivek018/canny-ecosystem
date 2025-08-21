@@ -7,16 +7,20 @@ import type {
   TypedSupabaseClient,
   VehiclesDatabaseInsert,
   VehiclesInsuranceDatabaseInsert,
+  VehiclesLoanDetailsDatabaseInsert,
 } from "../types";
 import {
   createVehicleInsurance,
+  createVehicleLoan,
   createVehicles,
   updateVehicle,
   updateVehicleById,
   updateVehicleInsuranceById,
+  updateVehicleLoan,
 } from "../mutations";
 import {
   getVehicleInsuranceDocumentUrlByInsuranceNumber,
+  getVehicleLoanDocumentUrlByVehicleId,
   getVehiclePhotoUrlByRegistrationNumber,
 } from "../queries";
 import { isGoodStatus } from "@canny_ecosystem/utils";
@@ -303,6 +307,120 @@ export async function deleteVehicleInsuranceDocument({
       documentName,
     }
   );
+  if (!data || error) return { status: 400, error };
+
+  const filePath = getFilePathFromUrl(data.document ?? "");
+
+  const { error: bucketError } = await supabase.storage
+    .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+    .remove([filePath]);
+
+  if (bucketError) return { status: 500, error: bucketError };
+
+  return { status: 200, error: null };
+}
+
+export async function addOrUpdateVehicleLoanWithDocument({
+  supabase,
+  document,
+  vehicleLoanData,
+  route,
+}: {
+  supabase: TypedSupabaseClient;
+  document: File;
+  vehicleLoanData: VehiclesLoanDetailsDatabaseInsert;
+  route?: "add" | "update";
+}) {
+  if (document instanceof File) {
+    const filePath = `vehicles/loan/${vehicleLoanData.vehicle_id}`;
+
+    const { data: existingData } = await getVehicleLoanDocumentUrlByVehicleId({
+      supabase,
+      vehicleId: vehicleLoanData.vehicle_id!,
+    });
+
+    if (existingData?.document) {
+      await deleteVehicleLoanDocument({
+        supabase,
+        documentName: vehicleLoanData.vehicle_id!,
+      });
+    }
+
+    const buffer = await document.arrayBuffer();
+    const fileData = new Uint8Array(buffer);
+
+    const { data, error } = await supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .upload(filePath, fileData, {
+        contentType: document.type,
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("uploadVehicleLoanDocument Error", error);
+      return { status: 500, error: error.message || "Error storing file" };
+    }
+
+    if (route === "add") {
+      const { status: insertStatus, error: insertError } =
+        await createVehicleLoan({
+          supabase,
+          data: {
+            ...vehicleLoanData,
+            document: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
+          },
+        });
+
+      if (insertError) {
+        await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .remove([filePath]);
+        console.error("addLoanDocument Error", insertError);
+        return {
+          status: insertStatus,
+          error: insertError || "Error uploading document record",
+        };
+      }
+
+      return { status: insertStatus, error: null };
+    }
+    if (route === "update") {
+      const { status: updateStatus, error: updateError } =
+        await updateVehicleLoan({
+          supabase,
+          data: {
+            ...vehicleLoanData,
+            document: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
+          },
+        });
+
+      if (updateError) {
+        console.error("updateLoanDocument Error", updateError);
+        return {
+          status: updateStatus,
+          error: updateError || "Error uploading document record",
+        };
+      }
+
+      return { status: updateStatus, error: null };
+    }
+  }
+
+  return { status: 400, error: "File not uploaded by the user" };
+}
+
+export async function deleteVehicleLoanDocument({
+  supabase,
+  documentName,
+}: {
+  supabase: TypedSupabaseClient;
+  documentName: string;
+}) {
+  const { data, error } = await getVehicleLoanDocumentUrlByVehicleId({
+    supabase,
+    vehicleId: documentName,
+  });
   if (!data || error) return { status: 400, error };
 
   const filePath = getFilePathFromUrl(data.document ?? "");

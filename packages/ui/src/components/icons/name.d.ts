@@ -41,6 +41,7 @@ export type IconName =
   | "plus"
   | "project"
   | "report"
+  | "rocket"
   | "rupees"
   | "search"
   | "setting"

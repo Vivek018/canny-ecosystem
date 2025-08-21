@@ -30,54 +30,6 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "employee_code",
-    header: "Employee Code",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate w-28">
-          {row.original?.employees?.employee_code ?? "--"}
-        </p>
-      );
-    },
-  },
-  {
-    accessorKey: "employee_name",
-    header: "Employee Name",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
-          row.original.employees?.first_name
-        } ${row.original.employees?.middle_name ?? ""} ${
-          row.original.employees?.last_name ?? ""
-        }`}</p>
-      );
-    },
-  },
-  {
-    accessorKey: "project",
-    header: "Project",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate w-28">
-          {row.original?.employees?.employee_project_assignment?.sites?.projects
-            ?.name ?? "--"}
-        </p>
-      );
-    },
-  },
-  {
-    accessorKey: "site",
-    header: "Site",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate w-28">
-          {row.original?.employees?.employee_project_assignment?.sites?.name ??
-            "--"}
-        </p>
-      );
-    },
-  },
-  {
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
@@ -170,6 +122,83 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
           label={"Action Taken"}
           description={row.original?.action_taken ?? "--"}
         />
+      );
+    },
+  },
+  {
+    accessorKey: "employee_code",
+    header: "Employee Code",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-28">
+          {row.original?.employees?.employee_code ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "employee_name",
+    header: "Employee Name",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-48 group-hover:text-primary">
+          {row.original.employee_id
+            ? `${
+                row.original.employees?.first_name
+              } ${row.original.employees?.middle_name ?? ""} ${
+                row.original.employees?.last_name ?? ""
+              }`
+            : "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "vehicle_number",
+    header: "Vehicle Number",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-28">
+          {row.original?.vehicles?.registration_number ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "vehicle_name",
+    header: "Vehicle Name",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-48 group-hover:text-primary">
+          {row.original?.vehicles?.name ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "project",
+    header: "Project",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-28">
+          {row.original?.employee_id
+            ? row.original?.employees?.employee_project_assignment?.sites
+                ?.projects?.name
+            : row.original?.vehicles?.sites?.projects?.name}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "site",
+    header: "Site",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-28">
+          {row.original?.employee_id
+            ? row.original?.employees?.employee_project_assignment?.sites?.name
+            : row.original?.vehicles?.sites?.name}
+        </p>
       );
     },
   },

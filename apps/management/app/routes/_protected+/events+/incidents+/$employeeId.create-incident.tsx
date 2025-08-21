@@ -51,6 +51,7 @@ import { UPDATE_INCIDENTS_TAG } from "./$incidentId.update-incident";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const CREATE_INCIDENTS_TAG = "Create-Incident";
 
@@ -58,13 +59,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   if (!hasPermission(user?.role!, `${createRole}:${attribute.incidents}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;
 
-  return json({ employeeId });
+  return json({ employeeId, companyId });
 }
 
 export async function action({
@@ -119,12 +121,12 @@ export async function action({
   }
 }
 
-export default function CreateIncident({
+export default function RegisterIncident({
   updateValues,
 }: {
   updateValues?: IncidentsDatabaseUpdate | null;
 }) {
-  const { employeeId } = useLoaderData<typeof loader>();
+  const { employeeId, companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const [resetKey, setResetKey] = useState(Date.now());
@@ -173,6 +175,7 @@ export default function CreateIncident({
     defaultValue: {
       ...initialValues,
       employee_id: initialValues.employee_id ?? employeeId,
+      company_id: initialValues.company_id ?? companyId,
     },
   });
 
@@ -194,6 +197,9 @@ export default function CreateIncident({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
+              <input
+                {...getInputProps(fields.company_id, { type: "hidden" })}
+              />
               <Field
                 inputProps={{
                   ...getInputProps(fields.date, { type: "date" }),
@@ -208,7 +214,6 @@ export default function CreateIncident({
                 inputProps={{
                   ...getInputProps(fields.title, { type: "text" }),
                   placeholder: `Enter ${fields.title.name}`,
-                  className: "capitalize",
                 }}
                 labelProps={{
                   children: fields.title.name,
@@ -297,29 +302,20 @@ export default function CreateIncident({
                   errors={fields.status.errors}
                 />
               </div>
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.diagnosis, { type: "text" }),
-
-                  placeholder:
-                    replaceUnderscore(`Enter ${fields.diagnosis.name}`) ?? "",
+              <TextareaField
+                textareaProps={{
+                  ...getTextareaProps(fields.diagnosis),
+                  placeholder: `Enter ${fields.diagnosis.name}`,
                 }}
-                labelProps={{
-                  children: replaceUnderscore(fields.diagnosis.name),
-                }}
+                labelProps={{ children: fields.diagnosis.name }}
                 errors={fields.diagnosis.errors}
               />
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.action_taken, { type: "text" }),
-
-                  placeholder:
-                    replaceUnderscore(`Enter ${fields.action_taken.name}`) ??
-                    "",
+              <TextareaField
+                textareaProps={{
+                  ...getTextareaProps(fields.action_taken),
+                  placeholder: `Enter ${fields.action_taken.name}`,
                 }}
-                labelProps={{
-                  children: replaceUnderscore(fields.action_taken.name),
-                }}
+                labelProps={{ children: fields.action_taken.name }}
                 errors={fields.action_taken.errors}
               />
             </CardContent>

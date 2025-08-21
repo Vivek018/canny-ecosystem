@@ -53,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.statutoryFieldsLeaveEncashment}`,
+      `${createRole}:${attribute.statutoryFieldsLeaveEncashment}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -70,7 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -89,7 +89,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -118,7 +118,7 @@ export async function action({
         message: "Failed to create leave encashment",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -197,10 +197,8 @@ export default function CreateLeaveEncashment({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(fields.eligible_years.name)!,
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(fields.eligible_years.name),
                 }}
                 errors={fields.eligible_years.errors}
@@ -210,7 +208,7 @@ export default function CreateLeaveEncashment({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  encashmentFreqArray as unknown as string[],
+                  encashmentFreqArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.encashment_frequency, {
@@ -231,14 +229,12 @@ export default function CreateLeaveEncashment({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.encashment_multiplier.name,
+                    fields.encashment_multiplier.name
                   )!,
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(
-                    fields.encashment_multiplier.name,
+                    fields.encashment_multiplier.name
                   ),
                 }}
                 errors={fields.encashment_multiplier.errors}
@@ -251,14 +247,12 @@ export default function CreateLeaveEncashment({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.max_encashable_leaves.name,
+                    fields.max_encashable_leaves.name
                   )!,
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(
-                    fields.max_encashable_leaves.name,
+                    fields.max_encashable_leaves.name
                   ),
                 }}
                 errors={fields.max_encashable_leaves.errors}
@@ -271,14 +265,12 @@ export default function CreateLeaveEncashment({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.max_encashment_amount.name,
+                    fields.max_encashment_amount.name
                   )!,
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(
-                    fields.max_encashment_amount.name,
+                    fields.max_encashment_amount.name
                   ),
                 }}
                 errors={fields.max_encashment_amount.errors}
@@ -291,14 +283,12 @@ export default function CreateLeaveEncashment({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.working_days_per_year.name,
+                    fields.working_days_per_year.name
                   )!,
-                  className: "capitalize",
                 }}
                 labelProps={{
-                  className: "capitalize",
                   children: replaceUnderscore(
-                    fields.working_days_per_year.name,
+                    fields.working_days_per_year.name
                   ),
                 }}
                 errors={fields.working_days_per_year.errors}

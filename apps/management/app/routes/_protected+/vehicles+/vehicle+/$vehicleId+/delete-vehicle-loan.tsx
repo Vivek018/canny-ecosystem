@@ -2,9 +2,15 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteVehicleInsuranceDocument } from "@canny_ecosystem/supabase/media";
-import { deleteVehicleInsurance } from "@canny_ecosystem/supabase/mutations";
-import { getVehicleInsuranceById } from "@canny_ecosystem/supabase/queries";
+import {
+  deleteVehicleLoanDocument,
+} from "@canny_ecosystem/supabase/media";
+import {
+  deleteVehicleLoan,
+} from "@canny_ecosystem/supabase/mutations";
+import {
+  getVehicleLoanDetailsByVehicleId,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -25,37 +31,35 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(user?.role!, `${deleteRole}:${attribute.vehicle_insurance}`)
-  ) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.vehicle_loan}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const vehicleId = params.vehicleId;
-  const insuranceId = params.insuranceId;
 
   try {
-    let insuranceData = null;
+    let loanData = null;
 
     if (vehicleId) {
-      ({ data: insuranceData } = await getVehicleInsuranceById({
+      ({ data: loanData } = await getVehicleLoanDetailsByVehicleId({
         supabase,
-        id: insuranceId!,
+        vehicleId,
       }));
     }
 
-    const { error: proofError } = await deleteVehicleInsuranceDocument({
+    const { error: proofError } = await deleteVehicleLoanDocument({
       supabase,
-      documentName: insuranceData?.insurance_number!,
+      documentName: loanData?.vehicle_id!,
     });
-    const { status, error } = await deleteVehicleInsurance({
+
+    const { status, error } = await deleteVehicleLoan({
       supabase,
-      id: insuranceId ?? "",
+      id: vehicleId ?? "",
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Vehicle Insurance deleted successfully",
+        message: "Vehicle Loan deleted successfully",
         error: null,
         vehicleId,
       });
@@ -64,7 +68,7 @@ export async function action({
     return json(
       {
         status: "error",
-        message: "Failed to delete Vehicle Insurance",
+        message: "Failed to delete Vehicle loan",
         error: proofError || error,
         vehicleId,
       },
@@ -83,7 +87,7 @@ export async function action({
   }
 }
 
-export default function DeleteVehicleInsurance() {
+export default function DeleteVehicleLoan() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -95,18 +99,18 @@ export default function DeleteVehicleInsurance() {
         clearExactCacheEntry(`${cacheKeyPrefix.vehicle_overview}${vehicleId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Vehicle Insurance deleted",
+          description: actionData?.message || "Vehicle Loan deleted",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Vehicle Insurance delete failed",
+            actionData?.error?.message || "Vehicle Loan delete failed",
           variant: "destructive",
         });
       }
-      navigate(`/vehicles/${actionData?.vehicleId}`);
+      navigate(`/vehicles/vehicle/${actionData?.vehicleId}`);
     }
   }, [actionData]);
 

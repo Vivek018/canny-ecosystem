@@ -304,7 +304,7 @@ export default function UpdateVehicleInsurance() {
           variant: "destructive",
         });
       }
-      navigate(`/vehicles/${vehicleId}`);
+      navigate(`/vehicles/vehicle/${vehicleId}`);
     }
   }, [actionData]);
 

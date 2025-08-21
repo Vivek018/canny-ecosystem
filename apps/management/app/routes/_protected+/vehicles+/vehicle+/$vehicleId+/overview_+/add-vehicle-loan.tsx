@@ -10,7 +10,7 @@ import {
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   isGoodStatus,
-  VehiclesInsuranceSchema,
+  VehiclesLoanSchema,
   getInitialValueFromZod,
   hasPermission,
   createRole,
@@ -26,14 +26,14 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { CreateVehicleInsurance } from "@/components/vehicles/insurance/create-vehicle-insurance";
-import { createVehicleInsurance } from "@canny_ecosystem/supabase/mutations";
 import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
-import { addOrUpdateVehicleInsuranceWithDocument } from "@canny_ecosystem/supabase/media";
-import type { VehiclesInsuranceDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import type { VehiclesLoanDetailsDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import { CreateVehicleLoan } from "@/components/vehicles/loan/create-vehicle-loan";
+import { createVehicleLoan } from "@canny_ecosystem/supabase/mutations";
+import { addOrUpdateVehicleLoanWithDocument } from "@canny_ecosystem/supabase/media";
 
-export const ADD_VEHICLE_INSURANCE = "add-vehicle-insurance";
+export const ADD_VEHICLE_LOAN = "add-vehicle-loan";
 
 export async function action({
   request,
@@ -44,9 +44,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(user?.role!, `${createRole}:${attribute.vehicle_insurance}`)
-  ) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.vehicle_loan}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -65,7 +63,7 @@ export async function action({
     }
 
     const submission = parseWithZod(formData, {
-      schema: VehiclesInsuranceSchema,
+      schema: VehiclesLoanSchema,
     });
 
     if (submission.status !== "success") {
@@ -75,9 +73,8 @@ export async function action({
       );
     }
     if (submission.value.document) {
-      const { error, status } = await addOrUpdateVehicleInsuranceWithDocument({
-        vehicleInsuranceData:
-          submission.value as VehiclesInsuranceDatabaseInsert,
+      const { error, status } = await addOrUpdateVehicleLoanWithDocument({
+        vehicleLoanData: submission.value as VehiclesLoanDetailsDatabaseInsert,
         document: submission.value.document as File,
         supabase,
         route: "add",
@@ -86,18 +83,18 @@ export async function action({
       if (isGoodStatus(status)) {
         return json({
           status: "success",
-          message: "Insurance added successfully",
+          message: "Loan added successfully",
           error: null,
         });
       }
 
       return json({
         status: "error",
-        message: "Error adding Insurance",
+        message: "Error adding loan",
         error,
       });
     }
-    const { status, error } = await createVehicleInsurance({
+    const { status, error } = await createVehicleLoan({
       supabase,
       data: { ...submission.value, vehicle_id: vehicleId },
     });
@@ -105,9 +102,9 @@ export async function action({
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Insurance added successfully",
+        message: "Loan added successfully",
         error: null,
-        returnTo: `/vehicles/${vehicleId}`,
+        returnTo: `/vehicles/vehicle/${vehicleId}`,
       });
     }
     return json({ status, error });
@@ -120,15 +117,15 @@ export async function action({
   }
 }
 
-export default function AddVehicleInsurance() {
+export default function AddVehicleLoan() {
   const [resetKey, setResetKey] = useState(Date.now());
-  const currentSchema = VehiclesInsuranceSchema;
+  const currentSchema = VehiclesLoanSchema;
   const { vehicleId } = useParams();
 
   const initialValues = getInitialValueFromZod(currentSchema);
 
   const [form, fields] = useForm({
-    id: ADD_VEHICLE_INSURANCE,
+    id: ADD_VEHICLE_LOAN,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
@@ -152,7 +149,7 @@ export default function AddVehicleInsurance() {
         clearExactCacheEntry(`${cacheKeyPrefix.vehicle_overview}${vehicleId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Insurance added",
+          description: actionData?.message || "Loan added",
           variant: "success",
         });
       } else {
@@ -179,7 +176,7 @@ export default function AddVehicleInsurance() {
           className="flex flex-col"
         >
           <Card>
-            <CreateVehicleInsurance key={resetKey} fields={fields as any} />
+            <CreateVehicleLoan key={resetKey} fields={fields as any} />
             <FormButtons
               form={form}
               setResetKey={setResetKey}

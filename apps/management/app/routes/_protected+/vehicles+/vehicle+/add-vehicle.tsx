@@ -89,7 +89,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       supabase,
     });
     const payeeOptions = payeeData?.map((payee: any) => ({
-      label: payee.name as string,
+      label: payee.payee_code as string,
+      pseudoLabel: payee?.name as string,
       value: payee.id as string,
     }));
 

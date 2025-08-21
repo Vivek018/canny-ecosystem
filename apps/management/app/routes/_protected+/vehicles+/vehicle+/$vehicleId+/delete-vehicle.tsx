@@ -2,9 +2,16 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteVehiclePhoto } from "@canny_ecosystem/supabase/media";
+import {
+  deleteVehicleInsuranceDocument,
+  deleteVehicleLoanDocument,
+  deleteVehiclePhoto,
+} from "@canny_ecosystem/supabase/media";
 import { deleteVehicle } from "@canny_ecosystem/supabase/mutations";
-import { getVehicleById } from "@canny_ecosystem/supabase/queries";
+import {
+  getVehicleById,
+  getVehicleInsuranceByVehicleId,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -32,18 +39,42 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let invoiceData = null;
-
+    let vehicleData = null;
+    let insuranceData = null;
     if (vehicleId) {
-      ({ data: invoiceData } = await getVehicleById({
+      ({ data: vehicleData } = await getVehicleById({
         supabase,
         id: vehicleId,
       }));
+
+      const { data } = await getVehicleInsuranceByVehicleId({
+        supabase,
+        vehicleId,
+      });
+      insuranceData = data;
     }
 
     const { error: proofError } = await deleteVehiclePhoto({
       supabase,
-      documentName: invoiceData?.registration_number!,
+      documentName: vehicleData?.registration_number!,
+    });
+
+    if (Array.isArray(insuranceData) && insuranceData.length > 0) {
+      for (const insurance of insuranceData) {
+        const { error } = await deleteVehicleInsuranceDocument({
+          supabase,
+          documentName: insurance.insurance_number,
+        });
+
+        if (error) {
+          console.error("Failed to delete insurance document", error);
+        }
+      }
+    }
+
+    const { error: loanError } = await deleteVehicleLoanDocument({
+      supabase,
+      documentName: vehicleData?.id!,
     });
 
     const { status, error } = await deleteVehicle({
@@ -63,7 +94,7 @@ export async function action({
       {
         status: "error",
         message: "Failed to delete vehicle",
-        error: proofError || error,
+        error: proofError || loanError || error,
       },
       { status: 500 }
     );
@@ -101,7 +132,7 @@ export default function DeleteVehicle() {
           variant: "destructive",
         });
       }
-      navigate("/vehicles", { replace: true });
+      navigate("/vehicles/vehicle", { replace: true });
     }
   }, [actionData]);
 

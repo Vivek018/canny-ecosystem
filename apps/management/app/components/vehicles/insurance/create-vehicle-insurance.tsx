@@ -45,7 +45,6 @@ export function CreateVehicleInsurance({
             ...getInputProps(fields.insurance_company, { type: "text" }),
             autoFocus: true,
             placeholder: `Enter ${replaceUnderscore(fields.insurance_company.name)}`,
-            className: "capitalize",
           }}
           labelProps={{
             children: replaceUnderscore(fields.insurance_company.name),
@@ -85,7 +84,7 @@ export function CreateVehicleInsurance({
           <Field
             inputProps={{
               ...getInputProps(fields.start_date, { type: "date" }),
-              className: "capitalize",
+              className: "",
               placeholder: `Enter ${fields.start_date.name}`,
             }}
             labelProps={{
@@ -97,7 +96,7 @@ export function CreateVehicleInsurance({
           <Field
             inputProps={{
               ...getInputProps(fields.end_date, { type: "date" }),
-              className: "capitalize",
+              className: "",
               placeholder: `Enter ${replaceUnderscore(fields.end_date.name)}`,
             }}
             labelProps={{
@@ -110,7 +109,7 @@ export function CreateVehicleInsurance({
         <Field
           inputProps={{
             ...getInputProps(fields.document, { type: "file" }),
-            className: "capitalize",
+
             placeholder: `Enter ${replaceUnderscore(fields.document.name)}`,
           }}
           labelProps={{

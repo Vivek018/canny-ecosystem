@@ -1,11 +1,11 @@
 import { useImportStoreForSalaryPayroll } from "@/store/import";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
-  getDepartmentIdsByDepartmentNames,
+  getDepartmentsByCompanyId,
   getEmployeeIdsByEmployeeCodes,
   getEmployeeIdsByEsicNumber,
   getEmployeeIdsByUanNumber,
-  getSiteIdsBySiteNames,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -21,9 +21,11 @@ import { normalizeNames } from "@canny_ecosystem/utils";
 export function SalaryPayrollImportData({
   env,
   fieldConfigs,
+  companyId,
 }: {
   env: SupabaseEnv;
   fieldConfigs: FieldConfig[];
+  companyId: string;
 }) {
   const submit = useSubmit();
   const { supabase } = useSupabase({ env });
@@ -37,8 +39,8 @@ export function SalaryPayrollImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -46,34 +48,31 @@ export function SalaryPayrollImportData({
   const handleFinalImport = async () => {
     const importEntries = importData.data! as any[];
 
-    const siteNames = importEntries.map((value) => normalizeNames(value?.site));
-
-    const { data: sites, error: siteError } = await getSiteIdsBySiteNames({
+    const { data: sites, error: siteError } = await getSiteNamesByCompanyId({
       supabase,
-      siteNames: siteNames,
+      companyId,
     });
 
     if (siteError) throw siteError;
 
-    const departmentNames = importEntries.map((value) =>
-      normalizeNames(value?.department),
-    );
     const { data: departments, error: departmentError } =
-      await getDepartmentIdsByDepartmentNames({
+      await getDepartmentsByCompanyId({
         supabase,
-        departmentNames: departmentNames,
+        companyId,
       });
 
     if (departmentError) throw departmentError;
 
-    const preData = importEntries.map((item: any) => {
-      const siteId = sites?.find(
-        (e) => e.name === normalizeNames(item.site),
-      )?.id;
+    const siteMap = new Map(
+      (sites ?? []).map((s) => [normalizeNames(s.name), s.id])
+    );
+    const departmentMap = new Map(
+      (departments ?? []).map((d) => [normalizeNames(d.name), d.id])
+    );
 
-      const departmentId = departments?.find(
-        (u) => u.name === normalizeNames(item.department),
-      )?.id;
+    const preData = importEntries.map((item: any) => {
+      const siteId = siteMap.get(normalizeNames(item.site));
+      const departmentId = departmentMap.get(normalizeNames(item.department));
 
       const { department, site, ...rest } = item;
 
@@ -95,7 +94,7 @@ export function SalaryPayrollImportData({
     if (codeError) throw codeError;
 
     let unresolvedEntries = preData.filter((entry) =>
-      missingCodes.includes(entry.employee_code),
+      missingCodes.includes(entry.employee_code)
     );
 
     const uanNumbers = unresolvedEntries
@@ -108,7 +107,7 @@ export function SalaryPayrollImportData({
 
     const resolvedUANs = employeesByUAN.map((e) => e.uan_number);
     unresolvedEntries = unresolvedEntries.filter(
-      (entry) => !resolvedUANs.includes(entry.uan_number),
+      (entry) => !resolvedUANs.includes(entry.uan_number)
     );
 
     const esicNumbers = unresolvedEntries
@@ -143,7 +142,7 @@ export function SalaryPayrollImportData({
           (e) =>
             (e.type === "employee_code" && e.matchKey === item.employee_code) ||
             (e.type === "uan_number" && e.matchKey === item.uan_number) ||
-            (e.type === "esic_number" && e.matchKey === item.esic_number),
+            (e.type === "esic_number" && e.matchKey === item.esic_number)
         );
 
         const { employee_code, uan_number, esic_number, ...rest } = item;
@@ -170,7 +169,7 @@ export function SalaryPayrollImportData({
       {
         method: "POST",
         action: "/create-payroll",
-      },
+      }
     );
   };
 

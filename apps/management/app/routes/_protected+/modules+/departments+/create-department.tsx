@@ -83,7 +83,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         companyId,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -102,7 +102,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -210,7 +210,6 @@ export default function CreateDepartment({
                   ...getInputProps(fields.name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(fields.name.name)}`,
-                  className: "capitalize",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.name.name),

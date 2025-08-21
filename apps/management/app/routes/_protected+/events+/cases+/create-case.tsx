@@ -218,14 +218,14 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
     const submission = parseWithZod(formData, { schema: CaseSchema });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -324,7 +324,7 @@ export async function action({
         error: error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error: any) {
     return json(
@@ -334,7 +334,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -421,19 +421,19 @@ export default function CreateCase({
     if (updateValues) {
       searchParams.set(
         "reported_by_project",
-        updateValues.reported_by_project_id ?? "",
+        updateValues.reported_by_project_id ?? ""
       );
       searchParams.set(
         "reported_by_site",
-        updateValues.reported_by_site_id ?? "",
+        updateValues.reported_by_site_id ?? ""
       );
       searchParams.set(
         "reported_on_project",
-        updateValues.reported_on_project_id ?? "",
+        updateValues.reported_on_project_id ?? ""
       );
       searchParams.set(
         "reported_on_site",
-        updateValues.reported_on_site_id ?? "",
+        updateValues.reported_on_site_id ?? ""
       );
     }
     setSearchParams(searchParams);
@@ -475,7 +475,7 @@ export default function CreateCase({
                   key={resetKey + 1}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseTypeArray as unknown as string[],
+                    caseTypeArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.case_type, { type: "text" }),
@@ -491,7 +491,6 @@ export default function CreateCase({
                 inputProps={{
                   ...getInputProps(fields.title, { type: "text" }),
                   placeholder: `Enter ${fields.title.name}`,
-                  className: "capitalize",
                 }}
                 labelProps={{
                   children: fields.title.name,
@@ -512,7 +511,7 @@ export default function CreateCase({
                   key={resetKey}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseLocationTypeArray as unknown as string[],
+                    caseLocationTypeArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.location_type, { type: "text" }),
@@ -541,7 +540,7 @@ export default function CreateCase({
                   key={resetKey + 1}
                   className="capitalize col-span-2"
                   options={transformStringArrayIntoOptions(
-                    reportedByArray as unknown as string[],
+                    reportedByArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.reported_by, { type: "text" }),
@@ -649,7 +648,7 @@ export default function CreateCase({
                   key={resetKey + 7}
                   className="capitalize col-span-2"
                   options={transformStringArrayIntoOptions(
-                    reportedOnArray as unknown as string[],
+                    reportedOnArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.reported_on, { type: "text" }),
@@ -758,7 +757,7 @@ export default function CreateCase({
                   key={resetKey + 12}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseStatusArray as unknown as string[],
+                    caseStatusArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
@@ -789,7 +788,7 @@ export default function CreateCase({
                   }),
                   placeholder:
                     replaceUnderscore(
-                      `Enter ${fields.court_case_reference.name}`,
+                      `Enter ${fields.court_case_reference.name}`
                     ) ?? "",
                   required: false,
                 }}
@@ -803,7 +802,7 @@ export default function CreateCase({
                   inputProps={{
                     ...getInputProps(fields.amount_given, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount_given.name,
+                      fields.amount_given.name
                     )}`,
                     required: false,
                   }}
@@ -818,7 +817,7 @@ export default function CreateCase({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount_received.name,
+                      fields.amount_received.name
                     )}`,
                     required: false,
                   }}

@@ -99,7 +99,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         locationOptions: null,
         projectOptions: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -118,7 +118,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -142,7 +142,7 @@ export async function action({
         error,
         returnTo: "/modules/sites",
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -152,7 +152,7 @@ export async function action({
         error,
         returnTo: "/modules/sites",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -238,7 +238,6 @@ export default function CreateSite({
                   ...getInputProps(fields.name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(fields.name.name)}`,
-                  className: "capitalize",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.name.name),
@@ -314,7 +313,7 @@ export default function CreateSite({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
-                    className: "capitalize",
+
                     placeholder: `Enter ${fields.city.name}`,
                   }}
                   labelProps={{
@@ -338,9 +337,9 @@ export default function CreateSite({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.pincode, { type: "text" }),
-                    className: "capitalize",
+
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name,
+                      fields.pincode.name
                     )}`,
                   }}
                   labelProps={{
@@ -353,11 +352,10 @@ export default function CreateSite({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.capacity, { type: "number" }),
-                    className: "capitalize",
+
                     placeholder: `Enter ${fields.capacity.name}`,
                   }}
                   labelProps={{
-                    className: "capitalize",
                     children: `Employee ${fields.capacity.name}`,
                   }}
                   errors={fields.capacity.errors}
@@ -365,7 +363,7 @@ export default function CreateSite({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),
-                    className: "capitalize",
+
                     placeholder: `Enter ${fields.latitude.name}`,
                   }}
                   labelProps={{
@@ -376,9 +374,9 @@ export default function CreateSite({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.longitude, { type: "number" }),
-                    className: "capitalize",
+
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name,
+                      fields.longitude.name
                     )}`,
                   }}
                   labelProps={{
