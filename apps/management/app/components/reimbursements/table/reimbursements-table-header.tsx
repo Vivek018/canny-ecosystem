@@ -13,8 +13,9 @@ type Props = {
 
 // make sure the order is same as header order
 export const ReimbursementsColumnIdArray = [
-  "employee_code",
   "employee_name",
+  "employee_code",
+  "payee_code",
   "project_name",
   "site_name",
   "submitted_date",
@@ -89,10 +90,10 @@ export function ReimbursementsTableHeader({
                 key={id}
                 className={cn(
                   "px-4 py-2 min-w-32 max-w-32",
-                  id === "employee_code" && "sticky left-12 bg-card z-10",
                   id === "employee_name" &&
-                    "sticky left-44 bg-card z-10 min-w-48 max-w-48",
-                  id === "email" && " min-w-60 max-w-60",
+                    "sticky left-12 bg-card z-10 min-w-48 max-w-48",
+                  id === "employee_code" && "sticky left-60 bg-card z-10 ",
+                  id === "email" && " min-w-60 max-w-60"
                 )}
               >
                 <Button
@@ -109,14 +110,14 @@ export function ReimbursementsTableHeader({
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

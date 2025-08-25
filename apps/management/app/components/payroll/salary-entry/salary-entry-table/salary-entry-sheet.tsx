@@ -174,6 +174,7 @@ export function SalaryEntrySheet({
           <DeletePayrollField
             id={salaryEntry?.payroll_fields.id}
             payrollId={payrollId}
+            editable={editable}
           />
 
           <SheetClose asChild>

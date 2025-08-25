@@ -30,6 +30,17 @@ import type { VehicleUsageFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
 import { recentlyAddedFilter } from "@/constant";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+
+export const PLACEHOLDERS = [
+  "All usage of vehcile number 'GJ00AB0000'",
+  "All vehcile usages for Site 'ABC' during 2021",
+  "Vehicle Usage created before 2020",
+  "Vehicle usage between 2018 and 2020",
+  "Vehicle usage of month January",
+  "All vehicle usage from Site 'ABC'",
+  "Vehicle usages created in last 5 mins",
+];
 
 export function VehicleUsageSearchFilter({
   disabled,
@@ -43,7 +54,12 @@ export function VehicleUsageSearchFilter({
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const submit = useSubmit();
+  const [isFocused, setIsFocused] = useState(false);
 
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
   const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
     submit(target, options);
   }, 300);
@@ -144,7 +160,7 @@ export function VehicleUsageSearchFilter({
       debounceSubmit(
         { prompt: prompt },
         {
-          action: "/vehicles-usage?index",
+          action: "/vehicles/usage?index",
           method: "POST",
         },
       );
@@ -181,11 +197,17 @@ export function VehicleUsageSearchFilter({
           <Input
             tabIndex={-1}
             ref={inputRef}
-            placeholder={"No Vehicle Usage Data to Search And Filter"}
+            placeholder={
+              disabled
+                ? "No Vehicle Usage Data to Search And Filter"
+                : animatedPlaceholder
+            }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"

@@ -7,25 +7,26 @@ import {
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { GEMINI_LITE } from "./chat/constant";
+import { recentlyAddedFilter } from "@/constant";
 
 export const ReimbursementFiltersSchema = z.object({
   name: z
     .string()
     .optional()
     .describe(
-      "Full name, employee code or reimbursement name. Example: John Doe or EMP123 or Bonus",
+      "Full name, employee code or reimbursement name. Example: John Doe or EMP123 or Bonus"
     ),
   submitted_date_start: z
     .string()
     .optional()
     .describe(
-      "Submitted Date Reimbursement start range in YYYY-MM-DD format. Example: 1990-01-01",
+      "Submitted Date Reimbursement start range in YYYY-MM-DD format. Example: 1990-01-01"
     ),
   submitted_date_end: z
     .string()
     .optional()
     .describe(
-      "Submitted Date of Reimbursement end range in YYYY-MM-DD format. Example: 2000-12-31",
+      "Submitted Date of Reimbursement end range in YYYY-MM-DD format. Example: 2000-12-31"
     ),
   users: z.string().optional().describe("Authority giving the approval."),
   status: z
@@ -45,6 +46,12 @@ export const ReimbursementFiltersSchema = z.object({
     .enum(booleanArray)
     .optional()
     .describe("Is the reimbursement in any Invoice."),
+  recently_added: z
+    .enum(recentlyAddedFilter as [string, ...string[]])
+    .optional()
+    .describe(
+      "Reimbursements usage added before particular time i.e.Recently added reimbursements. Example: 5_mins or 8_hours"
+    ),
 });
 
 export const generateReimbursementFilter = async ({

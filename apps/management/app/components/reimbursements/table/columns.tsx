@@ -36,6 +36,22 @@ export const columns = ({
   },
   {
     enableSorting: false,
+    accessorKey: "employee_name",
+    header: "Name",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">
+          {row.original.employee_id
+            ? `${row.original.employees?.first_name} ${
+                row.original.employees?.middle_name ?? ""
+              } ${row.original.employees?.last_name ?? ""}`
+            : `${row.original.payee?.name}`}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
@@ -48,15 +64,11 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_name",
-    header: "Name",
+    accessorKey: "payee_code",
+    header: "Payee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate">
-          {`${row.original.employees?.first_name} ${
-            row.original.employees?.middle_name ?? ""
-          } ${row.original.employees?.last_name ?? ""}`}
-        </p>
+        <p className="truncate">{row.original.payee?.payee_code ?? "--"}</p>
       );
     },
   },
@@ -67,10 +79,8 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {
-            row.original.employees?.employee_project_assignment?.sites?.projects
-              ?.name
-          }
+          {row.original.employees?.employee_project_assignment?.sites?.projects
+            ?.name ?? "--"}
         </p>
       );
     },
@@ -82,7 +92,8 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original.employees?.employee_project_assignment?.sites?.name}
+          {row.original.employees?.employee_project_assignment?.sites?.name ??
+            "--"}
         </p>
       );
     },
@@ -167,14 +178,14 @@ export const columns = ({
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.reimbursements}`,
+                  `${updateRole}:${attribute.reimbursements}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.reimbursements}`,
+                    `${deleteRole}:${attribute.reimbursements}`
                   ) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
               asChild
             >

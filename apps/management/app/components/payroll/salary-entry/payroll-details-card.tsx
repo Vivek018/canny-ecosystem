@@ -39,7 +39,7 @@ interface PayrollDetailsCardProps {
     title: string,
     rundate: string,
     link: string,
-    linked: string,
+    linked: string
   ) => void;
 }
 
@@ -66,7 +66,12 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
           <Card className="h-full flex flex-col justify-between px-4 py-3">
             <div className="absolute top-2 right-2 z-10">
               <AlertDialog>
-                <AlertDialogTrigger className="bg-secondary rounded-md px-1.5 pb-0.5">
+                <AlertDialogTrigger
+                  className={cn(
+                    "bg-secondary rounded-md px-1.5 pb-0.5",
+                    payrollData.status !== "pending" && "hidden"
+                  )}
+                >
                   <Icon name="edit" size="xs" />
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -112,7 +117,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                       className={cn(
                         "hidden",
                         link.length && "flex flex-col gap-1",
-                        link === "unlink" && "hidden",
+                        link === "unlink" && "hidden"
                       )}
                     >
                       <Label className="text-sm font-medium capitalize">
@@ -145,7 +150,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                 className={cn(
                   payrollData?.site_id || payrollData?.project_id
                     ? "h-full grid grid-cols-3 gap-4"
-                    : "h-full grid grid-cols-2 gap-4",
+                    : "h-full grid grid-cols-2 gap-4"
                 )}
               >
                 <div className="flex flex-col justify-around items-center">
@@ -160,7 +165,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                     "flex flex-col justify-around items-center",
                     !payrollData?.site_id &&
                       !payrollData?.project_id &&
-                      "hidden",
+                      "hidden"
                   )}
                 >
                   <span>{payrollData?.site_id ? "Site" : "Project"}</span>
@@ -196,7 +201,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                 <p
                   className={cn(
                     "text-wrap break-words whitespace-pre-wrap",
-                    details.title === "Title" && "text-sm",
+                    details.title === "Title" && "text-sm"
                   )}
                 >
                   {payrollData[details.value as keyof typeof payrollData]}
@@ -207,5 +212,5 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
         </div>
       </div>
     );
-  },
+  }
 );

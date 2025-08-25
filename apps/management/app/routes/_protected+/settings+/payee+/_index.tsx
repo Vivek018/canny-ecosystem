@@ -70,7 +70,7 @@ export function PayeesWrapper({ data }: { data: PayeeDatabaseRow[] }) {
 
   useEffect(() => {
     const filteredData = data?.filter((item) =>
-      searchInObject(item, searchString),
+      searchInObject(item, searchString)
     );
     setTableData(filteredData);
   }, [searchString, data]);
@@ -100,7 +100,7 @@ export function PayeesWrapper({ data }: { data: PayeeDatabaseRow[] }) {
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
               !hasPermission(role, `${createRole}:${attribute.settingPayee}`) &&
-                "hidden",
+                "hidden"
             )}
           >
             <span>Add</span>

@@ -1,16 +1,16 @@
-import { defaultYear, getYears, z } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
-import { google } from "@ai-sdk/google";
 import { GEMINI_LITE } from "./chat/constant";
+import { google } from "@ai-sdk/google";
+import { defaultYear, getYears, z } from "@canny_ecosystem/utils";
 import { months } from "@canny_ecosystem/utils/constant";
 import { recentlyAddedFilter } from "@/constant";
 
-export const AttendanceFiltersSchema = z.object({
+export const VehicleUsageFiltersSchema = z.object({
   name: z
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123"
+      "Registration number of the vehicle. Example: MH02AB1234 or GJ02AB1234"
     ),
   month: z
     .enum(Object.keys(months) as [string, ...string[]])
@@ -20,20 +20,23 @@ export const AttendanceFiltersSchema = z.object({
     .enum(getYears(25, defaultYear).map(String) as [string, ...string[]])
     .optional()
     .describe("Years."),
-  project: z
+  vehicle_no: z
     .string()
     .optional()
-    .describe("Project name assigned to the individual."),
-  site: z.string().optional().describe("Name of the site under the project."),
+    .describe(
+      "Registration number of the vehicle. Example: MH02AB1234 or GJ02AB1234"
+    ),
   recently_added: z
     .enum(recentlyAddedFilter as [string, ...string[]])
     .optional()
-    .describe(
-      "Attendance added before particular time i.e.Recently added attendance. Example: 5_mins or 8_hours"
-    ),
+    .describe("Vehicle usage added before particular time i.e.Recently added vehicle usages. Example: 5_mins or 8_hours"),
+  site: z
+    .string()
+    .optional()
+    .describe("Name of the site under the to which vehicle is linked."),
 });
 
-export const generateAttendanceFilter = async ({
+export const generateVehicleUsageFilter = async ({
   input,
   context,
 }: {
@@ -53,7 +56,7 @@ export const generateAttendanceFilter = async ({
       - Return filters as clean, minimal objects with only valid entries relevant to the user's request.
       ${context}`,
       prompt: input,
-      schema: AttendanceFiltersSchema,
+      schema: VehicleUsageFiltersSchema,
     });
     return { object: result.object };
   } catch (e) {
