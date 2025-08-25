@@ -257,7 +257,7 @@ export const getSalaryEntriesByPayrollId = async ({
           )
         )
       )
-    `,
+    `
     )
     .eq("salary_entries.payroll_id", payrollId)
     .limit(SOFT_QUERY_LIMIT);
@@ -311,7 +311,7 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
           )
         )
       )
-    `,
+    `
     )
     .eq("employee_id", employeeId)
     .eq("salary_entries.payroll_id", payrollId)
@@ -356,57 +356,42 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   filters?: DashboardFilters;
 }) {
   const columns = ["run_date", "total_net_amount"] as const;
-  const defMonth = defaultMonth - 1;
-  const filterMonth = filters?.month && Number(months[filters.month]);
-  const filterYear = filters?.year && Number(filters.year);
 
-  //For Current Month
-  const startOfCurrentMonth = filterMonth
-    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 1, 1))
-    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth, 1));
-  const endOfCurrentMonth = filterMonth
-    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
-    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+  const monthFilter = filters?.month
+    ? Number(months[filters?.month])
+    : defaultMonth;
+  const yearFilter = filters?.year ? Number(filters?.year) : defaultYear;
 
   const { data: currentMonth, error: currentMonthError } = await supabase
     .from("payroll")
     .select(columns.join(","))
     .eq("company_id", companyId)
     .in("status", ["approved"])
-    .gte("run_date", startOfCurrentMonth.toISOString())
-    .lt("run_date", endOfCurrentMonth.toISOString())
+    .eq("month", monthFilter)
+    .eq("year", yearFilter)
     .order("created_at", { ascending: false })
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
   if (currentMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      currentMonthError,
+      currentMonthError
     );
-
-  //For Previous Month
-
-  const startOfPrevMonth = filterMonth
-    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 2, 1))
-    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth - 1, 1));
-  const endOfPrevMonth = filterMonth
-    ? new Date(Number(filterYear ?? defaultYear), filterMonth - 1, 1)
-    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
 
   const { data: previousMonth, error: previousMonthError } = await supabase
     .from("payroll")
     .select(columns.join(","))
     .eq("company_id", companyId)
     .in("status", ["approved"])
-    .gte("run_date", startOfPrevMonth.toISOString())
-    .lt("run_date", endOfPrevMonth.toISOString())
+    .eq("month", monthFilter - 1)
+    .eq("year", yearFilter)
     .order("created_at", { ascending: false })
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
   if (previousMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      previousMonthError,
+      previousMonthError
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
@@ -421,27 +406,33 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   companyId: string;
   filters?: DashboardFilters;
 }) {
-  const payrollColumns = ["run_date", "total_net_amount"] as const;
+  const payrollColumns = ["month", "year", "total_net_amount"] as const;
   const restColumns = ["paid_date", "payroll_data"] as const;
-  const defMonth = defaultMonth;
-  const filterMonth = filters?.month && Number(months[filters.month]);
-  const filterYear = filters?.year && Number(filters.year);
+  const filterMonth = filters?.month
+    ? Number(months[filters.month])
+    : defaultMonth;
+  const filterYear = filters?.year ? Number(filters.year) : defaultYear;
 
-  const startOfYear = filterMonth
-    ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
-    : new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth, 1));
+  const startOfYear = new Date(
+    Date.UTC(Number(filterYear) - 1, filterMonth, 1)
+  );
 
-  const endOfYear = filterMonth
-    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
-    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
+  const endOfYear = new Date(Number(filterYear), filterMonth, 1);
+
+  const startMonth = filterMonth === 12 ? 1 : filterMonth + 1;
+  const startYear = filterMonth === 12 ? filterYear : filterYear - 1;
+  const endMonth = filterMonth;
+  const endYear = filterYear;
 
   const { data: payrollData, error: payrollError } = await supabase
     .from("payroll")
     .select(payrollColumns.join(","))
     .eq("company_id", companyId)
     .in("status", ["approved"])
-    .gte("run_date", startOfYear.toISOString())
-    .lt("run_date", endOfYear.toISOString())
+    .or(
+      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`
+    )
+
     .order("run_date", { ascending: true })
     .returns<
       InferredType<PayrollDatabaseRow, (typeof payrollColumns)[number]>[]
@@ -483,10 +474,11 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   }
 
   for (const item of payrollData) {
-    const date = new Date(item.run_date ?? "");
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    const key = `${month} ${year}`;
+    const monthName = new Date(item.year!, item.month! - 1).toLocaleString(
+      "default",
+      { month: "short" }
+    );
+    const key = `${monthName} ${item.year}`;
 
     if (groupedByMonthObj[key]) {
       groupedByMonthObj[key].push(item);
@@ -497,7 +489,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     ([month, data]) => ({
       month,
       data,
-    }),
+    })
   );
 
   for (const item of restData) {
@@ -580,7 +572,7 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
           )
         )
       )
-    `,
+    `
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -634,7 +626,7 @@ export async function getSalaryEntriesByEmployeeId({
           )
         )
       )
-    `,
+    `
     )
     .eq("employee_id", employeeId)
     .eq("year", filterYear)
@@ -754,7 +746,7 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
           )
         )
       )
-    `,
+    `
     )
     .eq("salary_entries.invoice_id", invoiceId);
 
@@ -785,7 +777,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
       absent_days,
       salary_entries!inner (
         id)       
-    `,
+    `
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -794,7 +786,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
   if (error)
     console.error(
       "getSalaryEntriesByPayrollIdForAddingSalaryEntry Error",
-      error,
+      error
     );
 
   return { data, error };

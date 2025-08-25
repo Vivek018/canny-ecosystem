@@ -16,11 +16,11 @@ export const ImportedDataColumns: ColumnDef<ImportReimbursementDataType>[] = [
   },
   {
     accessorKey: "employee_code",
-    header: "Employee Code",
+    header: "Code",
     cell: ({ row }) => {
       return (
         <p className="truncate group-hover:text-primary">
-          {row.original.employee_code}
+          {row.original.employee_code ?? row.original.payee_code}
         </p>
       );
     },

@@ -28,7 +28,7 @@ export function ReimbursementAdd() {
           asChild
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.reimbursements}`) &&
-              "hidden",
+              "hidden"
           )}
         >
           <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
@@ -48,9 +48,19 @@ export function ReimbursementAdd() {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
+              navigate("create-bulk-payee-reimbursement");
+            }}
+            className="space-x-2 flex items-center"
+          >
+            <Icon name="plus-circled" size="sm" />
+            <span>Add Payee Reimbursement</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => {
               searchParams.set(
                 "step",
-                modalSearchParamNames.import_reimbursement,
+                modalSearchParamNames.import_reimbursement
               );
               setSearchParams(searchParams);
             }}

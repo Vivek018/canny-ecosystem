@@ -13,12 +13,13 @@ import {
   getVehiclesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
   Outlet,
+  redirect,
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
@@ -33,6 +34,7 @@ import { FilterList } from "@/components/vehicles/usage/filter-list";
 import { columns } from "@/components/vehicles/usage/table/columns";
 import { VehicleUsageActions } from "@/components/vehicles/usage/vehicle-usage-actions";
 import { ImportVehicleUsageModal } from "@/components/vehicles/usage/import-export/import-modal-vehicle-usage";
+import { generateVehicleUsageFilter } from "@/utils/ai/vehicle-usage";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -130,6 +132,33 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
+
+    const { object } = await generateVehicleUsageFilter({ input: prompt });
+
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
+
+    url.search = searchParams.toString();
+
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Reimbursement Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
+}
+
 export default function VehicleUsageIndex() {
   const {
     vehicleUsagePromise,
@@ -164,7 +193,7 @@ export default function VehicleUsageIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-        <VehicleUsageActions isEmpty={!vehicleUsagePromise} env={env} />
+        <VehicleUsageActions isEmpty={!vehicleUsagePromise} />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={vehicleUsagePromise}>

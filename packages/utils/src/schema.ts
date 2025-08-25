@@ -764,43 +764,26 @@ export const ReimbursementSchema = z.object({
   status: z.enum(reimbursementStatusArray).default("approved"),
   amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
-  employee_id: z.string(),
+  employee_id: z.string().optional(),
+  payee_id: z.string().optional(),
   company_id: z.string(),
   type: z.enum(reimbursementTypeArray).default("expenses"),
   note: z.string().optional(),
 });
 
-export const ImportReimbursementHeaderSchema = z
-  .object({
-    submitted_date: z.string().optional(),
-    employee_code: z.string(),
-    amount: z.string(),
-    email: z.string().optional(),
-    status: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      const values = [
-        data.submitted_date,
-        data.employee_code,
-        data.amount,
-        data.email,
-        data.status,
-      ].filter(Boolean);
-
-      const uniqueValues = new Set(values);
-      return uniqueValues.size === values.length;
-    },
-    {
-      message:
-        "Some fields have the same value. Please select different options.",
-      path: ["employee_code", "amount", "submitted_date", "email", "status"],
-    }
-  );
+export const ImportReimbursementHeaderSchema = z.object({
+  submitted_date: z.string().optional(),
+  employee_code: z.string().optional(),
+  payee_code: z.string().optional(),
+  amount: z.string(),
+  email: z.string().optional(),
+  status: z.string().optional(),
+});
 
 export const ImportSingleReimbursementDataSchema = z.object({
   submitted_date: z.string(),
-  employee_code: zNumberString,
+  employee_code: zNumberString.optional(),
+  payee_code: zNumberString.optional(),
   amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
     z.number()

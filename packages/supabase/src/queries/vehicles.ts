@@ -242,66 +242,6 @@ export type VehicleUsageDataType = Pick<
   };
 };
 
-export async function getVehicleUsageByVehicleId({
-  supabase,
-  vehicleId,
-  params,
-}: {
-  supabase: TypedSupabaseClient;
-  vehicleId: string;
-  params: {
-    filters?: VehicleUsageFilters | null;
-  };
-}) {
-  const { filters } = params;
-
-  const { year, recently_added } = filters ?? {};
-
-  const columns = [
-    "id",
-    "vehicle_id",
-    "month",
-    "year",
-    "kilometers",
-    "fuel_in_liters",
-    "fuel_amount",
-    "toll_amount",
-    "maintainance_amount",
-  ] as const;
-
-  const query = supabase
-    .from("vehicle_usage")
-    .select(
-      `${columns.join(",")},
-          vehicles!inner(id, registration_number,sites!inner(id,name))`,
-      { count: "exact" }
-    )
-    .eq("vehicle_id", vehicleId);
-
-  if (filters) {
-    if (year) {
-      query.eq("year", Number(year));
-    }
-    if (recently_added) {
-      const now = new Date();
-      const diff =
-        filterComparison[recently_added as keyof typeof filterComparison];
-      if (diff) {
-        const startTime = new Date(now.getTime() - diff).toISOString();
-        query.gte("created_at", startTime);
-      }
-    }
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error("getVehicleUsageByVehicleId Error", error);
-  }
-
-  return { data, error };
-}
-
 export async function getVehicleUsageByCompanyId({
   supabase,
   companyId,

@@ -3,6 +3,7 @@ import type {
   EmployeeDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
   InferredType,
+  PayeeDatabaseRow,
   ProjectDatabaseRow,
   ReimbursementRow,
   SiteDatabaseRow,
@@ -17,6 +18,8 @@ export type ImportReimbursementDataType = Pick<
   "amount" | "status" | "submitted_date"
 > & { email: UserDatabaseRow["email"] } & {
   employee_code: EmployeeDatabaseRow["employee_code"];
+} & {
+  payee_code: PayeeDatabaseRow["payee_code"];
 };
 
 export type ReimbursementDataType = Pick<
@@ -53,6 +56,8 @@ export type ReimbursementDataType = Pick<
   };
 } & {
   users: Pick<UserDatabaseRow, "id" | "email">;
+} & {
+  payee: Pick<PayeeDatabaseRow, "id" | "name" | "payee_code">;
 };
 
 export type ImportReimbursementPayrollDataType = Pick<
@@ -135,7 +140,7 @@ export async function getReimbursementsByCompanyId({
         }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${
           project ? "inner" : "left"
         }(id, name)))),
-        payee!left(id, name, payee_code, type),
+        payee!left(id, name, payee_code),
         users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" }
     )
@@ -488,19 +493,46 @@ export async function getReimbursementEntriesByInvoiceIdForInvoicePreview({
 }) {
   const columns = ["amount"] as const;
 
-  const { data, error } = await supabase
+  const { data: employeeData, error: employeeError } = await supabase
     .from("employees")
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, reimbursements!inner(${columns.join(
         ","
       )})`
     )
-    .eq("reimbursements.invoice_id", invoiceId)
-    .returns<ReimbursementPayrollEntriesWithEmployee[]>();
+    .eq("reimbursements.invoice_id", invoiceId);
 
-  if (error) {
-    console.error("getPayrollEntriesByPayrollId Error", error);
+  if (employeeError) {
+    console.error("getReimbursementEntries employeeError", employeeError);
+    return { data: null, error: employeeError };
   }
+
+  const { data: payeeData, error: payeeError } = await supabase
+    .from("payee")
+    .select(
+      `id, company_id, name, payee_code, reimbursements!inner(${columns.join(
+        ","
+      )})`
+    )
+    .eq("reimbursements.invoice_id", invoiceId);
+
+  if (payeeError) {
+    console.error("getReimbursementEntries payeeError", payeeError);
+    return { data: null, error: payeeError };
+  }
+
+  const normalizedPayees = ((payeeData as any) ?? []).map((p: any) => ({
+    id: p.id,
+    company_id: p.company_id,
+    first_name: p.name,
+    middle_name: null,
+    last_name: null,
+    employee_code: p.payee_code,
+    reimbursements: p.reimbursements,
+  }));
+
+  // Merge both sets
+  const data = [...(employeeData ?? []), ...normalizedPayees];
 
   return { data, error: null };
 }

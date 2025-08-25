@@ -2,25 +2,26 @@ import { booleanArray, exitReasonArray, z } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { GEMINI_LITE } from "./chat/constant";
+import { recentlyAddedFilter } from "@/constant";
 
 export const ExitFiltersSchema = z.object({
   name: z
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123",
+      "Full name, employee code or any identifier. Example: John Doe or EMP123"
     ),
   last_working_day_start: z
     .string()
     .optional()
     .describe(
-      "Last working day start range in YYYY-MM-DD format. Example: 1990-01-01",
+      "Last working day start range in YYYY-MM-DD format. Example: 1990-01-01"
     ),
   last_working_day_end: z
     .string()
     .optional()
     .describe(
-      "Last Working day end range in YYYY-MM-DD format. Example: 2000-12-31",
+      "Last Working day end range in YYYY-MM-DD format. Example: 2000-12-31"
     ),
   reason: z.enum(exitReasonArray).optional().describe("Reason of leaving."),
   in_invoice: z.enum(booleanArray).optional().describe("Is in any Invoice."),
@@ -33,13 +34,19 @@ export const ExitFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Start of Final settlement date range in YYYY-MM-DD. Example: 2020-01-01",
+      "Start of Final settlement date range in YYYY-MM-DD. Example: 2020-01-01"
     ),
   final_settlement_date_end: z
     .string()
     .optional()
     .describe(
-      "End of Final settlement  range in YYYY-MM-DD. Example: 2023-12-31",
+      "End of Final settlement  range in YYYY-MM-DD. Example: 2023-12-31"
+    ),
+  recently_added: z
+    .enum(recentlyAddedFilter as [string, ...string[]])
+    .optional()
+    .describe(
+      "Exits added before particular time i.e.Recently added exits. Example: 5_mins or 8_hours"
     ),
 });
 
