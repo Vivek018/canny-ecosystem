@@ -152,7 +152,7 @@ export async function action({
           if (Number(skipped) > 0) {
             return json({
               status: "success",
-              message: `Salary Payroll Created  with ${skipped} skipped entries`,
+              message: `Salary Payroll Created with ${skipped} skipped entries`,
               failedRedirect,
               error: null,
             });
