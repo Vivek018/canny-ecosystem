@@ -26,6 +26,7 @@ import {
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 import { useState, useEffect } from "react";
 
@@ -47,6 +48,7 @@ export function EmployeeGuardiansImportData({
   const [tableData, setTableData] = useState(importData.data);
   const [finalData, setFinalData] =
     useState<EmployeeBankDetailsDatabaseInsert[]>();
+  const [isImporting, setIsImporting] = useState(false);
 
   const validateImportData = (data: any[]) => {
     try {
@@ -127,11 +129,14 @@ export function EmployeeGuardiansImportData({
 
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
+      setIsImporting(true);
       const { error, status } = await createEmployeeGuardiansFromImportedData({
         data: finalData as EmployeeBankDetailsDatabaseInsert[],
         import_type: importType,
         supabase,
       });
+
+      setIsImporting(false);
 
       if (error) {
         toast({
@@ -155,7 +160,10 @@ export function EmployeeGuardiansImportData({
   };
 
   return (
-    <section className="p-4">
+    <section className="p-4 relative">
+      <div className={cn("fixed inset-0 z-50 bg-background/80", isImporting ? "block" : "hidden")}>
+        <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
+      </div>
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full  flex justify-between items-center">
           <div className="relative w-[30rem] ">

@@ -16,8 +16,10 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { calculateSalaryTotalNetAmount } from "@canny_ecosystem/utils";
 
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, useActionData, useNavigate } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function action({
   request,
@@ -177,8 +179,8 @@ export async function action({
           salaryEntryData: transformedSalaryEntries,
           totalEmployees: salaryImportData.length,
           totalNetAmount,
-          month: Number(salaryImportData[0].month),
-          year: Number(salaryImportData[0].year),
+          month: Number(salaryImportData[0]?.month),
+          year: Number(salaryImportData[0]?.year),
           run_date: salaryImportData[0].run_date,
           payrollFieldsData:
             payrollFields as unknown as PayrollFieldsDatabaseRow[],
@@ -462,7 +464,11 @@ export default function CreatePayroll() {
         navigate(actionData?.failedRedirect ?? DEFAULT_ROUTE);
       }
     }
-  }, [actionData]);
+  }, [actionData, navigate, toast]);
 
-  return null;
+  return (
+    <div className="fixed inset-0 z-50 bg-background/80">
+      <LoadingSpinner className="absolute top-1/2 -translate-y-1/2 m-0" />
+    </div>
+  );
 }

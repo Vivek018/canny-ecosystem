@@ -9,6 +9,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { useNavigate } from "@remix-run/react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 import { useState, useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
@@ -18,6 +19,7 @@ import { ImportedDataColumns } from "../imported-attendance-table/columns";
 import { createEmployeeAttendanceImportedData } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus } from "@canny_ecosystem/utils";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
+  const [isImporting, setIsImporting] = useState(false);
 
   useEffect(() => {
     const filteredData = importData?.data.filter((item) =>
@@ -40,6 +43,7 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
   }, [searchString, importData]);
 
   const handleFinalImport = async () => {
+    setIsImporting(true);
     const employeeCodes = importData.data!.map((value) => value.employee_code);
     const { data: employees, error: codeError } =
       await getEmployeeIdsByEmployeeCodes({
@@ -64,6 +68,8 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
       supabase,
     });
 
+    setIsImporting(false);
+
     if (error) {
       toast({
         title: "Error",
@@ -86,7 +92,10 @@ export function EmployeeAttendanceImportData({ env }: { env: SupabaseEnv }) {
   };
 
   return (
-    <section className="p-4">
+    <section className="p-4 relative">
+      <div className={cn("fixed inset-0 z-50 bg-background/80", isImporting ? "block" : "hidden")}>
+        <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
+      </div>
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full  flex justify-between items-center">
           <div className="relative w-[30rem] ">

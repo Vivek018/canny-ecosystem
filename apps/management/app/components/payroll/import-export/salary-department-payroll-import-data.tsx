@@ -9,7 +9,11 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSubmit } from "@remix-run/react";
+import { useNavigation } from "@remix-run/react";
+import { LoadingSpinner } from "@/components/loading-spinner";
+
 import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../salary-imported-table/imported-data-table";
 import { ImportedDataColumns } from "../salary-imported-table/columns";
@@ -25,12 +29,14 @@ export function SalaryDepartmentPayrollImportData({
   fieldConfigs: FieldConfig[];
 }) {
   const submit = useSubmit();
+  const navigation = useNavigation();
 
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForSalaryPayroll();
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
+  const [isImporting, setIsImporting] = useState(false);
 
   useEffect(() => {
     const filteredData = importData?.data.filter((item) =>
@@ -42,6 +48,14 @@ export function SalaryDepartmentPayrollImportData({
     );
     setTableData(filteredData);
   }, [searchString, importData]);
+
+  useEffect(() => {
+    if (navigation.state === "submitting" && navigation.formData?.get("type") === "salary-import") {
+      setIsImporting(true);
+    } else if (navigation.state === "idle" && isImporting) {
+      setIsImporting(false);
+    }
+  }, [navigation.state, navigation.formData, isImporting]);
 
   const handleFinalImport = async () => {
     const importEntries = importData.data! as any[];
@@ -138,7 +152,10 @@ export function SalaryDepartmentPayrollImportData({
   };
 
   return (
-    <section className="px-4">
+    <section className="px-4 relative">
+      <div className={cn("fixed inset-0 z-50 bg-background/80", isImporting ? "block" : "hidden")}>
+        <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
+      </div>
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full  flex justify-between items-center">
           <div className="relative w-[30rem] ">
@@ -157,7 +174,7 @@ export function SalaryDepartmentPayrollImportData({
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button variant={"default"} onClick={handleFinalImport}>
+            <Button variant={"default"} onClick={handleFinalImport} disabled={isImporting}>
               Import
             </Button>
           </div>
