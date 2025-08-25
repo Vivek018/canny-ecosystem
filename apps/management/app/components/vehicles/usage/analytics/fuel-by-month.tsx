@@ -41,7 +41,7 @@ export function FuelByMonth({
                   <div className="rounded-lg bg-background p-2 shadow-sm">
                     <div className="grid grid-cols-2 gap-2">
                       <span className="font-medium">{data.month}:</span>
-                      <span>{data.value.toLocaleString()} km</span>
+                      <span>{data.value.toLocaleString()}</span>
                     </div>
                   </div>
                 );
