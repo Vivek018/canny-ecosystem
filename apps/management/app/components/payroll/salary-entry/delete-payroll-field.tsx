@@ -22,9 +22,11 @@ import { useState } from "react";
 export const DeletePayrollField = ({
   id,
   payrollId,
+  editable,
 }: {
   id: string;
   payrollId: string;
+  editable: boolean;
 }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
@@ -39,7 +41,7 @@ export const DeletePayrollField = ({
   };
 
   const handleDeletePayrollField = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -50,7 +52,7 @@ export const DeletePayrollField = ({
         {
           method: "POST",
           action: `/payroll/run-payroll/${payrollId}/delete-payroll-fields`,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -67,7 +69,9 @@ export const DeletePayrollField = ({
             className: "mr-auto",
           }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "flex",
+          hasPermission(role, `${deleteRole}:${attribute.payroll}`) &&
+            editable &&
+            "flex"
         )}
       >
         Delete Payroll Field

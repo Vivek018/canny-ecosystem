@@ -25,7 +25,10 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
+import {
+  getEmployeeBankDetailsById,
+  getPayeeBankDetailsById,
+} from "@canny_ecosystem/supabase/queries";
 import { CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER } from "@/constant";
 
 export const prepareBankAdviceWorkbook = async ({
@@ -37,13 +40,20 @@ export const prepareBankAdviceWorkbook = async ({
 }) => {
   const date = new Date();
   const bankDetailsResults = await Promise.all(
-    data.map(({ employee_id }) =>
-      getEmployeeBankDetailsById({ id: employee_id, supabase }),
-    ),
+    data.map(async ({ employee_id, payee_id }) => {
+      if (employee_id) {
+        return getEmployeeBankDetailsById({ id: employee_id, supabase });
+      }
+      if (payee_id) {
+        return getPayeeBankDetailsById({ id: payee_id, supabase });
+      }
+      return null;
+    })
   );
+
   const dateToBeSent = formatDate(date)
     ?.toString()!
-    .replace(/([A-Za-z]{3})/, (match) => match.toUpperCase())
+    .replace(/([A-Za-z]{3})/, (match: any) => match.toUpperCase())
     .replaceAll(" ", "-");
 
   const updatedData = data.map((entry, index) => ({

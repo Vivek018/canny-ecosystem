@@ -47,6 +47,7 @@ export const PLACEHOLDERS = [
   "Non-invoice exits due to personal reasons",
   "Employees exited in 2020 from Project 'XYZ'",
   "Last working day between 2021 and 2022 for Site 'ABC'",
+  "Exits created in last 4 hours",
 ];
 
 export function ExitsSearchFilter({
@@ -115,7 +116,7 @@ export function ExitsSearchFilter({
     last_working_day_start: searchParams.get("last_working_day_start"),
     last_working_day_end: searchParams.get("last_working_day_end"),
     final_settlement_date_start: searchParams.get(
-      "final_settlement_date_start",
+      "final_settlement_date_start"
     ),
     final_settlement_date_end: searchParams.get("final_settlement_date_end"),
     reason: searchParams.get("reason"),
@@ -143,7 +144,7 @@ export function ExitsSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -178,7 +179,7 @@ export function ExitsSearchFilter({
         {
           action: "/approvals/exits?index",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -190,7 +191,7 @@ export function ExitsSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -207,7 +208,7 @@ export function ExitsSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -240,7 +241,7 @@ export function ExitsSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />

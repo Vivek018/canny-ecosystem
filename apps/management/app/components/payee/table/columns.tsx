@@ -13,6 +13,7 @@ import type { PayeeDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export type PayeeType = {
   id: PayeeDatabaseRow["id"] | string;
@@ -31,6 +32,17 @@ export type PayeeType = {
 };
 
 export const columns: ColumnDef<PayeeType>[] = [
+  {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "payee_code",
     header: "Payee Code",

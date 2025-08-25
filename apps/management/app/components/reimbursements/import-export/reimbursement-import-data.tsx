@@ -3,6 +3,7 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { createReimbursementsFromImportedData } from "@canny_ecosystem/supabase/mutations";
 import {
   getEmployeeIdsByEmployeeCodes,
+  getPayeeIdsByPayeeCodes,
   getUserIdsByUserEmails,
 } from "@canny_ecosystem/supabase/queries";
 import type {
@@ -28,9 +29,11 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 export function ReimbursementImportData({
   env,
   companyId,
+  ofWhich,
 }: {
   env: SupabaseEnv;
   companyId: string;
+  ofWhich: "employee" | "payee";
 }) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -60,49 +63,86 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
 
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
+      let ids = [] as any;
+
+      if (ofWhich === "employee") {
+        const employeeCodes = importData.data!.map(
+          (value) => value.employee_code
+        );
+
+        const { data: employees, error: codeError } =
+          await getEmployeeIdsByEmployeeCodes({
+            supabase,
+            employeeCodes,
+          });
+
+        if (codeError) throw codeError;
+        ids = employees;
+      }
+
+      if (ofWhich === "payee") {
+        const payeeCodes = importData.data!.map((value) => value.payee_code);
+
+        const { data: payees, error: codeError } =
+          await getPayeeIdsByPayeeCodes({
+            supabase,
+            payeeCodes,
+          });
+
+        if (codeError) throw codeError;
+        ids = payees;
+      }
+
       const userEmails = importData.data!.map((value) => value.email!);
-      const employeeCodes = importData.data!.map(
-        (value) => value.employee_code,
-      );
 
-      const { data: employees, error: codeError } =
-        await getEmployeeIdsByEmployeeCodes({
-          supabase,
-          employeeCodes,
-        });
-
-      if (codeError) throw codeError;
       const { data: users, error: userError } = await getUserIdsByUserEmails({
         supabase,
         userEmails,
       });
-
       if (userError) throw userError;
 
-      const updatedData = importData.data!.map((item: any) => {
-        const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code,
-        )?.id;
-        const userId = users?.find((u) => u.email === item.email)?.id;
+      let updatedData: any;
+      if (ofWhich === "employee") {
+        updatedData = importData.data!.map((item: any) => {
+          const employeeId = ids?.find(
+            (e: any) => e.employee_code === item.employee_code
+          )?.id;
+          const userId = users?.find((u) => u.email === item.email)?.id;
+          const { email, employee_code, ...rest } = item;
 
-        const { email, employee_code, ...rest } = item;
+          return {
+            ...rest,
+            ...(employeeId ? { employee_id: employeeId } : {}),
+            ...(userId ? { user_id: userId } : { user_id: null }),
+            company_id: companyId,
+          };
+        });
+      }
+      if (ofWhich === "payee") {
+        updatedData = importData.data!.map((item: any) => {
+          const payeeIds = ids?.find(
+            (e: any) => e.payee_code === item.payee_code
+          )?.id;
+          const userId = users?.find((u) => u.email === item.email)?.id;
 
-        return {
-          ...rest,
-          ...(employeeId ? { employee_id: employeeId } : {}),
-          ...(userId ? { user_id: userId } : {}),
-          company_id: companyId,
-        };
-      });
+          const { email, payee_code, ...rest } = item;
 
+          return {
+            ...rest,
+            ...(payeeIds ? { payee_id: payeeIds } : {}),
+            ...(userId ? { user_id: userId } : { user_id: null }),
+            company_id: companyId,
+          };
+        });
+      }
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],
         supabase,
@@ -123,7 +163,7 @@ export function ReimbursementImportData({
         });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         navigate(
-          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`,
+          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
         );
       }
     }

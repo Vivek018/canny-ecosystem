@@ -49,6 +49,7 @@ export const PLACEHOLDERS = [
   "Leaves from Site 'ABC' for the year 2023",
   "Emergency leaves taken by employees in March 2022",
   "Leaves from EMP1001 in year 2021 for Site 'XYZ'",
+  "Leaves created in last 2 hours",
 ];
 
 export function LeavesSearchFilter({
@@ -147,7 +148,7 @@ export function LeavesSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -182,7 +183,7 @@ export function LeavesSearchFilter({
         {
           action: "/time-tracking/leaves",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -194,7 +195,7 @@ export function LeavesSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -211,7 +212,7 @@ export function LeavesSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -244,7 +245,7 @@ export function LeavesSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />

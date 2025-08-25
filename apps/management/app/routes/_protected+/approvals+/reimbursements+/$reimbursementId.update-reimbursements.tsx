@@ -27,6 +27,7 @@ import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import AddReimbursements from "../../employees+/$employeeId+/reimbursements+/add-reimbursement";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import AddReimbursementsFromPayee from "../../settings+/payee+/$payeeId.create-reimbursements";
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update_Reimbursement";
 
@@ -82,7 +83,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -150,7 +151,12 @@ export default function UpdateReimbursements() {
     }
   }, [actionData]);
 
-  return (
+  return updatableData?.payee_id ? (
+    <AddReimbursementsFromPayee
+      updateValues={updatableData}
+      userOptionsFromUpdate={userOptions}
+    />
+  ) : (
     <AddReimbursements
       updateValues={updatableData}
       userOptionsFromUpdate={userOptions}

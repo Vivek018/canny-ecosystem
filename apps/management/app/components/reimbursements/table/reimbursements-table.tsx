@@ -62,7 +62,7 @@ export function ReimbursementsTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useReimbursementStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreEmployees = async () => {
@@ -174,7 +174,7 @@ export function ReimbursementsTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
@@ -214,7 +214,7 @@ export function ReimbursementsTable<TData, TValue>({
                     }}
                     className={cn(
                       "absolute flex cursor-default select-text",
-                      row.original?.invoice_id && "bg-primary/20",
+                      row.original?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -225,18 +225,18 @@ export function ReimbursementsTable<TData, TValue>({
                             "px-3 md:px-4 py-4 min-w-32 max-w-32 hidden md:table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                            cell.column.id === "employee_code" &&
-                              "sticky left-12 min-w-32 max-w-32 bg-card z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-44 min-w-48 max-w-48 bg-card z-10",
+                              "sticky left-12 min-w-48 max-w-48 bg-card z-10",
+                            cell.column.id === "employee_code" &&
+                              "sticky left-60 min-w-32 max-w-32 bg-card z-10",
                             cell.column.id === "email" && " min-w-60 max-w-",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -255,7 +255,7 @@ export function ReimbursementsTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -264,7 +264,7 @@ export function ReimbursementsTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();
