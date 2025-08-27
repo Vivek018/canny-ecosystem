@@ -248,7 +248,7 @@ export async function getMonthlyAttendanceByCompanyId({
   const effectiveMonth = month ? Number(months[month]) : defaultMonth;
   const effectiveYear = year ? Number(year) : defaultYear;
 
-  if (!filters) {
+  if (filters) {
     query = query
       .eq("monthly_attendance.month", effectiveMonth)
       .eq("monthly_attendance.year", effectiveYear);

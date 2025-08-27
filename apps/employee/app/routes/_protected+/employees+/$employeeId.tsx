@@ -21,11 +21,18 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
   const cookieEmployeeId = await getEmployeeIdFromCookie(request);
 
-  if (!(cookieEmployeeId || user?.role === "supervisor")) {
+  if (
+    !(
+      cookieEmployeeId ||
+      user?.role === "supervisor" ||
+      user?.role === "location_incharge"
+    )
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -71,7 +78,7 @@ export default function Employee() {
               to="/employees"
               className={cn(
                 buttonVariants({ variant: "outline" }),
-                "bg-card w-9 h-9 px-0 rounded-full",
+                "bg-card w-9 h-9 px-0 rounded-full"
               )}
             >
               <Icon name="chevron-left" size="sm" />

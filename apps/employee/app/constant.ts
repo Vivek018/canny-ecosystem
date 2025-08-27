@@ -1,3 +1,5 @@
+import type{ NavList } from "@canny_ecosystem/types";
+
 export const DEFAULT_ROUTE = "/";
 
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
@@ -42,6 +44,19 @@ export const cacheKeyPrefix = {
   employee_leaves: "employee-leaves",
   employee_salary: "employee-salary",
   employee_document: "employee-document",
+  approvals: "approvals",
+  exits: "exits",
+  reimbursements: "reimbursements",
+  dashboard: "dashboard",
+  payroll: "payroll",
+  payroll_history: "payroll-history",
+  payroll_history_id: "payroll-history-id",
+  payroll_invoice: "payroll-invoice",
+  time_tracking: "time-tracking",
+  vehicles_main: "vehicle-main",
+  vehicles: "vehicles",
+  vehicle_overview: "vehcile_overview",
+  vehicle_usage: "vehicle_usage",
 };
 
 export function numberToWordsIndian(num: number) {
@@ -113,7 +128,7 @@ export function numberToWordsIndian(num: number) {
       if (remainder > 0) {
         const groupName = i > 0 ? units[i] : ""; // Add lakh, crore, etc.
         parts.unshift(
-          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
         );
       }
       n = Math.floor(n / (i === 0 ? 1000 : 100)); // Reduce the number based on the group
@@ -133,7 +148,7 @@ export function numberToWordsIndian(num: number) {
   // Split integer and decimal parts
   const [integerPart, decimalPart] = num.toString().split(".");
   const integerWords = convertIntegerToWordsIndian(
-    Number.parseInt(integerPart, 10),
+    Number.parseInt(integerPart, 10)
   );
   const decimalWords = decimalPart
     ? `point ${convertDecimalPart(decimalPart)}`
@@ -141,3 +156,23 @@ export function numberToWordsIndian(num: number) {
 
   return `${integerWords}${decimalPart ? ` ${decimalWords}` : ""}`;
 }
+
+export const sideNavList = [
+  { name: "Dashboard", link: "/dashboard", icon: "dashboard" },
+  { name: "Group 1" },
+  { name: "Employees", link: "/employees", icon: "employee" },
+  { name: "Vehicles", link: "/vehicles", icon: "rocket" },
+  { name: "Group 2" },
+  {
+    name: "Payment",
+    link: "/payroll",
+    icon: "table",
+  },
+  { name: "Approvals", link: "/approvals", icon: "check-circle" },
+  { name: "Group 3" },
+  {
+    name: "Time Tracking",
+    link: "/time-tracking",
+    icon: "lab-timer",
+  },
+] as NavList[];

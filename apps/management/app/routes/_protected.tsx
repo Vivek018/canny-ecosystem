@@ -24,7 +24,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (user?.role === "supervisor") return redirect("/no-user-found");
+  if (user?.role === "supervisor" || user?.role === "location_incharge")
+    return redirect("/no-user-found");
 
   if (!sessionUser?.email) return redirect("/login");
 
@@ -62,7 +63,7 @@ export default function ProtectedRoute() {
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   return (

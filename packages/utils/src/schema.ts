@@ -36,7 +36,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after.",
+    "Must contain a dot with at least one character before and two after."
   );
 
 export const SIZE_1KB = 1 * 1024; //1KB
@@ -54,21 +54,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB",
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported.",
+    "Only .jpg, .jpeg, .png and .webp formats are supported."
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_10MB : true),
-    "File size must be less than 10MB",
+    "File size must be less than 10MB"
   )
   .refine(
     (file) =>
@@ -86,7 +86,7 @@ export const zFile = z
             "multipart/x-zip",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .zip formats are supported.",
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .zip formats are supported."
   );
 
 export const booleanArray = ["true", "false"] as const;
@@ -477,7 +477,7 @@ export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
   {
     message: `When payment type is "variable", calculation type must be "fixed".`,
     path: ["calculation_type"],
-  },
+  }
 );
 
 export const deductionCycleArray = [
@@ -621,6 +621,7 @@ export const userRoles = [
   "operation_manager",
   "executive",
   "supervisor",
+  "location_incharge",
 ] as const;
 
 export const UserSchema = z.object({
@@ -634,6 +635,7 @@ export const UserSchema = z.object({
   company_id: z.string(),
   role: z.enum(userRoles),
   site_id: z.string().optional(),
+  location_id: z.string().optional(),
 });
 
 // Exits
@@ -700,7 +702,7 @@ export const PaymentTemplateComponentsSchema = z.object({
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),
-    }),
+    })
   ),
 });
 
@@ -786,7 +788,7 @@ export const ImportSingleReimbursementDataSchema = z.object({
   payee_code: zNumberString.optional(),
   amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   email: zEmail.optional(),
   status: z.enum(reimbursementStatusArray),
@@ -851,7 +853,7 @@ export const ImportEmployeeDetailsHeaderSchema =
         "primary_mobile_number",
         "secondary_mobile_number",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeDetailsDataSchema = z.object({
@@ -867,7 +869,7 @@ export const ImportSingleEmployeeDetailsDataSchema = z.object({
     .preprocess(
       (value) =>
         typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false),
+      z.boolean().default(false)
     )
     .default(false),
   primary_mobile_number: z.preprocess((value) => {
@@ -932,7 +934,7 @@ export const ImportEmployeeStatutoryHeaderSchema =
         "passport_number",
         "passport_expiry",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeStatutoryDataSchema = z.object({
@@ -940,14 +942,14 @@ export const ImportSingleEmployeeStatutoryDataSchema = z.object({
   aadhaar_number: zNumber.min(12).max(12).optional(),
   pan_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).optional(),
+    z.string().max(10).optional()
   ),
   uan_number: zNumberString.max(12).optional(),
   pf_number: zNumberString.max(22).optional(),
   esic_number: zNumberString.max(20).optional(),
   driving_license_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(20).optional(),
+    z.string().max(20).optional()
   ),
   driving_license_expiry: z.string().optional(),
   passport_number: zNumberString.max(20).optional(),
@@ -996,7 +998,7 @@ export const ImportEmployeeBankDetailsHeaderSchema =
         "bank_name",
         "branch_name",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
@@ -1063,7 +1065,7 @@ export const ImportEmployeeAddressHeaderSchema =
         "longitude",
         "is_primary",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeAddressDataSchema = z.object({
@@ -1072,7 +1074,7 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   is_primary: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false),
+    z.boolean().default(false)
   ),
   address_line_1: z
     .string()
@@ -1088,11 +1090,11 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   pincode: zNumber.min(6).max(6).optional(),
   latitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(180).min(-180).optional(),
+    z.string().max(180).min(-180).optional()
   ),
   longitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(180).min(-180).optional(),
+    z.string().max(180).min(-180).optional()
   ),
 });
 
@@ -1149,7 +1151,7 @@ export const ImportEmployeeGuardiansHeaderSchema =
         "is_emergency_contact",
         "address_same_as_employee",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeGuardiansDataSchema = z.object({
@@ -1162,20 +1164,20 @@ export const ImportSingleEmployeeGuardiansDataSchema = z.object({
   is_emergency_contact: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false),
+    z.boolean().default(false)
   ),
   address_same_as_employee: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false),
+    z.boolean().default(false)
   ),
   mobile_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).min(10).optional(),
+    z.string().max(10).min(10).optional()
   ),
   alternate_mobile_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).min(10).optional(),
+    z.string().max(10).min(10).optional()
   ),
   email: zEmail.optional(),
 });
@@ -1227,7 +1229,7 @@ export const ImportEmployeeProjectAssignmentsHeaderSchema =
         "probation_period",
         "probation_end_date",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeProjectAssignmentsDataSchema = z.object({
@@ -1243,7 +1245,7 @@ export const ImportSingleEmployeeProjectAssignmentsDataSchema = z.object({
     .preprocess(
       (value) =>
         typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false),
+      z.boolean().default(false)
     )
     .default(false),
 });
@@ -1343,7 +1345,7 @@ export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
       "deduction",
       "note",
     ],
-  },
+  }
 );
 
 export const ImportSingleExitDataSchema = z.object({
@@ -1352,28 +1354,28 @@ export const ImportSingleExitDataSchema = z.object({
   reason: z.string(),
   final_settlement_date: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   payable_days: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
 
   bonus: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   leave_encashment: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   gratuity: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   deduction: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   note: z.string().optional(),
 });
@@ -1449,7 +1451,7 @@ export const ImportEmployeeAttendanceHeaderSchema =
         "paid_leaves",
         "casual_leaves",
       ],
-    },
+    }
   );
 
 export const ImportSingleEmployeeAttendanceDataSchema = z.object({
@@ -1723,7 +1725,7 @@ export const ImportLeavesHeaderSchema = z
         "leave_type",
         "email",
       ],
-    },
+    }
   );
 
 export const ImportSingleLeavesDataSchema = z.object({
@@ -1756,7 +1758,7 @@ export const ImportReimbursementPayrollHeaderSchema =
       message:
         "Some fields have the same value. Please select different options.",
       path: ["employee_code", "amount"],
-    },
+    }
   );
 
 export const ImportSingleReimbursementPayrollDataSchema = z.object({
@@ -1804,7 +1806,7 @@ export const ImportExitPayrollHeaderSchema =
         "leave_encashment",
         "deduction",
       ],
-    },
+    }
   );
 
 export const ImportSingleExitPayrollDataSchema = z.object({
@@ -1849,7 +1851,7 @@ export const ImportSalaryPayrollHeaderSchema =
       message:
         "Some fields have the same value. Please select different options.",
       path: ["employee_code", "present_days"],
-    },
+    }
   );
 
 export const ImportSingleSalaryPayrollDataSchema = z.object({
@@ -1877,7 +1879,7 @@ export const InvoiceSchema = z.object({
   subject: z
     .string()
     .default(
-      "Providing Manpower on Labour contract basis at your _____ Office for Month of _________",
+      "Providing Manpower on Labour contract basis at your _____ Office for Month of _________"
     ),
   company_address_id: z.string(),
   type: z.enum(["salary", "exit", "reimbursement"]),
@@ -2014,38 +2016,38 @@ export const ImportVehicleUsageHeaderSchema = z
         "toll_amount",
         "maintainance_amount",
       ],
-    },
+    }
   );
 
 export const ImportSingleVehicleUsageDataSchema = z.object({
   registration_number: zNumberString,
   month: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   year: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   kilometers: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   fuel_in_liters: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   fuel_amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   toll_amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
   maintainance_amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number(),
+    z.number()
   ),
 });
 

@@ -1,7 +1,3 @@
-import { FilterList } from "@/components/reimbursements/filter-list";
-import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
-import { columns } from "@/components/reimbursements/table/columns";
-import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
@@ -26,6 +22,10 @@ import { Suspense } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
+import { FilterList } from "@/components/reimbursements/filter-list";
+import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
+import { columns } from "@/components/reimbursements/table/columns";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const env = {
@@ -56,7 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const usersPromise = getUsersEmail({ supabase, companyId });
@@ -103,7 +103,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.employee_reimbursements}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -152,7 +152,7 @@ export default function ReimbursementsIndex() {
                 {({ data, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
+                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
                     );
                     toast({
                       variant: "destructive",

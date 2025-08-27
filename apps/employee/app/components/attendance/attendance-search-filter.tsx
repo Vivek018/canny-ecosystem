@@ -1,0 +1,403 @@
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@canny_ecosystem/ui/dropdown-menu";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { Input } from "@canny_ecosystem/ui/input";
+import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import {
+  type SubmitOptions,
+  useNavigation,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
+import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
+import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+import { months } from "@canny_ecosystem/utils/constant";
+import {
+  defaultYear,
+  getYears,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+import { recentlyAddedFilter } from "@/constant";
+
+export const PLACEHOLDERS = [
+  "Attendance records for March 2024 at Site 'ABC'",
+  "Attendance of employees for Project 'ABC' in 2023",
+  "Monthly attendance for Site 'XYZ' in January",
+  "Year 2022 attendance across all sites",
+  "Attendance in June 2020 for Project 'XYZ'",
+  "Project 'Delta' site-wise attendance in July 2021",
+  "Employees attendance for December 2023 at Site 'ABC'",
+  "Attendance of EMP123 in April 2022",
+  "Project 'Beta' attendance for the year 2021",
+  "Attendance data for Site 'ABC' in August 2020",
+  "Employees who worked at Site 'ABC' in October 2019",
+  "Annual attendance report for Project 'XYZ' in 2020",
+  "Attendance in November 2022 for Site 'XYZ'",
+  "March 2021 attendance of employees in payroll",
+  "Attendance created in last 8 hours",
+];
+
+export function AttendanceSearchFilter({
+  disabled,
+  projectArray,
+  siteArray,
+}: {
+  disabled?: boolean;
+  projectArray: string[];
+  siteArray: string[];
+}) {
+  const [prompt, setPrompt] = useState("");
+  const navigation = useNavigation();
+  const isSubmitting =
+    navigation.state === "submitting" ||
+    (navigation.state === "loading" &&
+      navigation.location.pathname === "/time-tracting/attendance" &&
+      navigation.location.search.length);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialFilterParams: AttendanceFilters = {
+    month: "",
+    year: "",
+    project: "",
+    site: "",
+    recently_added: "",
+  };
+
+  const [filterParams, setFilterParams] = useState(initialFilterParams);
+
+  const submit = useSubmit();
+  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
+    submit(target, options);
+  }, 300);
+
+  const deleteAllSearchParams = () => {
+    for (const [key, _val] of Object.entries(filterParams)) {
+      searchParams.delete(key);
+    }
+    searchParams.delete("name");
+    setSearchParams(searchParams);
+  };
+
+  useEffect(() => {
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.set(key, value);
+      }
+      setSearchParams(searchParams);
+    }
+  }, [filterParams]);
+
+  const searchParamsList: AttendanceFilters = {
+    month: searchParams.get("month"),
+    year: searchParams.get("year"),
+    project: searchParams.get("project"),
+    site: searchParams.get("site"),
+    recently_added: searchParams.get("recently_added"),
+  };
+
+  useEffect(() => {
+    for (const [key, value] of Object.entries(searchParamsList)) {
+      if (value === null || value === undefined || !String(value)?.length) {
+        setFilterParams((prev) => ({ ...prev, [key]: "" }));
+      }
+    }
+  }, [searchParams]);
+
+  useHotkeys(
+    "esc",
+    () => {
+      setPrompt("");
+      deleteAllSearchParams();
+      setFilterParams(initialFilterParams);
+      setIsOpen(false);
+    },
+    {
+      enableOnFormTags: true,
+    }
+  );
+
+  useHotkeys(["meta+s", "ctrl+s"], (evt) => {
+    if (!disabled) {
+      evt.preventDefault();
+      inputRef.current?.focus();
+    }
+  });
+
+  useHotkeys(["meta+f", "ctrl+f"], (evt) => {
+    if (!disabled) {
+      evt.preventDefault();
+      setIsOpen((prev) => !prev);
+    }
+  });
+
+  const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    const value = evt.target.value;
+    if (value) {
+      setPrompt(value);
+    } else {
+      deleteAllSearchParams();
+      setFilterParams(initialFilterParams);
+      setPrompt("");
+    }
+  };
+
+  const handleSubmit = () => {
+    if (prompt.split(" ").length > 1) {
+      debounceSubmit(
+        { prompt: prompt },
+        {
+          action: "/time-tracking/attendance?index",
+          method: "POST",
+        }
+      );
+    } else {
+      if (prompt.length) {
+        searchParams.set("name", prompt);
+        setSearchParams(searchParams);
+      }
+    }
+  };
+
+  const hasValidFilters =
+    Object.entries(filterParams).filter(
+      ([key, value]) => value?.length && key !== "name"
+    ).length > 0;
+
+  return (
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <div className="flex space-x-4 w-full md:w-auto items-center">
+        <form
+          className="relative w-full md:w-auto"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
+          <Icon
+            name={isSubmitting ? "update" : "search"}
+            className={cn(
+              "absolute pointer-events-none left-3 top-[12.5px]",
+              isSubmitting && "animate-spin"
+            )}
+          />
+          <Input
+            tabIndex={-1}
+            ref={inputRef}
+            placeholder={
+              disabled
+                ? "No Attendance Data to Search And Filter"
+                : animatedPlaceholder
+            }
+            disabled={disabled}
+            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            value={prompt}
+            onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            autoComplete="on"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
+          />
+
+          <DropdownMenuTrigger disabled={disabled} asChild>
+            <button
+              onClick={() => setIsOpen((prev) => !prev)}
+              type="button"
+              disabled={disabled}
+              className={cn(
+                "absolute z-10 right-3 top-[6px] opacity-70",
+                !disabled &&
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                hasValidFilters && "opacity-100",
+                isOpen && "opacity-100"
+              )}
+            >
+              <Icon name="mixer" />
+            </button>
+          </DropdownMenuTrigger>
+        </form>
+      </div>
+
+      <DropdownMenuContent
+        className="w-full md:w-[480px]"
+        align="end"
+        sideOffset={19}
+        alignOffset={-11}
+      >
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {projectArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.project === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        project: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Site</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {siteArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Year</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {getYears(25, defaultYear).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.year === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        year: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Month</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {Object.keys(months).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.month === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        month: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Recently Added</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {recentlyAddedFilter.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.recently_added === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        recently_added: name,
+                      }));
+                    }}
+                  >
+                    {replaceUnderscore(name)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

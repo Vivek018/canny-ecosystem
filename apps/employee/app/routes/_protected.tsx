@@ -22,6 +22,7 @@ import { ThemeSwitch } from "@/components/theme-switch";
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState } from "react";
+import { Sidebar } from "@/components/sidebar";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -46,10 +47,9 @@ clientLoader.hydrate = true;
 export default function ProtectedRoute() {
   const { user, employeeId } = useLoaderData<typeof loader>();
   const requestInfo = useRequestInfo();
-  const { pathname } = useLocation();
   const [isLoading, setLoading] = useState(false);
   const submit = useSubmit();
-
+  const { pathname } = useLocation();
   const handleLogout = () => {
     setLoading(true);
     clearAllCache();
@@ -59,16 +59,17 @@ export default function ProtectedRoute() {
 
   return (
     <>
-      <header className="flex justify-between items-center p-4">
+      {user?.role === "location_incharge" && <Sidebar className="flex-none" />}
+      <header className="flex justify-between items-center border border-b-muted px-4 py-[11px]">
         <div className="flex items-center justify-center gap-2">
-          {user && (
+          {user?.role === "supervisor" && (
             <Link
               prefetch="intent"
               to="/employees"
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "bg-card w-12 h-12 px-0 rounded-full md:hidden",
-                pathname === "/employees" && "hidden",
+                pathname === "/employees" && "hidden"
               )}
             >
               <Icon name="chevron-left" size="sm" />
@@ -83,7 +84,7 @@ export default function ProtectedRoute() {
           <Button
             className={cn(
               "h-12 rounded-full",
-              !(employeeId || user) && "hidden",
+              !(employeeId || user) && "hidden"
             )}
             variant="outline"
             onClick={handleLogout}
@@ -92,7 +93,14 @@ export default function ProtectedRoute() {
           </Button>
         </div>
       </header>
-      <Outlet />
+      <div
+        className={cn(
+          "flex-1 min-h-0  overflow-scroll",
+          user?.role === "location_incharge" && "pl-20"
+        )}
+      >
+        <Outlet />
+      </div>
     </>
   );
 }

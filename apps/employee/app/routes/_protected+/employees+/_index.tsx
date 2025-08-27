@@ -8,7 +8,8 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { getEmployeeIdFromCookie } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
-  getEmployeesBySiteId,
+  getEmployeesBySiteIds,
+  getSitesByLocationId,
   getUserByEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -38,15 +39,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 
     const { data: userProfile, error: userProfileError } = await getUserByEmail(
-      { email: user?.email || "", supabase },
+      { email: user?.email || "", supabase }
     );
+
+    if (user?.role === "supervisor" && !userProfile?.site_id)
+      throw new Error("No site id found");
+    if (user?.role === "location_incharge" && !userProfile?.location_id)
+      throw new Error("No location id found");
+
     if (userProfileError) throw userProfileError;
 
-    if (!userProfile?.site_id) throw new Error("No site id found");
-
-    const employeesPromise = getEmployeesBySiteId({
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      siteId: userProfile?.site_id || "",
+    });
+
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+
+    const employeesPromise = getEmployeesBySiteIds({
+      supabase,
+      siteIds:
+        userProfile?.role === "supervisor"
+          ? [userProfile!.site_id!]
+          : siteIdsArray,
     });
 
     return defer({
@@ -85,7 +100,7 @@ export default function EmployeesIndex() {
   }, [error]);
 
   return (
-    <section className="p-4 w-full border-t">
+    <section className="p-4 w-full">
       <Suspense fallback={<div className="h-1/3" />}>
         <Await resolve={employeesPromise}>
           {({ data: backendData, error }) => {
@@ -104,7 +119,7 @@ export default function EmployeesIndex() {
 
             useEffect(() => {
               const filteredData = backendData?.filter((item) =>
-                searchInObject(item, searchString),
+                searchInObject(item, searchString)
               ) as any;
               setData(filteredData);
             }, [searchString, backendData]);

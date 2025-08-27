@@ -21,13 +21,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
   const employeeId = await getEmployeeIdFromCookie(request);
 
-  if (user?.role && user?.role !== "supervisor") {
-    return safeRedirect("/no-user-found", { headers });
-  }
-
   if (!(user || employeeId)) {
     return safeRedirect("/login", { status: 303 });
   }
+  if (
+    user?.role &&
+    user.role !== "supervisor" &&
+    user.role !== "location_incharge"
+  ) {
+    return safeRedirect("/no-user-found", { headers });
+  }
+
   if (employeeId) {
     return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
   }
