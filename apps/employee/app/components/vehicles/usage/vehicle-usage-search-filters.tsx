@@ -20,16 +20,11 @@ import {
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
-import {
-  defaultYear,
-  getYears,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
+import { defaultYear, getYears } from "@canny_ecosystem/utils";
 
 import type { VehicleUsageFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
-import { recentlyAddedFilter } from "@/constant";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 
 export const PLACEHOLDERS = [
@@ -44,12 +39,12 @@ export const PLACEHOLDERS = [
 
 export function VehicleUsageSearchFilter({
   disabled,
-  siteArray,
   vehicleOptions,
+  siteOptions,
 }: {
   disabled?: boolean;
-  siteArray?: string[];
   vehicleOptions?: string[];
+  siteOptions: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -76,10 +71,10 @@ export function VehicleUsageSearchFilter({
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialFilterParams: VehicleUsageFilters = {
-    site: "",
     month: "",
     year: "",
     vehicle_no: "",
+    site: "",
     recently_added: "",
   };
 
@@ -102,11 +97,11 @@ export function VehicleUsageSearchFilter({
   }, [filterParams]);
 
   const searchParamsList: VehicleUsageFilters = {
-    site: searchParams.get("site"),
     month: searchParams.get("month"),
     year: searchParams.get("year"),
     vehicle_no: searchParams.get("vehicle_no"),
     recently_added: searchParams.get("recently_added"),
+    site: searchParams.get("site"),
   };
 
   useEffect(() => {
@@ -127,7 +122,7 @@ export function VehicleUsageSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -162,7 +157,7 @@ export function VehicleUsageSearchFilter({
         {
           action: "/vehicles/usage?index",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -174,7 +169,7 @@ export function VehicleUsageSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -191,7 +186,7 @@ export function VehicleUsageSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -224,7 +219,7 @@ export function VehicleUsageSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -269,7 +264,6 @@ export function VehicleUsageSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -281,7 +275,7 @@ export function VehicleUsageSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {siteArray?.map((name, index) => (
+                {siteOptions?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
@@ -300,7 +294,6 @@ export function VehicleUsageSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -356,37 +349,6 @@ export function VehicleUsageSearchFilter({
                     }}
                   >
                     {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Recently Added</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {recentlyAddedFilter.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.recently_added === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        recently_added: name,
-                      }));
-                    }}
-                  >
-                    {replaceUnderscore(name)}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>

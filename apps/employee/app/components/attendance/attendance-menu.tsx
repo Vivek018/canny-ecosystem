@@ -1,20 +1,11 @@
-import { useUser } from "@/utils/user";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission } from "@canny_ecosystem/utils";
-import {
-  attribute,
-  modalSearchParamNames,
-} from "@canny_ecosystem/utils/constant";
-import { useNavigate, useSearchParams } from "@remix-run/react";
 import { AttendanceRegister } from "./attendance-register";
 import type {
   CompanyDatabaseRow,
@@ -32,11 +23,6 @@ export function AttendanceMenu({
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
 }) {
-  const { role } = useUser();
-  // const submit = useSubmit();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-
   /* Do it Later */
   // function extractAttendanceData(employees: { [key: string]: any }[]) {
   //   return employees?.map(({ employee_id, ...rest }) => {
@@ -96,7 +82,7 @@ export function AttendanceMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         asChild
-        className={selectedRows?.length ? "" : undefined}
+        className={selectedRows?.length ? "flex" : "hidden"}
       >
         <Button
           variant="outline"
@@ -131,7 +117,7 @@ export function AttendanceMenu({
           <div
             className={cn(
               "flex flex-col gap-1",
-              !selectedRows?.length && "hidden",
+              !selectedRows?.length && "hidden"
             )}
           >
             <AttendanceRegister
@@ -146,47 +132,6 @@ export function AttendanceMenu({
             />
           </div>
         </div>
-        <DropdownMenuSeparator
-          className={cn(
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
-            !selectedRows.length && "hidden",
-          )}
-        />
-        <DropdownMenuItem
-          onClick={() => {
-            navigate("create-bulk-attendance");
-          }}
-          className={cn(
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
-            "space-x-2 flex items-center",
-          )}
-        >
-          <Icon name="plus-circled" size="sm" />
-          <span>Add Attendance</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator
-          className={cn(
-            "space-x-2 flex items-center",
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
-          )}
-        />
-        <DropdownMenuItem
-          onClick={() => {
-            searchParams.set("step", modalSearchParamNames.import_attendance);
-            setSearchParams(searchParams);
-          }}
-          className={cn(
-            "space-x-2 flex items-center",
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
-          )}
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Attendance</span>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

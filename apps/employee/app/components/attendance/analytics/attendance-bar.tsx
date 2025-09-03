@@ -13,7 +13,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+
 
 const MAX_EMPLOYEES = 100;
 
@@ -24,11 +24,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function AttendanceBars({
-  chartData,
-}: {
-  chartData: TransformedAttendanceDataType[];
-}) {
+export function AttendanceBars({ chartData }: { chartData: any[] }) {
   const trendData = useMemo(() => {
     return chartData.map(({ employee_code, attendance_summary }) => {
       const totalPresents = attendance_summary?.present_days ?? 0;

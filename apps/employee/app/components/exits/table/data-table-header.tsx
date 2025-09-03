@@ -69,7 +69,7 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] bg-card">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+        <TableHead className="hidden md:table-cell px-4  py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -88,11 +88,9 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
                 key={id}
                 className={cn(
                   "px-4 py-2 min-w-36 max-w-36",
-                  id === "employee_code" &&
-                    "sticky  left-12 bg-card z-10 min-w-32 max-w-32",
-                  id === "employee_name" &&
-                    "sticky left-44 bg-card z-10 min-w-40 max-w-40",
-                  id === "final_settlement_date" && " min-w-40 max-w-40",
+                  id === "employee_code" && "table-cell",
+                  id === "employee_name" && "min-w-48 max-w-48",
+                  id === "final_settlement_date" && "min-w-40 max-w-40"
                 )}
               >
                 <Button
@@ -110,14 +108,14 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

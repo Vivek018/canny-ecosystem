@@ -7,10 +7,11 @@ import {
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
-  getSiteNamesByCompanyId,
   type VehicleUsageFilters,
-  getVehicleUsageByCompanyId,
-  getVehiclesByCompanyId,
+  getVehicleUsageBySiteIds,
+  getSitesByLocationId,
+  getUserByEmail,
+  getVehiclesBySiteIds,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -41,9 +42,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
   if (user?.role !== "location_incharge") {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
+
+  if (userProfileError) throw userProfileError;
 
   try {
     const url = new URL(request.url);
@@ -56,11 +65,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const filters: VehicleUsageFilters = {
       name: query,
-      site: searchParams.get("site") ?? undefined,
       month: searchParams.get("month") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
       year: searchParams.get("year") ?? undefined,
       vehicle_no: searchParams.get("vehicle_no") ?? undefined,
-      recently_added: searchParams.get("recently_added") ?? undefined,
     };
 
     const hasFilters =
@@ -68,10 +76,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
       Object.values(filters).some(
         (value) => value !== null && value !== undefined
       );
-
-    const vehicleUsagePromise = getVehicleUsageByCompanyId({
+    const { data: siteData } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId,
+    });
+
+    const siteIdsArray = siteData
+      ?.map((dat) => dat.id)
+      .filter(Boolean) as string[];
+
+    const vehicleUsagePromise = getVehicleUsageBySiteIds({
+      supabase,
+      siteIds: siteIdsArray ?? [],
       params: {
         from: 0,
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
@@ -81,23 +97,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const { data } = await getVehiclesByCompanyId({
+    const { data } = await getVehiclesBySiteIds({
       supabase,
-      companyId,
+      siteId: siteIdsArray ?? [],
     });
+
     const vehicleOptions = data?.length
       ? data?.map((vehicle) => vehicle!.registration_number)
       : [];
 
-    const sitePromise = getSiteNamesByCompanyId({
-      supabase,
-      companyId,
-    });
+    const siteOptions = siteData?.length
+      ? siteData?.map((site) => site!.name)
+      : [];
 
     return defer({
       vehicleUsagePromise: vehicleUsagePromise as any,
-      sitePromise,
+      siteIdsArray,
       vehicleOptions,
+      siteOptions,
       query,
       filters,
       companyId,
@@ -108,10 +125,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return defer({
       vehicleUsagePromise: Promise.resolve({ data: [] }),
-      sitePromise: Promise.resolve({ data: [] }),
+      siteIdsArray: [],
       query: "",
       filters: null,
       vehicleOptions: [],
+      siteOptions: [],
       companyId: "",
       env,
     });
@@ -132,10 +150,11 @@ export default function VehicleUsageIndex() {
   const {
     vehicleUsagePromise,
     vehicleOptions,
-    sitePromise,
+    siteIdsArray,
     query,
     filters,
     companyId,
+    siteOptions,
     env,
   } = useLoaderData<typeof loader>();
 
@@ -143,26 +162,18 @@ export default function VehicleUsageIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<LoadingSpinner className="ml-14" />}>
-            <Await resolve={sitePromise}>
-              {(siteData) => (
-                <VehicleUsageSearchFilter
-                  siteArray={
-                    siteData?.data?.length
-                      ? siteData?.data?.map((site) => site!.name)
-                      : []
-                  }
-                  vehicleOptions={vehicleOptions as unknown as string[]}
-                />
-              )}
-            </Await>
-          </Suspense>
+    <section className="py-4 overflow-hidden max-sm:py-2">
+      <div className="w-full flex flex-row justify-between gap-4 pb-4">
+        <div className="flex w-full md:w-[90%] flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-2">
+          <VehicleUsageSearchFilter
+            vehicleOptions={vehicleOptions as unknown as string[]}
+            siteOptions={siteOptions as string[]}
+          />
           <FilterList filters={filterList} />
         </div>
-        <VehicleUsageActions isEmpty={!vehicleUsagePromise} />
+        <div className="flex justify-end w-auto">
+          <VehicleUsageActions isEmpty={!vehicleUsagePromise} />
+        </div>
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={vehicleUsagePromise}>
@@ -174,7 +185,7 @@ export default function VehicleUsageIndex() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > data?.length);
+            const hasNextPage = Boolean(meta?.count && meta.count > pageSize);
 
             return (
               <VehicleUsageTable
@@ -187,6 +198,7 @@ export default function VehicleUsageIndex() {
                 pageSize={pageSize}
                 companyId={companyId}
                 env={env}
+                siteIdsArray={siteIdsArray as string[]}
               />
             );
           }}

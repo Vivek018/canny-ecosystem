@@ -1,4 +1,5 @@
 import { Button } from "@canny_ecosystem/ui/button";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -69,16 +70,27 @@ export function DataTableHeader({ table, loading, className }: Props) {
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
+      <TableRow className="h-[45px] bg-card">
+        <TableHead className="table-cell px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+          <Checkbox
+            checked={
+              table?.getIsAllPageRowsSelected() ||
+              (table?.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+          />
+        </TableHead>
         {employeeColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
               <TableHead
                 key={id}
                 className={cn(
-                  "px-4 py-2",
-                  id === "employee_code" && "md:sticky left-0 bg-card z-10",
-                  id === "full_name" && "md:sticky w-full left-32 bg-card z-10",
+                  "px-4 py-2 min-w-36 max-w-36",
+                  id === "employee_code" && "table-cell",
+                  id === "full_name" && "min-w-56 max-w-56 table-cell"
                 )}
               >
                 <Button
@@ -96,14 +108,14 @@ export function DataTableHeader({ table, loading, className }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

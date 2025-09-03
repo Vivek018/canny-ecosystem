@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 const getDataSource = (
   selectedRows: ExitDataType[],
-  storedValue: ExitDataType[],
+  storedValue: ExitDataType[]
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -19,7 +19,7 @@ export default function ExitAnalytics() {
   const { selectedRows } = useExitsStore();
   const [storedValue, setValue] = useLocalStorage<ExitDataType[]>(
     "analyticsArray",
-    [],
+    []
   );
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function ExitAnalytics() {
   return (
     <div className="w-full p-4 m-auto flex flex-col gap-4">
       <ExitTrend chartData={dataSource} />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
         <ExitPaymentByTime chartData={dataSource} />
         <ExitByTime chartData={dataSource} />
         <ExitByReasons chartData={dataSource} />

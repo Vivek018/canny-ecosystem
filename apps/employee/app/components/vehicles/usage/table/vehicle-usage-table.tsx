@@ -11,7 +11,7 @@ import {
 import { useInView } from "react-intersection-observer";
 import { useEffect, useRef, useState } from "react";
 import {
-  getVehicleUsageByCompanyId,
+  getVehicleUsageBySiteIds,
   type VehicleUsageDataType,
   type VehicleUsageFilters,
 } from "@canny_ecosystem/supabase/queries";
@@ -35,6 +35,7 @@ interface DataTableProps<TData, TValue> {
   filters?: VehicleUsageFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
+  siteIdsArray: string[];
 }
 
 export function VehicleUsageTable<TData, TValue>({
@@ -43,10 +44,10 @@ export function VehicleUsageTable<TData, TValue>({
   hasNextPage: initialHasNextPage,
   pageSize,
   env,
-  companyId,
   noFilters,
   filters,
   initialColumnVisibility,
+  siteIdsArray,
   query,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
@@ -59,18 +60,18 @@ export function VehicleUsageTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useVehicleUsageStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreUsages = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
-    if (companyId) {
+    if (siteIdsArray.length) {
       try {
-        const { data, meta } = await getVehicleUsageByCompanyId({
+        const { data, meta } = await getVehicleUsageBySiteIds({
           supabase,
-          companyId,
+          siteIds: siteIdsArray ?? [],
           params: {
             from: from,
             to: to,
@@ -150,16 +151,17 @@ export function VehicleUsageTable<TData, TValue>({
   return (
     <div
       className={cn(
-        "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        "border rounded max-h-fit overflow-hidden max-sm:border-x-0",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
-        className={cn("relative rounded overflow-auto")}
+        className={cn("relative rounded overflow-auto max-sm:rounded-none")}
         style={{
           maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "20px",
+          overflowX: "auto",
         }}
       >
         <table className="w-full bg-card shadow text-sm">
@@ -191,7 +193,7 @@ export function VehicleUsageTable<TData, TValue>({
                     }}
                     className={cn(
                       "absolute flex cursor-default select-text",
-                      row.original?.invoice_id && "bg-primary/20",
+                      row.original?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -199,20 +201,17 @@ export function VehicleUsageTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 min-w-32 max-w-32 hidden md:table-cell",
+                            "px-4 py-4 min-w-36 max-w-36",
                             cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                            cell.column.id === "vehicle_number" &&
-                              "sticky left-12 min-w-36 max-w-36 bg-card z-10",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
+                            cell.column.id === "vehicle_number" && "table-cell",
                             cell.column.id === "maintainance_amount" &&
-                              "min-w-40 max-w-40",
+                              "min-w-40 max-w-40 table-cell"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -231,7 +230,7 @@ export function VehicleUsageTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -240,7 +239,7 @@ export function VehicleUsageTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

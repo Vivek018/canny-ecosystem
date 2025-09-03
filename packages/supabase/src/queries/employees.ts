@@ -968,7 +968,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
   const { data, error } = await supabase
     .from("employee_project_assignment")
     .select(
-      `${columns.join(",")}, sites(id, name, projects(name),company_locations!left(address_line_1,address_line_2,city,state,pincode))`
+      `${columns.join(",")}, sites(id, name, projects(name),company_locations!left(name,address_line_1,address_line_2,city,state,pincode))`
     )
 
     .eq("employee_id", employeeId)
@@ -1526,10 +1526,30 @@ export async function getEmployeeProjectAssignmentsConflicts({
 export async function getEmployeesBySiteIds({
   supabase,
   siteIds,
+  params,
 }: {
   supabase: TypedSupabaseClient;
   siteIds: string[];
+  params: GetEmployeesByCompanyIdParams;
 }) {
+  const { sort, from, to, filters, searchQuery } = params;
+
+  const {
+    dob_start,
+    dob_end,
+    education,
+    gender,
+    status,
+    assignment_type,
+    position,
+    skill_level,
+    doj_start,
+    doj_end,
+    dol_start,
+    dol_end,
+    site,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "employee_code",
@@ -1543,7 +1563,7 @@ export async function getEmployeesBySiteIds({
     "gender",
   ] as const;
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("employees")
     .select(
       `${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
@@ -1555,12 +1575,81 @@ export async function getEmployeesBySiteIds({
         end_date,
         site_id,
         sites!inner(name, projects(id, name))
-      )`
+      )`,
+      { count: "exact" }
     )
-    .in("employee_project_assignment.site_id", siteIds)
-    .order("created_at", { ascending: false })
-    .limit(MID_QUERY_LIMIT)
-    .returns<EmployeeDataType[]>();
+    .in("employee_project_assignment.site_id", siteIds);
+
+  if (sort) {
+    const [column, direction] = sort;
+    const baseCols = [
+      "first_name",
+      "last_name",
+      "employee_code",
+      "date_of_birth",
+      "education",
+      "gender",
+      "is_active",
+      "primary_mobile_number",
+    ];
+    if (column === "full_name") {
+      query.order("first_name", { ascending: direction === "asc" });
+    }
+    if (baseCols.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+
+  if (searchQuery) {
+    query.textSearch("fts_vector", `'${searchQuery}'`, { type: "plain" });
+  }
+
+  const dateFilters = [
+    { field: "date_of_birth", start: dob_start, end: dob_end },
+    {
+      field: "employee_project_assignment.start_date",
+      start: doj_start,
+      end: doj_end,
+    },
+    {
+      field: "employee_project_assignment.end_date",
+      start: dol_start,
+      end: dol_end,
+    },
+  ];
+
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+
+  if (status) {
+    query.eq("is_active", status === "active");
+  }
+  if (gender) {
+    query.eq("gender", gender.toLowerCase());
+  }
+  if (education) {
+    query.eq("education", education.toLowerCase());
+  }
+  if (assignment_type) {
+    query.eq("employee_project_assignment.assignment_type", assignment_type);
+  }
+  if (position) {
+    query.eq("employee_project_assignment.position", position);
+  }
+  if (site) {
+    query.eq("employee_project_assignment.sites.name", site);
+  }
+  if (skill_level) {
+    query.eq("employee_project_assignment.skill_level", skill_level);
+  }
+
+  const { data, count, error } = await query.range(from, to);
 
   if (error) {
     console.error("getEmployeesBySiteIds Error", error);
@@ -1568,6 +1657,81 @@ export async function getEmployeesBySiteIds({
 
   return {
     data,
+    meta: { count: count },
     error,
+  };
+}
+
+export async function getActiveEmployeesBySiteIds({
+  supabase,
+  siteIds,
+}: {
+  supabase: TypedSupabaseClient;
+  siteIds: string[];
+}) {
+  const columns = ["employee_code"] as const;
+
+  //Active Employee
+  const activeQuery = supabase
+    .from("employees")
+    .select(
+      `${columns.join(",")},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        sites!inner(name, projects(id, name))
+      )`
+    )
+    .in("employee_project_assignment.site_id", siteIds)
+    .in("is_active", [true]);
+
+  const { data: activeEmployees, error: activeEmployeeError } =
+    await activeQuery;
+
+  if (activeEmployeeError) {
+    console.error("getActiveEmployeesByCompanyId Error", activeEmployeeError);
+  }
+
+  //Total Employee
+  const totalQuery = supabase
+    .from("employees")
+    .select(
+      `${columns.join(",")},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        sites!inner(name, projects(id, name))
+      )`
+    )
+    .in("employee_project_assignment.site_id", siteIds);
+
+  const { data: totalEmployees, error: totalEmployeeError } = await totalQuery;
+
+  if (totalEmployeeError) {
+    console.error("getTotalEmployeesByCompanyId Error", totalEmployeeError);
+  }
+
+  //Active Employee By Sites
+  const activeQueryBySites = supabase
+    .from("employees")
+    .select(
+      `${columns.join(
+        ","
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))`
+    )
+    .in("employee_project_assignment.site_id", siteIds)
+    .eq("is_active", true);
+
+  const { data: activeEmployeesBySites, error: activeEmployeeErrorBySites } =
+    await activeQueryBySites;
+
+  if (activeEmployeeErrorBySites) {
+    console.error(
+      "getActiveEmployeesByCompanyId Error",
+      activeEmployeeErrorBySites
+    );
+  }
+
+  return {
+    activeEmployees,
+    activeEmployeeError,
+    totalEmployees,
+    totalEmployeeError,
+    activeEmployeeErrorBySites,
+    activeEmployeesBySites,
   };
 }

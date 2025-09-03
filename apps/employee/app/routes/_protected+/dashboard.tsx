@@ -7,13 +7,15 @@ import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   type DashboardFilters,
-  getActiveEmployeesByCompanyId,
-  getApprovedPayrollsAmountsByCompanyIdByMonths,
-  getApprovedPayrollsByCompanyIdByYears,
-  getExitsByCompanyIdByMonths,
-  getInvoicesByCompanyIdForDashboard,
-  getNotificationByCompanyId,
-  getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements,
+  getActiveEmployeesBySiteIds,
+  getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths,
+  getApprovedPayrollsBySiteIdsAndProjectIdsByYears,
+  getExitsBySiteIdsByMonthsAndSiteIds,
+  getInvoicesByLocationIdForDashboard,
+  getPaidInvoicesAmountsByLocationIdByMonthsForReimbursements,
+  getProjectBySiteIds,
+  getSitesByLocationId,
+  getUserByEmail,
   type InvoiceDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -32,10 +34,8 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import { ActiveEmployeesBySite } from "@/components/payroll/analytics/active-employees-by-site";
 import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
-import { useAnimateTextScroll } from "@canny_ecosystem/ui/animate-text-scroll";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { DashboardFilter } from "@/components/dashboard/dashboard-filter";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -43,9 +43,19 @@ import { safeRedirect } from "@/utils/server/http.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
   if (user?.role !== "location_incharge") {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
+
+  if (userProfileError) throw userProfileError;
+
   const url = new URL(request.url);
 
   const searchParams = new URLSearchParams(url.searchParams);
@@ -56,48 +66,63 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   try {
-    const notificationPromise = getNotificationByCompanyId({
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId,
     });
 
-    const exitsPromise = getExitsByCompanyIdByMonths({
-      companyId,
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+    const { data: projectData } = await getProjectBySiteIds({
+      siteIds: siteIdsArray,
+      supabase,
+    });
+    const projectIdsArray = projectData
+      ?.map((dat) => dat.id)
+      .filter(Boolean) as string[];
+
+    const exitsPromise = getExitsBySiteIdsByMonthsAndSiteIds({
+      siteIds: siteIdsArray,
       supabase,
       filters,
     });
 
-    const employeesPromise = getActiveEmployeesByCompanyId({
+    const employeesPromise = getActiveEmployeesBySiteIds({
       supabase,
-      companyId,
+      siteIds: siteIdsArray,
     });
 
-    const payrollPromise = getApprovedPayrollsAmountsByCompanyIdByMonths({
-      supabase,
-      companyId,
-      filters,
-    });
-    const reimbursementPromise =
-      getPaidInvoicesAmountsByCompanyIdByMonthsForReimbursements({
+    const payrollPromise =
+      getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
         supabase,
-        companyId,
+        siteIds: siteIdsArray,
+        projectIds: projectIdsArray,
         filters,
       });
-    const payrollByYearsPromise = getApprovedPayrollsByCompanyIdByYears({
-      companyId,
-      supabase,
-      filters,
-    });
 
-    const invoicePromise = getInvoicesByCompanyIdForDashboard({
-      companyId,
+    const reimbursementPromise =
+      getPaidInvoicesAmountsByLocationIdByMonthsForReimbursements({
+        supabase,
+        locationId: userProfile?.location_id!,
+        filters,
+      });
+
+    const payrollByYearsPromise =
+      getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
+        siteIds: siteIdsArray,
+        projectIds: projectIdsArray,
+        locationId: userProfile?.location_id!,
+        supabase,
+        filters,
+      });
+
+    const invoicePromise = getInvoicesByLocationIdForDashboard({
+      locationId: userProfile?.location_id!,
       supabase,
       filters,
     });
 
     return defer({
       companyId,
-      notificationPromise,
       reimbursementPromise,
       exitsPromise,
       employeesPromise,
@@ -158,7 +183,6 @@ clientLoader.hydrate = true;
 export default function Dashboard() {
   const {
     companyId,
-    notificationPromise,
     exitsPromise,
     employeesPromise,
     payrollPromise,
@@ -182,45 +206,6 @@ export default function Dashboard() {
 
   return (
     <div key={key}>
-      <Suspense fallback={null}>
-        <Await resolve={notificationPromise}>
-          {({ data: notificationData, error: notificationError }) => {
-            if (notificationError) {
-              clearCacheEntry(cacheKeyPrefix.dashboard);
-              return (
-                <ErrorBoundary
-                  error={notificationError}
-                  message="Failed to load Notification"
-                />
-              );
-            }
-
-            const { containerRef, contentRef } = useAnimateTextScroll({
-              pauseDurationMs: 2000,
-              speed: 1.5,
-            });
-
-            return (
-              <div
-                ref={containerRef}
-                className={cn(
-                  "overflow-hidden w-full border-b bg-primary/15",
-                  !notificationData?.text && "hidden"
-                )}
-              >
-                <div
-                  ref={contentRef}
-                  className="text-primary whitespace-nowrap p-4"
-                >
-                  {notificationData?.text}
-                  <span aria-hidden className="inline-block w-[17px]" />
-                </div>
-              </div>
-            );
-          }}
-        </Await>
-      </Suspense>
-
       <section className="w-full p-4 flex flex-col gap-4">
         <div className="flex justify-end">
           <div className="flex justify-between gap-3">
@@ -328,7 +313,7 @@ export default function Dashboard() {
             </Await>
           </Suspense>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-4">
             <Suspense fallback={<LoadingSpinner className="h-64" />}>
               <Await resolve={employeesPromise}>
                 {({ activeEmployeesBySites, activeEmployeeErrorBySites }) => {

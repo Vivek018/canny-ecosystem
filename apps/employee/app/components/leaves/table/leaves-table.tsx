@@ -26,6 +26,7 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useLeavesStore } from "@/store/leaves";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@canny_ecosystem/ui/button";
+import { ExportBar } from "../import-export/export-bar";
 
 interface LeavesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -64,7 +65,7 @@ export function LeavesDataTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useLeavesStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
@@ -127,6 +128,10 @@ export function LeavesDataTable<TData, TValue>({
     },
   });
 
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
+
   useEffect(() => {
     const rowArray = [];
     for (const row of table.getSelectedRowModel().rows) {
@@ -158,7 +163,7 @@ export function LeavesDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <div className="relative">
@@ -180,14 +185,17 @@ export function LeavesDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 md:table-cell",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                            "px-4 py-4 min-w-36 max-w-36",
+                            cell.column.id === "select" &&
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
+                            cell.column.id === "employee_code" && "table-cell",
+                            cell.column.id === "employee_name" &&
+                              "min-w-48 max-w-48 table-cell"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -205,7 +213,7 @@ export function LeavesDataTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -214,7 +222,7 @@ export function LeavesDataTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -238,6 +246,12 @@ export function LeavesDataTable<TData, TValue>({
           </div>
         </div>
       )}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as LeavesDataType[]}
+        columnVisibility={columnVisibility}
+      />
     </div>
   );
 }

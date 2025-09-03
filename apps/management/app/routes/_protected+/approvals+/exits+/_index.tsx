@@ -76,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const exitsPromise = getExitsByCompanyId({
@@ -125,7 +125,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -216,26 +216,22 @@ export default function ExitsIndex() {
             <div>Sorry, Exit data can't be loaded. Try again later!</div>
           }
         >
-          {(exitsData) => {
-            if (exitsData?.error) {
+          {({ data, meta, error }) => {
+            if (error) {
               clearCacheEntry(cacheKeyPrefix.exits);
               return (
-                <ErrorBoundary
-                  error={exitsData?.error}
-                  message="Failed to load Exits"
-                />
+                <ErrorBoundary error={error} message="Failed to load Exits" />
               );
             }
             const hasNextPage = Boolean(
-              exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT,
+              meta?.count && meta.count > LAZY_LOADING_LIMIT
             );
 
             return (
               <ExitPaymentTable
-                data={exitsData?.data ?? []}
+                data={data ?? []}
                 columns={ExitPaymentColumns}
-                count={exitsData?.meta?.count ?? exitsData?.data?.length ?? 0}
+                count={meta?.count ?? data?.length ?? 0}
                 query={query}
                 noFilters={noFilters}
                 filters={filters}

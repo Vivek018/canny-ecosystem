@@ -22,7 +22,7 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
-import { booleanArray, replaceUnderscore } from "@canny_ecosystem/utils";
+import { booleanArray } from "@canny_ecosystem/utils";
 import type { InvoiceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
@@ -46,10 +46,8 @@ export const PLACEHOLDERS = [
 
 export function InvoiceSearchFilter({
   disabled,
-  locationArray,
 }: {
   disabled?: boolean;
-  locationArray: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -71,7 +69,6 @@ export function InvoiceSearchFilter({
   const initialFilterParams: InvoiceFilters = {
     date_start: "",
     date_end: "",
-    company_location: "",
     type: "",
     service_charge: "",
     paid: "",
@@ -106,7 +103,6 @@ export function InvoiceSearchFilter({
   const searchParamsList: InvoiceFilters = {
     date_start: searchParams.get("date_start"),
     date_end: searchParams.get("date_end"),
-    company_location: searchParams.get("company_location"),
     type: searchParams.get("type"),
     service_charge: searchParams.get("project"),
     paid: searchParams.get("paid"),
@@ -289,37 +285,7 @@ export function InvoiceSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Company Location</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {locationArray.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.company_location === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        company_location: name,
-                      }));
-                    }}
-                  >
-                    {replaceUnderscore(name)}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
+      
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>

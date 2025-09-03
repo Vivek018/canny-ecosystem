@@ -1,8 +1,37 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import Previewer from "@/utils/previewer";
 
 export const columns = (): ColumnDef<ReimbursementDataType>[] => [
+  {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    enableSorting: false,
+    accessorKey: "employee_name",
+    header: "Name",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">
+          {row.original.employee_id
+            ? `${row.original.employees?.first_name} ${
+                row.original.employees?.middle_name ?? ""
+              } ${row.original.employees?.last_name ?? ""}`
+            : `${row.original.payee?.name}`}
+        </p>
+      );
+    },
+  },
   {
     enableSorting: false,
     accessorKey: "employee_code",
@@ -17,15 +46,11 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_name",
-    header: "Employee Name",
+    accessorKey: "payee_code",
+    header: "Payee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
-          row.original.employees?.first_name
-        } ${row.original.employees?.middle_name ?? ""} ${
-          row.original.employees?.last_name ?? ""
-        }`}</p>
+        <p className="truncate">{row.original.payee?.payee_code ?? "--"}</p>
       );
     },
   },
@@ -36,10 +61,8 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {
-            row.original.employees?.employee_project_assignment?.sites?.projects
-              ?.name
-          }
+          {row.original.employees?.employee_project_assignment?.sites?.projects
+            ?.name ?? "--"}
         </p>
       );
     },
@@ -51,7 +74,8 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original.employees?.employee_project_assignment?.sites?.name}
+          {row.original.employees?.employee_project_assignment?.sites?.name ??
+            "--"}
         </p>
       );
     },
@@ -62,7 +86,18 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {formatDate(row.original?.submitted_date ?? "") ?? "--"}
+          <> {formatDate(row.original?.submitted_date ?? "") ?? "--"}</>
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate capitalize ">
+          {replaceUnderscore(row.original.type) ?? "--"}
         </p>
       );
     },
@@ -90,13 +125,11 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     },
   },
   {
-    accessorKey: "type",
-    header: "Type",
+    accessorKey: "note",
+    header: "Note",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize ">
-          {replaceUnderscore(row.original.type) ?? "--"}
-        </p>
+        <Previewer label={"Note"} description={row.original?.note ?? "--"} />
       );
     },
   },
@@ -105,7 +138,7 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+      return <p className="truncate">{row.original?.users?.email ?? "--"}</p>;
     },
   },
 ];

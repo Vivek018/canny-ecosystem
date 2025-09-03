@@ -35,7 +35,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (employeeId) {
     return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
   }
-  return safeRedirect("/employees", { status: 303 });
+
+  return safeRedirect(
+    `${user!.role === "supervisor" ? "/employees" : "/dashboard"}`,
+    {
+      status: 303,
+    }
+  );
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {

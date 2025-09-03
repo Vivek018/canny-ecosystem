@@ -3,8 +3,21 @@ import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
 import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export const columns = (): ColumnDef<EmployeeDataType>[] => [
+  {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+
   {
     enableHiding: false,
     accessorKey: "employee_code",
@@ -109,7 +122,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
+            row.original?.employee_project_assignment?.assignment_type ?? ""
           )}
         </p>
       );
@@ -121,9 +134,9 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     header: "Position",
     cell: ({ row }) => {
       return (
-        <p className="w-40 truncate capitalize">
+        <p className="truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position ?? "",
+            row.original?.employee_project_assignment?.position ?? ""
           )}
         </p>
       );
@@ -135,9 +148,9 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     header: "Skill Level",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
+            row.original?.employee_project_assignment?.skill_level ?? ""
           )}
         </p>
       );
@@ -153,8 +166,8 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
           {row.original?.employee_project_assignment?.start_date
             ? String(
                 formatDate(
-                  row.original?.employee_project_assignment?.start_date,
-                ),
+                  row.original?.employee_project_assignment?.start_date
+                )
               )
             : ""}
         </p>
@@ -170,7 +183,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
         <p className="w-max capitalize">
           {row.original?.employee_project_assignment?.end_date
             ? String(
-                formatDate(row.original?.employee_project_assignment?.end_date),
+                formatDate(row.original?.employee_project_assignment?.end_date)
               )
             : ""}
         </p>

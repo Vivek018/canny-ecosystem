@@ -26,7 +26,6 @@ export function FilterList({ filters }: Props) {
       case "month":
       case "year":
       case "vehicle_no":
-      case "recently_added":
         return replaceUnderscore(value);
       default:
         return null;

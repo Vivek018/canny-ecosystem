@@ -1,6 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import type { VehicleUsageDataType } from "@canny_ecosystem/supabase/queries";
+import { getMonthName } from "@canny_ecosystem/utils";
 
 export const columns = (): ColumnDef<VehicleUsageDataType>[] => [
   {
@@ -43,7 +44,7 @@ export const columns = (): ColumnDef<VehicleUsageDataType>[] => [
     accessorKey: "month",
     header: "Month",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original.month}</p>;
+      return <p className="truncate ">{getMonthName(row.original.month)}</p>;
     },
   },
   {

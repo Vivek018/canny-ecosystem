@@ -3,19 +3,7 @@ import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Link } from "@remix-run/react";
 
 import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
-import { useUser } from "@/utils/user";
-import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import {
-  deleteRole,
-  getMonthName,
-  hasPermission,
-  updateRole,
-} from "@canny_ecosystem/utils";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { attribute } from "@canny_ecosystem/utils/constant";
-import { Icon } from "@canny_ecosystem/ui/icon";
-import { Button } from "@canny_ecosystem/ui/button";
-import { AttendanceOptionsDropdown } from "./attendance-option-dropdown";
+import { getMonthName } from "@canny_ecosystem/utils";
 
 export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
   {
@@ -102,6 +90,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "working_days",
     header: "Working Days",
     cell: ({ row }) => (
@@ -111,6 +100,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "present_days",
     header: "Presents",
     cell: ({ row }) => (
@@ -120,6 +110,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "absent_days",
     header: "Absents",
     cell: ({ row }) => (
@@ -129,6 +120,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "working_hours",
     header: "Working Hours",
     cell: ({ row }) => (
@@ -138,6 +130,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "overtime_hours",
     header: "Overtime Hours",
     cell: ({ row }) => (
@@ -147,6 +140,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "paid_holidays",
     header: "Paid Holidays",
     cell: ({ row }) => (
@@ -156,6 +150,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "paid_leaves",
     header: "Paid Leaves",
     cell: ({ row }) => (
@@ -165,6 +160,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "casual_leaves",
     header: "Casual Leaves",
     cell: ({ row }) => (
@@ -172,42 +168,5 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
         {row.original?.monthly_attendance?.casual_leaves ?? "--"}
       </p>
     ),
-  },
-  {
-    id: "actions",
-    enableSorting: false,
-    enableHiding: false,
-    cell: ({ row }) => {
-      const { role } = useUser();
-      return (
-        <AttendanceOptionsDropdown
-          key={row.original.id}
-          attendanceId={row.original?.monthly_attendance?.id}
-          triggerChild={
-            <DropdownMenuTrigger
-              asChild
-              className={cn(
-                (!hasPermission(
-                  role,
-                  `${updateRole}:${attribute.attendance}`,
-                ) &&
-                  !hasPermission(
-                    role,
-                    `${deleteRole}:${attribute.attendance}`,
-                  )) ||
-                  !row.original?.monthly_attendance?.id
-                  ? "hidden"
-                  : "flex",
-              )}
-            >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
-              </Button>
-            </DropdownMenuTrigger>
-          }
-        />
-      );
-    },
   },
 ];

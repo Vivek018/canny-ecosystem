@@ -17,9 +17,8 @@ export function ReimbursementActions({
   const { selectedRows } = useReimbursementStore();
   const navigate = useNavigate();
 
-
   return (
-    <div className="gap-4 hidden md:flex">
+    <div className="gap-4 flex">
       <div className="flex gap-2">
         <ColumnVisibility disabled={isEmpty} />
         <Button
@@ -27,7 +26,7 @@ export function ReimbursementActions({
           size="icon"
           className={cn(
             "h-10 w-10  border border-input",
-            !selectedRows?.length && "hidden",
+            !selectedRows?.length && "hidden"
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/reimbursements/analytics")}
@@ -40,10 +39,9 @@ export function ReimbursementActions({
           className={cn(
             buttonVariants({ variant: "muted", size: "icon" }),
             "h-10 w-10  border border-input",
-            !selectedRows.length && "hidden",
+            !selectedRows.length && "hidden"
           )}
         />
-
       </div>
     </div>
   );

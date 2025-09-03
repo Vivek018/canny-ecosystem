@@ -18,7 +18,7 @@ import { useInView } from "react-intersection-observer";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import {
-  getMonthlyAttendanceByCompanyId,
+  getMonthlyAttendanceBySiteIds,
   type AttendanceDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -34,6 +34,7 @@ interface DataTableProps {
   companyId: string;
   env: SupabaseEnv;
   query?: string | null;
+  siteIdsArray: string[];
 }
 
 export function AttendanceTable({
@@ -46,7 +47,7 @@ export function AttendanceTable({
   count,
   query,
   env,
-  companyId,
+  siteIdsArray,
 }: DataTableProps) {
   const {
     rowSelection,
@@ -71,9 +72,9 @@ export function AttendanceTable({
     const sortParam = searchParams.get("sort");
 
     try {
-      const { data } = await getMonthlyAttendanceByCompanyId({
+      const { data } = await getMonthlyAttendanceBySiteIds({
         supabase,
-        companyId,
+        siteIds: siteIdsArray ?? [],
         params: {
           from: formattedFrom,
           to: to,
@@ -131,7 +132,7 @@ export function AttendanceTable({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as unknown as AttendanceDataType[]);
+    setSelectedRows(rowArray as unknown as any[]);
   }, [rowSelection]);
   const { rows } = table.getRowModel();
 
@@ -154,16 +155,17 @@ export function AttendanceTable({
   return (
     <div
       className={cn(
-        "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        "border rounded max-h-fit overflow-hidden max-sm:border-x-0",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
-        className={cn("relative rounded overflow-auto")}
+        className={cn("relative rounded overflow-auto max-sm:rounded-none")}
         style={{
           maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "20px",
+          overflowX: "auto",
         }}
       >
         <table className="w-full bg-card shadow text-sm">
@@ -197,7 +199,7 @@ export function AttendanceTable({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.monthly_attendance?.salary_entries
-                        ?.invoice_id && "bg-primary/20",
+                        ?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -205,24 +207,17 @@ export function AttendanceTable({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 min-w-28 max-w-28 hidden md:table-cell",
+                            "px-4 py-2 min-w-36 max-36",
                             cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                            cell.column.id === "employee_code" &&
-                              "sticky left-12 min-w-32 max-w-32 bg-card z-10",
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
+                            cell.column.id === "employee_code" && "table-cell",
                             cell.column.id === "first_name" &&
-                              "sticky left-44 min-w-48 max-w-48 bg-card z-10",
-                            cell.column.id === "project_name" &&
-                              "min-w-32 max-w-32",
-                            cell.column.id === "site_name" &&
-                              "min-w-32 max-w-32",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "min-w-48 max-w-48 table-cell"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -241,7 +236,7 @@ export function AttendanceTable({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -250,7 +245,7 @@ export function AttendanceTable({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

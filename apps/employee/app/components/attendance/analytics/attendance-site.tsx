@@ -12,7 +12,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+
 
 const chartConfig = {
   presents: {
@@ -25,11 +25,7 @@ const chartConfig = {
   },
 } satisfies { [key: string]: { label: string; color?: string } };
 
-export function AttendanceBySite({
-  chartData,
-}: {
-  chartData: TransformedAttendanceDataType[];
-}) {
+export function AttendanceBySite({ chartData }: { chartData: any[] }) {
   const trendData = useMemo(() => {
     const siteTotals = new Map<
       string,

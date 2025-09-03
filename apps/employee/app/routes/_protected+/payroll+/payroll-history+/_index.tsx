@@ -25,7 +25,10 @@ import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { formatDate } from "@canny_ecosystem/utils";
 import {
-  getApprovedPayrollsByCompanyId,
+  getApprovedPayrollsBySiteIdsAndProjectIds,
+  getProjectBySiteIds,
+  getSitesByLocationId,
+  getUserByEmail,
   type PayrollFilters,
 } from "@canny_ecosystem/supabase/queries";
 import { PayrollSearchFilter } from "@/components/payroll/payroll-search-filter";
@@ -41,10 +44,17 @@ const pageSize = 15;
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
-
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
   if (user?.role !== "location_incharge") {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
+
+  if (userProfileError) throw userProfileError;
 
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
@@ -64,11 +74,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
       status: searchParams.get("status") ?? null,
       month: searchParams.get("month") ?? null,
       year: searchParams.get("year") ?? null,
+      
     };
 
-    const payrollsPromise = getApprovedPayrollsByCompanyId({
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId: companyId ?? "",
+    });
+
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+
+    const { data: projectData } = await getProjectBySiteIds({
+      siteIds: siteIdsArray,
+      supabase,
+    });
+    const projectIdsArray = projectData
+      ?.map((dat) => dat.id)
+      .filter(Boolean) as string[];
+
+    const payrollsPromise = getApprovedPayrollsBySiteIdsAndProjectIds({
+      supabase,
+      siteIds: siteIdsArray ?? [],
+      projectIds: projectIdsArray ?? [],
       params: {
         from: 0,
         to: pageSize - 1,
@@ -77,13 +104,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    return defer({ payrollsPromise, query, filters, env, companyId });
+    return defer({
+      payrollsPromise,
+      query,
+      filters,
+      env,
+      companyId,
+      siteIdsArray,
+      projectIdsArray,
+    });
   } catch (error) {
     console.error("Payroll History Error", error);
     return defer({
       payrollsPromise: Promise.resolve({ data: [], error: null }),
       query: "",
       filters: null,
+      siteIdsArray: [],
+      projectIdsArray: [],
       env: {
         SUPABASE_URL: process.env.SUPABASE_URL!,
         SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -94,14 +131,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(cacheKeyPrefix.payroll_history, args);
+  const url = new URL(args.request.url);
+  return clientCaching(
+    `${cacheKeyPrefix.payroll_history}${url.searchParams.toString()}`,
+    args
+  );
 }
 
 clientLoader.hydrate = true;
 
 export default function PayrollHistoryIndex() {
-  const { payrollsPromise, filters, query, companyId, env } =
-    useLoaderData<typeof loader>();
+  const {
+    payrollsPromise,
+    filters,
+    query,
+    companyId,
+    env,
+    siteIdsArray,
+    projectIdsArray,
+  } = useLoaderData<typeof loader>();
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
   const { ref, inView } = useInView();
@@ -122,7 +170,7 @@ export default function PayrollHistoryIndex() {
                   />
                 );
               return (
-                <div className="w-full flex items-center justify-between gap-4">
+                <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 m:gap-4">
                   <PayrollSearchFilter
                     disabled={!data?.length && noFilters}
                     from="payroll-history"
@@ -150,6 +198,7 @@ export default function PayrollHistoryIndex() {
                   />
                 );
               const { isDocument } = useIsDocument();
+
               const [hasNextPage, setHasNextPage] = useState(
                 Boolean(
                   meta?.count && innitial?.length
@@ -179,9 +228,10 @@ export default function PayrollHistoryIndex() {
                 try {
                   if (companyId) {
                     const { data: moreData } =
-                      await getApprovedPayrollsByCompanyId({
+                      await getApprovedPayrollsBySiteIdsAndProjectIds({
                         supabase,
-                        companyId,
+                        siteIds: siteIdsArray ?? [],
+                        projectIds: projectIdsArray ?? [],
                         params: {
                           from: formattedFrom,
                           to,

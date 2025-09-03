@@ -14,7 +14,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import {
   type ExitDataType,
   type ExitFilterType,
-  getExitsByCompanyId,
+  getExitsBySiteIds,
 } from "@canny_ecosystem/supabase/queries";
 import { useState, useEffect, useRef } from "react";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
@@ -24,7 +24,6 @@ import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../import-export/export-bar";
-import { useCompanyId } from "@/utils/company";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 interface DataTableProps<TData, TValue> {
@@ -38,6 +37,7 @@ interface DataTableProps<TData, TValue> {
   pageSize: number;
   initialColumnVisibility?: VisibilityState;
   env: SupabaseEnv;
+  siteIdsArray: string[];
 }
 
 export function ExitPaymentTable<TData, TValue>({
@@ -50,6 +50,7 @@ export function ExitPaymentTable<TData, TValue>({
   hasNextPage: initialHasNextPage,
   pageSize,
   initialColumnVisibility,
+  siteIdsArray,
   env,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
@@ -58,7 +59,6 @@ export function ExitPaymentTable<TData, TValue>({
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [searchParams, setSearchParams] = useSearchParams();
   const { supabase } = useSupabase({ env });
-  const { companyId } = useCompanyId();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetData, setSheetData] = useState<any>(null);
@@ -68,7 +68,7 @@ export function ExitPaymentTable<TData, TValue>({
     useExitsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreExit = async () => {
@@ -76,9 +76,9 @@ export function ExitPaymentTable<TData, TValue>({
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
     try {
-      const { data } = await getExitsByCompanyId({
+      const { data } = await getExitsBySiteIds({
         supabase,
-        companyId: companyId ?? "",
+        siteIds: siteIdsArray ?? [],
         params: {
           from: from,
           to: to,
@@ -156,7 +156,7 @@ export function ExitPaymentTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
@@ -191,24 +191,21 @@ export function ExitPaymentTable<TData, TValue>({
                     style={{ transform: `translateY(${virtualRow.start}px)` }}
                     className={cn(
                       "absolute flex cursor-pointer select-text",
-                      row.original?.invoice_id && "bg-primary/20",
+                      row.original?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => (
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          "px-3 md:px-4 py-4 hidden md:table-cell min-w-36 max-w-36",
+                          "px-4 py-2 hidden md:table-cell min-w-36 max-w-36",
                           cell.column.id === "select" &&
-                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                          cell.column.id === "employee_code" &&
-                            "sticky left-12 min-w-32 max-w-32 bg-card z-10",
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
+                          cell.column.id === "employee_code" && "table-cell",
                           cell.column.id === "employee_name" &&
-                            "sticky left-44 min-w-40 max-w-40 bg-card z-10",
+                            "min-w-40 max-w-40",
                           cell.column.id === "final_settlement_date" &&
-                            " min-w-40 max-w-40",
-                          cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                            " min-w-48 max-w-48"
                         )}
                         onClick={(e) => {
                           if (
@@ -223,7 +220,7 @@ export function ExitPaymentTable<TData, TValue>({
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext(),
+                          cell.getContext()
                         )}
                       </TableCell>
                     ))}
@@ -241,7 +238,7 @@ export function ExitPaymentTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -250,7 +247,7 @@ export function ExitPaymentTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

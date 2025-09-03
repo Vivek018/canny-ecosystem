@@ -66,7 +66,7 @@ export function VehicleUsageTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="flex h-[45px] bg-card">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10 mt-2">
+        <TableHead className="table-cell px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10 mt-2">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -83,10 +83,9 @@ export function VehicleUsageTableHeader({ table, className, loading }: Props) {
               <TableHead
                 key={id}
                 className={cn(
-                  "px-4 py-2 min-w-32 max-w-32",
-                  id === "vehicle_number" &&
-                    "sticky left-12 bg-card z-10 min-w-36 max-w-36",
-                  id === "maintainance_amount" && "min-w-40 max-w-40",
+                  "px-4 py-2 min-w-36 max-w-36",
+                  id === "vehicle_number" && "table-cell",
+                  id === "maintainance_amount" && "min-w-40 max-w-40 table-cell"
                 )}
               >
                 <Button
@@ -103,14 +102,14 @@ export function VehicleUsageTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>
@@ -118,7 +117,6 @@ export function VehicleUsageTableHeader({ table, className, loading }: Props) {
             )
           );
         })}
-        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

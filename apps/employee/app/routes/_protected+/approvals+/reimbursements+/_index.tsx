@@ -3,15 +3,11 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  LAZY_LOADING_LIMIT,
-  MAX_QUERY_LIMIT,
-} from "@canny_ecosystem/supabase/constant";
-import {
   type ReimbursementFilters,
-  getReimbursementsByCompanyId,
-  getProjectNamesByCompanyId,
+  getReimbursementsBySiteIds,
   getUsersEmail,
-  getSiteNamesByCompanyId,
+  getUserByEmail,
+  getSitesByLocationId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -31,8 +27,8 @@ import { ReimbursementSearchFilter } from "@/components/reimbursements/reimburse
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { columns } from "@/components/reimbursements/table/columns";
 import { FilterList } from "@/components/reimbursements/filter-list";
-
-const pageSize = LAZY_LOADING_LIMIT;
+import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
+const pageSize = 20;
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
@@ -42,9 +38,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
   if (user?.role !== "location_incharge") {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
+
+  if (userProfileError) throw userProfileError;
 
   try {
     const url = new URL(request.url);
@@ -63,23 +67,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
       type: searchParams.get("type") ?? undefined,
       users: searchParams.get("users") ?? undefined,
       name: query,
-      project: searchParams.get("project") ?? undefined,
-      site: searchParams.get("site") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
       month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
-      recently_added: searchParams.get("recently_added") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
     };
-
     const hasFilters =
       filters &&
       Object.values(filters).some(
         (value) => value !== null && value !== undefined
       );
 
-    const reimbursementsPromise = getReimbursementsByCompanyId({
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId,
+    });
+
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+
+    const reimbursementsPromise = getReimbursementsBySiteIds({
+      supabase,
+      siteIds: siteIdsArray ?? [],
       params: {
         from: 0,
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
@@ -89,23 +97,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
-
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
-    const sitePromise = getSiteNamesByCompanyId({
-      supabase,
-      companyId,
-    });
+    const siteOptions = data?.length ? data?.map((site) => site!.name) : [];
 
     return defer({
       reimbursementsPromise: reimbursementsPromise as any,
-      projectPromise,
-      sitePromise,
       userEmailsPromise,
+      siteIdsArray,
+      siteOptions,
       query,
       filters,
-      companyId,
       env,
     });
   } catch (error) {
@@ -113,12 +115,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return defer({
       reimbursementsPromise: Promise.resolve({ data: [] }),
-      projectPromise: Promise.resolve({ data: [] }),
-      sitePromise: Promise.resolve({ data: [] }),
       userEmailsPromise: Promise.resolve({ data: [] }),
       query: "",
+      siteIdsArray: [],
+      siteOptions: [],
       filters: null,
-      companyId: "",
       env,
     });
   }
@@ -137,52 +138,32 @@ clientLoader.hydrate = true;
 export default function ReimbursementsIndex() {
   const {
     reimbursementsPromise,
-    projectPromise,
-    sitePromise,
     userEmailsPromise,
     query,
     filters,
-    companyId,
+    siteOptions,
     env,
+    siteIdsArray,
   } = useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className="py-4 overflow-hidden">
+      <div className="w-full flex items-start sm:items-center justify-between pb-4">
+        <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-4 mr-4">
           <Suspense fallback={<LoadingSpinner className="ml-14" />}>
-            <Await resolve={projectPromise}>
-              {(projectData) => (
-                <Await resolve={sitePromise}>
-                  {(siteData) => (
-                    <Await resolve={userEmailsPromise}>
-                      {(userEmailsData) => (
-                        <ReimbursementSearchFilter
-                          projectArray={
-                            projectData?.data?.length
-                              ? projectData?.data?.map(
-                                  (project) => project!.name
-                                )
-                              : []
-                          }
-                          siteArray={
-                            siteData?.data?.length
-                              ? siteData?.data?.map((site) => site!.name)
-                              : []
-                          }
-                          userEmails={
-                            userEmailsData?.data?.length
-                              ? userEmailsData?.data?.map((user) => user!.email)
-                              : []
-                          }
-                        />
-                      )}
-                    </Await>
-                  )}
-                </Await>
+            <Await resolve={userEmailsPromise}>
+              {(userEmailsData) => (
+                <ReimbursementSearchFilter
+                  userEmails={
+                    userEmailsData?.data?.length
+                      ? userEmailsData?.data?.map((user) => user!.email)
+                      : []
+                  }
+                  siteOptions={siteOptions as string[]}
+                />
               )}
             </Await>
           </Suspense>
@@ -192,7 +173,7 @@ export default function ReimbursementsIndex() {
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={reimbursementsPromise}>
-          {({ data, error }) => {
+          {({ data, meta, error }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.reimbursements);
               return (
@@ -202,16 +183,18 @@ export default function ReimbursementsIndex() {
                 />
               );
             }
-
+            const hasNextPage = Boolean(meta?.count && meta.count > pageSize);
             return (
               <ReimbursementsTable
                 data={data ?? []}
-                columns={columns()}
-                query={query}
-                filters={filters}
-                noFilters={noFilters}
-                companyId={companyId}
                 env={env}
+                hasNextPage={hasNextPage}
+                pageSize={pageSize}
+                filters={filters}
+                query={query}
+                columns={columns() as any}
+                noFilters={noFilters}
+                siteIdsArray={siteIdsArray as string[]}
               />
             );
           }}

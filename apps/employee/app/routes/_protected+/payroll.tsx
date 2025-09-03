@@ -4,6 +4,7 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
+import { FooterTabs } from "@/components/footer-tabs";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Outlet,
@@ -33,7 +34,24 @@ export default function Payroll() {
   return (
     <section className="flex flex-col h-full">
       <div className="py-[18px] px-4 border-b">
-        <SecondaryMenu
+        <div className="hidden md:block">
+          <SecondaryMenu
+            items={[
+              {
+                label: "Payroll History",
+                path: "/payroll/payroll-history",
+              },
+              {
+                label: "Invoices",
+                path: "/payroll/invoices",
+              },
+            ]}
+            pathname={pathname}
+            Link={Link}
+          />
+        </div>
+
+        <FooterTabs
           items={[
             {
               label: "Payroll History",

@@ -28,14 +28,12 @@ export function ReimbursementSearchFilter({
   disabled,
   userEmails,
   employeeId,
-  projectArray,
-  siteArray,
+  siteOptions,
 }: {
   disabled?: boolean;
   userEmails?: (string | null | undefined)[];
   employeeId?: string | undefined;
-  projectArray?: string[];
-  siteArray?: string[];
+  siteOptions: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -59,7 +57,6 @@ export function ReimbursementSearchFilter({
     status: "",
     users: "",
     name: "",
-    project: "",
     site: "",
   };
 
@@ -86,7 +83,6 @@ export function ReimbursementSearchFilter({
     submitted_date_end: searchParams.get("submitted_date_end"),
     status: searchParams.get("status"),
     users: searchParams.get("users"),
-    project: searchParams.get("project"),
     site: searchParams.get("site"),
   };
 
@@ -108,7 +104,7 @@ export function ReimbursementSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -146,7 +142,7 @@ export function ReimbursementSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -163,7 +159,7 @@ export function ReimbursementSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -194,7 +190,7 @@ export function ReimbursementSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -251,6 +247,35 @@ export function ReimbursementSearchFilter({
                     setFilterParams((prev) => ({ ...prev, ...newRange }));
                   }}
                 />
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Site</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {siteOptions?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -312,77 +337,6 @@ export function ReimbursementSearchFilter({
                     {name}
                   </DropdownMenuCheckboxItem>
                 ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup className={cn(!projectArray?.length && "hidden")}>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Project</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {projectArray?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.project === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        project: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup className={cn(!projectArray?.length && "hidden")}>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Site</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {!searchParamsList.project ? (
-                  <DropdownMenuCheckboxItem
-                    disabled={true}
-                    className="p-8 items-center justify-center"
-                  >
-                    Select Project First
-                  </DropdownMenuCheckboxItem>
-                ) : (
-                  siteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
-                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

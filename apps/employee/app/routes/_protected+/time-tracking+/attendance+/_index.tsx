@@ -1,11 +1,11 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { LAZY_LOADING_LIMIT } from "@canny_ecosystem/supabase/constant";
+import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  getMonthlyAttendanceByCompanyId,
   getCompanyNameByCompanyId,
   getPrimaryLocationByCompanyId,
-  getProjectNamesByCompanyId,
-  getSiteNamesByCompanyId,
+  getMonthlyAttendanceBySiteIds,
+  getUserByEmail,
+  getSitesByLocationId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -33,24 +33,33 @@ import type {
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 
-const pageSize = LAZY_LOADING_LIMIT;
+const pageSize = 20;
 
 export type DayType = { day: number; fullDate: string };
-export type TransformedAttendanceDataType = any;
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  try {
-    const url = new URL(request.url);
-    const { supabase, headers } = getSupabaseWithHeaders({ request });
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const url = new URL(request.url);
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
+  if (user?.role !== "location_incharge") {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
 
-    if (user?.role !== "location_incharge") {
-      return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
+  if (userProfileError) throw userProfileError;
+
+  try {
+    const page = 0;
+
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const { data: companyName } = await getCompanyNameByCompanyId({
       supabase,
@@ -67,35 +76,43 @@ export async function loader({ request }: LoaderFunctionArgs) {
       month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
       name: searchParams.get("name") ?? undefined,
-      project: searchParams.get("project") ?? undefined,
       site: searchParams.get("site") ?? undefined,
       recently_added: searchParams.get("recently_added") ?? undefined,
     };
+    const hasFilters =
+      filters &&
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined
+      );
 
-    const attendancePromise = getMonthlyAttendanceByCompanyId({
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId,
+    });
+
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+    const siteOptions = data?.length ? data?.map((site) => site!.name) : [];
+
+    const attendancePromise = getMonthlyAttendanceBySiteIds({
+      supabase,
+      siteIds: siteIdsArray ?? [],
       params: {
         from: 0,
-        to: pageSize - 1,
+        to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
         filters,
         searchQuery: filters.name,
         sort: searchParams.get("sort")?.split(":") as [string, "asc" | "desc"],
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
-
-    const sitePromise = getSiteNamesByCompanyId({ supabase, companyId });
-
     return defer({
-      projectPromise,
-      sitePromise,
       attendancePromise: attendancePromise as any,
       filters,
       companyName,
       companyAddress,
+      siteOptions,
       query: filters.name,
+      siteIdsArray,
       env,
       companyId,
     });
@@ -103,12 +120,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     console.error("Attendance Error in loader function:", error);
     return defer({
       attendancePromise: Promise.resolve({ data: [] }),
-      projectPromise: Promise.resolve({ data: [] }),
-      sitePromise: Promise.resolve({ data: [] }),
       defaultPayDay: null,
       query: "",
       filters: null,
+      siteIdsArray: [],
       companyId: "",
+      siteOptions: [],
       companyName: null,
       companyAddress: null,
       env,
@@ -129,11 +146,11 @@ clientLoader.hydrate = true;
 export default function Attendance() {
   const {
     attendancePromise,
-    projectPromise,
-    sitePromise,
     query,
     filters,
     companyId,
+    siteIdsArray,
+    siteOptions,
     companyName,
     companyAddress,
     env,
@@ -142,27 +159,10 @@ export default function Attendance() {
   const noFilters = Object.values(filters ?? {}).every((value) => !value);
 
   return (
-    <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<LoadingSpinner className="mt-20" />}>
-            <Await resolve={projectPromise}>
-              {(projectData) => (
-                <Await resolve={sitePromise}>
-                  {(siteData) => (
-                    <AttendanceSearchFilter
-                      projectArray={
-                        projectData?.data?.map((project) => project!.name) || []
-                      }
-                      siteArray={
-                        siteData?.data?.map((site) => site!.name) || []
-                      }
-                    />
-                  )}
-                </Await>
-              )}
-            </Await>
-          </Suspense>
+    <section className="py-4 overflow-hidden">
+      <div className="w-full flex items-start md:items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 mr-4">
+          <AttendanceSearchFilter siteOptions={siteOptions as string[]} />
           <FilterList filters={filters ?? undefined} />
         </div>
         <AttendanceActions
@@ -183,7 +183,8 @@ export default function Attendance() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > data?.length);
+            const hasNextPage = Boolean(meta?.count && meta.count > pageSize);
+
             return (
               <AttendanceTable
                 data={data as any[]}
@@ -196,6 +197,7 @@ export default function Attendance() {
                 noFilters={noFilters}
                 companyId={companyId}
                 env={env}
+                siteIdsArray={siteIdsArray as string[]}
               />
             );
           }}

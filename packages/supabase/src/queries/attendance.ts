@@ -226,7 +226,7 @@ export async function getMonthlyAttendanceByCompanyId({
         salary_entries:salary_entries!left(id,invoice_id)
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -235,12 +235,12 @@ export async function getMonthlyAttendanceByCompanyId({
     if (searchQueryArray.length > 0 && searchQueryArray.length <= 3) {
       for (const element of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${element}%,middle_name.ilike.%${element}%,last_name.ilike.%${element}%,employee_code.ilike.%${element}%)`,
+          `or(first_name.ilike.%${element}%,middle_name.ilike.%${element}%,last_name.ilike.%${element}%,employee_code.ilike.%${element}%)`
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
       );
     }
   }
@@ -256,7 +256,7 @@ export async function getMonthlyAttendanceByCompanyId({
   if (project) {
     query = query.eq(
       "employee_project_assignment.sites.projects.name",
-      project,
+      project
     );
   }
 
@@ -361,7 +361,7 @@ export async function getAttendanceReportByCompanyId({
         employee_id
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId)
     .eq("attendance.present", true)
@@ -381,12 +381,12 @@ export async function getAttendanceReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
       );
     }
   }
@@ -399,17 +399,17 @@ export async function getAttendanceReportByCompanyId({
     }
     const start_date = new Date(`${start_month} 1, ${start_year} 12:00:00`);
     const end_date = new Date(
-      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`,
+      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`
     );
     if (start_year)
       query.gte(
         "attendance.date",
-        formatUTCDate(start_date.toISOString().split("T")[0]),
+        formatUTCDate(start_date.toISOString().split("T")[0])
       );
     if (end_year)
       query.lte(
         "attendance.date",
-        formatUTCDate(end_date.toISOString().split("T")[0]),
+        formatUTCDate(end_date.toISOString().split("T")[0])
       );
   }
   if (project) {
@@ -432,7 +432,7 @@ export async function getAttendanceReportByCompanyId({
       acc[num] = name;
       return acc;
     },
-    {} as { [key: number]: string },
+    {} as { [key: number]: string }
   );
 
   const processedData = data?.map((employee) => {
@@ -466,5 +466,138 @@ export async function getAttendanceReportByCompanyId({
     data: processedData,
     meta: { count: count },
     error: null,
+  };
+}
+
+////////////////////////////////////////////////////////////////
+
+export async function getMonthlyAttendanceBySiteIds({
+  supabase,
+  siteIds,
+  params,
+}: {
+  supabase: TypedSupabaseClient;
+  siteIds: string[];
+  params: {
+    from: number;
+    to: number;
+    sort?: [string, "asc" | "desc"];
+    searchQuery?: string;
+    filters?: AttendanceFilters;
+  };
+}) {
+  const { to, from, sort, searchQuery, filters } = params;
+  const { month, year, project, site, recently_added } = filters ?? {};
+
+  const columns = [
+    "id",
+    "first_name",
+    "middle_name",
+    "last_name",
+    "employee_code",
+    "company_id",
+  ] as const;
+
+  let query = supabase
+    .from("employees")
+    .select(
+      `
+      ${columns.join(",")},
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        sites!inner(
+          id,
+          name,
+          projects!${project ? "inner" : "left"}(id, name)
+        )
+      ),
+      monthly_attendance:monthly_attendance!inner(
+        id,
+        present_days,
+        working_hours,
+        overtime_hours,
+        month,
+        year,
+        working_days,
+        absent_days,
+        paid_holidays,
+        paid_leaves,
+        casual_leaves,
+        salary_entries:salary_entries!left(id,invoice_id)
+      )
+    `,
+      { count: "exact" }
+    )
+    .in("employee_project_assignment.sites.id", siteIds);
+
+  if (searchQuery) {
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray.length > 0 && searchQueryArray.length <= 3) {
+      for (const element of searchQueryArray) {
+        query = query.or(
+          `or(first_name.ilike.%${element}%,middle_name.ilike.%${element}%,last_name.ilike.%${element}%,employee_code.ilike.%${element}%)`
+        );
+      }
+    } else {
+      query = query.or(
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
+      );
+    }
+  }
+
+  const effectiveMonth = month ? Number(months[month]) : defaultMonth;
+  const effectiveYear = year ? Number(year) : defaultYear;
+
+  if (filters) {
+    query = query
+      .eq("monthly_attendance.month", effectiveMonth)
+      .eq("monthly_attendance.year", effectiveYear);
+  }
+  if (project) {
+    query = query.eq(
+      "employee_project_assignment.sites.projects.name",
+      project
+    );
+  }
+
+  if (site) {
+    query = query.eq("employee_project_assignment.sites.name", site);
+  }
+
+  if (recently_added) {
+    const now = new Date();
+    const diff =
+      filterComparison[recently_added as keyof typeof filterComparison];
+    if (diff) {
+      const startTime = new Date(now.getTime() - diff).toISOString();
+      query = query.gte("monthly_attendance.created_at", startTime);
+    }
+  }
+
+  if (sort) {
+    const [column, direction] = sort;
+    if (column === "first_name") {
+      query = query.order("first_name", { ascending: direction === "asc" });
+    }
+
+    if (column === "employee_code") {
+      query = query.order("employee_code", { ascending: direction === "asc" });
+    }
+  } else {
+    query = query.order("employee_code", { ascending: true });
+  }
+
+  const { data, count, error } = await query.range(from, to);
+  if (error) {
+    console.error("getMonthlyAttendanceByCompanyId Error", error);
+  }
+  const transformedData = data?.map((employee: any) => ({
+    ...employee,
+    monthly_attendance: employee.monthly_attendance?.[0] ?? null,
+  }));
+
+  return {
+    data: transformedData,
+    meta: { count },
+    error,
   };
 }

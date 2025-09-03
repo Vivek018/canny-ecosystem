@@ -29,43 +29,17 @@ import {
 } from "@canny_ecosystem/utils";
 import type { ExitFilterType } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
-import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
-import { recentlyAddedFilter } from "@/constant";
-
-export const PLACEHOLDERS = [
-  "Employees who left before 2020 due to resignation",
-  "Exits with final settlement after Jan 2023",
-  "Employees exited from Project 'XYZ' at Site 'ABC'",
-  "Resigned employees not included in invoice",
-  "Terminated employees whose last working day was in 2022",
-  "Employees who exited Site 'ABC' with settlements before 2024",
-  "Exits from Project 'XYZ' with final settlement after June 2021",
-  "Employees who left between 2019-2021 and were in invoice",
-  "Voluntary exits from Site 'XYZ' before 2018",
-  "Exits due to retirement with working day end before 2015",
-  "Employees whose final settlement is still pending after 2023",
-  "Non-invoice exits due to personal reasons",
-  "Employees exited in 2020 from Project 'XYZ'",
-  "Last working day between 2021 and 2022 for Site 'ABC'",
-  "Exits created in last 4 hours",
-];
 
 export function ExitsSearchFilter({
   disabled,
-  projectArray,
-  siteArray,
+  siteOptions,
 }: {
   disabled?: boolean;
-  projectArray: string[] | null;
-  siteArray: string[] | null;
+  siteOptions: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
-  const [isFocused, setIsFocused] = useState(false);
-  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
-    typingSpeed: 40,
-    pauseDuration: 4000,
-  });
+
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
@@ -82,10 +56,8 @@ export function ExitsSearchFilter({
     final_settlement_date_start: "",
     final_settlement_date_end: "",
     reason: "",
-    project: "",
     site: "",
     in_invoice: "",
-    recently_added: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -120,7 +92,6 @@ export function ExitsSearchFilter({
     ),
     final_settlement_date_end: searchParams.get("final_settlement_date_end"),
     reason: searchParams.get("reason"),
-    project: searchParams.get("project"),
     in_invoice: searchParams.get("in_invoice"),
     site: searchParams.get("site"),
     recently_added: searchParams.get("recently_added"),
@@ -214,17 +185,11 @@ export function ExitsSearchFilter({
           <Input
             tabIndex={-1}
             ref={inputRef}
-            placeholder={
-              disabled
-                ? "No Exits Data to Search And Filter"
-                : animatedPlaceholder
-            }
+            placeholder={"No Exits Data to Search And Filter"}
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"
@@ -381,38 +346,6 @@ export function ExitsSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Project</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {projectArray?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.project === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        project: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -424,7 +357,7 @@ export function ExitsSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {siteArray?.map((name, index) => (
+                {siteOptions.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
@@ -467,36 +400,6 @@ export function ExitsSearchFilter({
                     }}
                   >
                     {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Recently Added</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {recentlyAddedFilter.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.recently_added === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        recently_added: name,
-                      }));
-                    }}
-                  >
-                    {replaceUnderscore(name)}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>

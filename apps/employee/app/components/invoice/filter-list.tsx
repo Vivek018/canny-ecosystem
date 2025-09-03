@@ -34,9 +34,6 @@ export function FilterList({ filterList }: Props) {
       case "date_end":
         return !filterList?.date_start && value && formatDate(new Date(value));
 
-      case "company_location":
-        return value;
-
       case "type":
         return value;
 

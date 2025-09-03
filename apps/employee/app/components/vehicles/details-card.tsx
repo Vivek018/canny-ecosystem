@@ -19,7 +19,11 @@ export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 };
 
 export const VehicleDetailsCard: React.FC<{
-  vehicle: Omit<VehiclesDatabaseRow, "created_at">;
+  vehicle: Omit<VehiclesDatabaseRow, "created_at"> & {
+    payee: { name: string } | null;
+    driver: { first_name: string; last_name: string } | null;
+    site: { name: string } | null;
+  };
 }> = ({ vehicle }) => {
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
@@ -43,6 +47,12 @@ export const VehicleDetailsCard: React.FC<{
             value={formatDate(vehicle.start_date)}
           />
           <DetailItem label="End Date" value={vehicle.end_date} />
+          <DetailItem label="Site" value={vehicle.site?.name} />
+          <DetailItem
+            label="Driver"
+            value={`${vehicle.driver?.first_name} ${vehicle.driver?.last_name}`}
+          />
+          <DetailItem label="Payee" value={vehicle.payee?.name} />
         </div>
       ) : (
         <div className="text-center py-8">

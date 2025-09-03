@@ -1,4 +1,9 @@
-import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
+
 import type { ColumnDef } from "@tanstack/react-table";
 import type { LeavesDataType } from "@canny_ecosystem/supabase/queries";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -8,7 +13,17 @@ export const columns = (
   isEmployeeRoute?: boolean,
 ): ColumnDef<LeavesDataType>[] => [
   {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
     enableHiding: false,
+  },
+  {
     enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
@@ -18,15 +33,15 @@ export const columns = (
         prefetch="intent"
         className={cn("group", isEmployeeRoute && "cursor-default")}
       >
-        <p className={cn("truncate", !isEmployeeRoute && "text-primary/80")}>
+        <p
+          className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+        >
           {row.original?.employees?.employee_code}
         </p>
       </Link>
     ),
   },
   {
-    enableSorting: false,
-
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => (
@@ -36,10 +51,7 @@ export const columns = (
         className={cn("group", isEmployeeRoute && "cursor-default")}
       >
         <p
-          className={cn(
-            "truncate w-48 group-hover:text-primary",
-            !isEmployeeRoute && "text-primary/80",
-          )}
+          className={cn("truncate w-52", !isEmployeeRoute && "text-primary/80")}
         >{`${row.original?.employees?.first_name} ${
           row.original?.employees?.middle_name ?? ""
         } ${row.original?.employees?.last_name ?? ""}`}</p>
@@ -47,8 +59,6 @@ export const columns = (
     ),
   },
   {
-    enableSorting: false,
-
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
@@ -59,8 +69,6 @@ export const columns = (
     },
   },
   {
-    enableSorting: false,
-
     accessorKey: "site",
     header: "Site",
     cell: ({ row }) => {
@@ -86,7 +94,9 @@ export const columns = (
     header: "Start Date",
     cell: ({ row }) => {
       return (
-        <p className="w-max">{formatDate(row.original?.start_date) ?? "--"}</p>
+        <p className="w-max">
+          {(formatDate(row.original?.start_date) as any) ?? "--"}
+        </p>
       );
     },
   },
@@ -95,7 +105,9 @@ export const columns = (
     header: "End Date",
     cell: ({ row }) => {
       return (
-        <p className="w-max">{formatDate(row.original?.end_date) ?? "--"}</p>
+        <p className="w-max">
+          {(formatDate(row.original?.end_date) as any) ?? "--"}
+        </p>
       );
     },
   },
@@ -111,11 +123,12 @@ export const columns = (
     },
   },
   {
-    enableSorting: false,
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
       return <p className="truncate">{row.original?.users?.email ?? "--"}</p>;
     },
   },
+
+  
 ];

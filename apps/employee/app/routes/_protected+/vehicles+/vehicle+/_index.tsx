@@ -1,5 +1,8 @@
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getVehiclesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  getSitesByLocationId,
+  getUserByEmail,
+  getVehiclesBySiteIds,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Command,
@@ -33,15 +36,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
   if (user?.role !== "location_incharge") {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  try {
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
 
-    const vehiclesPromise = getVehiclesByCompanyId({
+  if (userProfileError) throw userProfileError;
+
+  try {
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId,
+    });
+
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+
+    const vehiclesPromise = getVehiclesBySiteIds({
+      supabase,
+      siteId: siteIdsArray ?? [],
     });
 
     return defer({

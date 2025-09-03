@@ -23,40 +23,14 @@ import {
 import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
-import {
-  defaultYear,
-  getYears,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
-import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
-import { recentlyAddedFilter } from "@/constant";
-
-export const PLACEHOLDERS = [
-  "Attendance records for March 2024 at Site 'ABC'",
-  "Attendance of employees for Project 'ABC' in 2023",
-  "Monthly attendance for Site 'XYZ' in January",
-  "Year 2022 attendance across all sites",
-  "Attendance in June 2020 for Project 'XYZ'",
-  "Project 'Delta' site-wise attendance in July 2021",
-  "Employees attendance for December 2023 at Site 'ABC'",
-  "Attendance of EMP123 in April 2022",
-  "Project 'Beta' attendance for the year 2021",
-  "Attendance data for Site 'ABC' in August 2020",
-  "Employees who worked at Site 'ABC' in October 2019",
-  "Annual attendance report for Project 'XYZ' in 2020",
-  "Attendance in November 2022 for Site 'XYZ'",
-  "March 2021 attendance of employees in payroll",
-  "Attendance created in last 8 hours",
-];
+import { defaultYear, getYears } from "@canny_ecosystem/utils";
 
 export function AttendanceSearchFilter({
   disabled,
-  projectArray,
-  siteArray,
+  siteOptions,
 }: {
   disabled?: boolean;
-  projectArray: string[];
-  siteArray: string[];
+  siteOptions: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -68,19 +42,13 @@ export function AttendanceSearchFilter({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
-    typingSpeed: 40,
-    pauseDuration: 4000,
-  });
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialFilterParams: AttendanceFilters = {
     month: "",
     year: "",
-    project: "",
     site: "",
-    recently_added: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -110,9 +78,7 @@ export function AttendanceSearchFilter({
   const searchParamsList: AttendanceFilters = {
     month: searchParams.get("month"),
     year: searchParams.get("year"),
-    project: searchParams.get("project"),
     site: searchParams.get("site"),
-    recently_added: searchParams.get("recently_added"),
   };
 
   useEffect(() => {
@@ -203,17 +169,11 @@ export function AttendanceSearchFilter({
           <Input
             tabIndex={-1}
             ref={inputRef}
-            placeholder={
-              disabled
-                ? "No Attendance Data to Search And Filter"
-                : animatedPlaceholder
-            }
+            placeholder={"No Attendance Data to Search And Filter"}
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"
@@ -245,67 +205,6 @@ export function AttendanceSearchFilter({
         sideOffset={19}
         alignOffset={-11}
       >
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Project</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {projectArray?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.project === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        project: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Site</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {siteArray?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.site === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        site: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -367,10 +266,11 @@ export function AttendanceSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
+
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Recently Added</span>
+              <span>Site</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -378,19 +278,19 @@ export function AttendanceSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {recentlyAddedFilter.map((name, index) => (
+                {siteOptions.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.recently_added === name}
+                    checked={filterParams?.site === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        recently_added: name,
+                        site: name,
                       }));
                     }}
                   >
-                    {replaceUnderscore(name)}
+                    {name}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>

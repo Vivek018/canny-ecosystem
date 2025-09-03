@@ -24,10 +24,15 @@ export function FooterTabs({
     <nav
       className={cn(
         "w-full fixed bottom-0 left-0 z-50 border-t md:hidden",
-        className,
+        className
       )}
     >
-      <ul className="bg-card overflow-x-scroll mx-auto flex justify-between text-sm overflow-auto no-scrollbar border-muted border-1 rounded-md h-20 p-2 pr-10">
+      <ul
+        className={cn(
+          "bg-card overflow-x-scroll mx-auto flex text-sm overflow-auto no-scrollbar border-muted border-1 rounded-md h-14 p-2 pr-10",
+          items.length < 3 && "gap-2"
+        )}
+      >
         {items?.map((item) => (
           <Link
             prefetch="intent"
@@ -39,7 +44,7 @@ export function FooterTabs({
               item?.path && pathname.includes(item?.path) && "text-primary/80",
               item?.path &&
                 pathname === item?.path &&
-                "text-primary no-underline hover:no-underline focus:no-underline cursor-default",
+                "text-primary no-underline hover:no-underline focus:no-underline cursor-default"
             )}
           >
             <span className="capitalize">{item.label}</span>
@@ -52,7 +57,7 @@ export function FooterTabs({
           <Button
             variant="muted"
             className={cn(
-              "fixed right-0 h-20 z-50 bottom-0 p-3 text-center font-medium border-l rounded-none",
+              "fixed right-0 h-14 z-50 bottom-0 p-3 text-center font-medium border-l rounded-none"
             )}
           >
             <Icon name="dots-vertical" />
@@ -72,7 +77,7 @@ export function FooterTabs({
                     "text-primary/80",
                   item?.path &&
                     pathname === item?.path &&
-                    "text-primary no-underline hover:no-underline focus:no-underline cursor-default",
+                    "text-primary no-underline hover:no-underline focus:no-underline cursor-default"
                 )}
               >
                 <DropdownMenuItem className="capitalize pr-12">

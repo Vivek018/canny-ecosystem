@@ -71,8 +71,8 @@ export function SalaryEntryComponent({
   );
 
   return (
-    <section className="p-4 flex flex-col max-h-full gap-4 overflow-hidden">
-      <div className="grid grid-cols-2 gap-4">
+    <section className="p-2 md:p-4 flex flex-col max-h-full gap-4 overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <PayrollSummaryCard
           totals={totals}
           hasSelectedRows={selectedRows.length > 0}
@@ -80,7 +80,7 @@ export function SalaryEntryComponent({
         <PayrollDetailsCard payrollData={payrollData} />
       </div>
 
-      <div className="w-full flex items-start gap-3">
+      <div className="w-full flex flex-col md:flex-row items-start gap-3">
         <FilterControls
           searchString={searchString}
           onSearchChange={setSearchString}

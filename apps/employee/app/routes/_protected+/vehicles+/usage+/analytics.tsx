@@ -65,27 +65,27 @@ export default function VehicleUsageAnalytics() {
     },
     7: {
       label: "July",
-      color: "hsl(var(--chart-7))",
+      color: "hsl(120, 100%, 75%)",
     },
     8: {
       label: "Aug",
-      color: "hsl(var(--chart-8))",
+      color: "hsl(120, 65%, 45%)",
     },
     9: {
       label: "Sept",
-      color: "hsl(var(--chart-9))",
+      color: "hsl(50, 100%, 50%)",
     },
     10: {
       label: "Oct",
-      color: "hsl(var(--chart-10))",
+      color: "hsl(330, 80%, 70%)",
     },
     11: {
       label: "Nov",
-      color: "hsl(var(--chart-11))",
+      color: "hsl(120, 65%, 45%))",
     },
     12: {
       label: "Dec",
-      color: "hsl(var(--chart-12))",
+      color: "hsl(195, 85%, 55%)",
     },
   } satisfies ChartConfig;
 
@@ -121,7 +121,7 @@ export default function VehicleUsageAnalytics() {
           <VehicleUsageBars chartData={dataSource} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-col-1 md:grid-cols-2 gap-3">
         <KilometersByMonth
           chartData={newData as unknown as any[]}
           chartConfig={chartConfig}
@@ -131,7 +131,7 @@ export default function VehicleUsageAnalytics() {
           chartConfig={chartConfig}
         />
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-col-1 md:grid-cols-3 gap-3">
         <FuelByMonth
           chartData={newData as unknown as any[]}
           chartConfig={chartConfig}

@@ -3,7 +3,12 @@ import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getMonthName,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
@@ -51,7 +56,7 @@ export const columns = (): ColumnDef<VehicleUsageDataType>[] => [
     accessorKey: "month",
     header: "Month",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original.month}</p>;
+      return <p className="truncate ">{getMonthName(row.original.month)}</p>;
     },
   },
   {
@@ -128,13 +133,13 @@ export const columns = (): ColumnDef<VehicleUsageDataType>[] => [
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.vehicle_usage}`,
+                  `${updateRole}:${attribute.vehicle_usage}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.vehicle_usage}`,
+                    `${deleteRole}:${attribute.vehicle_usage}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
               asChild
             >

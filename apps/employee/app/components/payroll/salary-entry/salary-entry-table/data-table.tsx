@@ -77,19 +77,20 @@ export function SalaryEntryDataTable<TData, TValue>({
   return (
     <div
       className={cn(
-        "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        "border rounded max-h-fit overflow-hidden max-sm:border-x-0",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
-        className={cn("relative rounded overflow-auto")}
+        className={cn("relative rounded overflow-auto max-sm:rounded-none")}
         style={{
           maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "40px",
+          overflowX: "auto",
         }}
       >
-        <table className="w-full bg-card shadow text-sm">
+        <table className="w-full bg-card shadow text-sm min-w-[800px]">
           <SalaryTableHeader
             table={table}
             className={cn("sticky z-10 top-0", !tableLength && "hidden")}
@@ -120,7 +121,7 @@ export function SalaryEntryDataTable<TData, TValue>({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
-                        "bg-primary/20",
+                        "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -128,25 +129,20 @@ export function SalaryEntryDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-2 hidden md:flex items-center min-w-24 max-w-24",
+                            "px-4 py-2 flex items-center min-w-36 max-w-36",
                             cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-3",
+                              "sticky left-0 z-10 bg-card min-w-12 max-w-12",
                             cell.column.id === "sr_no" &&
-                              "sticky left-12 bg-card min-w-20 max-w-20 z-10",
-                            cell.column.id === "employee_code" &&
-                              "sticky left-32 z-10 min-w-36 max-w-36 bg-card",
-                            cell.column.id === "name" && "min-w-52 max-w-52",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
-                            cell.column.id.length > 7 &&
-                              cell.column.id !== "employee_code" &&
-                              cell.column.id !== "department" &&
-                              "min-w-40 max-w-40",
+                              "min-w-20 max-w-20 table-cell",
+                            cell.column.id === "employee_code" && "table-cell",
+                            cell.column.id === "name" &&
+                              "min-w-52 max-w-52 table-cell",
+                            cell.column.id === "net_amount" && "table-cell"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );

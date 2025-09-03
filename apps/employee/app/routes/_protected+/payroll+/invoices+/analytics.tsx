@@ -80,7 +80,7 @@ export default function InvoicesAnalytics() {
         </div>
       </div>
 
-      <div className="flex w-full h-96 gap-3">
+      <div className="flex flex-col md:felx-row w-full md:h-96 gap-3">
         <InvoicesByLocations
           chartData={dataSource}
           companyRelations={companyRelations}

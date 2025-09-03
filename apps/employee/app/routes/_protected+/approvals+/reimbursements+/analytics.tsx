@@ -1,4 +1,3 @@
-
 import { ReimbursementByTime } from "@/components/reimbursements/analytics/reimbursement-by-time";
 import { ReimbursementTopEmployees } from "@/components/reimbursements/analytics/reimbursement-top-employees";
 import { ReimbursementTrend } from "@/components/reimbursements/analytics/reimbursement-trend";
@@ -11,7 +10,7 @@ import { ReimbursementPerEmployer } from "@/components/reimbursements/analytics/
 
 const getDataSource = (
   selectedRows: ReimbursementDataType[],
-  storedValue: ReimbursementDataType[],
+  storedValue: ReimbursementDataType[]
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -20,7 +19,7 @@ export default function ReimbursementAnalytics() {
   const { selectedRows } = useReimbursementStore();
   const [storedValue, setValue] = useLocalStorage<ReimbursementDataType[]>(
     "analyticsArray",
-    [],
+    []
   );
 
   useEffect(() => {
@@ -31,7 +30,7 @@ export default function ReimbursementAnalytics() {
 
   const dataSource: ReimbursementDataType[] = getDataSource(
     selectedRows,
-    storedValue,
+    storedValue
   );
 
   return (
@@ -42,7 +41,7 @@ export default function ReimbursementAnalytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <ReimbursementByType chartData={dataSource} />
         <ReimbursementByTime chartData={dataSource} />
         <ReimbursementPerEmployer chartData={dataSource} />

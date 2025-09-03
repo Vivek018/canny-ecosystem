@@ -1,4 +1,4 @@
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+
 import ExcelJS from "exceljs";
 import saveAs from "file-saver";
 import {
@@ -30,16 +30,16 @@ export const prepareAttendanceWorkbook = async ({
   companyName,
   companyAddress,
 }: {
-  selectedRows: TransformedAttendanceDataType[];
+  selectedRows: any[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
 }) => {
   const updatedData = selectedRows.map((employee) => {
     const totalPresents = Object.values(employee).filter(
-      (value: any) => value?.present === "P",
+      (value: any) => value?.present === "P"
     ).length;
     const totalLeaves = Object.values(employee).filter(
-      (value: any) => value?.present === "L",
+      (value: any) => value?.present === "L"
     ).length;
 
     return {
@@ -61,7 +61,7 @@ export const prepareAttendanceWorkbook = async ({
     }
   }
   const sortedDates = Array.from(allDates).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
 
   const allMonths = new Set<string>();
@@ -134,7 +134,7 @@ export const prepareAttendanceWorkbook = async ({
       emp.project || "N/A",
       emp.site || "N/A",
       ...sortedDates.map(
-        (date) => (emp[date as "attendance"] as any)?.present || "",
+        (date) => (emp[date as "attendance"] as any)?.present || ""
       ),
       emp.total_presents || 0,
       emp.total_leaves || 0,
@@ -184,14 +184,12 @@ export const AttendanceRegister = ({
   companyAddress,
   className,
 }: {
-  selectedRows: TransformedAttendanceDataType[];
+  selectedRows: any[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
   className?: string;
 }) => {
-  const generateAttendanceExcel = async (
-    selectedRows: TransformedAttendanceDataType[],
-  ) => {
+  const generateAttendanceExcel = async (selectedRows: any[]) => {
     if (!selectedRows.length) return;
 
     const workbook = await prepareAttendanceWorkbook({
@@ -204,7 +202,7 @@ export const AttendanceRegister = ({
       new Blob([workbook], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       }),
-      `Attendance-Register ${formatDateTime(Date.now())}.xlsx`,
+      `Attendance-Register ${formatDateTime(Date.now())}.xlsx`
     );
   };
 
@@ -214,7 +212,7 @@ export const AttendanceRegister = ({
         className={cn(
           buttonVariants({ variant: "muted" }),
           "w-full justify-start text-[13px] h-9 px-2 gap-2",
-          className,
+          className
         )}
       >
         <Icon name="plus-circled" />

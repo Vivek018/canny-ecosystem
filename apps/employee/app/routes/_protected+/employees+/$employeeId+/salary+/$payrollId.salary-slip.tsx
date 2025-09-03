@@ -28,6 +28,7 @@ import {
 import {
   formatDate,
   formatDateTime,
+  formatNumber,
   getMonthNameFromNumber,
   replaceUnderscore,
   roundToNearest,
@@ -228,8 +229,10 @@ type DataType = {
       position: string;
       start_date: string;
       site: string;
+      location: string;
       project: string;
       salary_entry_site: string;
+      salary_entry_location: string;
       salary_entry_department: string;
       salary_entry_site_project: string;
       salary_location: {
@@ -308,13 +311,13 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
               (Employee Code: {data?.employee?.employeeData?.employee_code})
             </Text>
             <Text style={styles.department}>
-              Designation:{" "}
-              {replaceUnderscore(
-                data?.employee?.employeeProjectAssignmentData?.position,
-              )}
+              Location:{" "}
+              {data?.employee?.employeeProjectAssignmentData
+                ?.salary_entry_location ??
+                data?.employee?.employeeProjectAssignmentData?.location}
             </Text>
             <Text style={styles.department}>
-              Location:{" "}
+              Site:{" "}
               {data?.employee?.employeeProjectAssignmentData
                 ?.salary_entry_site ??
                 data?.employee?.employeeProjectAssignmentData?.site}
@@ -326,6 +329,12 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                 data?.employee?.employeeProjectAssignmentData
                   ?.salary_entry_site_project ??
                 data?.employee?.employeeProjectAssignmentData?.project}
+            </Text>
+            <Text style={styles.department}>
+              Designation:{" "}
+              {replaceUnderscore(
+                data?.employee?.employeeProjectAssignmentData?.position
+              )}
             </Text>
           </View>
           <View style={styles.workingDetails}>
@@ -394,7 +403,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.infoLabel}>Date of Joining</Text>
             <Text style={styles.infoValue}>
               {formatDate(
-                data?.employee?.employeeProjectAssignmentData?.start_date,
+                data?.employee?.employeeProjectAssignmentData?.start_date
               )}
             </Text>
           </View>
@@ -411,7 +420,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
               return (
                 <View style={styles.earningRow} key={earning.name}>
                   <Text>{earning?.name}</Text>
-                  <Text>{earning?.amount.toFixed(2)}</Text>
+                  <Text>{formatNumber(earning?.amount)}</Text>
                 </View>
               );
             })}
@@ -422,8 +431,8 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                   Number(
                     data?.employee?.earnings
                       ?.reduce((sum, earning) => sum + earning.amount, 0)
-                      .toFixed(2),
-                  ),
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -438,7 +447,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
               return (
                 <View style={styles.earningRow} key={deduction.name}>
                   <Text>{deduction?.name}</Text>
-                  <Text>{deduction?.amount.toFixed(2)}</Text>
+                  <Text>{formatNumber(deduction?.amount)}</Text>
                 </View>
               );
             })}
@@ -449,8 +458,8 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                   Number(
                     data?.employee?.deductions
                       ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                      .toFixed(2),
-                  ),
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -465,13 +474,13 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             Number(
               data?.employee?.earnings
                 ?.reduce((sum, earning) => sum + earning.amount, 0)
-                .toFixed(2),
+                .toFixed(2)
             ) -
               Number(
                 data?.employee?.deductions
                   ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                  .toFixed(2),
-              ),
+                  .toFixed(2)
+              )
           )}`}</Text>
           <Text style={styles.netPayableWords}>
             {numberToWordsIndian(
@@ -479,14 +488,14 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                 Number(
                   data?.employee?.earnings
                     ?.reduce((sum, earning) => sum + earning.amount, 0)
-                    .toFixed(2),
+                    .toFixed(2)
                 ) -
                   Number(
                     data?.employee?.deductions
                       ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                      .toFixed(2),
-                  ),
-              ),
+                      .toFixed(2)
+                  )
+              )
             )}
           </Text>
         </View>
@@ -562,8 +571,13 @@ export default function SalarySlip() {
       position: data?.employeeProjectAssignmentData?.position || "",
       start_date: data?.employeeProjectAssignmentData?.start_date || "",
       site: data?.employeeProjectAssignmentData?.sites?.name || "",
+      location:
+        data?.employeeProjectAssignmentData?.sites?.company_locations?.name ||
+        "",
       project: data?.employeeProjectAssignmentData?.sites?.projects?.name || "",
       salary_entry_site: data?.payrollData?.salary_entries?.site?.name,
+      salary_entry_location:
+        data?.payrollData?.salary_entries?.site?.company_locations?.name,
       salary_entry_department:
         data?.payrollData?.salary_entries?.department?.name,
       salary_entry_site_project:
@@ -629,7 +643,7 @@ export default function SalarySlip() {
 
     const deductions: DeductionEntry[] = salaryEntries
       .filter(
-        (entry: SalaryEntry) => entry?.payroll_fields?.type === "deduction",
+        (entry: SalaryEntry) => entry?.payroll_fields?.type === "deduction"
       )
       .map((entry: SalaryEntry) => ({
         name: entry?.payroll_fields?.name,

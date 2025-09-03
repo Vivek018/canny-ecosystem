@@ -1,4 +1,3 @@
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import ExcelJS from "exceljs";
 import saveAs from "file-saver";
 import {
@@ -30,12 +29,12 @@ export const createAttendanceHourlyWorkbook = async ({
   companyName,
   companyAddress,
 }: {
-  selectedRows: TransformedAttendanceDataType[];
+  selectedRows: any[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
 }) => {
   const updatedData = selectedRows.map((employee) => {
-    const totalHours = Object.values(employee).reduce((sum, value) => {
+    const totalHours = Object.values(employee).reduce((sum: number, value) => {
       if (typeof value === "object" && value !== null && "hours" in value) {
         return sum + (Number(value.hours) || 0);
       }
@@ -60,7 +59,7 @@ export const createAttendanceHourlyWorkbook = async ({
     }
   }
   const sortedDates = Array.from(allDates).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
 
   const allMonths = new Set<string>();
@@ -133,7 +132,7 @@ export const createAttendanceHourlyWorkbook = async ({
       emp.project || "N/A",
       emp.site || "N/A",
       ...sortedDates.map(
-        (date) => (emp[date as "attendance"] as any)?.hours || 0,
+        (date) => (emp[date as "attendance"] as any)?.hours || 0
       ),
       emp.total_hours || 0,
     ];
@@ -177,14 +176,12 @@ export const AttendanceHourlyRegister = ({
   companyAddress,
   className,
 }: {
-  selectedRows: TransformedAttendanceDataType[];
+  selectedRows: any[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
   className?: string;
 }) => {
-  const generateAttendanceHourlyExcel = async (
-    selectedRows: TransformedAttendanceDataType[],
-  ) => {
+  const generateAttendanceHourlyExcel = async (selectedRows: any[]) => {
     if (!selectedRows.length) return;
 
     const workbook = await createAttendanceHourlyWorkbook({
@@ -197,7 +194,7 @@ export const AttendanceHourlyRegister = ({
       new Blob([workbook], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       }),
-      `Attendance(Hourly)-Register ${formatDateTime(Date.now())}.xlsx`,
+      `Attendance(Hourly)-Register ${formatDateTime(Date.now())}.xlsx`
     );
   };
 
@@ -207,7 +204,7 @@ export const AttendanceHourlyRegister = ({
         className={cn(
           buttonVariants({ variant: "muted" }),
           "w-full justify-start text-[13px] h-9 px-2 gap-2",
-          className,
+          className
         )}
       >
         <Icon name="plus-circled" />

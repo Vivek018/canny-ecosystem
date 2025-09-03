@@ -48,6 +48,7 @@ export default function ProtectedRoute() {
   const { user, employeeId } = useLoaderData<typeof loader>();
   const requestInfo = useRequestInfo();
   const [isLoading, setLoading] = useState(false);
+  const [openNav, setOpenNav] = useState(false);
   const submit = useSubmit();
   const { pathname } = useLocation();
   const handleLogout = () => {
@@ -59,7 +60,31 @@ export default function ProtectedRoute() {
 
   return (
     <>
-      {user?.role === "location_incharge" && <Sidebar className="flex-none" />}
+      {user?.role === "location_incharge" && (
+        <>
+          <Sidebar
+            key={pathname}
+            setOpenNav={setOpenNav}
+            className={cn(
+              "flex-none hidden sm:flex fixed top-0 left-0 h-full",
+              openNav && "flex fixed z-50"
+            )}
+          />
+          {
+            <div
+              className={cn(
+                "fixed inset-0 bg-background/80 backdrop-blur-sm z-40",
+                !openNav && "hidden"
+              )}
+              onClick={() => setOpenNav(false)}
+              onKeyDown={(e) => e.key === "Escape" && setOpenNav(false)}
+              role="button"
+              tabIndex={0}
+              aria-label="Close navigation"
+            />
+          }
+        </>
+      )}
       <header className="flex justify-between items-center border border-b-muted px-4 py-[11px]">
         <div className="flex items-center justify-center gap-2">
           {user?.role === "supervisor" && (
@@ -75,9 +100,20 @@ export default function ProtectedRoute() {
               <Icon name="chevron-left" size="sm" />
             </Link>
           )}
-          <Link to={DEFAULT_ROUTE}>
-            <Logo className="w-11 h-11" />
-          </Link>
+          {user?.role === "supervisor" || employeeId ? (
+            <Link to={DEFAULT_ROUTE}>
+              <Logo className="w-11 h-11" />
+            </Link>
+          ) : (
+            <Button
+              variant={"outline"}
+              size="icon"
+              className="flex sm:hidden h-9 w-9"
+              onClick={() => setOpenNav(true)}
+            >
+              <Icon name="hamburger" className="h-5 w-5" />
+            </Button>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <ThemeSwitch theme={requestInfo?.userPrefs.theme ?? "system"} />
@@ -95,8 +131,8 @@ export default function ProtectedRoute() {
       </header>
       <div
         className={cn(
-          "flex-1 min-h-0  overflow-scroll",
-          user?.role === "location_incharge" && "pl-20"
+          "flex-1 min-h-0",
+          user?.role === "location_incharge" && "sm:pl-20 h-max"
         )}
       >
         <Outlet />

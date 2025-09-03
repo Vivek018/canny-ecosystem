@@ -89,9 +89,22 @@ export async function getVehicleById({
 
   const { data, error } = await supabase
     .from("vehicles")
-    .select(columns.join(","))
+    .select(
+      `
+      ${columns.join(",")},
+      payee:payee_id ( name ),
+      driver:driver_id ( first_name, last_name ),
+      site:site_id ( name )
+    `
+    )
     .eq("id", id)
-    .single<Omit<VehiclesDatabaseRow, "created_at">>();
+    .single<
+      Omit<VehiclesDatabaseRow, "created_at"> & {
+        payee: { name: string } | null;
+        driver: { first_name: string; last_name: string } | null;
+        site: { name: string } | null;
+      }
+    >();
 
   if (error) {
     console.error("getVehicleById Error", error);
@@ -207,7 +220,7 @@ export async function getVehicleInsuranceDocumentUrlByInsuranceNumber({
   if (error)
     console.error(
       "getVehicleInsuranceDocumentUrlByInsuranceNumber Error",
-      error,
+      error
     );
 
   return { data, error };
@@ -278,7 +291,7 @@ export async function getVehicleUsageByCompanyId({
     .select(
       `${columns.join(",")},
           vehicles!inner(id, registration_number,sites!inner(id,name))`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("vehicles.company_id", companyId);
 
@@ -373,9 +386,18 @@ export async function getVehicleUsageById({
 
   const { data, error } = await supabase
     .from("vehicle_usage")
-    .select(columns.join(","))
+    .select(
+      `
+      ${columns.join(",")},
+      vehicle:vehicle_id ( payee_id )
+    `
+    )
     .eq("id", usageId)
-    .single<InferredType<VehiclesUsageDatabaseRow, (typeof columns)[number]>>();
+    .single<
+      InferredType<VehiclesUsageDatabaseRow, (typeof columns)[number]> & {
+        vehicle: { payee_id: string } | null;
+      }
+    >();
 
   if (error) {
     console.error("getVehicleUsageById Error", error);
@@ -435,4 +457,123 @@ export async function getVehicleLoanDocumentUrlByVehicleId({
   if (error) console.error("getVehicleLoanDocumentUrlByVehicleId Error", error);
 
   return { data, error };
+}
+
+////////////////////////////////////////////////////////////
+
+export async function getVehiclesBySiteIds({
+  supabase,
+  siteId,
+}: {
+  supabase: TypedSupabaseClient;
+  siteId: string[];
+}) {
+  const columns = [
+    "id",
+    "company_id",
+    "registration_number",
+    "name",
+    "ownership",
+    "price",
+    "monthly_rate",
+    "is_active",
+    "start_date",
+    "end_date",
+    "vehicle_type",
+    "driver_id",
+    "payee_id",
+    "site_id",
+    "photo",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("vehicles")
+    .select(columns.join(","))
+    .in("site_id", siteId)
+    .order("created_at", { ascending: false })
+    .returns<Omit<VehiclesDatabaseRow, "created_at">[]>();
+
+  if (error) {
+    console.error("getVehiclesBysiteId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getVehicleUsageBySiteIds({
+  supabase,
+  siteIds,
+  params,
+}: {
+  supabase: TypedSupabaseClient;
+  siteIds: string[];
+  params: {
+    from: number;
+    to: number;
+    sort?: [string, "asc" | "desc"];
+    searchQuery?: string;
+    filters?: VehicleUsageFilters | null;
+  };
+}) {
+  const { from, to, sort, searchQuery, filters } = params;
+
+  const { site, month, year, vehicle_no } = filters ?? {};
+
+  const columns = [
+    "id",
+    "vehicle_id",
+    "month",
+    "year",
+    "kilometers",
+    "fuel_in_liters",
+    "fuel_amount",
+    "toll_amount",
+    "maintainance_amount",
+  ] as const;
+
+  const query = supabase
+    .from("vehicle_usage")
+    .select(
+      `${columns.join(",")},
+          vehicles!inner(id, registration_number,sites!inner(id,name))`,
+      { count: "exact" }
+    )
+    .in("vehicles.site_id", siteIds);
+
+  if (sort) {
+    const [column, direction] = sort;
+    const usageCols = [
+      "kilometers",
+      "fuel_in_liters",
+      "fuel_amount",
+      "toll_amount",
+      "maintainance_amount",
+    ];
+
+    if (usageCols.includes(column)) {
+      query.order(column, { ascending: direction === "asc" });
+    } else {
+      query.order("created_at", { ascending: false });
+    }
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+
+  if (searchQuery) {
+    query.or(`registration_number.ilike.*${searchQuery}*`, {
+      referencedTable: "vehicles",
+    });
+  }
+
+  if (vehicle_no) query.eq("vehicles.registration_number", vehicle_no);
+  if (site) query.eq("vehicles.sites.name", site);
+  if (month) query.eq("month", Number(months[month]));
+  if (year) query.eq("year", Number(year));
+
+  const { data, count, error } = await query.range(from, to);
+  if (error) {
+    console.error("getVehicleUsageBySiteIds Error", error);
+  }
+
+  return { data, meta: { count }, error };
 }

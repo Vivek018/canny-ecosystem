@@ -7,7 +7,6 @@ import { ExitPaymentTable } from "@/components/exits/table/data-table";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
@@ -16,9 +15,9 @@ import {
 } from "@canny_ecosystem/supabase/constant";
 import {
   type ExitFilterType,
-  getExitsByCompanyId,
-  getProjectNamesByCompanyId,
-  getSiteNamesByCompanyId,
+  getExitsBySiteIds,
+  getSitesByLocationId,
+  getUserByEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -40,12 +39,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
   if (user?.role !== "location_incharge") {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
+
+  if (userProfileError) throw userProfileError;
+
   try {
     const url = new URL(request.url);
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const page = 0;
 
     const searchParams = new URLSearchParams(url.searchParams);
@@ -62,10 +69,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       final_settlement_date_end:
         searchParams.get("final_settlement_date_end") ?? undefined,
       reason: searchParams.get("reason") ?? undefined,
-      project: searchParams.get("project") ?? undefined,
-      site: searchParams.get("site") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
-      recently_added: searchParams.get("recently_added") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
     };
 
     const hasFilters =
@@ -73,10 +78,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
       Object.values(filters).some(
         (value) => value !== null && value !== undefined
       );
-
-    const exitsPromise = getExitsByCompanyId({
+    const { data } = await getSitesByLocationId({
+      locationId: userProfile?.location_id!,
       supabase,
-      companyId,
+    });
+
+    const siteIdsArray = data?.map((dat) => dat.id).filter(Boolean) as string[];
+    const siteOptions = data?.length ? data?.map((site) => site!.name) : [];
+
+    const exitsPromise = getExitsBySiteIds({
+      supabase,
+      siteIds: siteIdsArray ?? [],
       params: {
         from: 0,
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
@@ -86,19 +98,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
-
-    const sitePromise = getSiteNamesByCompanyId({
-      supabase,
-      companyId,
-    });
-
     return defer({
       exitsPromise: exitsPromise as any,
+      siteIdsArray,
+      siteOptions,
       query,
       filters,
-      projectPromise,
-      sitePromise,
       env,
       error: null,
     });
@@ -106,9 +111,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       exitsPromise: null,
       query: null,
+      siteOptions: [],
+      siteIdsArray: [],
       filters: null,
-      projectPromise: null,
-      sitePromise: null,
       env,
       error,
     });
@@ -126,7 +131,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function ExitsIndex() {
-  const { exitsPromise, query, filters, env, projectPromise, sitePromise } =
+  const { exitsPromise, query, filters, env, siteIdsArray, siteOptions } =
     useLoaderData<typeof loader>();
 
   const noFilters = filters
@@ -135,42 +140,11 @@ export default function ExitsIndex() {
   const filterList = { ...filters, name: query };
 
   return (
-    <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4">
-          <Suspense fallback={<LoadingSpinner className="ml-10" />}>
-            <Await resolve={projectPromise}>
-              {(projectData) => (
-                <Await resolve={sitePromise}>
-                  {(siteData) => {
-                    if (siteData?.error) {
-                      clearCacheEntry(cacheKeyPrefix.exits);
-                      return (
-                        <ErrorBoundary
-                          error={siteData?.error}
-                          message="Failed to load Exits"
-                        />
-                      );
-                    }
-                    const projectArray =
-                      projectData?.data?.map((project) => project.name) ?? [];
-                    const siteArray =
-                      siteData?.data?.map((site) => site.name) ?? [];
-
-                    return (
-                      <>
-                        <ExitsSearchFilter
-                          projectArray={projectArray}
-                          siteArray={siteArray}
-                        />
-                        <FilterList filterList={filterList} />
-                      </>
-                    );
-                  }}
-                </Await>
-              )}
-            </Await>
-          </Suspense>
+    <section className="py-4 overflow-hidden">
+      <div className="w-full flex items-start md:items-center justify-between gap-2 pb-4">
+        <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+          <ExitsSearchFilter siteOptions={siteOptions as string[]} />
+          <FilterList filterList={filterList} />
         </div>
         <div className="flex-shrink-0">
           <ExitActions isEmpty={!exitsPromise} env={env} />
@@ -184,32 +158,29 @@ export default function ExitsIndex() {
             <div>Sorry, Exit data can't be loaded. Try again later!</div>
           }
         >
-          {(exitsData) => {
-            if (exitsData?.error) {
+          {({ data, meta, error }) => {
+            if (error) {
               clearCacheEntry(cacheKeyPrefix.exits);
               return (
-                <ErrorBoundary
-                  error={exitsData?.error}
-                  message="Failed to load Exits"
-                />
+                <ErrorBoundary error={error} message="Failed to load Exits" />
               );
             }
             const hasNextPage = Boolean(
-              exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT
+              meta?.count && meta.count > LAZY_LOADING_LIMIT
             );
 
             return (
               <ExitPaymentTable
-                data={exitsData?.data ?? []}
+                data={data ?? []}
                 columns={ExitPaymentColumns}
-                count={exitsData?.meta?.count ?? exitsData?.data?.length ?? 0}
+                count={meta?.count ?? data?.length ?? 0}
                 query={query}
                 noFilters={noFilters}
                 filters={filters}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 env={env}
+                siteIdsArray={siteIdsArray as string[]}
               />
             );
           }}

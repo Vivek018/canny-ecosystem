@@ -7,7 +7,6 @@ import { InvoiceTable } from "@/components/invoice/table/data-table";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
@@ -15,8 +14,8 @@ import {
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
-  getInvoicesByCompanyId,
-  getLocationsForSelectByCompanyId,
+  getInvoicesByLocationId,
+  getUserByEmail,
   type InvoiceDataType,
   type InvoiceFilters,
 } from "@canny_ecosystem/supabase/queries";
@@ -32,24 +31,31 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
-
-const pageSize = LAZY_LOADING_LIMIT;
+const pageSize = 20;
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (user?.role !== "location_incharge") {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const { data: userProfile, error: userProfileError } = await getUserByEmail({
+    email: user?.email || "",
+    supabase,
+  });
+  if (user?.role !== "location_incharge") {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+  if (user?.role === "location_incharge" && !userProfile?.location_id)
+    throw new Error("No location id found");
+
+  if (userProfileError) throw userProfileError;
+
   try {
-    const url = new URL(request.url);
     const page = 0;
+
+    const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
     const sortParam = searchParams.get("sort");
     const query = searchParams.get("name") ?? null;
@@ -57,23 +63,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const filters: InvoiceFilters = {
       date_start: searchParams.get("date_start") ?? null,
       date_end: searchParams.get("date_end") ?? null,
-      company_location: searchParams.get("company_location") ?? null,
       type: searchParams.get("type") ?? null,
       service_charge: searchParams.get("service_charge") ?? null,
       paid: searchParams.get("paid") ?? null,
       paid_date_start: searchParams.get("paid_date_start") ?? null,
       paid_date_end: searchParams.get("paid_date_end") ?? null,
     };
-
     const hasFilters =
       filters &&
       Object.values(filters).some(
         (value) => value !== null && value !== undefined
       );
-
-    const invoicePromise = await getInvoicesByCompanyId({
+    const invoicePromise = await getInvoicesByLocationId({
       supabase,
-      companyId,
+      locationId: userProfile?.location_id ?? "",
       params: {
         from: 0,
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
@@ -82,28 +85,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
       },
     });
-    const locationPromise = await getLocationsForSelectByCompanyId({
-      companyId,
-      supabase,
-    });
+
     return defer({
-      locationPromise: locationPromise as any,
       invoicePromise: invoicePromise as any,
-      companyId,
       query,
-      filters,
       env,
+      locationId: userProfile?.location_id!,
+      filters,
     });
   } catch (error) {
     return json(
       {
-        locationPromise: Promise.resolve({ data: [] }),
         invoicePromise: Promise.resolve({ data: [] }),
-        companyId,
+        env,
         error,
+        locationId: "",
         query: "",
         filters: null,
-        env,
       },
       { status: 500 }
     );
@@ -120,35 +118,17 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Invoices() {
-  const { invoicePromise, env, filters, query, companyId, locationPromise } =
+  const { invoicePromise, filters, query, env, locationId } =
     useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
   return (
     <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
-          <Suspense fallback={<LoadingSpinner />}>
-            <Await resolve={locationPromise}>
-              {(locationData) => (
-                <>
-                  <InvoiceSearchFilter
-                    disabled={!locationData?.data?.length && noFilters}
-                    locationArray={
-                      locationData?.data?.length
-                        ? locationData?.data?.map(
-                            (location: { name: string } | null) =>
-                              location!.name
-                          )
-                        : []
-                    }
-                  />
-                  <FilterList filterList={filterList as InvoiceFilters} />
-                </>
-              )}
-            </Await>
-          </Suspense>
+      <div className="w-full flex item-start sm:items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col sm:flex-row  gap-2 mr-4">
+          <InvoiceSearchFilter disabled={noFilters} />
+          <FilterList filterList={filterList as InvoiceFilters} />
         </div>
         <InvoiceActions isEmpty={!invoicePromise} />
       </div>
@@ -164,18 +144,21 @@ export default function Invoices() {
                 />
               );
             }
-            const hasNextPage = Boolean(meta?.count > data?.length);
+            const hasNextPage = Boolean(
+              meta?.count && meta.count > LAZY_LOADING_LIMIT
+            );
+
             return (
               <InvoiceTable
                 data={data as unknown as InvoiceDataType[]}
                 columns={columns}
-                count={meta?.count ?? 0}
-                query={query}
-                filters={filters}
-                noFilters={noFilters}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
-                companyId={companyId}
+                filters={filters}
+                query={query}
+                noFilters={noFilters}
+                locationId={locationId as string}
+                count={meta?.count ?? data?.length ?? 0}
                 env={env}
               />
             );
