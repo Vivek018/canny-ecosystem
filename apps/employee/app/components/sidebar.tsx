@@ -33,14 +33,14 @@ export function Sidebar({
         "fixed flex h-full flex-col overflow-hidden w-20 z-50 bg-background border-r transition-[width]",
         isExpanded && "w-60 shadow-2xl dark:shadow-foreground/10",
         "max-sm:w-60 max-sm:shadow-2xl max-sm:dark:shadow-foreground/10",
-        className
+        className,
       )}
       onMouseEnter={openSidebar}
       onMouseLeave={closeSidebar}
     >
       <div
         className={cn(
-          "min-h-[72px] max-h-[72px] my-auto justify-start flex items-center gap-2 px-[22px] border-b"
+          "min-h-[72px] max-h-[72px] my-auto justify-start flex items-center gap-2 px-[22px] border-b",
         )}
       >
         <Link prefetch="intent" to="/" onClick={() => setOpenNav(false)}>
@@ -49,7 +49,7 @@ export function Sidebar({
       </div>
       <nav
         className={cn(
-          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center"
+          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center",
         )}
       >
         <ul className="flex w-full h-full flex-col py-2 gap-1.5 items-start">
@@ -71,7 +71,7 @@ export function Sidebar({
                     isActive &&
                       "bg-primary/15 text-primary hover:bg-primary/20",
                     link === pathname &&
-                      "cursor-auto bg-primary/25  text-primary hover:bg-primary/25"
+                      "cursor-auto bg-primary/25  text-primary hover:bg-primary/25",
                   )
                 }
                 onClick={() => setOpenNav(false)}
@@ -81,7 +81,7 @@ export function Sidebar({
                   className={cn(
                     "w-40 truncate",
                     !isExpanded && "hidden",
-                    "max-sm:flex"
+                    "max-sm:flex",
                   )}
                 >
                   {name}

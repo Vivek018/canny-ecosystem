@@ -1,8 +1,6 @@
 import { Card } from "@canny_ecosystem/ui/card";
 import type { VehiclesLoanDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
-import {
-  formatDate,
-} from "@canny_ecosystem/utils";
+import { formatDate } from "@canny_ecosystem/utils";
 import { toast } from "@canny_ecosystem/ui/use-toast";
 import { DetailItem } from "../details-card";
 
@@ -79,7 +77,7 @@ export const VehicleLoanItem = ({ loan }: { loan: VehicleLoan }) => {
                 onClick={() =>
                   handleDownloadDocument(
                     loan?.document as string,
-                    `${loan?.vehicle_id}`
+                    `${loan?.vehicle_id}`,
                   )
                 }
               >
@@ -98,7 +96,6 @@ export const VehicleLoanCard = ({
 }: {
   vehicleLoan: VehicleLoan | null;
 }) => {
-
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">

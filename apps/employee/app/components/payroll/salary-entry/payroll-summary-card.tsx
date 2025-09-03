@@ -11,10 +11,10 @@ interface PayrollSummaryProps {
 export const PayrollSummaryCard = React.memo<PayrollSummaryProps>(
   ({ totals, hasSelectedRows }) => {
     const earningEntries = Object.entries(totals).filter(
-      ([, value]: any) => value?.type === "earning"
+      ([, value]: any) => value?.type === "earning",
     );
     const deductionEntries = Object.entries(totals).filter(
-      ([, value]: any) => value?.type === "deduction"
+      ([, value]: any) => value?.type === "deduction",
     );
 
     const maxEntries = Math.max(earningEntries.length, deductionEntries.length);
@@ -32,7 +32,7 @@ export const PayrollSummaryCard = React.memo<PayrollSummaryProps>(
               <p className="text-muted-foreground">
                 {roundToNearest(value?.amount) || "0"}
               </p>
-            </React.Fragment>
+            </React.Fragment>,
           );
         } else {
           result.push(
@@ -41,7 +41,7 @@ export const PayrollSummaryCard = React.memo<PayrollSummaryProps>(
             >
               <p>&nbsp;</p>
               <p>&nbsp;</p>
-            </React.Fragment>
+            </React.Fragment>,
           );
         }
       }
@@ -51,7 +51,7 @@ export const PayrollSummaryCard = React.memo<PayrollSummaryProps>(
 
     const cardClassName = cn(
       "flex flex-col justify-around px-4 py-2",
-      hasSelectedRows && "bg-muted"
+      hasSelectedRows && "bg-muted",
     );
 
     const hrClassName = cn(hasSelectedRows && "border-muted-foreground/30");
@@ -93,5 +93,5 @@ export const PayrollSummaryCard = React.memo<PayrollSummaryProps>(
         </CardContent>
       </Card>
     );
-  }
+  },
 );

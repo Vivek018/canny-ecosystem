@@ -45,7 +45,7 @@ export default function InchargeEmployees({
           }
 
           const hasNextPage = Boolean(
-            meta?.count && meta.count > LAZY_LOADING_LIMIT
+            meta?.count && meta.count > LAZY_LOADING_LIMIT,
           );
 
           return (

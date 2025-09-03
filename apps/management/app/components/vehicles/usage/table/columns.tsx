@@ -133,13 +133,13 @@ export const columns = (): ColumnDef<VehicleUsageDataType>[] => [
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.vehicle_usage}`
+                  `${updateRole}:${attribute.vehicle_usage}`,
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.vehicle_usage}`
+                    `${deleteRole}:${attribute.vehicle_usage}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
               asChild
             >

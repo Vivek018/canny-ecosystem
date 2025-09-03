@@ -31,7 +31,7 @@ export default function SupervisorEmployees({
 
           useEffect(() => {
             const filteredData = data?.filter((item: any) =>
-              searchInObject(item, searchString)
+              searchInObject(item, searchString),
             );
             setTableData(filteredData);
           }, [searchString, data]);

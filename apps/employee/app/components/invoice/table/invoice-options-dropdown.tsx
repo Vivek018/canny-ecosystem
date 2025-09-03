@@ -32,8 +32,6 @@ export const InvoiceOptionsDropdown = ({
     navigate(`/payroll/invoices/${invoiceId}/preview-invoice`);
   };
 
-  
-
   const getExtensionFromContentType = (contentType: string | null) => {
     if (!contentType) return "";
 
@@ -102,7 +100,7 @@ export const InvoiceOptionsDropdown = ({
             !hasPermission(role, `${updateRole}:${attribute.invoice}`) &&
               !hasPermission(role, `${deleteRole}:${attribute.invoice}`) &&
               "hidden",
-            hide && "hidden"
+            hide && "hidden",
           )}
         />
 
@@ -111,7 +109,7 @@ export const InvoiceOptionsDropdown = ({
             className={cn(
               (!hasPermission(role, `${updateRole}:${attribute.invoice}`) ||
                 !proofUrl) &&
-                "hidden"
+                "hidden",
             )}
             onClick={() => handleDownloadProof(proofUrl, `${invoiceNumber}`)}
           >

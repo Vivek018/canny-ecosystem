@@ -257,7 +257,7 @@ export const getSalaryEntriesByPayrollId = async ({
           )
         )
       )
-    `
+    `,
     )
     .eq("salary_entries.payroll_id", payrollId)
     .limit(SOFT_QUERY_LIMIT);
@@ -311,7 +311,7 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
           )
         )
       )
-    `
+    `,
     )
     .eq("employee_id", employeeId)
     .eq("salary_entries.payroll_id", payrollId)
@@ -375,7 +375,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   if (currentMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      currentMonthError
+      currentMonthError,
     );
 
   const { data: previousMonth, error: previousMonthError } = await supabase
@@ -391,7 +391,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   if (previousMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      previousMonthError
+      previousMonthError,
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
@@ -414,7 +414,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   const filterYear = filters?.year ? Number(filters.year) : defaultYear;
 
   const startOfYear = new Date(
-    Date.UTC(Number(filterYear) - 1, filterMonth, 1)
+    Date.UTC(Number(filterYear) - 1, filterMonth, 1),
   );
 
   const endOfYear = new Date(Number(filterYear), filterMonth, 1);
@@ -430,7 +430,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     .eq("company_id", companyId)
     .in("status", ["approved"])
     .or(
-      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`
+      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`,
     )
 
     .order("run_date", { ascending: true })
@@ -476,7 +476,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   for (const item of payrollData) {
     const monthName = new Date(item.year!, item.month! - 1).toLocaleString(
       "default",
-      { month: "short" }
+      { month: "short" },
     );
     const key = `${monthName} ${item.year}`;
 
@@ -489,7 +489,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     ([month, data]) => ({
       month,
       data,
-    })
+    }),
   );
 
   for (const item of restData) {
@@ -572,7 +572,7 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
           )
         )
       )
-    `
+    `,
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -626,7 +626,7 @@ export async function getSalaryEntriesByEmployeeId({
           )
         )
       )
-    `
+    `,
     )
     .eq("employee_id", employeeId)
     .eq("year", filterYear)
@@ -746,7 +746,7 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
           )
         )
       )
-    `
+    `,
     )
     .eq("salary_entries.invoice_id", invoiceId);
 
@@ -777,7 +777,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
       absent_days,
       salary_entries!inner (
         id)       
-    `
+    `,
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -786,7 +786,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
   if (error)
     console.error(
       "getSalaryEntriesByPayrollIdForAddingSalaryEntry Error",
-      error
+      error,
     );
 
   return { data, error };
@@ -829,7 +829,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIds({
     .from("payroll")
     .select(columns.join(","), { count: "exact" })
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
     )
     .order("created_at", { ascending: false })
     .in("status", ["approved"]);
@@ -893,7 +893,7 @@ export async function getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
     .from("payroll")
     .select(columns.join(","))
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
     )
     .in("status", ["approved"])
     .eq("month", monthFilter)
@@ -904,14 +904,14 @@ export async function getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
   if (currentMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      currentMonthError
+      currentMonthError,
     );
 
   const { data: previousMonth, error: previousMonthError } = await supabase
     .from("payroll")
     .select(columns.join(","))
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
     )
     .in("status", ["approved"])
     .eq("month", monthFilter - 1)
@@ -922,7 +922,7 @@ export async function getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
   if (previousMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      previousMonthError
+      previousMonthError,
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
@@ -949,7 +949,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
   const filterYear = filters?.year ? Number(filters.year) : defaultYear;
 
   const startOfYear = new Date(
-    Date.UTC(Number(filterYear) - 1, filterMonth, 1)
+    Date.UTC(Number(filterYear) - 1, filterMonth, 1),
   );
 
   const endOfYear = new Date(Number(filterYear), filterMonth, 1);
@@ -963,11 +963,11 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
     .from("payroll")
     .select(payrollColumns.join(","))
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
     )
     .in("status", ["approved"])
     .or(
-      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`
+      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`,
     )
 
     .order("run_date", { ascending: true })
@@ -1013,7 +1013,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
   for (const item of payrollData) {
     const monthName = new Date(item.year!, item.month! - 1).toLocaleString(
       "default",
-      { month: "short" }
+      { month: "short" },
     );
     const key = `${monthName} ${item.year}`;
 
@@ -1026,7 +1026,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
     ([month, data]) => ({
       month,
       data,
-    })
+    }),
   );
 
   for (const item of restData) {

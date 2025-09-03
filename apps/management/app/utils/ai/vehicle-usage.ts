@@ -10,7 +10,7 @@ export const VehicleUsageFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Registration number of the vehicle. Example: MH02AB1234 or GJ02AB1234"
+      "Registration number of the vehicle. Example: MH02AB1234 or GJ02AB1234",
     ),
   month: z
     .enum(Object.keys(months) as [string, ...string[]])
@@ -24,12 +24,14 @@ export const VehicleUsageFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Registration number of the vehicle. Example: MH02AB1234 or GJ02AB1234"
+      "Registration number of the vehicle. Example: MH02AB1234 or GJ02AB1234",
     ),
   recently_added: z
     .enum(recentlyAddedFilter as [string, ...string[]])
     .optional()
-    .describe("Vehicle usage added before particular time i.e.Recently added vehicle usages. Example: 5_mins or 8_hours"),
+    .describe(
+      "Vehicle usage added before particular time i.e.Recently added vehicle usages. Example: 5_mins or 8_hours",
+    ),
   site: z
     .string()
     .optional()

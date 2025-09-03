@@ -13,7 +13,6 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 
-
 const chartConfig = {
   presents: {
     label: "Presents",

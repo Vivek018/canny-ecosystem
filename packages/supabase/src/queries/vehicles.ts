@@ -95,7 +95,7 @@ export async function getVehicleById({
       payee:payee_id ( name ),
       driver:driver_id ( first_name, last_name ),
       site:site_id ( name )
-    `
+    `,
     )
     .eq("id", id)
     .single<
@@ -220,7 +220,7 @@ export async function getVehicleInsuranceDocumentUrlByInsuranceNumber({
   if (error)
     console.error(
       "getVehicleInsuranceDocumentUrlByInsuranceNumber Error",
-      error
+      error,
     );
 
   return { data, error };
@@ -291,7 +291,7 @@ export async function getVehicleUsageByCompanyId({
     .select(
       `${columns.join(",")},
           vehicles!inner(id, registration_number,sites!inner(id,name))`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("vehicles.company_id", companyId);
 
@@ -390,7 +390,7 @@ export async function getVehicleUsageById({
       `
       ${columns.join(",")},
       vehicle:vehicle_id ( payee_id )
-    `
+    `,
     )
     .eq("id", usageId)
     .single<
@@ -536,7 +536,7 @@ export async function getVehicleUsageBySiteIds({
     .select(
       `${columns.join(",")},
           vehicles!inner(id, registration_number,sites!inner(id,name))`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .in("vehicles.site_id", siteIds);
 

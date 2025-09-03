@@ -29,7 +29,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                 className={cn(
                   payrollData?.site_id || payrollData?.project_id
                     ? "h-full grid grid-cols-3 gap-4"
-                    : "h-full grid grid-cols-2 gap-4"
+                    : "h-full grid grid-cols-2 gap-4",
                 )}
               >
                 <div className="flex flex-col justify-around items-center">
@@ -44,7 +44,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                     "flex flex-col justify-around items-center",
                     !payrollData?.site_id &&
                       !payrollData?.project_id &&
-                      "hidden"
+                      "hidden",
                   )}
                 >
                   <span>{payrollData?.site_id ? "Site" : "Project"}</span>
@@ -80,7 +80,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
                 <p
                   className={cn(
                     "text-wrap break-words whitespace-pre-wrap",
-                    details.title === "Title" && "text-sm"
+                    details.title === "Title" && "text-sm",
                   )}
                 >
                   {payrollData[details.value as keyof typeof payrollData]}
@@ -91,5 +91,5 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
         </div>
       </div>
     );
-  }
+  },
 );

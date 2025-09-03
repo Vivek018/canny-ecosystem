@@ -3,7 +3,7 @@ import { redirect } from "@remix-run/node";
 // for internal app redirects only
 export function safeRedirect(
   to: FormDataEntryValue | string | null | undefined,
-  init?: number | ResponseInit
+  init?: number | ResponseInit,
 ) {
   if (
     !to ||

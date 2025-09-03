@@ -65,7 +65,7 @@ const BulkReimbursementSchema = z.object({
     note: true,
   }),
   reimbursements: z.array(
-    ReimbursementSchema.pick({ amount: true, payee_id: true })
+    ReimbursementSchema.pick({ amount: true, payee_id: true }),
   ),
 });
 
@@ -118,7 +118,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -177,7 +177,7 @@ export default function AddBulkReimbursements() {
         });
       }
       navigate(
-        `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
+        `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`,
       );
     }
   }, [actionData]);
@@ -269,7 +269,7 @@ export default function AddBulkReimbursements() {
                   key={resetKey}
                   className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[]
+                    reimbursementStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(singleField.status, { type: "text" }),
@@ -291,7 +291,7 @@ export default function AddBulkReimbursements() {
                     defaultValue: "expenses",
                   }}
                   options={transformStringArrayIntoOptions(
-                    reimbursementTypeArray as unknown as string[]
+                    reimbursementTypeArray as unknown as string[],
                   )}
                   labelProps={{
                     children: "Type",
@@ -331,7 +331,7 @@ export default function AddBulkReimbursements() {
                 return (
                   <div
                     key={String(
-                      fields?.reimbursements.key! + index + resetKey + 3
+                      fields?.reimbursements.key! + index + resetKey + 3,
                     )}
                     className="flex flex-row items-center justify-center gap-2"
                   >

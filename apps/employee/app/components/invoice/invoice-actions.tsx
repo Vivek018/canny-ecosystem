@@ -18,7 +18,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows?.length && "hidden"
+            !selectedRows?.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/payroll/invoices/analytics")}

@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 const getDataSource = (
   selectedRows: ExitDataType[],
-  storedValue: ExitDataType[]
+  storedValue: ExitDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -19,7 +19,7 @@ export default function ExitAnalytics() {
   const { selectedRows } = useExitsStore();
   const [storedValue, setValue] = useLocalStorage<ExitDataType[]>(
     "analyticsArray",
-    []
+    [],
   );
 
   useEffect(() => {

@@ -41,19 +41,24 @@ export async function action({ request }: ActionFunctionArgs) {
       headers.append("Set-Cookie", cookieValue);
     }
 
-    return json({
-      status: "success",
-      message: `${updateType} changed successfully`,
-      returnTo,
-    }, { headers });
-
+    return json(
+      {
+        status: "success",
+        message: `${updateType} changed successfully`,
+        returnTo,
+      },
+      { headers },
+    );
   } catch (error) {
     console.error("Cookie", error);
-    return json({
-      status: "error",
-      message: "Failed to update settings",
-      returnTo: DEFAULT_ROUTE,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "Failed to update settings",
+        returnTo: DEFAULT_ROUTE,
+      },
+      { status: 500 },
+    );
   }
 }
 

@@ -14,7 +14,6 @@ import {
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
 
-
 const MAX_EMPLOYEES = 100;
 
 const chartConfig = {

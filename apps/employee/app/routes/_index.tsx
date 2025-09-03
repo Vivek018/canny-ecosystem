@@ -40,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     `${user!.role === "supervisor" ? "/employees" : "/dashboard"}`,
     {
       status: 303,
-    }
+    },
   );
 }
 

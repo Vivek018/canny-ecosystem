@@ -17,9 +17,7 @@ import {
   getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type {
-  SupabaseEnv,
-} from "@canny_ecosystem/supabase/types";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -121,7 +119,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.payroll_history_id}${
       args.params.payrollId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -154,7 +152,7 @@ export default function HistoryPayrollId() {
         {({ data, error }) => {
           if (error || !data) {
             clearExactCacheEntry(
-              `${cacheKeyPrefix.payroll_history_id}${payrollId}`
+              `${cacheKeyPrefix.payroll_history_id}${payrollId}`,
             );
             return (
               <ErrorBoundary

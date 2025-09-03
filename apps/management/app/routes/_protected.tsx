@@ -65,7 +65,7 @@ export default function ProtectedRoute() {
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   return (

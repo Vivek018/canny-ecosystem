@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const { data } = await getSitesByLocationId({
@@ -129,7 +129,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

@@ -1,9 +1,7 @@
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-import {
-  formatDate,
-} from "@canny_ecosystem/utils";
+import { formatDate } from "@canny_ecosystem/utils";
 import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 
 export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [

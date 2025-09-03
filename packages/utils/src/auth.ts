@@ -70,7 +70,7 @@ export const ROLES: { [key in (typeof userRoles)[number]]: readonly string[] } =
 
 export function hasPermission(
   role: keyof typeof ROLES,
-  permission: string
+  permission: string,
 ): boolean {
   const permissions = ROLES[role];
   return permissions ? permissions.includes(permission) : false;

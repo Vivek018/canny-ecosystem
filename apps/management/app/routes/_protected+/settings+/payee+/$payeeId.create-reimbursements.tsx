@@ -101,7 +101,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -160,7 +160,7 @@ export default function AddReimbursementsFromPayee({
         });
       }
       navigate(
-        `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
+        `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`,
       );
     }
   }, [actionData]);
@@ -200,7 +200,7 @@ export default function AddReimbursementsFromPayee({
               </CardTitle>
               <CardDescription className="lowercase">
                 {`${replaceUnderscore(
-                  REIMBURSEMENTS_TAG
+                  REIMBURSEMENTS_TAG,
                 )} by filling this form`}
               </CardDescription>
             </CardHeader>
@@ -229,13 +229,13 @@ export default function AddReimbursementsFromPayee({
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[]
+                    reimbursementStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name
+                    fields.status.name,
                   )}`}
                   labelProps={{
                     children: "Status",
@@ -250,7 +250,7 @@ export default function AddReimbursementsFromPayee({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name
+                      fields.amount.name,
                     )}`,
                     className: "",
                   }}
@@ -286,7 +286,7 @@ export default function AddReimbursementsFromPayee({
                     placeholder: "Select Reimbursement Type",
                   }}
                   options={transformStringArrayIntoOptions(
-                    reimbursementTypeArray as unknown as string[]
+                    reimbursementTypeArray as unknown as string[],
                   )}
                   labelProps={{
                     children: "Type",

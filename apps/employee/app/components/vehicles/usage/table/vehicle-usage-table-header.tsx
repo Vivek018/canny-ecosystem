@@ -85,7 +85,8 @@ export function VehicleUsageTableHeader({ table, className, loading }: Props) {
                 className={cn(
                   "px-4 py-2 min-w-36 max-w-36",
                   id === "vehicle_number" && "table-cell",
-                  id === "maintainance_amount" && "min-w-40 max-w-40 table-cell"
+                  id === "maintainance_amount" &&
+                    "min-w-40 max-w-40 table-cell",
                 )}
               >
                 <Button
@@ -102,14 +103,14 @@ export function VehicleUsageTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

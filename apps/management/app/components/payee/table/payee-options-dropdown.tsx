@@ -44,7 +44,7 @@ export const PayeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${createRole}:${attribute.settingPayee}`) &&
-                "flex"
+                "flex",
             )}
             onClick={handleCreateReimbursement}
           >
@@ -54,14 +54,14 @@ export const PayeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${createRole}:${attribute.settingPayee}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DropdownMenuItem
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.settingPayee}`) &&
-                "flex"
+                "flex",
             )}
             onClick={handleEdit}
           >
@@ -71,7 +71,7 @@ export const PayeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.settingPayee}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeletePayee id={id} role={role} />

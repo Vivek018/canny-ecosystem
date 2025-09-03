@@ -26,7 +26,7 @@ export async function action({
     const formData = await request.formData();
     const employeeFile = formData.get("employeeFile") as string;
     const emails = formData.get("to") as unknown as string;
-    
+
     const emailList = emails
       .split(",")
       .map((email) => email.trim())

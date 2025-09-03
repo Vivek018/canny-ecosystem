@@ -1,7 +1,4 @@
-import {
-  formatDate,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
+import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 import type { ColumnDef } from "@tanstack/react-table";
@@ -129,6 +126,4 @@ export const columns = (
       return <p className="truncate">{row.original?.users?.email ?? "--"}</p>;
     },
   },
-
-  
 ];

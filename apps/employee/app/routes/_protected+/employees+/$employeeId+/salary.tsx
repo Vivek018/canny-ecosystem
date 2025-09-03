@@ -72,7 +72,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return clientCaching(
     `${cacheKeyPrefix.employee_salary}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

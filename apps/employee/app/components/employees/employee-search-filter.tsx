@@ -40,7 +40,6 @@ export function EmployeesSearchFilter({
   disabled?: boolean;
   siteOptions: string[];
 }) {
-  
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const isSubmitting =
@@ -127,7 +126,7 @@ export function EmployeesSearchFilter({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -162,7 +161,7 @@ export function EmployeesSearchFilter({
         {
           action: "/employees?index",
           method: "POST",
-        }
+        },
       );
     } else {
       if (prompt.length) {
@@ -174,7 +173,7 @@ export function EmployeesSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name"
+      ([key, value]) => value?.length && key !== "name",
     ).length > 0;
 
   return (
@@ -191,7 +190,7 @@ export function EmployeesSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin"
+              isSubmitting && "animate-spin",
             )}
           />
           <Input
@@ -218,7 +217,7 @@ export function EmployeesSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100"
+                isOpen && "opacity-100",
               )}
             >
               <Icon name="mixer" />

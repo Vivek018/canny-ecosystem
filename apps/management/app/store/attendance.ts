@@ -18,7 +18,7 @@ export const useAttendanceStore = create<AttendanceState>()((set) => ({
   selectedRows: [],
   columnVisibility: {},
   setColumnVisibility: (
-    updater: any[] | ((arg0: any[]) => any[] | undefined) | undefined
+    updater: any[] | ((arg0: any[]) => any[] | undefined) | undefined,
   ) =>
     set((state) => {
       return {

@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         vehiclesPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -117,7 +117,7 @@ export default function VehiclesIndex() {
                   <CommandEmpty
                     className={cn(
                       "w-full py-40 capitalize text-lg tracking-wide text-center",
-                      !isDocument && "hidden"
+                      !isDocument && "hidden",
                     )}
                   >
                     No vehicles found.

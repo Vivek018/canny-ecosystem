@@ -14,7 +14,6 @@ import {
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
 
-
 const chartConfig = {
   present_days: { label: "Present", color: "hsl(var(--chart-2))" },
   absent_days: { label: "Absent", color: "hsl(var(--chart-5))" },

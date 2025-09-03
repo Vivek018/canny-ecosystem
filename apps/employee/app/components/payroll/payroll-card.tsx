@@ -24,7 +24,7 @@ export function PayrollCard({ data }: { data: PayrollDatabaseRow }) {
             <p
               className={cn(
                 "p-2 w-auto font-semibold text-center text-sm rounded-md capitalize",
-                is_approved ? "bg-green" : "bg-muted"
+                is_approved ? "bg-green" : "bg-muted",
               )}
             >
               {data.status}
@@ -78,7 +78,7 @@ export function PayrollCard({ data }: { data: PayrollDatabaseRow }) {
             }
             className={cn(
               buttonVariants(),
-              "border-2 border-primary w-full md:w-36"
+              "border-2 border-primary w-full md:w-36",
             )}
           >
             View {is_approved ? "Pay History" : "Pay Run"}

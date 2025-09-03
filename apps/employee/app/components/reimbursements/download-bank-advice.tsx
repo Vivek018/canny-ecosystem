@@ -48,7 +48,7 @@ export const prepareBankAdviceWorkbook = async ({
         return getPayeeBankDetailsById({ id: payee_id, supabase });
       }
       return null;
-    })
+    }),
   );
 
   const dateToBeSent = formatDate(date)

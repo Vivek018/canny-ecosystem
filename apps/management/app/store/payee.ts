@@ -1,5 +1,4 @@
-
-import type{ PayeeDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { PayeeDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
@@ -10,7 +9,7 @@ interface PayeeState {
   rowSelection: Record<string, boolean>;
   selectedRows: PayeeDatabaseRow[];
   setSelectedRows: (updater: Updater<PayeeDatabaseRow[]>) => void;
-} 
+}
 
 export const usePayeeStore = create<PayeeState>()((set) => ({
   columns: [],

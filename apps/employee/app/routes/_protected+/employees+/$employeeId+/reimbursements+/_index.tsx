@@ -56,7 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const usersPromise = getUsersEmail({ supabase, companyId });
@@ -103,7 +103,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.employee_reimbursements}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -152,7 +152,7 @@ export default function ReimbursementsIndex() {
                 {({ data, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
                     );
                     toast({
                       variant: "destructive",

@@ -15,7 +15,6 @@ import {
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
 
-
 const chartConfig = {
   absents: {
     label: "Absents",

@@ -10,7 +10,7 @@ export const AttendanceFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123"
+      "Full name, employee code or any identifier. Example: John Doe or EMP123",
     ),
   month: z
     .enum(Object.keys(months) as [string, ...string[]])
@@ -29,7 +29,7 @@ export const AttendanceFiltersSchema = z.object({
     .enum(recentlyAddedFilter as [string, ...string[]])
     .optional()
     .describe(
-      "Attendance added before particular time i.e.Recently added attendance. Example: 5_mins or 8_hours"
+      "Attendance added before particular time i.e.Recently added attendance. Example: 5_mins or 8_hours",
     ),
 });
 

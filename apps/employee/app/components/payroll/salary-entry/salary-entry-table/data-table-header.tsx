@@ -101,7 +101,7 @@ export function SalaryTableHeader({
                 id === "sr_no" && "min-w-20 max-w-20 table-cell",
                 id === "employee_code" && "table-cell",
                 id === "name" && "min-w-52 max-w-52 table-cell",
-                id === "net_amount" && "table-cell"
+                id === "net_amount" && "table-cell",
               )}
             >
               <Button
@@ -115,14 +115,14 @@ export function SalaryTableHeader({
                   name="chevron-up"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "desc" && "flex"
+                    sortingId === id && sortingOrder === "desc" && "flex",
                   )}
                 />
                 <Icon
                   name="chevron-down"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "asc" && "flex"
+                    sortingId === id && sortingOrder === "asc" && "flex",
                   )}
                 />
               </Button>

@@ -21,7 +21,7 @@ export const SalaryEntryDropdown = ({
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    document: string
+    document: string,
   ) => {
     e.preventDefault();
     navigate(`${employeeId}/${document}`);

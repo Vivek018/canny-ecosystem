@@ -12,7 +12,7 @@ import { MaintainanceAmountByMonth } from "@/components/vehicles/usage/analytics
 
 const getDataSource = (
   selectedRows: VehicleUsageDataType[],
-  storedValue: VehicleUsageDataType[]
+  storedValue: VehicleUsageDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -21,7 +21,7 @@ export default function VehicleUsageAnalytics() {
   const { selectedRows } = useVehicleUsageStore();
   const [storedValue, setValue] = useLocalStorage<VehicleUsageDataType[]>(
     "analyticsArray",
-    []
+    [],
   );
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function VehicleUsageAnalytics() {
 
   const dataSource: VehicleUsageDataType[] = getDataSource(
     selectedRows,
-    storedValue
+    storedValue,
   );
   const chartConfig = {
     amount: {
@@ -110,7 +110,7 @@ export default function VehicleUsageAnalytics() {
       acc[reg].maintainance_amount += data.maintainance_amount || 0;
 
       return acc;
-    }, {})
+    }, {}),
   );
 
   return (

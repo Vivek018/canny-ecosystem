@@ -29,7 +29,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.dob_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -64,7 +64,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.doj_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -81,7 +81,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.dol_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 

@@ -107,7 +107,6 @@ export async function getProjectById({
   return { data, error };
 }
 
-
 export async function getProjectBySiteIds({
   supabase,
   siteIds,
@@ -127,7 +126,9 @@ export async function getProjectBySiteIds({
   }
 
   // Extract unique project_ids from sites and filter out nulls
-  const projectIds = [...new Set(sites.map((s) => s.project_id))].filter((id): id is string => id !== null);
+  const projectIds = [...new Set(sites.map((s) => s.project_id))].filter(
+    (id): id is string => id !== null,
+  );
 
   if (projectIds.length === 0) {
     return { data: [], error: null };

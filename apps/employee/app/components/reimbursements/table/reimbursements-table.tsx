@@ -59,7 +59,7 @@ export function ReimbursementsTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useReimbursementStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreEmployees = async () => {
@@ -151,7 +151,7 @@ export function ReimbursementsTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden max-sm:border-x-0",
-        !tableLength && "border-none"
+        !tableLength && "border-none",
       )}
     >
       <div
@@ -192,7 +192,7 @@ export function ReimbursementsTable<TData, TValue>({
                     }}
                     className={cn(
                       "absolute flex cursor-default select-text",
-                      row.original?.invoice_id && "bg-primary/20"
+                      row.original?.invoice_id && "bg-primary/20",
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -205,12 +205,12 @@ export function ReimbursementsTable<TData, TValue>({
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
                             cell.column.id === "employee_name" &&
                               "min-w-48 max-w-48 table-cell",
-                            cell.column.id === "employee_code" && "table-cell"
+                            cell.column.id === "employee_code" && "table-cell",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -229,7 +229,7 @@ export function ReimbursementsTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden"
+                        !data?.length && noFilters && "hidden",
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -238,7 +238,7 @@ export function ReimbursementsTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden"
+                        !data?.length && noFilters && "hidden",
                       )}
                       onClick={() => {
                         setSearchParams();

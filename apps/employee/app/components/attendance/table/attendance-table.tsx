@@ -156,7 +156,7 @@ export function AttendanceTable({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden max-sm:border-x-0",
-        !tableLength && "border-none"
+        !tableLength && "border-none",
       )}
     >
       <div
@@ -199,7 +199,7 @@ export function AttendanceTable({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.monthly_attendance?.salary_entries
-                        ?.invoice_id && "bg-primary/20"
+                        ?.invoice_id && "bg-primary/20",
                     )}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -212,12 +212,12 @@ export function AttendanceTable({
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
                             cell.column.id === "employee_code" && "table-cell",
                             cell.column.id === "first_name" &&
-                              "min-w-48 max-w-48 table-cell"
+                              "min-w-48 max-w-48 table-cell",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -236,7 +236,7 @@ export function AttendanceTable({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden"
+                        !data?.length && noFilters && "hidden",
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -245,7 +245,7 @@ export function AttendanceTable({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden"
+                        !data?.length && noFilters && "hidden",
                       )}
                       onClick={() => {
                         setSearchParams();

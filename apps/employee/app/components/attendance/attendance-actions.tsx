@@ -43,7 +43,7 @@ export function AttendanceActions({
           size="icon"
           className={cn(
             "h-10 w-10 border border-input",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/time-tracking/attendance/analytics")}

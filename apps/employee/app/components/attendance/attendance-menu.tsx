@@ -117,7 +117,7 @@ export function AttendanceMenu({
           <div
             className={cn(
               "flex flex-col gap-1",
-              !selectedRows?.length && "hidden"
+              !selectedRows?.length && "hidden",
             )}
           >
             <AttendanceRegister

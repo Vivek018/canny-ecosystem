@@ -134,7 +134,12 @@ export function EmployeeDetailsImportData({
 
   return (
     <section className="p-4 relative">
-      <div className={cn("fixed inset-0 z-50 bg-background/80", isImporting ? "block" : "hidden")}>
+      <div
+        className={cn(
+          "fixed inset-0 z-50 bg-background/80",
+          isImporting ? "block" : "hidden",
+        )}
+      >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
       </div>
       <div className="w-full flex items-center justify-between pb-4">

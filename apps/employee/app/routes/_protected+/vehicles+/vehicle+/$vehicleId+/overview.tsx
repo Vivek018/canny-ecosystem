@@ -76,7 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.vehicle_overview}${args.params.vehicleId}`,
-    args
+    args,
   );
 }
 
@@ -106,7 +106,7 @@ export default function VehicleIndex() {
           {(resolvedData) => {
             if (!resolvedData || !env) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.vehicle_overview}${vehicleId}`
+                `${cacheKeyPrefix.vehicle_overview}${vehicleId}`,
               );
               return <ErrorBoundary message="Failed to load vehicle" />;
             }
@@ -139,7 +139,7 @@ export default function VehicleIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.vehicle_overview}${vehicleId}`
+                `${cacheKeyPrefix.vehicle_overview}${vehicleId}`,
               );
               return <ErrorBoundary message="Failed to load vehicle loan" />;
             }
@@ -161,7 +161,7 @@ export default function VehicleIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.vehicle_overview}${vehicleId}`
+                `${cacheKeyPrefix.vehicle_overview}${vehicleId}`,
               );
               return (
                 <ErrorBoundary message="Failed to load vehicle insurance" />

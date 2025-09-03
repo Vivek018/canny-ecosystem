@@ -197,7 +197,6 @@ export async function getSiteIdsBySiteNames({
   return { data, error };
 }
 
-
 export async function getSitesByLocationId({
   supabase,
   locationId,

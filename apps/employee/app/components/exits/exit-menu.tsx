@@ -31,7 +31,7 @@ export function ExitMenu({
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.exits}`) &&
               "hidden",
-            className
+            className,
           )}
         >
           <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">

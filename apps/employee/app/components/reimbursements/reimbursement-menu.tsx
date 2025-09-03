@@ -31,7 +31,7 @@ export function ReimbursementMenu({
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.reimbursements}`) &&
               "hidden",
-            className
+            className,
           )}
         >
           <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">

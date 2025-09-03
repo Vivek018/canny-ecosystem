@@ -285,7 +285,6 @@ export function InvoiceSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-      
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>

@@ -10,7 +10,7 @@ import { ReimbursementPerEmployer } from "@/components/reimbursements/analytics/
 
 const getDataSource = (
   selectedRows: ReimbursementDataType[],
-  storedValue: ReimbursementDataType[]
+  storedValue: ReimbursementDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -19,7 +19,7 @@ export default function ReimbursementAnalytics() {
   const { selectedRows } = useReimbursementStore();
   const [storedValue, setValue] = useLocalStorage<ReimbursementDataType[]>(
     "analyticsArray",
-    []
+    [],
   );
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function ReimbursementAnalytics() {
 
   const dataSource: ReimbursementDataType[] = getDataSource(
     selectedRows,
-    storedValue
+    storedValue,
   );
 
   return (

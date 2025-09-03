@@ -72,14 +72,14 @@ export default function ProtectedRoute() {
             setOpenNav={setOpenNav}
             className={cn(
               "flex-none hidden sm:flex fixed top-0 left-0 h-full",
-              openNav && "flex fixed z-50"
+              openNav && "flex fixed z-50",
             )}
           />
           {
             <div
               className={cn(
                 "fixed inset-0 bg-background/80 backdrop-blur-sm z-40",
-                !openNav && "hidden"
+                !openNav && "hidden",
               )}
               onClick={() => setOpenNav(false)}
               onKeyDown={(e) => e.key === "Escape" && setOpenNav(false)}
@@ -99,7 +99,7 @@ export default function ProtectedRoute() {
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "bg-card w-12 h-12 px-0 rounded-full md:hidden",
-                pathname === "/employees" && "hidden"
+                pathname === "/employees" && "hidden",
               )}
             >
               <Icon name="chevron-left" size="sm" />
@@ -125,7 +125,7 @@ export default function ProtectedRoute() {
           <Button
             className={cn(
               "h-12 rounded-full",
-              !(employeeId || user) && "hidden"
+              !(employeeId || user) && "hidden",
             )}
             variant="outline"
             onClick={handleLogout}
@@ -137,7 +137,7 @@ export default function ProtectedRoute() {
       <div
         className={cn(
           "flex-1 min-h-0",
-          user?.role === "location_incharge" && "sm:pl-20 h-max"
+          user?.role === "location_incharge" && "sm:pl-20 h-max",
         )}
       >
         <Outlet />

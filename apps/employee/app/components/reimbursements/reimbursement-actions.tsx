@@ -26,7 +26,7 @@ export function ReimbursementActions({
           size="icon"
           className={cn(
             "h-10 w-10  border border-input",
-            !selectedRows?.length && "hidden"
+            !selectedRows?.length && "hidden",
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/approvals/reimbursements/analytics")}
@@ -39,7 +39,7 @@ export function ReimbursementActions({
           className={cn(
             buttonVariants({ variant: "muted", size: "icon" }),
             "h-10 w-10  border border-input",
-            !selectedRows.length && "hidden"
+            !selectedRows.length && "hidden",
           )}
         />
       </div>

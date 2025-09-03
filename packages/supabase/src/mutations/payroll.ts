@@ -142,11 +142,11 @@ export async function createSalaryPayroll({
     const newTotalEmployees = payrollData.total_employees! - skipped;
 
     const unSkippedEmployeeIds = salaryEntriesData.map(
-      (entry) => entry.monthly_attendance.employee_id
+      (entry) => entry.monthly_attendance.employee_id,
     );
 
     const unSkippedRawData = data.rawData.filter((entry) =>
-      unSkippedEmployeeIds.includes(entry.employee_id)
+      unSkippedEmployeeIds.includes(entry.employee_id),
     );
 
     const newTotalNetAmount = calculateSalaryTotalNetAmount(unSkippedRawData);
@@ -172,16 +172,16 @@ export async function createSalaryPayroll({
     const employeeId = record.employee_id;
 
     const salaryEntry = salaryEntriesData!.find(
-      (entry) => entry.monthly_attendance?.employee_id === employeeId
+      (entry) => entry.monthly_attendance?.employee_id === employeeId,
     );
 
     if (!salaryEntry) continue;
 
     for (const [normalizedKey, matchedField] of Object.entries(
-      payrollFieldMap
+      payrollFieldMap,
     )) {
       const rawKey = Object.keys(record).find(
-        (k) => k.trim().toUpperCase() === normalizedKey
+        (k) => k.trim().toUpperCase() === normalizedKey,
       );
 
       const rawValue = rawKey ? record[rawKey] : undefined;
@@ -276,7 +276,7 @@ export async function createSalaryPayrollByDepartment({
       .eq("id", data.payrollId!);
     console.error(
       "createSalaryPayrollByDepartment payroll error",
-      payrollError
+      payrollError,
     );
     return { status: payrollStatus, error: payrollError };
   }
@@ -360,7 +360,7 @@ export async function createSalaryPayrollByDepartment({
     const employeeId = record.employee_id;
 
     const salaryEntry = salaryEntriesData!.find(
-      (entry) => entry.monthly_attendance?.employee_id === employeeId
+      (entry) => entry.monthly_attendance?.employee_id === employeeId,
     );
 
     if (!salaryEntry) continue;
@@ -553,7 +553,7 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
     if (error) {
       console.error(
         "deleteSalaryEntriesFromPayrollAndEmployeeId Error:",
-        error
+        error,
       );
     }
 
@@ -562,7 +562,7 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
 
   console.error(
     "deleteSalaryEntriesFromPayrollAndEmployeeId Error:",
-    "No Salary Entries Found"
+    "No Salary Entries Found",
   );
 
   return { status: 404, error: "No Salary Entries Found" };

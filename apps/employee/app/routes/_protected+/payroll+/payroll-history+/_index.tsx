@@ -74,7 +74,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       status: searchParams.get("status") ?? null,
       month: searchParams.get("month") ?? null,
       year: searchParams.get("year") ?? null,
-      
     };
 
     const { data } = await getSitesByLocationId({
@@ -134,7 +133,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.payroll_history}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -203,8 +202,8 @@ export default function PayrollHistoryIndex() {
                 Boolean(
                   meta?.count && innitial?.length
                     ? meta.count > innitial.length
-                    : false
-                )
+                    : false,
+                ),
               );
 
               const [data, setData] = useState(innitial);
@@ -216,8 +215,8 @@ export default function PayrollHistoryIndex() {
                   Boolean(
                     meta?.count && innitial?.length
                       ? meta.count > innitial.length
-                      : false
-                  )
+                      : false,
+                  ),
                 );
               }, [innitial]);
 
@@ -266,7 +265,7 @@ export default function PayrollHistoryIndex() {
                     <CommandEmpty
                       className={cn(
                         "w-full py-40 capitalize text-lg tracking-wide text-center",
-                        !isDocument && "hidden"
+                        !isDocument && "hidden",
                       )}
                     >
                       No payrolls found.

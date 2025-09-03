@@ -44,7 +44,6 @@ export function VehicleUsageBars({
 }: {
   chartData: VehicleUsageDataType[];
 }) {
-
   const newData = Object.values(
     chartData.reduce((acc: any, data) => {
       const reg = data.vehicles.registration_number;
@@ -67,7 +66,7 @@ export function VehicleUsageBars({
       acc[reg].maintainance_amount += data.maintainance_amount || 0;
 
       return acc;
-    }, {})
+    }, {}),
   );
 
   const limitedData = newData.slice(0, MAX_VEHICLES);
