@@ -24,10 +24,15 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { managementUserRoles } from "@canny_ecosystem/utils";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { user: userData } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (managementUserRoles.includes(userData?.role ?? "")) {
+    return redirect("/no-user-found");
+  }
 
   const employeeId = await getEmployeeIdFromCookie(request);
 

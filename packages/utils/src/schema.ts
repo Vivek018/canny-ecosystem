@@ -630,6 +630,13 @@ export const userRoles = [
   "location_incharge",
 ] as const;
 
+export const managementUserRoles = [
+  "master",
+  "admin",
+  "operation_manager",
+  "executive",
+];
+
 export const UserSchema = z.object({
   id: z.string().uuid().optional(),
   first_name: zString.max(20),

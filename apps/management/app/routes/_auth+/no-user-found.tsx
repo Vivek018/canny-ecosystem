@@ -8,6 +8,7 @@ import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Logo } from "@canny_ecosystem/ui/logo";
+import { managementUserRoles } from "@canny_ecosystem/utils";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 
@@ -17,7 +18,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (user?.role === "supervisor") return {};
+  if (!managementUserRoles.includes(user?.role ?? "")) {
+    return {};
+  }
 
   if (sessionUser?.email) {
     const { data: userData, error: userError } = await getUserByEmail({
