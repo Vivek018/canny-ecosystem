@@ -1,7 +1,7 @@
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
-export type TransformedAttendanceDataType = {
+export type any = {
   attendance: any[];
   employee_id: string;
   employee_code: string;
@@ -12,17 +12,31 @@ export type TransformedAttendanceDataType = {
 
 interface AttendanceState {
   columns: string[];
+  columnVisibility: any;
+  setColumnVisibility: any;
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;
   rowSelection: Record<string, boolean>;
-  selectedRows: TransformedAttendanceDataType[];
-  setSelectedRows: (updater: Updater<TransformedAttendanceDataType[]>) => void;
+  selectedRows: any[];
+  setSelectedRows: (updater: Updater<any[]>) => void;
 }
 
 export const useAttendanceStore = create<AttendanceState>()((set) => ({
   columns: [],
   rowSelection: {},
   selectedRows: [],
+  columnVisibility: {},
+  setColumnVisibility: (
+    updater: any[] | ((arg0: any[]) => any[] | undefined) | undefined
+  ) =>
+    set((state) => {
+      return {
+        columnVisibility:
+          typeof updater === "function"
+            ? updater(state.columnVisibility)
+            : updater,
+      };
+    }),
   setColumns: (columns) => set({ columns }),
   setRowSelection: (updater: Updater<RowSelectionState>) =>
     set((state) => {

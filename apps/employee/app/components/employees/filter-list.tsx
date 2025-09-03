@@ -29,7 +29,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.dob_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
@@ -47,12 +47,6 @@ export function FilterList({ filterList }: Props) {
       case "status":
         return value;
 
-      case "project":
-        return value;
-
-      case "site":
-        return value;
-
       case "assignment_type":
         return replaceUnderscore(value);
 
@@ -61,7 +55,8 @@ export function FilterList({ filterList }: Props) {
 
       case "skill_level":
         return replaceUnderscore(value);
-
+      case "site":
+        return value;
       case "doj_start": {
         if (value && filterList?.doj_end) {
           return formatDateRange(
@@ -69,7 +64,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.doj_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
@@ -86,7 +81,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.dol_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 

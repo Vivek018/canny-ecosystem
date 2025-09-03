@@ -26,6 +26,7 @@ export type IconName =
   | "employee"
   | "exclaimation-triangle"
   | "feedback"
+  | "hamburger"
   | "import"
   | "info"
   | "input"

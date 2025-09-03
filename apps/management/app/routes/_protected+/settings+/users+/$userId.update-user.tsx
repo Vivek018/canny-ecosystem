@@ -15,6 +15,7 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import {
+  getLocationsByCompanyId,
   getSiteNamesByCompanyId,
   getUserById,
 } from "@canny_ecosystem/supabase/queries";
@@ -52,7 +53,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       pseudoLabel: site?.projects?.name,
       value: site?.id,
     }));
+    const { data: locations } = await getLocationsByCompanyId({
+      supabase,
+      companyId,
+    });
 
+    const locationOptions = locations?.map((location) => ({
+      label: location?.name,
+      value: location?.id,
+    }));
     let userData = null;
     let userError = null;
 
@@ -67,6 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return json({
         userData,
         siteOptions,
+        locationOptions,
         error: null,
       });
     }
@@ -77,9 +87,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         userData: null,
         siteOptions: null,
+        locationOptions: null,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -98,7 +109,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -126,13 +137,14 @@ export async function action({
         message: "Failed to update user",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function UpdateUser() {
-  const { userData, error, siteOptions } = useLoaderData<typeof loader>();
+  const { userData, error, siteOptions, locationOptions } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -165,5 +177,11 @@ export default function UpdateUser() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load user" />;
 
-  return <CreateUser updateValues={userData} siteOptions={siteOptions} />;
+  return (
+    <CreateUser
+      updateValues={userData}
+      updateSiteOptions={siteOptions}
+      updateLocationOptions={locationOptions}
+    />
+  );
 }

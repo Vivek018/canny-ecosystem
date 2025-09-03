@@ -7,6 +7,7 @@ import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Logo } from "@canny_ecosystem/ui/logo";
+import { managementUserRoles } from "@canny_ecosystem/utils";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 
@@ -14,12 +15,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { user: sessionUser } = await getSessionUser({ request });
 
   const { supabase } = getSupabaseWithHeaders({ request });
-
   if (sessionUser?.email) {
     const { data: userData, error: userError } = await getUserByEmail({
       supabase,
       email: sessionUser.email,
     });
+
+    if (managementUserRoles.includes(userData?.role ?? "")) {
+      return {};
+    }
 
     if (userError && !userData) {
       return safeRedirect(DEFAULT_ROUTE);
@@ -37,7 +41,7 @@ export default function NoUserFound() {
       <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
         <div>
           <Link to={DEFAULT_ROUTE}>
-            <Logo theme={theme} />
+            <Logo />
           </Link>
         </div>
         <div>

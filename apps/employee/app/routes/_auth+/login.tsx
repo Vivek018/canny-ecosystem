@@ -53,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -67,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (error || !data) {
       return json(
         { error: error || "No employee data found", employeeId: null },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -147,9 +147,12 @@ export default function Login() {
           </div>
 
           <p className="font-medium text-center pb-2 text-[#878787]">
-            Managing your workforce effortlessly, from fully transparent
-            operations to most detailed insights, all in one end to end
-            ecosystem.
+            If you are an{" "}
+            <strong className="text-foreground/80">Employee</strong>, please
+            enter your Employee Code, Mobile Number, or Email directly. If you
+            are a{" "}
+            <strong className="text-foreground/80">Incharge/Supervisor </strong>
+            , please use the Login button.
           </p>
 
           <div className="flex flex-col items-center my-4">
@@ -198,7 +201,7 @@ export default function Login() {
                   value="supervisor_login"
                   className="cursor-pointer w-full sm:w-80"
                 >
-                  Login as Supervisor
+                  Login
                 </Button>
               </Form>
             </div>

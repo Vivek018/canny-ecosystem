@@ -8,7 +8,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (user && user?.role !== "supervisor") {
+  if (
+    user &&
+    user?.role !== "supervisor" &&
+    user?.role !== "location_incharge"
+  ) {
     return safeRedirect("/no-user-found", { status: 303, headers });
   }
 

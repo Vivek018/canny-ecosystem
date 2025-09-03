@@ -33,6 +33,7 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import {
   formatDate,
+  formatNumber,
   getMonthNameFromNumber,
   replaceUnderscore,
   roundToNearest,
@@ -134,7 +135,7 @@ type DataType = {
 
 function chunkArray(array: any, size: number) {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size),
+    array.slice(i * size, i * size + size)
   );
 }
 
@@ -161,13 +162,20 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
           {chunk.map((emp: any, i: number) => {
             const earningsTotal = emp.earnings.reduce(
               (acc: number, e: any) => acc + e.amount,
-              0,
+              0
             );
             const deductionTotal = emp.deductions.reduce(
               (acc: number, d: any) => acc + d.amount,
-              0,
+              0
             );
             const netAmount = earningsTotal - deductionTotal;
+
+            const site =
+              emp?.employeeProjectAssignmentData?.salary_entry_site ??
+              emp?.employeeProjectAssignmentData?.site;
+            const department =
+              emp?.employeeProjectAssignmentData?.salary_entry_department ??
+              emp?.employeeProjectAssignmentData?.salary_entry_site_project;
 
             return (
               <View key={i.toString()} wrap={false}>
@@ -267,7 +275,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                       ]}
                     >
                       {replaceUnderscore(
-                        emp.employeeProjectAssignmentData.position,
+                        emp.employeeProjectAssignmentData.position
                       )}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>ESI No.</Text>
@@ -283,8 +291,9 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         { flex: 2, textTransform: "capitalize" },
                       ]}
                     >
-                      {emp?.employeeProjectAssignmentData?.salary_entry_site ??
-                        emp?.employeeProjectAssignmentData?.site}
+                      {emp?.employeeProjectAssignmentData
+                        ?.salary_entry_location ??
+                        emp?.employeeProjectAssignmentData?.location}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>Bank</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
@@ -299,11 +308,9 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         { flex: 2, textTransform: "capitalize" },
                       ]}
                     >
-                      {emp?.employeeProjectAssignmentData
-                        ?.salary_entry_department ??
-                        emp?.employeeProjectAssignmentData
-                          ?.salary_entry_site_project ??
-                        emp?.employeeProjectAssignmentData?.project}
+                      {site && department
+                        ? `${site} - ${department}`
+                        : emp?.employeeProjectAssignmentData?.project}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>PAN No.</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
@@ -320,7 +327,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp?.employeeProjectAssignmentData?.start_date,
+                          emp?.employeeProjectAssignmentData?.start_date
                         )}
                       </>
                     </Text>
@@ -355,7 +362,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                   {Array.from({
                     length: Math.max(
                       emp.earnings.length,
-                      emp.deductions.length,
+                      emp.deductions.length
                     ),
                   }).map((_, idx) => (
                     <View style={styles.row} key={idx.toString()}>
@@ -363,13 +370,13 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         {emp.earnings[idx]?.name || ""}
                       </Text>
                       <Text style={[styles.cell, { flex: 1 }]}>
-                        {emp.earnings[idx]?.amount?.toFixed(2) || ""}
+                        {formatNumber(emp.earnings[idx]?.amount) || ""}
                       </Text>
                       <Text style={[styles.cell, { flex: 1 }]}>
                         {emp.deductions[idx]?.name || ""}
                       </Text>
                       <Text style={[styles.cell, { flex: 1 }]}>
-                        {emp.deductions[idx]?.amount?.toFixed(2) || ""}
+                        {formatNumber(emp.deductions[idx]?.amount) || ""}
                       </Text>
                     </View>
                   ))}
@@ -521,23 +528,23 @@ export default function SalarySlips() {
       }
 
       const orderedEarnings = preferredEarningOrder.filter((f) =>
-        earningFields.has(f),
+        earningFields.has(f)
       );
       const remainingEarnings = [...earningFields.keys()].filter(
-        (f) => !preferredEarningOrder.includes(f),
+        (f) => !preferredEarningOrder.includes(f)
       );
       const orderedDeductions = preferredDeductionOrder.filter((f) =>
-        deductionFields.has(f),
+        deductionFields.has(f)
       );
       const remainingDeductions = [...deductionFields.keys()].filter(
-        (f) => !preferredDeductionOrder.includes(f),
+        (f) => !preferredDeductionOrder.includes(f)
       );
 
       const earnings = [...orderedEarnings, ...remainingEarnings].map(
-        (name) => ({ name, amount: earningsMap[name] }),
+        (name) => ({ name, amount: earningsMap[name] })
       );
       const deductions = [...orderedDeductions, ...remainingDeductions].map(
-        (name) => ({ name, amount: deductionsMap[name] }),
+        (name) => ({ name, amount: deductionsMap[name] })
       );
 
       return {
@@ -552,10 +559,15 @@ export default function SalarySlips() {
           start_date:
             emp.employee?.employee_project_assignment?.start_date || "",
           site: emp?.employee?.employee_project_assignment?.sites?.name || "",
+          location:
+            emp?.employee?.employee_project_assignment?.sites?.company_locations
+              ?.name || "",
           project:
             emp?.employee?.employee_project_assignment?.sites?.projects?.name ||
             "",
           salary_entry_site: emp?.salary_entries?.site?.name,
+          salary_entry_location:
+            emp?.salary_entries?.site?.company_locations?.name,
           salary_entry_department: emp?.salary_entries?.department?.name,
           salary_entry_site_project: emp?.salary_entries?.site?.projects?.name,
 
@@ -619,7 +631,6 @@ export default function SalarySlips() {
       employeeData,
     };
   }
-
   const slipData = transformData(updatedData);
 
   if (!isDocument) return <div>Loading...</div>;

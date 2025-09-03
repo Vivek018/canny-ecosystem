@@ -196,3 +196,45 @@ export async function getSiteIdsBySiteNames({
 
   return { data, error };
 }
+
+
+export async function getSitesByLocationId({
+  supabase,
+  locationId,
+}: {
+  supabase: TypedSupabaseClient;
+  locationId: string;
+}) {
+  const columns = [
+    "id",
+    "name",
+    "address_line_1",
+    "address_line_2",
+    "city",
+    "state",
+    "pincode",
+    "latitude",
+    "longitude",
+    "company_location_id",
+    "is_active",
+    "capacity",
+    "company_location:company_locations!company_location_id (id, name)",
+    "project:projects!project_id (id, name)",
+    "project_id",
+    "company_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("sites")
+    .select(columns.join(","))
+    .eq("company_location_id", locationId)
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<Omit<SitesWithLocation, "created_at">[]>();
+
+  if (error) {
+    console.error("getSitesBylocationId Error", error);
+  }
+
+  return { data, error };
+}

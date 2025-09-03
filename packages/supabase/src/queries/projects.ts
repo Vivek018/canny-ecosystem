@@ -106,3 +106,42 @@ export async function getProjectById({
 
   return { data, error };
 }
+
+
+export async function getProjectBySiteIds({
+  supabase,
+  siteIds,
+}: {
+  supabase: TypedSupabaseClient;
+  siteIds: string[];
+}) {
+  const { data: sites, error: sitesError } = await supabase
+    .from("sites")
+    .select("project_id")
+    .in("id", siteIds)
+    .not("project_id", "is", null);
+
+  if (sitesError) {
+    console.error("getProjectBySiteIds - sites fetch error", sitesError);
+    return { data: null, error: sitesError };
+  }
+
+  // Extract unique project_ids from sites and filter out nulls
+  const projectIds = [...new Set(sites.map((s) => s.project_id))].filter((id): id is string => id !== null);
+
+  if (projectIds.length === 0) {
+    return { data: [], error: null };
+  }
+
+  const { data: projects, error: projectsError } = await supabase
+    .from("projects")
+    .select("id, name")
+    .in("id", projectIds);
+
+  if (projectsError) {
+    console.error("getProjectBySiteIds - projects fetch error", projectsError);
+    return { data: null, error: projectsError };
+  }
+
+  return { data: projects, error: null };
+}

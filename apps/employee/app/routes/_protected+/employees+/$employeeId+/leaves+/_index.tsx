@@ -25,10 +25,10 @@ import { LeavesSearchFilter } from "@/components/employees/leaves/leave-search-f
 import { FilterList } from "@/components/employees/leaves/filter-list";
 import { ColumnVisibility } from "@/components/employees/leaves/column-visibility";
 import { LeaveCountCards } from "@/components/employees/leaves/leave-count-cards";
-import { LeavesDataTable } from "@/components/leaves/table/leaves-table";
-import { columns } from "@/components/leaves/table/columns";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { LeavesDataTable } from "@/components/leaves/table/leaves-table";
+import { columns } from "@/components/leaves/table/columns";
 
 const isEmployeeRoute = true;
 export async function loader({ request, params }: LoaderFunctionArgs) {

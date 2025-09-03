@@ -31,16 +31,6 @@ export function VehiclesWrapper({
       {data?.map((vehicle) => (
         <CommandItem
           key={vehicle.id}
-          // value={
-          //   project?.id +
-          //   project?.name +
-          //   project?.description +
-          //   project?.project_type +
-          //   project?.start_date +
-          //   project?.end_date +
-          //   project?.status +
-          //   project?.company_id
-          // }
           className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
         >
           <VehicleCard vehicle={vehicle} />

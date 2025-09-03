@@ -13,7 +13,6 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const chartConfig = {
   present_days: { label: "Present", color: "hsl(var(--chart-2))" },
@@ -24,11 +23,7 @@ const chartConfig = {
   paid_holidays: { label: "Paid Holiday", color: "hsl(var(--chart-9))" },
 } satisfies ChartConfig;
 
-export function AttendanceTrend({
-  chartData,
-}: {
-  chartData: TransformedAttendanceDataType[];
-}) {
+export function AttendanceTrend({ chartData }: { chartData: any[] }) {
   const totalData = useMemo(() => {
     const totals: Record<string, number> = {};
 

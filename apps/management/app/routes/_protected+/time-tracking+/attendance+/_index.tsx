@@ -41,7 +41,6 @@ import { generateAttendanceFilter } from "@/utils/ai/attendance";
 const pageSize = LAZY_LOADING_LIMIT;
 
 export type DayType = { day: number; fullDate: string };
-export type TransformedAttendanceDataType = any;
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {

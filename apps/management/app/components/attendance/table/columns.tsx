@@ -102,6 +102,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "working_days",
     header: "Working Days",
     cell: ({ row }) => (
@@ -111,6 +112,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "present_days",
     header: "Presents",
     cell: ({ row }) => (
@@ -120,6 +122,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "absent_days",
     header: "Absents",
     cell: ({ row }) => (
@@ -129,6 +132,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "working_hours",
     header: "Working Hours",
     cell: ({ row }) => (
@@ -138,6 +142,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "overtime_hours",
     header: "Overtime Hours",
     cell: ({ row }) => (
@@ -147,6 +152,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "paid_holidays",
     header: "Paid Holidays",
     cell: ({ row }) => (
@@ -156,6 +162,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "paid_leaves",
     header: "Paid Leaves",
     cell: ({ row }) => (
@@ -165,6 +172,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "casual_leaves",
     header: "Casual Leaves",
     cell: ({ row }) => (
@@ -189,15 +197,15 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
               className={cn(
                 (!hasPermission(
                   role,
-                  `${updateRole}:${attribute.attendance}`,
+                  `${updateRole}:${attribute.attendance}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.attendance}`,
+                    `${deleteRole}:${attribute.attendance}`
                   )) ||
                   !row.original?.monthly_attendance?.id
                   ? "hidden"
-                  : "flex",
+                  : "flex"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

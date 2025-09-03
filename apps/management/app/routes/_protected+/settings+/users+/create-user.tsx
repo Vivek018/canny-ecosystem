@@ -54,7 +54,10 @@ import {
   userRoles,
 } from "@canny_ecosystem/utils";
 import { SITE_PARAM } from "@/components/employees/form/create-employee-project-assignment";
-import { getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  getLocationsByCompanyId,
+  getSiteNamesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const CREATE_USER_TAG = "create-user";
@@ -83,11 +86,22 @@ export async function loader({
       value: site?.id,
     }));
 
+    const { data: locations } = await getLocationsByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    const locationOptions = locations?.map((location) => ({
+      label: location?.name,
+      value: location?.id,
+    }));
+
     return json({
       status: "success",
       message: "User form loaded",
       companyId,
       siteOptions,
+      locationOptions,
       error: null,
     });
   } catch (error) {
@@ -96,10 +110,11 @@ export async function loader({
         status: "error",
         message: "An unexpected error occurred",
         companyId,
+        locationOptions: null,
         siteOptions: null,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -118,7 +133,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -150,20 +165,22 @@ export async function action({
 
 export default function CreateUser({
   updateValues,
-  siteOptions: updateSiteOptions,
+  updateSiteOptions,
+  updateLocationOptions,
 }: {
-  siteOptions: ComboboxSelectOption[] | null | undefined;
+  updateSiteOptions: ComboboxSelectOption[] | null | undefined;
+  updateLocationOptions: ComboboxSelectOption[] | null | undefined;
   updateValues?: UserDatabaseUpdate | null;
 }) {
-  const { companyId, siteOptions } = useLoaderData<typeof loader>();
+  const { companyId, siteOptions, locationOptions } =
+    useLoaderData<typeof loader>();
 
   const actionData = useActionData<typeof action>();
   const USER_TAG = updateValues ? UPDATE_USER_TAG : CREATE_USER_TAG;
   const [resetKey, setResetKey] = useState(Date.now());
   const [searchParams, setSearchParams] = useSearchParams();
-  const [supervisor, setSupervisor] = useState(
-    updateValues ? updateValues.role : "",
-  );
+  const [role, setRole] = useState(updateValues ? updateValues.role : "");
+
   const initialValues = updateValues ?? getInitialValueFromZod(UserSchema);
 
   const [form, fields] = useForm({
@@ -229,7 +246,7 @@ export default function CreateUser({
                     ...getInputProps(fields.first_name, { type: "text" }),
                     autoFocus: true,
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.first_name.name,
+                      fields.first_name.name
                     )}`,
                   }}
                   labelProps={{
@@ -241,7 +258,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.last_name, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.last_name.name,
+                      fields.last_name.name
                     )}`,
                   }}
                   labelProps={{
@@ -256,7 +273,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.email, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.email.name,
+                      fields.email.name
                     )}`,
                   }}
                   labelProps={{
@@ -268,7 +285,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.mobile_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.mobile_number.name,
+                      fields.mobile_number.name
                     )}`,
                   }}
                   labelProps={{
@@ -282,13 +299,13 @@ export default function CreateUser({
                 key={resetKey}
                 className="mb-2"
                 options={transformStringArrayIntoOptions(
-                  userRoles as unknown as string[],
+                  userRoles as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.role, { type: "text" }),
                 }}
                 onChange={(e) => {
-                  setSupervisor(e);
+                  setRole(e);
                 }}
                 placeholder={`Select ${replaceUnderscore(fields.role.name)}`}
                 labelProps={{
@@ -297,7 +314,7 @@ export default function CreateUser({
                 errors={fields.role.errors}
               />
 
-              {supervisor === "supervisor" && (
+              {role === "supervisor" && (
                 <SearchableSelectField
                   className="capitalize"
                   options={siteOptions ?? updateSiteOptions ?? []}
@@ -322,6 +339,33 @@ export default function CreateUser({
                     setSearchParams(searchParams);
                   }}
                   errors={fields.site_id.errors}
+                />
+              )}
+              {role === "location_incharge" && (
+                <SearchableSelectField
+                  className="capitalize"
+                  options={locationOptions ?? updateLocationOptions ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.location_id, {
+                      type: "text",
+                    }),
+                    defaultValue:
+                      searchParams.get("location") ??
+                      String(fields.location_id.initialValue),
+                  }}
+                  placeholder={"Select Location"}
+                  labelProps={{
+                    children: "Location",
+                  }}
+                  onChange={(location) => {
+                    if (location?.length) {
+                      searchParams.set("location", location);
+                    } else {
+                      searchParams.delete("location");
+                    }
+                    setSearchParams(searchParams);
+                  }}
+                  errors={fields.location_id.errors}
                 />
               )}
 

@@ -55,6 +55,7 @@ export async function getUserByEmail({
     "preferred_language",
     "company_id",
     "site_id",
+    "location_id",
     "is_active",
   ] as const;
 
@@ -149,6 +150,8 @@ export async function getUserById({
     "last_login",
     "preferred_language",
     "company_id",
+    "site_id",
+    "location_id",
     "is_active",
   ] as const;
 

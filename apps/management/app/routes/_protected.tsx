@@ -18,13 +18,16 @@ import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useHotkeys } from "react-hotkeys-hook";
+import { managementUserRoles } from "@canny_ecosystem/utils";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: sessionUser } = await getSessionUser({ request });
   const { supabase } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (user?.role === "supervisor") return redirect("/no-user-found");
+  if (!managementUserRoles.includes(user?.role ?? "")) {
+    return redirect("/no-user-found");
+  }
 
   if (!sessionUser?.email) return redirect("/login");
 
@@ -62,7 +65,7 @@ export default function ProtectedRoute() {
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   return (
