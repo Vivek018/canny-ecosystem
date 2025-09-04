@@ -202,7 +202,7 @@ export function ReimbursementSearchFilter({
       <DropdownMenuContent
         className={cn(
           "w-auto max-h-[70vh] overflow-y-auto",
-          "max-sm:relative max-sm:left-[75px] max-md:relative max-md:right-0"
+          "max-sm:relative max-sm:left-[75px] max-md:relative max-md:right-0",
         )}
         align="end"
         sideOffset={19}

@@ -59,7 +59,7 @@ export function VehicleUsageTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useVehicleUsageStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreUsages = async () => {
@@ -151,7 +151,7 @@ export function VehicleUsageTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none"
+        !tableLength && "border-none",
       )}
     >
       <div
@@ -191,7 +191,7 @@ export function VehicleUsageTable<TData, TValue>({
                     }}
                     className={cn(
                       "absolute flex cursor-default select-text",
-                      row.original?.invoice_id && "bg-primary/20"
+                      row.original?.invoice_id && "bg-primary/20",
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -207,12 +207,12 @@ export function VehicleUsageTable<TData, TValue>({
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                             cell.column.id === "maintainance_amount" &&
-                              "min-w-40 max-w-40"
+                              "min-w-40 max-w-40",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -231,7 +231,7 @@ export function VehicleUsageTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden"
+                        !data?.length && noFilters && "hidden",
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -240,7 +240,7 @@ export function VehicleUsageTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden"
+                        !data?.length && noFilters && "hidden",
                       )}
                       onClick={() => {
                         setSearchParams();

@@ -45,7 +45,7 @@ export function ReimbursementTopEmployees({
       acc[employee_name] = (acc[employee_name] || 0) + (row.amount || 0);
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const topEmployeesData = Object.entries(employeeTotals)

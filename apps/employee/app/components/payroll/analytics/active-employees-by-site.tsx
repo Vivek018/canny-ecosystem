@@ -30,9 +30,9 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
       const project = item.employee_project_assignment?.sites?.projects?.name;
       const site = item.employee_project_assignment?.sites?.name;
 
-      if (!site) continue
+      if (!site) continue;
 
-      const projectKey = project || site; 
+      const projectKey = project || site;
 
       if (!siteCounts[projectKey]) {
         siteCounts[projectKey] = {};

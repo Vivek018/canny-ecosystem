@@ -193,14 +193,14 @@ export const columns = ({
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.reimbursements}`
+                  `${updateRole}:${attribute.reimbursements}`,
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.reimbursements}`
+                    `${deleteRole}:${attribute.reimbursements}`,
                   ) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden"
+                !!row.original.invoice_id?.length && "hidden",
               )}
               asChild
             >

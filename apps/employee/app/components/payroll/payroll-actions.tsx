@@ -54,7 +54,7 @@ export function PayrollActions({
           size="icon"
           className={cn(
             "h-10 w-12 px-2 bg-muted border border-input",
-            className
+            className,
           )}
         >
           <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
@@ -68,13 +68,13 @@ export function PayrollActions({
               className={cn(
                 "hidden",
                 status === "approved" &&
-                  "flex flex-row justify-start gap-2 px-2 pr-1"
+                  "flex flex-row justify-start gap-2 px-2 pr-1",
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/salary-slips`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/salary-slips`
+                      `/payroll/payroll-history/${payrollId}/salary-slips`,
                     )
               }
             >
@@ -93,7 +93,7 @@ export function PayrollActions({
                 <Button
                   variant={"ghost"}
                   className={cn(
-                    "w-full flex flex-row justify-start gap-2 px-2 pr-1"
+                    "w-full flex flex-row justify-start gap-2 px-2 pr-1",
                   )}
                 >
                   <Icon name="import" />
@@ -124,10 +124,10 @@ export function PayrollActions({
                       newParams.set("location", locations);
                       fromWhere === "runpayroll"
                         ? navigate(
-                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`
+                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`,
                           )
                         : navigate(
-                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`
+                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`,
                           );
                     }}
                   >

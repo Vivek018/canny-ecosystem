@@ -32,8 +32,8 @@ export const prepareEsiFormatWorkbook = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
+    ),
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -127,7 +127,7 @@ export const DownloadEsiFormat = ({
           (e: {
             amount: number;
             payroll_fields: { type: string; name: string };
-          }) => e.payroll_fields.type === "earning"
+          }) => e.payroll_fields.type === "earning",
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 

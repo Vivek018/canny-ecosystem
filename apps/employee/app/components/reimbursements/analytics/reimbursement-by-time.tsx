@@ -79,7 +79,7 @@ export function ReimbursementByTime({
     chartData.map((row) => {
       const date = new Date(row.submitted_date || "");
       return date.getFullYear();
-    })
+    }),
   );
 
   let reimbursementByTimeData = [];
@@ -92,7 +92,7 @@ export function ReimbursementByTime({
             number,
             { year: number; amount: number; month: string | null }
           >,
-          row
+          row,
         ) => {
           if (row.submitted_date) {
             const date = new Date(row.submitted_date);
@@ -105,8 +105,8 @@ export function ReimbursementByTime({
           }
           return acc;
         },
-        {}
-      )
+        {},
+      ),
     );
   } else {
     reimbursementByTimeData = Object.values(
@@ -116,7 +116,7 @@ export function ReimbursementByTime({
             string,
             { month: string; amount: number; year: number | null }
           >,
-          row
+          row,
         ) => {
           if (row.submitted_date) {
             const date = new Date(row.submitted_date);
@@ -129,8 +129,8 @@ export function ReimbursementByTime({
           }
           return acc;
         },
-        {}
-      )
+        {},
+      ),
     );
   }
 
