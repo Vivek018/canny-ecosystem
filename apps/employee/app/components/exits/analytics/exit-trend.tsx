@@ -41,19 +41,19 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
 
         return acc;
       },
-      {},
-    ),
+      {}
+    )
   ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const total = useMemo(
     () => ({ amount: trendData.reduce((acc, curr) => acc + curr.amount, 0) }),
-    [],
+    []
   );
 
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6 max-sm:text-sm">
           <CardTitle>Exits Over Time</CardTitle>
           <CardDescription>
             Showing trend of exits for the period.

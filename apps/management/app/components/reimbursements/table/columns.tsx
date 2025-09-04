@@ -17,6 +17,7 @@ import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import Previewer from "@/utils/previewer";
+import { Link } from "@remix-run/react";
 
 export const columns = ({
   isEmployeeRoute = false,
@@ -55,10 +56,18 @@ export const columns = ({
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
-      return (
-        <p className="truncate">
-          {row.original?.employees?.employee_code ?? "--"}
-        </p>
+      return row.original.employee_id ? (
+        <Link
+          to={`/employees/${row.original.employee_id}/reimbursements`}
+          prefetch="intent"
+          className="group"
+        >
+          <p className="truncate text-primary/80 group-hover:text-primary ">
+            {row.original?.employees?.employee_code ?? "--"}
+          </p>
+        </Link>
+      ) : (
+        <p>--</p>
       );
     },
   },
@@ -67,8 +76,14 @@ export const columns = ({
     accessorKey: "payee_code",
     header: "Payee Code",
     cell: ({ row }) => {
-      return (
-        <p className="truncate">{row.original.payee?.payee_code ?? "--"}</p>
+      return row.original.payee_id ? (
+        <Link to={"/settings/payee"} prefetch="intent" className="group">
+          <p className="truncate text-primary/80 group-hover:text-primary ">
+            {row.original.payee?.payee_code ?? "--"}
+          </p>
+        </Link>
+      ) : (
+        <p>--</p>
       );
     },
   },
@@ -178,14 +193,14 @@ export const columns = ({
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.reimbursements}`,
+                  `${updateRole}:${attribute.reimbursements}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.reimbursements}`,
+                    `${deleteRole}:${attribute.reimbursements}`
                   ) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
               asChild
             >

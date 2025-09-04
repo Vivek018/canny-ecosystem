@@ -1,4 +1,5 @@
-import ExcelJS from "exceljs";
+import * as XLSX from "xlsx";
+
 import saveAs from "file-saver";
 import {
   AlertDialog,
@@ -31,8 +32,8 @@ export const prepareEsiFormatWorkbook = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
-    ),
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
+    )
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -42,71 +43,72 @@ export const prepareEsiFormatWorkbook = async ({
 
   const extractedData = updatedData.map((formatData) => ({
     wages: roundToNearest(formatData?.amount),
-    ip_number: formatData?.statutoryDetails?.esic_number || null,
-    ip_name:
-      `${formatData?.employees?.first_name} ${
-        formatData?.employees?.middle_name || ""
-      } ${formatData?.employees?.last_name}` || null,
+    ip_number: formatData?.statutoryDetails?.esic_number || "",
+    ip_name: `${formatData?.employees?.first_name} ${
+      formatData?.employees?.middle_name || ""
+    } ${formatData?.employees?.last_name}`,
     days: roundToNearest(formatData?.presentDays) || 0,
-    code: null,
-    last_day: null,
+    code: "",
+    last_day: "",
   }));
 
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("ESI Format");
-
-  const headerRow = worksheet.addRow([
+  const headers = [
     "IP Number",
     "IP Name",
     "No Of Days for which wages paid/payable during the month",
     "Total Monthly Wages",
     "Reason Code for Zero workings days(numeric only:provide 0 for all other reasons)",
     "Last Working Day",
-  ]);
+  ];
 
-  for (let col = 1; col <= 6; col++) {
-    const cell = headerRow.getCell(col);
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFBFEFFF" },
-    };
-    cell.font = { bold: true };
-    cell.alignment = {
-      horizontal: "center",
-      vertical: "middle",
-      wrapText: true,
-    };
-    cell.border = {
-      bottom: { style: "thin", color: { argb: "FF000000" } },
-      left: { style: "thin", color: { argb: "FF000000" } },
-      right: { style: "thin", color: { argb: "FF000000" } },
-    };
-  }
-  const columnWidths = [20, 30, 30, 20, 20, 20];
+  const dataRows = [headers];
 
-  for (let col = 0; col < columnWidths.length; col++) {
-    worksheet.getColumn(col + 1).width = columnWidths[col];
-  }
   for (const emp of extractedData) {
-    const row = [
-      emp.ip_number || null,
-      emp.ip_name || null,
-      emp.days || 0,
-      emp.wages || 0,
-      emp.code || null,
-      emp.last_day || null,
-    ];
-    const newRow = worksheet.addRow(row);
+    dataRows.push([
+      emp.ip_number,
+      emp.ip_name,
+      emp.days,
+      emp.wages,
+      emp.code,
+      emp.last_day,
+    ]);
+  }
 
-    for (let i = 4; i < newRow.cellCount - 1; i++) {
-      const cell = newRow.getCell(i + 1);
+  const worksheet = XLSX.utils.aoa_to_sheet(dataRows);
 
-      cell.alignment = { horizontal: "center" };
+  const columnWidths = [20, 30, 30, 20, 20, 20].map((w) => ({ wch: w }));
+  worksheet["!cols"] = columnWidths;
+
+  for (let col = 0; col < headers.length; col++) {
+    const cellAddress = XLSX.utils.encode_cell({ c: col, r: 0 });
+    const cell = worksheet[cellAddress];
+    if (cell) {
+      cell.s = {
+        fill: {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF999999" },
+        },
+        font: { bold: true },
+        alignment: { horizontal: "center", vertical: "middle", wrapText: true },
+        border: {
+          bottom: { style: "thin", color: { argb: "FF000000" } },
+          left: { style: "thin", color: { argb: "FF000000" } },
+          right: { style: "thin", color: { argb: "FF000000" } },
+        },
+      };
     }
   }
 
-  return await workbook.xlsx.writeBuffer();
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "ESI Format");
+  const buffer = XLSX.write(workbook, {
+    bookType: "xls",
+    type: "array",
+    cellStyles: true,
+  });
+
+  return new Blob([buffer], { type: "application/vnd.ms-excel" });
 };
 
 export const DownloadEsiFormat = ({
@@ -125,7 +127,7 @@ export const DownloadEsiFormat = ({
           (e: {
             amount: number;
             payroll_fields: { type: string; name: string };
-          }) => e.payroll_fields.type === "earning",
+          }) => e.payroll_fields.type === "earning"
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
@@ -145,17 +147,12 @@ export const DownloadEsiFormat = ({
   }
 
   const generateEsiFormatExcel = async () => {
-    const workbook = await prepareEsiFormatWorkbook({
+    const blob = await prepareEsiFormatWorkbook({
       data: transformSalaryData(data),
       supabase,
     });
-    if (!workbook) return;
-    saveAs(
-      new Blob([workbook], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      }),
-      `Esi-Format ${formatDateTime(Date.now())}.xlsx`,
-    );
+    if (!blob) return;
+    saveAs(blob, `Esi-Format ${formatDateTime(Date.now())}.xls`);
   };
 
   return (

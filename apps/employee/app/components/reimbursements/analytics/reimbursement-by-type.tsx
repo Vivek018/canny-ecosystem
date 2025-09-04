@@ -76,7 +76,7 @@ export function ReimbursementByType({
 
   return (
     <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-0 max-sm:text-sm">
         <CardTitle>Reimbursement by Type</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>

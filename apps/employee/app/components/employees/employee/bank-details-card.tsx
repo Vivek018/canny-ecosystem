@@ -31,7 +31,7 @@ export const EmployeeBankDetailsCard = ({
       </div>
 
       {bankDetails ? (
-        <div className="grid grid-cols-1 max-sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <DetailItem label="Bank Name" value={bankDetails.bank_name} />
           <DetailItem label="Branch Name" value={bankDetails.branch_name} />
           <DetailItem

@@ -54,10 +54,10 @@ export function ReimbursementTrend({
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6">
+      <CardHeader className="flex flex-col items-stretch max-sm:text-sm space-y-0 border-b p-0 sm:flex-row">
+        <div className="flex flex-1  flex-col justify-center gap-1 px-6 max-sm:py-4">
           <CardTitle>Reimbursement Trend Over Time</CardTitle>
-          <CardDescription>
+          <CardDescription className="max-sm:text-xs">
             Showing total reimbursements over the period.
           </CardDescription>
         </div>
@@ -72,10 +72,10 @@ export function ReimbursementTrend({
                 onClick={() => setActiveChart(chart)}
                 type="button"
               >
-                <span className="text-xs text-muted-foreground">
+                <span className="text-sm max-sm:text-xs text-muted-foreground">
                   {chartConfig[chart]?.label}
                 </span>
-                <span className="text-lg font-bold leading-none sm:text-3xl">
+                <span className="text-lg max-sm:text-xs font-bold leading-none ">
                   {total[key as keyof typeof total]?.toLocaleString()}
                 </span>
               </button>

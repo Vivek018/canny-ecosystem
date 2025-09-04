@@ -36,14 +36,16 @@ const chartConfig = {
 
 export function ReimbursementTopEmployees({
   chartData,
-}: { chartData: ReimbursementDataType[] }) {
+}: {
+  chartData: ReimbursementDataType[];
+}) {
   const employeeTotals = chartData.reduce(
     (acc, row) => {
       const employee_name = `${row?.employees?.first_name}_${row.employees?.middle_name || ""}_${row?.employees?.last_name}`;
       acc[employee_name] = (acc[employee_name] || 0) + (row.amount || 0);
       return acc;
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
 
   const topEmployeesData = Object.entries(employeeTotals)
@@ -62,9 +64,11 @@ export function ReimbursementTopEmployees({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="text-lg max-sm:text-sm">
         <CardTitle>Top Employees Reimbursements</CardTitle>
-        <CardDescription>Over the period</CardDescription>
+        <CardDescription className="max-sm:text-sm">
+          Over the period
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[200px] w-full">

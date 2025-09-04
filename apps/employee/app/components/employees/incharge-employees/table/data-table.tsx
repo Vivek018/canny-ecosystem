@@ -163,7 +163,7 @@ export function DataTable<TData, TValue>({
         ref={parentRef}
         className={cn("relative rounded overflow-auto max-sm:rounded-none")}
         style={{
-          maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
+          maxHeight: `calc(100dvh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "20px",
           overflowX: "auto",
         }}
@@ -201,7 +201,7 @@ export function DataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-4 py-2 min-w-36 max-36",
+                            "px-4 py-4 min-w-36 max-36",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
                             cell.column.id === "employee_code" && "table-cell",

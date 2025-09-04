@@ -30,9 +30,9 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
       const project = item.employee_project_assignment?.sites?.projects?.name;
       const site = item.employee_project_assignment?.sites?.name;
 
-      if (!site) continue; // Skip if site is missing
+      if (!site) continue
 
-      const projectKey = project || site; // If no project, use site as project
+      const projectKey = project || site; 
 
       if (!siteCounts[projectKey]) {
         siteCounts[projectKey] = {};
@@ -62,13 +62,13 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
 
   return (
     <Card className="flex flex-col gap-20">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-0 max-sm:text-sm">
         <CardTitle>Employees by Module</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] w-full pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+          className="mx-auto aspect-square max-h-[250px] w-full flex-shrink-0 pb-0 [&_.recharts-pie-label-text]:fill-foreground"
           ref={chartRef}
         >
           <PieChart>

@@ -9,9 +9,6 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate } from "@remix-run/react";
-import { DownloadBankAdvice } from "./download-bank-advice";
-import { DownloadEsiFormat } from "./download-esi-format";
-import { DownloadEpfFormat } from "./download-epf-format";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,8 +30,6 @@ import { useState } from "react";
 export function PayrollActions({
   payrollId,
   className,
-  env,
-  data,
   fromWhere,
   status,
   allLocationOptions,
@@ -59,7 +54,7 @@ export function PayrollActions({
           size="icon"
           className={cn(
             "h-10 w-12 px-2 bg-muted border border-input",
-            className,
+            className
           )}
         >
           <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
@@ -67,33 +62,19 @@ export function PayrollActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <div className="flex flex-col">
-          <Button variant={"ghost"} className="w-full px-2">
-            <DownloadBankAdvice env={env} data={data} />
-          </Button>
-          <Button variant={"ghost"} className={cn("w-full px-2")}>
-            <DownloadEsiFormat env={env} data={data} />
-          </Button>
-
-          <Button variant={"ghost"} className={cn(" w-full px-2")}>
-            <DownloadEpfFormat env={env} data={data} />
-          </Button>
-
-          <DropdownMenuSeparator
-            className={cn("hidden", status === "approved" && "flex")}
-          />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
                 status === "approved" &&
-                  "flex flex-row justify-start gap-2 px-2 pr-1",
+                  "flex flex-row justify-start gap-2 px-2 pr-1"
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/salary-slips`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/salary-slips`,
+                      `/payroll/payroll-history/${payrollId}/salary-slips`
                     )
               }
             >
@@ -112,7 +93,7 @@ export function PayrollActions({
                 <Button
                   variant={"ghost"}
                   className={cn(
-                    "w-full flex flex-row justify-start gap-2 px-2 pr-1",
+                    "w-full flex flex-row justify-start gap-2 px-2 pr-1"
                   )}
                 >
                   <Icon name="import" />
@@ -143,10 +124,10 @@ export function PayrollActions({
                       newParams.set("location", locations);
                       fromWhere === "runpayroll"
                         ? navigate(
-                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`,
+                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`
                           )
                         : navigate(
-                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`,
+                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`
                           );
                     }}
                   >

@@ -30,7 +30,7 @@ export const EmployeeDetailsCard: React.FC<{
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <h2 className="text-xl font-semibold">Employee Details</h2>
       {employee ? (
-        <div className="grid grid-cols-1 max-sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           <DetailItem label="First Name" value={employee?.first_name} />
           <DetailItem label="Middle Name" value={employee?.middle_name} />
           <DetailItem label="Last Name" value={employee?.last_name} />

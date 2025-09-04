@@ -44,11 +44,7 @@ export const PLACEHOLDERS = [
   "Paid salary invoices from Company Location 'ABC'",
 ];
 
-export function InvoiceSearchFilter({
-  disabled,
-}: {
-  disabled?: boolean;
-}) {
+export function InvoiceSearchFilter({ disabled }: { disabled?: boolean }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const [isFocused, setIsFocused] = useState(false);
@@ -128,7 +124,7 @@ export function InvoiceSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -163,7 +159,7 @@ export function InvoiceSearchFilter({
         {
           action: "/payroll/invoices?index",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -175,7 +171,7 @@ export function InvoiceSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -192,7 +188,7 @@ export function InvoiceSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -223,7 +219,7 @@ export function InvoiceSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -233,7 +229,10 @@ export function InvoiceSearchFilter({
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
+        className={cn(
+          "w-auto max-h-[70vh] overflow-y-auto",
+          "max-sm:relative max-sm:left-[75px] max-md:relative max-md:right-0"
+        )}
         align="end"
         sideOffset={19}
         alignOffset={-11}

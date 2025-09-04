@@ -83,7 +83,7 @@ export function ExitOverview({ chartData }: { chartData: ExitDataType[] }) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="max-sm:text-sm">
         <CardTitle>Exits Overview</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>

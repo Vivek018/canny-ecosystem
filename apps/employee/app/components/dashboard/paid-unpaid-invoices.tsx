@@ -46,7 +46,7 @@ export function InvoicePaidUnpaid({ chartData }: { chartData: any }) {
 
   return (
     <Card className="col-span-2">
-      <CardHeader>
+      <CardHeader className="max-sm:text-sm">
         <CardTitle className="text-center">Paid vs Unpaid Invoice</CardTitle>
       </CardHeader>
       <CardContent>

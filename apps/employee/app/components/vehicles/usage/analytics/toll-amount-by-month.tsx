@@ -24,7 +24,7 @@ export function TollAmountByMonth({
 
   return (
     <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-0 max-sm:text-sm">
         <CardTitle>Toll Amount by Month</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

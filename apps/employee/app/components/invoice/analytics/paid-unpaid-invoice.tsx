@@ -45,7 +45,7 @@ export function InvoicePaidUnpaid({
 
   return (
     <Card className="flex flex-col gap-10">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-0 max-sm:text-sm">
         <CardTitle className="text-center">Paid vs Unpaid Analysis</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0 ">

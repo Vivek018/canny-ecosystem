@@ -78,14 +78,14 @@ export function SalaryEntryDataTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
         className={cn("relative rounded overflow-auto")}
         style={{
-          maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
+          maxHeight: `calc(100dvh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "40px",
         }}
       >
@@ -120,7 +120,7 @@ export function SalaryEntryDataTable<TData, TValue>({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
-                        "bg-primary/20",
+                        "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => {
@@ -141,12 +141,12 @@ export function SalaryEntryDataTable<TData, TValue>({
                             cell.column.id.length > 7 &&
                               cell.column.id !== "employee_code" &&
                               cell.column.id !== "department" &&
-                              "min-w-40 max-w-40",
+                              "min-w-40 max-w-40"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );

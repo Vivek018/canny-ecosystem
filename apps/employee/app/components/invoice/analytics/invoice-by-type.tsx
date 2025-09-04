@@ -41,13 +41,13 @@ export function InvoicesByType({
       totalGross +
       Number(
         invoice.payroll_data?.find(
-          (item: any) => item.field === "PF" || item.field === "EPF",
-        )?.amount ?? 0,
+          (item: any) => item.field === "PF" || item.field === "EPF"
+        )?.amount ?? 0
       ) +
       Number(
         invoice.payroll_data?.find(
-          (item: any) => item.field === "ESIC" || item.field === "ESI",
-        )?.amount ?? 0,
+          (item: any) => item.field === "ESIC" || item.field === "ESI"
+        )?.amount ?? 0
       );
 
     const includedFields: string[] | undefined =
@@ -57,7 +57,7 @@ export function InvoicesByType({
 
     const sum: number = invoice.payroll_data
       ?.filter((item: any) =>
-        includedFields?.includes(item.field.toUpperCase()),
+        includedFields?.includes(item.field.toUpperCase())
       )
       ?.reduce((acc: number, curr: any) => acc + Number(curr.amount ?? 0), 0);
 
@@ -69,7 +69,7 @@ export function InvoicesByType({
         : invoice.include_charge
           ? (invoice.payroll_data.reduce(
               (sum: number, item: any) => sum + Number(item.amount),
-              0,
+              0
             ) *
               companyRelations.reimbursement_charge) /
             100
@@ -114,7 +114,9 @@ export function InvoicesByType({
   return (
     <Card className="flex-1 flex flex-col">
       <CardHeader>
-        <CardTitle className="text-center">Invoices Amount by Type</CardTitle>
+        <CardTitle className="text-center max-sm:text-sm">
+          Invoices Amount by Type
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer className="w-full h-64" config={chartConfig}>

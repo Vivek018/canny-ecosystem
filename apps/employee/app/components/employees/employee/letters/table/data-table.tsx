@@ -63,7 +63,7 @@ export function DataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-2 md:table-cell",
+                            "px-3 md:px-4 py-4 md:table-cell",
                             cell.column.id === "letter_type" &&
                               "sticky left-0 bg-card z-10",
                             cell.column.id === "issue_date" &&

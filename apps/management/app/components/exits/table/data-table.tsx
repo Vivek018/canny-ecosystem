@@ -68,7 +68,7 @@ export function ExitPaymentTable<TData, TValue>({
     useExitsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreExit = async () => {
@@ -156,14 +156,14 @@ export function ExitPaymentTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
         className="relative rounded overflow-auto"
         style={{
-          maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
+          maxHeight: `calc(100dvh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "20px",
         }}
       >
@@ -191,7 +191,7 @@ export function ExitPaymentTable<TData, TValue>({
                     style={{ transform: `translateY(${virtualRow.start}px)` }}
                     className={cn(
                       "absolute flex cursor-pointer select-text",
-                      row.original?.invoice_id && "bg-primary/20",
+                      row.original?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell: any) => (
@@ -208,7 +208,7 @@ export function ExitPaymentTable<TData, TValue>({
                           cell.column.id === "final_settlement_date" &&
                             " min-w-40 max-w-40",
                           cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                         )}
                         onClick={(e) => {
                           if (
@@ -223,7 +223,7 @@ export function ExitPaymentTable<TData, TValue>({
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext(),
+                          cell.getContext()
                         )}
                       </TableCell>
                     ))}
@@ -241,7 +241,7 @@ export function ExitPaymentTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -250,7 +250,7 @@ export function ExitPaymentTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

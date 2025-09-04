@@ -123,7 +123,7 @@ export function InvoicesByLocations({
 
   return (
     <Card className="flex flex-col gap-10">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-0 max-sm:text-sm">
         <CardTitle>Invoices by Company Location</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

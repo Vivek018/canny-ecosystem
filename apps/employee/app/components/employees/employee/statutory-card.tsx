@@ -33,7 +33,7 @@ export const EmployeeStatutoryCard: React.FC<{
       </div>
 
       {employeeStatutory ? (
-        <div className="grid grid-cols-1 max-sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <DetailItem
             label="Aadhaar Number"
             value={employeeStatutory.aadhaar_number}

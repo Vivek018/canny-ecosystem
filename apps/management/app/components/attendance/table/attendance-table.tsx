@@ -155,14 +155,14 @@ export function AttendanceTable({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
         className={cn("relative rounded overflow-auto")}
         style={{
-          maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
+          maxHeight: `calc(100dvh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "20px",
         }}
       >
@@ -197,7 +197,7 @@ export function AttendanceTable({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.monthly_attendance?.salary_entries
-                        ?.invoice_id && "bg-primary/20",
+                        ?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -217,12 +217,12 @@ export function AttendanceTable({
                             cell.column.id === "site_name" &&
                               "min-w-32 max-w-32",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -241,7 +241,7 @@ export function AttendanceTable({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -250,7 +250,7 @@ export function AttendanceTable({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

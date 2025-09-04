@@ -31,7 +31,7 @@ export function DataTable<TData, TValue>({
     useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const table = useReactTable({
@@ -83,14 +83,14 @@ export function DataTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden max-sm:border-x-0",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
         ref={parentRef}
         className={cn("relative rounded overflow-auto max-sm:rounded-none")}
         style={{
-          maxHeight: `calc(100vh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
+          maxHeight: `calc(100dvh - ${parentRef.current?.getBoundingClientRect().top ?? 0}px - 16px)`,
           minHeight: "20px",
           overflowX: "auto",
         }}
@@ -120,7 +120,7 @@ export function DataTable<TData, TValue>({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.salary_entries?.invoice_id &&
-                        "bg-primary/20",
+                        "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -128,17 +128,17 @@ export function DataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-4 py-2 min-w-36 max-36",
+                            "px-4 py-4 min-w-36 max-36",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10 table-cell",
                             cell.column.id === "employee_code" && "table-cell",
                             cell.column.id === "full_name" &&
-                              "min-w-56 max-w-56 table-cell",
+                              "min-w-56 max-w-56 table-cell"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
