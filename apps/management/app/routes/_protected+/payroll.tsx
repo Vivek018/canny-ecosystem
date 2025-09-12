@@ -1,3 +1,4 @@
+import { FooterTabs } from "@/components/footer-tabs";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -33,9 +34,31 @@ clientLoader.hydrate = true;
 export default function Payroll() {
   const { pathname } = useLocation();
   return (
-    <section className="flex flex-col h-full">
-      <div className="py-[18px] px-4 border-b">
-        <SecondaryMenu
+    <section className="flex flex-col h-full w-full">
+      <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b">
+        <div className="hidden md:flex md:items-center md:gap-4 w-full">
+          <SecondaryMenu
+            items={[
+              {
+                label: "Run Payroll",
+                path: "/payroll/run-payroll",
+              },
+              {
+                label: "Payroll History",
+                path: "/payroll/payroll-history",
+              },
+              {
+                label: "Invoices",
+                path: "/payroll/invoices",
+              },
+            ]}
+            pathname={pathname}
+            Link={Link}
+            className="py-2"
+          />
+        </div>
+
+        <FooterTabs
           items={[
             {
               label: "Run Payroll",
@@ -54,7 +77,9 @@ export default function Payroll() {
           Link={Link}
         />
       </div>
-      <Outlet />
+      <div className="max-sm:pb-12">
+        <Outlet />
+      </div>
     </section>
   );
 }

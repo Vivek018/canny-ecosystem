@@ -8,6 +8,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
   getDepartmentsByCompanyId,
+  getEmployeeProvidentFundForEpfChallanByCompanyId,
   getEmployeesBySiteId,
   getLocationsByCompanyId,
   getPayrollById,
@@ -18,6 +19,7 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
+  EmployeeProvidentFundDatabaseRow,
   PayrollDatabaseRow,
   PayrollFieldsDatabaseRow,
   SupabaseEnv,
@@ -130,6 +132,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
       supabase,
     });
+    const { data: epfData } =
+      await getEmployeeProvidentFundForEpfChallanByCompanyId({
+        companyId,
+        supabase,
+      });
 
     return defer({
       payrollData,
@@ -140,6 +147,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allEmployeeOptions,
       allProjectOptions,
       payrollFields,
+      epfData,
       error: null,
       env,
     });
@@ -154,6 +162,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       allEmployeeOptions: [],
       allProjectOptions: [],
       payrollFields: [],
+      epfData: [],
       error,
       env: null,
     });
@@ -166,7 +175,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.run_payroll_id}${
       args.params.payrollId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -206,7 +215,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     return json(
       { status: "error", message: "Payroll update failed", redirectUrl, error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Payroll Id Action error", error);
@@ -218,7 +227,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -233,6 +242,7 @@ export default function RunPayrollId() {
     allLocationOptions,
     allEmployeeOptions,
     allProjectOptions,
+    epfData,
     payrollFields,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -285,7 +295,7 @@ export default function RunPayrollId() {
           {({ data, error }) => {
             if (error || !data) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.run_payroll_id}${payrollId}`,
+                `${cacheKeyPrefix.run_payroll_id}${payrollId}`
               );
               return (
                 <ErrorBoundary
@@ -304,6 +314,9 @@ export default function RunPayrollId() {
                 allDepartmentOptions={allDepartmentOptions ?? []}
                 allProjectOptions={allProjectOptions ?? []}
                 fromWhere="runpayroll"
+                epfData={
+                  epfData as unknown as EmployeeProvidentFundDatabaseRow
+                }
                 allLocationOptions={allLocationOptions ?? []}
                 payrollFields={payrollFields as PayrollFieldsDatabaseRow[]}
                 allEmployeeOptions={allEmployeeOptions}

@@ -55,7 +55,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
     );
   };
   return (
-    <div className="gap-4 hidden md:flex">
+    <div className="gap-4 flex">
       <div className="flex gap-2">
         <ColumnVisibility disabled={isEmpty} />
         <Button
@@ -90,7 +90,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Update Bulk Invoices</AlertDialogTitle>
               </AlertDialogHeader>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2  max-sm:grid-cols-1 gap-4">
                 <div className="flex flex-col gap-1">
                   <Label className="text-sm font-medium">Is Paid</Label>
                   <Combobox

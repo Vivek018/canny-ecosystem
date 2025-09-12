@@ -180,7 +180,7 @@ export default function AddLeaves({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-4">
                 <SearchableSelectField
                   key={resetKey}
                   className="w-full capitalize flex-1 "
@@ -214,7 +214,7 @@ export default function AddLeaves({
                   errors={fields.user_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 ">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, {

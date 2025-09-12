@@ -249,7 +249,7 @@ export default function LeavesFieldMapping() {
       {loadNext ? (
         <LeavesImportData env={env} companyId={companyId} />
       ) : (
-        <Card className="m-4 px-40">
+        <Card className="m-4 px-auto lg:px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -275,7 +275,7 @@ export default function LeavesFieldMapping() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
                 <div key={field.key} className="flex flex-col">
                   <div className="flex flex-row gap-1 pb-1">

@@ -15,6 +15,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime, roundToNearest } from "@canny_ecosystem/utils";
 import type {
+  EmployeeProvidentFundDatabaseRow,
   SupabaseEnv,
   TypedSupabaseClient,
 } from "@canny_ecosystem/supabase/types";
@@ -25,14 +26,16 @@ import { getEmployeeStatutoryDetailsById } from "@canny_ecosystem/supabase/queri
 export const prepareEpfFormat = async ({
   data,
   supabase,
+  isRestricted,
 }: {
   data: any[];
   supabase: TypedSupabaseClient;
+  isRestricted: boolean;
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
-    ),
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
+    )
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -47,30 +50,61 @@ export const prepareEpfFormat = async ({
         formatData?.employees?.middle_name || ""
       } ${formatData?.employees?.last_name}` || null,
     gross_wages: formatData?.amount,
-    epf_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
-    eps_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
-    edli_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
+    epf_wages: isRestricted
+      ? formatData?.amount > 15000
+        ? 15000
+        : formatData?.amount
+      : formatData?.amount,
+    eps_wages: isRestricted
+      ? formatData?.amount > 15000
+        ? 15000
+        : formatData?.amount
+      : formatData?.amount,
+    edli_wages: isRestricted
+      ? formatData?.amount > 15000
+        ? 15000
+        : formatData?.amount
+      : formatData?.amount,
     epf_contribution: roundToNearest(
-      Number((formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12),
+      Number(
+        (isRestricted
+          ? formatData?.amount > 15000
+            ? 15000
+            : formatData?.amount
+          : formatData?.amount) * 0.12
+      )
     ),
     eps_contribution: roundToNearest(
       Number(
-        (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833,
-      ),
+        (isRestricted
+          ? formatData?.amount > 15000
+            ? 15000
+            : formatData?.amount
+          : formatData?.amount) * 0.0833
+      )
     ),
     diffEpf_Eps:
       roundToNearest(
-        Number(formatData?.amount > 15000 ? 15000 : formatData?.amount * 0.12),
+        Number(
+          isRestricted
+            ? formatData?.amount > 15000
+              ? 15000
+              : formatData?.amount
+            : formatData?.amount * 0.12
+        )
       ) -
       roundToNearest(
         Number(
-          (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833,
-        ),
+          (isRestricted
+            ? formatData?.amount > 15000
+              ? 15000
+              : formatData?.amount
+            : formatData?.amount) * 0.0833
+        )
       ),
     ncp_days:
       formatData.absentDays ??
-      Number(formatData.workingDays) - Number(formatData.presentDays) ??
-      0,
+      Number(formatData.workingDays) - Number(formatData.presentDays),
     refund: 0,
   }));
 
@@ -79,20 +113,32 @@ export const prepareEpfFormat = async ({
 export const DownloadEpfFormat = ({
   env,
   data,
+  epfData: epfRules,
 }: {
   env: SupabaseEnv;
   data: any[];
+  epfData: EmployeeProvidentFundDatabaseRow;
 }) => {
   const { supabase } = useSupabase({ env });
 
-  function transformSalaryData(data: any[]) {
+  function transformSalaryData(data: any[], epfRules: any) {
+    const fieldsStr = epfRules?.terms?.fields?.trim().toUpperCase();
+
+    const allowedFields =
+      fieldsStr && fieldsStr !== "ALL"
+        ? fieldsStr.split(",").map((f: string) => f.trim().toUpperCase())
+        : null;
+
     return data.map((emp: any) => {
       const earnings = emp.salary_entries.salary_field_values
         .filter(
           (e: {
             amount: number;
             payroll_fields: { type: string; name: string };
-          }) => e.payroll_fields.type === "earning",
+          }) =>
+            e.payroll_fields.type === "earning" &&
+            (allowedFields === null ||
+              allowedFields.includes(e.payroll_fields.name.toUpperCase()))
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
@@ -113,13 +159,17 @@ export const DownloadEpfFormat = ({
   }
 
   const generateEpfFormat = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
 
-    const transformedData = transformSalaryData(data);
+    const transformedData = transformSalaryData(data, epfRules);
 
-    const epfData = await prepareEpfFormat({ data: transformedData, supabase });
+    const epfData = await prepareEpfFormat({
+      data: transformedData,
+      supabase,
+      isRestricted: epfRules?.restrict_employee_contribution!,
+    });
 
     const csv = Papa.unparse(epfData, { header: false }).replaceAll(",", "#~#");
 

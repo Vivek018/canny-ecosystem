@@ -27,8 +27,8 @@ export const FormButtons = ({
     navigation.state === "submitting" || navigation.state === "loading";
 
   return (
-    <CardFooter className={cn("flex items-center justify-between", className)}>
-      <div className={cn("flex flex-row items-center justify-center gap-4")}>
+    <CardFooter className={cn("max-sm:pt-4 flex flex-col md:flex-row max-sm:gap-3 max-md:gap-3 items-center justify-between", className)}>
+      <div className={cn("flex flex-row items-center justify-center gap-4 max-sm:w-full max-md:w-full")}>
         <Button
           variant="outline"
           size="full"
@@ -46,7 +46,7 @@ export const FormButtons = ({
           Skip
         </Button>
       </div>
-      <div className="ml-auto flex flex-row items-center justify-center gap-4">
+      <div className="ml-auto flex flex-row items-center justify-center gap-4 max-sm:gap-x-2 max-sm:w-full max-md:w-full max-sm:grid max-sm:grid-cols-2" >
         <Button
           variant="secondary"
           size="full"
@@ -89,7 +89,7 @@ export const FormButtons = ({
           className={cn(
             "min-w-28",
             step === totalSteps && "hidden",
-            isSingle && "hidden",
+            isSingle && "hidden"
           )}
         >
           Next
@@ -105,7 +105,7 @@ export const FormButtons = ({
           value="submit"
           className={cn(
             "min-w-28",
-            !isSingle && step !== totalSteps ? "hidden" : "flex",
+            !isSingle && step !== totalSteps ? "hidden" : "flex"
           )}
         >
           Submit

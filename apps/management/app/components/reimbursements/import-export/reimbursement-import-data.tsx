@@ -4,7 +4,6 @@ import { createReimbursementsFromImportedData } from "@canny_ecosystem/supabase/
 import {
   getEmployeeIdsByEmployeeCodes,
   getPayeeIdsByPayeeCodes,
-  getUserIdsByUserEmails,
 } from "@canny_ecosystem/supabase/queries";
 import type {
   ReimbursementInsert,
@@ -66,8 +65,8 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -79,7 +78,7 @@ export function ReimbursementImportData({
 
       if (ofWhich === "employee") {
         const employeeCodes = importData.data!.map(
-          (value) => value.employee_code,
+          (value) => value.employee_code
         );
 
         const { data: employees, error: codeError } =
@@ -105,27 +104,17 @@ export function ReimbursementImportData({
         ids = payees;
       }
 
-      const userEmails = importData.data!.map((value) => value.email!);
-
-      const { data: users, error: userError } = await getUserIdsByUserEmails({
-        supabase,
-        userEmails,
-      });
-      if (userError) throw userError;
-
       let updatedData: any;
       if (ofWhich === "employee") {
         updatedData = importData.data!.map((item: any) => {
           const employeeId = ids?.find(
-            (e: any) => e.employee_code === item.employee_code,
+            (e: any) => e.employee_code === item.employee_code
           )?.id;
-          const userId = users?.find((u) => u.email === item.email)?.id;
-          const { email, employee_code, ...rest } = item;
+          const { employee_code, ...rest } = item;
 
           return {
             ...rest,
             ...(employeeId ? { employee_id: employeeId } : {}),
-            ...(userId ? { user_id: userId } : { user_id: null }),
             company_id: companyId,
           };
         });
@@ -133,20 +122,19 @@ export function ReimbursementImportData({
       if (ofWhich === "payee") {
         updatedData = importData.data!.map((item: any) => {
           const payeeIds = ids?.find(
-            (e: any) => e.payee_code === item.payee_code,
+            (e: any) => e.payee_code === item.payee_code
           )?.id;
-          const userId = users?.find((u) => u.email === item.email)?.id;
 
-          const { email, payee_code, ...rest } = item;
+          const { payee_code, ...rest } = item;
 
           return {
             ...rest,
             ...(payeeIds ? { payee_id: payeeIds } : {}),
-            ...(userId ? { user_id: userId } : { user_id: null }),
             company_id: companyId,
           };
         });
       }
+
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],
         supabase,
@@ -170,7 +158,7 @@ export function ReimbursementImportData({
         });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         navigate(
-          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`,
+          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
         );
       }
     }
@@ -181,7 +169,7 @@ export function ReimbursementImportData({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden",
+          isImporting ? "block" : "hidden"
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />

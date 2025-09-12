@@ -81,8 +81,8 @@ export function AttendanceActions({
   };
 
   return (
-    <div className="gap-4 hidden md:flex">
-      <div className="flex gap-2">
+    <div className="gap-4 flex">
+      <div className="flex gap-2 ">
         <ColumnVisibility disabled={isEmpty} />
         {/* <AttendanceEmailMenu
         selectedRows={selectedRows}

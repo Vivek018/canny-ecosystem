@@ -324,7 +324,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
           companyId={companyId}
         />
       ) : (
-        <Card className="m-4 px-40">
+        <Card className="m-4 px-auto lg:px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -337,7 +337,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                 <h4 className="text-red-700 font-medium mb-2">
                   Validation Errors:
                 </h4>
-                <ul className="grid grid-cols-3 gap-y-1">
+                <ul className="grid grid-cols-3 max-sm:grid-cols-1 gap-y-1">
                   {validationErrors.map((error, index) => (
                     <li
                       key={error.toString() + index.toString()}

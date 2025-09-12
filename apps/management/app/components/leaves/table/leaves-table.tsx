@@ -185,13 +185,13 @@ export function LeavesDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 hidden md:table-cell",
+                            "px-4 py-4 table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "employee_code" &&
-                              "sticky left-12 bg-card z-10",
+                              "md:sticky md:left-12 md:bg-card md:z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10",
+                              "md:sticky md:left-48 md:bg-card md:z-10",
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}

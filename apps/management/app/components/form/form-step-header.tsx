@@ -36,7 +36,7 @@ export const FormStepHeader = ({
 
           <div
             className={cn(
-              "bg-foreground/75 h-[0.5px] mx-4 w-20",
+              "bg-foreground/75 h-[0.5px] mx-4 w-20 max-sm:mx-0 max-sm:w-10",
               stepNumber + 1 === totalSteps && "hidden",
             )}
           >

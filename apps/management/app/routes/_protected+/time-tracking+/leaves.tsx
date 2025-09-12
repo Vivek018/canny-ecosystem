@@ -310,8 +310,8 @@ export default function LeavesIndex() {
         </Suspense>
       </div>
       <div className="mt-5">
-        <div className="w-full flex items-center justify-between pb-4">
-          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+        <div className="w-full flex items-center max-sm:items-start max-md:items-start justify-between pb-4">
+          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
             <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
               <Await resolve={projectPromise}>
                 {(projectData) => (
@@ -350,7 +350,7 @@ export default function LeavesIndex() {
             </Suspense>
             <FilterList filters={filterList} />
           </div>
-          <div className="gap-4 hidden md:flex">
+          <div className="gap-4 flex">
             <div className="flex gap-2">
               <ColumnVisibility />
               {/* <LeavesEmailMenu

@@ -143,7 +143,7 @@ export default function PayrollHistoryIndex() {
                   />
                 );
               return (
-                <div className="w-full flex items-center justify-between gap-4">
+                <div className="w-full flex flex-col md:flex-row items-center justify-between gap-2">
                   <PayrollSearchFilter
                     disabled={!data?.length && noFilters}
                     from="payroll-history"

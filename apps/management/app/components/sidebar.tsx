@@ -5,7 +5,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, NavLink, useLocation } from "@remix-run/react";
 import { ThemeSwitch } from "./theme-switch";
 import { UserMenu } from "./user-menu";
-import { useRef, useState } from "react";
+import { type Dispatch, type SetStateAction, useRef, useState } from "react";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { Icon, type IconName } from "@canny_ecosystem/ui/icon";
 
@@ -13,10 +13,12 @@ export function Sidebar({
   className,
   theme,
   user,
+  setOpenNav,
 }: {
   className: string;
   theme: Theme;
   user: Omit<UserDatabaseRow, "created_at">;
+  setOpenNav: Dispatch<SetStateAction<boolean>>;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { pathname } = useLocation();
@@ -38,23 +40,23 @@ export function Sidebar({
       className={cn(
         "fixed flex h-full flex-col overflow-hidden w-20 z-50 bg-background border-r transition-[width]",
         isExpanded && "w-60 shadow-2xl dark:shadow-foreground/10",
-        className,
+        className
       )}
       onMouseEnter={openSidebar}
       onMouseLeave={closeSidebar}
     >
       <div
         className={cn(
-          "min-h-[72px] max-h-[72px] my-auto justify-start flex items-center gap-2 px-[22px] border-b",
+          "min-h-[72px] max-h-[72px] my-auto justify-start flex items-center gap-2 px-[22px] border-b"
         )}
       >
-        <Link prefetch="intent" to="/" className="">
+        <Link prefetch="intent" to="/" onClick={() => setOpenNav(false)}>
           <Logo />
         </Link>
       </div>
       <nav
         className={cn(
-          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center",
+          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center"
         )}
       >
         <ul className="flex w-full h-full flex-col py-2 gap-1.5 items-start">
@@ -75,9 +77,10 @@ export function Sidebar({
                     isActive &&
                       "bg-primary/15 text-primary hover:bg-primary/20",
                     link === pathname &&
-                      "cursor-auto bg-primary/25  text-primary hover:bg-primary/25",
+                      "cursor-auto bg-primary/25  text-primary hover:bg-primary/25"
                   )
                 }
+                onClick={() => setOpenNav(false)}
               >
                 <Icon name={icon as IconName} size="md" className="shrink-0" />
                 <span className={cn("w-40 truncate", !isExpanded && "hidden")}>
@@ -91,7 +94,7 @@ export function Sidebar({
       </nav>
       <div
         className={cn(
-          "w-full flex flex-col items-start justify-start px-4 gap-4 pt-6 pb-12 border-t",
+          "w-full flex flex-col items-start justify-start px-4 gap-4 pt-6 pb-12 border-t"
         )}
       >
         <ThemeSwitch

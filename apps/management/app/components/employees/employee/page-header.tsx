@@ -77,11 +77,11 @@ export function EmployeePageHeader({
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div className="w-full flex flex-row gap-6 justify-between">
+      <div className="w-full flex flex-col md:flex-row gap-6 justify-between">
         <div className="flex flex-row gap-6 items-center">
           <div>
             <Avatar
-              className="w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40 cursor-pointer"
+              className="w-20 h-20 sm:w-28 sm:h-28 border border-muted-foreground/30 shadow-sm hover:z-40 cursor-pointer"
               onClick={() => inputRef?.current?.click()}
             >
               <>
@@ -106,7 +106,7 @@ export function EmployeePageHeader({
             <div
               className={cn(
                 "rounded-sm flex items-center",
-                employee.is_active ? "text-green" : "text-yellow-500",
+                employee.is_active ? "text-green" : "text-yellow-500"
               )}
             >
               <Icon name="dot-filled" className="mt-[1px]" />
@@ -115,7 +115,7 @@ export function EmployeePageHeader({
               </p>
             </div>
             <div className="mt-3">
-              <h1 className="text-3xl tracking-wide font-bold capitalize">
+              <h1 className="text:lg sm:text-3xl tracking-wide font-bold capitalize">
                 {`${employee?.first_name} ${employee?.middle_name ?? ""} ${
                   employee?.last_name ?? ""
                 }`}
@@ -135,8 +135,8 @@ export function EmployeePageHeader({
               "w-full bg-card",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.employeeDetails}`,
-              ) && "hidden",
+                `${updateRole}:${attribute.employeeDetails}`
+              ) && "hidden"
             )}
           >
             <Icon name="edit" size="xs" className="mr-1.5" />
@@ -153,11 +153,11 @@ export function EmployeePageHeader({
               <DropdownMenuTrigger
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "bg-card",
+                  "w-full bg-card",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.employees}`,
-                  ) && "hidden",
+                    `${updateRole}:${attribute.employees}`
+                  ) && "hidden"
                 )}
               >
                 <Icon name="dots-vertical" size="xs" className="mr-1.5" />

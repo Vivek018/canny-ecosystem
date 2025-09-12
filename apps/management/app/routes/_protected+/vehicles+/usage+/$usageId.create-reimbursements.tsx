@@ -193,7 +193,7 @@ export default function AddReimbursementsFromVehicleUsage() {
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.submitted_date, {
@@ -225,7 +225,7 @@ export default function AddReimbursementsFromVehicleUsage() {
                   errors={fields.status.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.amount, {
@@ -258,7 +258,7 @@ export default function AddReimbursementsFromVehicleUsage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-10">
                 <SearchableSelectField
                   key={resetKey + 1}
                   inputProps={{

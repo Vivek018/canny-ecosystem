@@ -1,5 +1,4 @@
 import { Button } from "@canny_ecosystem/ui/button";
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
@@ -35,17 +34,6 @@ export function DataTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
-          <Checkbox
-            checked={
-              table?.getIsAllPageRowsSelected() ||
-              (table?.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => {
-              table?.toggleAllPageRowsSelected(!!value);
-            }}
-          />
-        </TableHead>
         {payeeDataArray?.map((id) => {
           return (
             <TableHead key={id} className={cn("px-4 py-2")}>

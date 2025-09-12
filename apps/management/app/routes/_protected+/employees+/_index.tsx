@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -128,7 +128,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -176,7 +176,7 @@ export default function EmployeesIndex() {
 
   return (
     <section className="p-4 h-full overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
           <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>

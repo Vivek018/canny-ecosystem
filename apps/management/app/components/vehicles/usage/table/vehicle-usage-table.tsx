@@ -199,11 +199,11 @@ export function VehicleUsageTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 min-w-32 max-w-32 hidden md:table-cell",
+                            "px-4 py-4 min-w-32 max-w-32 table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "vehicle_number" &&
-                              "sticky left-12 min-w-36 max-w-36 bg-card z-10",
+                              "md:sticky md:left-12 min-w-36 max-w-36 md:bg-card md:z-10",
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                             cell.column.id === "maintainance_amount" &&

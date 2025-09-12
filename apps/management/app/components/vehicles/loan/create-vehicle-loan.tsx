@@ -39,7 +39,7 @@ export function CreateVehicleLoan({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.vehicle_id, { type: "hidden" })} />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.bank_name, { type: "text" }),
@@ -64,7 +64,7 @@ export function CreateVehicleLoan({
             errors={fields.period.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
           <Field
             className=""
             inputProps={{
@@ -104,7 +104,7 @@ export function CreateVehicleLoan({
           }}
           errors={fields.monthly_emi.errors}
         />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.start_date, { type: "date" }),

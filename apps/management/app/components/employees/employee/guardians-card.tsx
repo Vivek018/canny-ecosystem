@@ -48,14 +48,14 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   );
 };
 
-type EmployeeGuardian = Omit<EmployeeGuardianDatabaseRow, "created_at">;
+export type EmployeeGuardian = Omit<EmployeeGuardianDatabaseRow, "created_at">;
 
 export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
   const { role } = useUser();
   return (
     <Card
       key={guardian.id}
-      className="w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className="w-[420px] max-sm:w-11/12 shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">
@@ -73,8 +73,8 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.employeeGuardians}`,
-                    ) && "hidden",
+                      `${updateRole}:${attribute.employeeGuardians}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -90,8 +90,8 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "px-2.5 h-min hidden",
                 hasPermission(
                   role,
-                  `${deleteRole}:${attribute.employeeGuardians}`,
-                ) && "flex",
+                  `${deleteRole}:${attribute.employeeGuardians}`
+                ) && "flex"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -108,7 +108,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col px-4 pt-1 pb-4 gap-3">
-        <div className="flex flex-row items-center justify-between">
+        <div className="w-full grid grid-cols-3 max-sm:grid-cols-2 gap-4 max-sm:gap-x-2">
           <DetailItem
             label="Name"
             value={`${guardian.first_name ?? "--"} ${
@@ -118,7 +118,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
           <DetailItem label="Date of Birth" value={guardian.date_of_birth} />
           <DetailItem label="Gender" value={guardian.gender} />
         </div>
-        <div className="flex flex-row items-center justify-between">
+        <div className="w-full grid grid-cols-3 gap-4">
           <DetailItem label="Mobile Number" value={guardian.mobile_number} />
           <DetailItem
             label="Alternate Number"
@@ -134,7 +134,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.is_emergency_contact
                   ? "text-green"
-                  : "text-destructive",
+                  : "text-destructive"
               )}
             />
             <p>Is emergency contact</p>
@@ -147,7 +147,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.address_same_as_employee
                   ? "text-green"
-                  : "text-destructive",
+                  : "text-destructive"
               )}
             />
             <p>Address same as employee</p>
@@ -173,7 +173,7 @@ export const EmployeeGuardiansCard = ({
             to={
               hasPermission(
                 role,
-                `${createRole}:${attribute.employeeGuardians}`,
+                `${createRole}:${attribute.employeeGuardians}`
               )
                 ? "add-employee-guardian"
                 : DEFAULT_ROUTE
@@ -183,8 +183,8 @@ export const EmployeeGuardiansCard = ({
               "bg-card",
               !hasPermission(
                 role,
-                `${createRole}:${attribute.employeeGuardians}`,
-              ) && "hidden",
+                `${createRole}:${attribute.employeeGuardians}`
+              ) && "hidden"
             )}
           >
             <Icon name="plus-circled" className="mr-2" />

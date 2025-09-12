@@ -64,9 +64,9 @@ export const CompanyLogo = ({
   return (
     <Card>
       <div className="flex justify-between items-center pr-6">
-        <CardHeader>
+        <CardHeader className="max-sm:text-sm">
           <CardTitle>Company Logo</CardTitle>
-          <CardDescription>
+          <CardDescription className="max-sm:text-xs">
             This is your company's logo. Click on the avatar to upload a custom
             one from your files.
           </CardDescription>
@@ -92,7 +92,7 @@ export const CompanyLogo = ({
           />
         </Avatar>
       </div>
-      <CardFooter className="border-t pt-6">
+      <CardFooter className="border-t pt-6 max-sm:text-sm">
         Uploading it is optional but strongly recommended.
       </CardFooter>
     </Card>

@@ -285,7 +285,7 @@ export default function CreateRelationship({
                   children: "Is this currently active?",
                 }}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),

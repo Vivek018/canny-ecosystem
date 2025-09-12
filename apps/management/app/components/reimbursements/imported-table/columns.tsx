@@ -44,13 +44,6 @@ export const ImportedDataColumns: ColumnDef<ImportReimbursementDataType>[] = [
   },
 
   {
-    accessorKey: "email",
-    header: "Approved By",
-    cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.email ?? "--"}</p>;
-    },
-  },
-  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {

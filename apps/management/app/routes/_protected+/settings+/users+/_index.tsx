@@ -52,7 +52,13 @@ export default function Users() {
     <Suspense fallback={<LoadingSpinner className="my-20" />}>
       <Await resolve={usersPromise}>
         {(resolvedData) => {
-          return <UsersWrapper data={resolvedData?.data || []} />;
+          return (
+            <UsersWrapper
+              data={
+                (resolvedData?.data as UserDatabaseRow[]) || []
+              }
+            />
+          );
         }}
       </Await>
     </Suspense>

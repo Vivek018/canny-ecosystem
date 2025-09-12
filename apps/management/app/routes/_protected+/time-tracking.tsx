@@ -1,3 +1,4 @@
+import { FooterTabs } from "@/components/footer-tabs";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -34,22 +35,34 @@ export default function TimeTracking() {
   const { pathname } = useLocation();
 
   return (
-    <section className="flex flex-col h-full">
-      <div className="py-[18px] px-4 border-b">
-        <SecondaryMenu
+    <section className="flex flex-col h-full w-full">
+      <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b">
+        <div className="hidden md:flex md:items-center md:gap-4 w-full">
+          <SecondaryMenu
+            items={[
+              { label: "Attendance", path: "/time-tracking/attendance" },
+              { label: "Leaves", path: "/time-tracking/leaves" },
+              { label: "Holidays", path: "/time-tracking/holidays" },
+            ]}
+            pathname={pathname}
+            Link={Link}
+            className="py-2"
+          />
+        </div>
+
+        <FooterTabs
           items={[
             { label: "Attendance", path: "/time-tracking/attendance" },
             { label: "Leaves", path: "/time-tracking/leaves" },
-            {
-              label: "Holidays",
-              path: "/time-tracking/holidays",
-            },
+            { label: "Holidays", path: "/time-tracking/holidays" },
           ]}
           pathname={pathname}
           Link={Link}
         />
       </div>
-      <Outlet />
+      <div className="max-sm:pb-24">
+        <Outlet />
+      </div>
     </section>
   );
 }

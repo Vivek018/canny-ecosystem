@@ -14,6 +14,7 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearAllCache } from "@/utils/cache";
 import { createCompany } from "@canny_ecosystem/supabase/mutations";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export async function action({
   request,
@@ -51,7 +52,7 @@ export async function action({
       {
         status: "error",
         message: "An unexpected error occurred",
-        returnTo: "/companies",
+        returnTo: DEFAULT_ROUTE,
         error,
       },
       { status: 500 },
@@ -88,7 +89,7 @@ export default function CreateCompany() {
           variant: "destructive",
         });
       }
-      navigate(actionData?.returnTo ?? "/companies");
+      navigate(actionData?.returnTo ?? DEFAULT_ROUTE);
     }
   }, [actionData]);
 

@@ -257,7 +257,7 @@ export default function CreateExit({
                   errors={fields.deduction.errors}
                 />
               </div>
-              <div className="flex gap-7">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.last_working_day, { type: "date" }),

@@ -13,6 +13,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type {
+  EmployeeProvidentFundDatabaseRow,
   PayrollDatabaseRow,
   PayrollFieldsDatabaseRow,
   SupabaseEnv,
@@ -58,6 +59,7 @@ export function SalaryEntryComponent({
   payrollFields,
   allEmployeeOptions,
   allProjectOptions,
+  epfData,
 }: {
   data: any[];
   payrollData: Omit<PayrollDatabaseRow, "created_at"> & {
@@ -73,6 +75,7 @@ export function SalaryEntryComponent({
   allLocationOptions: ComboboxSelectOption[];
   payrollFields?: PayrollFieldsDatabaseRow[];
   allEmployeeOptions?: ComboboxSelectOption[];
+  epfData: EmployeeProvidentFundDatabaseRow;
 }) {
   const { selectedRows } = useSalaryEntriesStore();
   const { role } = useUser();
@@ -101,18 +104,18 @@ export function SalaryEntryComponent({
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
-    [selectedRows, data],
+    [selectedRows, data]
   );
 
   const uniqueFields = useMemo(
     () => getUniqueFields(filteredData),
-    [filteredData],
+    [filteredData]
   );
 
   const updateStatusPayroll = useCallback(
     (
       e: React.MouseEvent<HTMLButtonElement>,
-      status: PayrollDatabaseRow["status"],
+      status: PayrollDatabaseRow["status"]
     ) => {
       e.preventDefault();
       clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
@@ -129,10 +132,10 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: `/payroll/run-payroll/${payrollId}`,
-        },
+        }
       );
     },
-    [payrollId, payrollData, submit],
+    [payrollId, payrollData, submit]
   );
 
   const handleUpdateBulkSalaryEntry = () => {
@@ -155,7 +158,7 @@ export function SalaryEntryComponent({
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/update-bulk-salary-entries`,
-      },
+      }
     );
   };
 
@@ -188,36 +191,36 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: "/payroll/run-payroll/update-payroll",
-        },
+        }
       );
     },
-    [payrollId, payrollData?.id, submit],
+    [payrollId, payrollData?.id, submit]
   );
 
   const showSubmitButton = useMemo(
     () =>
       (payrollData.status === "pending" || payrollData.status === "approved") &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role],
+    [payrollData.status, role]
   );
 
   const showUndoSubmitButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role],
+    [payrollData.status, role]
   );
 
   const showApproveButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${approveRole}:${attribute.payroll}`),
-    [payrollData.status, role],
+    [payrollData.status, role]
   );
 
   return (
-    <section className="p-4 flex flex-col max-h-full gap-4 overflow-hidden">
-      <div className="grid grid-cols-2 gap-4">
+    <section className="p-2 md:p-4 flex flex-col max-h-full gap-4 overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <PayrollSummaryCard
           totals={totals}
           hasSelectedRows={selectedRows.length > 0}
@@ -230,124 +233,131 @@ export function SalaryEntryComponent({
         />
       </div>
 
-      <div className="w-full flex items-start gap-3">
-        <FilterControls
-          searchString={searchString}
-          onSearchChange={setSearchString}
-          siteOptions={siteOptions}
-          departmentOptions={departmentOptions}
-          selectedSiteIds={selectedSiteIds}
-          selectedDeptIds={selectedDeptIds}
-          onFieldChange={handleFieldChange}
-          payrollData={payrollData}
-        />
-        <div
-          className={cn("ml-auto flex flex-row gap-3", noButtons && "hidden")}
-        >
-          <Button
-            variant={payrollData.status === "approved" ? "muted" : "default"}
-            onClick={(e) => updateStatusPayroll(e, "submitted")}
-            className={cn("hidden h-10", showSubmitButton && "flex")}
-            disabled={disable}
-          >
-            {payrollData.status === "pending" ? "Submit" : "Undo Approval"}
-          </Button>
-
-          <Button
-            variant="muted"
-            onClick={(e) => updateStatusPayroll(e, "pending")}
-            className={cn("hidden h-10", showUndoSubmitButton && "flex")}
-            disabled={disable}
-          >
-            Undo Submit
-          </Button>
-
-          <Button
-            onClick={(e) => updateStatusPayroll(e, "approved")}
-            className={cn("hidden h-10", showApproveButton && "flex")}
-            disabled={disable}
-          >
-            Approve
-          </Button>
-        </div>
-
-        <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
-          <ImportDepartmentPayrollDialog
-            payrollFields={payrollFields!}
-            payrollId={payrollId!}
-            allSiteOptions={allSiteOptions}
-            allEmployeeOptions={allEmployeeOptions!}
+      <div className="w-full flex flex-col md:flex-row items-start gap-3">
+        <div className="w-full flex flex-col md:flex-row gap-3">
+          <FilterControls
+            searchString={searchString}
+            onSearchChange={setSearchString}
+            siteOptions={siteOptions}
+            departmentOptions={departmentOptions}
+            selectedSiteIds={selectedSiteIds}
+            selectedDeptIds={selectedDeptIds}
+            onFieldChange={handleFieldChange}
+            payrollData={payrollData}
           />
-        </div>
-
-        <PayrollActions
-          className={cn(
-            payrollData?.status === "pending" || !selectedRows.length
-              ? "hidden"
-              : "",
-          )}
-          allLocationOptions={allLocationOptions}
-          payrollId={payrollId ?? payrollData?.id}
-          data={selectedRows.length ? selectedRows : (data as any)}
-          env={env}
-          fromWhere={fromWhere}
-          status={payrollData?.status}
-        />
-        <div
-          className={cn(
-            "border border-dotted border-muted-foreground h-full",
-            (payrollData?.status === "approved" || !selectedRows.length) &&
-              "hidden",
-          )}
-        />
-        <AlertDialog>
-          <AlertDialogTrigger
+          <div
             className={cn(
-              (payrollData?.status === "approved" || !selectedRows.length) &&
-                "hidden",
+              "md:ml-auto flex flex-row gap-3",
+              noButtons && "hidden"
             )}
           >
             <Button
-              variant={"muted"}
-              size={"icon"}
-              className="w-10 h-10 border border-input"
+              variant={payrollData.status === "approved" ? "muted" : "default"}
+              onClick={(e) => updateStatusPayroll(e, "submitted")}
+              className={cn("hidden h-10", showSubmitButton && "flex")}
+              disabled={disable}
             >
-              <Icon name="edit" className="h-[18px] w-[18px]" />
+              {payrollData.status === "pending" ? "Submit" : "Undo Approval"}
             </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Update Bulk Salary Entry</AlertDialogTitle>
-            </AlertDialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <Label className="text-sm font-medium">Site</Label>
-                <Combobox
-                  options={allSiteOptions}
-                  value={sites}
-                  onChange={(e) => setSites(e)}
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-sm font-medium">Department</Label>
-                <Combobox
-                  options={allDepartmentOptions}
-                  value={departments}
-                  onChange={(e) => setDepartments(e)}
-                />
-              </div>
-            </div>
-            <AlertDialogFooter className="pt-2">
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className={cn(buttonVariants({ variant: "default" }))}
-                onClick={handleUpdateBulkSalaryEntry}
+
+            <Button
+              variant="muted"
+              onClick={(e) => updateStatusPayroll(e, "pending")}
+              className={cn("hidden h-10", showUndoSubmitButton && "flex")}
+              disabled={disable}
+            >
+              Undo Submit
+            </Button>
+
+            <Button
+              onClick={(e) => updateStatusPayroll(e, "approved")}
+              className={cn("hidden h-10", showApproveButton && "flex")}
+              disabled={disable}
+            >
+              Approve
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-row gap-3">
+          <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
+            <ImportDepartmentPayrollDialog
+              payrollFields={payrollFields!}
+              payrollId={payrollId!}
+              allSiteOptions={allSiteOptions}
+              allEmployeeOptions={allEmployeeOptions!}
+            />
+          </div>
+          <PayrollActions
+            className={cn(
+              payrollData?.status === "pending" || !selectedRows.length
+                ? "hidden"
+                : ""
+            )}
+            epfData={epfData}
+            payrollData={payrollData}
+            allLocationOptions={allLocationOptions}
+            payrollId={payrollId ?? payrollData?.id}
+            data={selectedRows.length ? selectedRows : (data as any)}
+            env={env}
+            fromWhere={fromWhere}
+            status={payrollData?.status}
+          />
+          <div
+            className={cn(
+              "border border-dotted border-muted-foreground h-full md:h-10",
+              (payrollData?.status === "approved" || !selectedRows.length) &&
+                "hidden"
+            )}
+          />
+          <AlertDialog>
+            <AlertDialogTrigger
+              className={cn(
+                (payrollData?.status === "approved" || !selectedRows.length) &&
+                  "hidden"
+              )}
+            >
+              <Button
+                variant={"muted"}
+                size={"icon"}
+                className="w-10 h-10 border border-input"
               >
-                Update
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                <Icon name="edit" className="h-[18px] w-[18px]" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Update Bulk Salary Entry</AlertDialogTitle>
+              </AlertDialogHeader>
+              <div className="grid grid-cols-2  max-sm:grid-cols-1 gap-4">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm font-medium">Site</Label>
+                  <Combobox
+                    options={allSiteOptions}
+                    value={sites}
+                    onChange={(e) => setSites(e)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm font-medium">Department</Label>
+                  <Combobox
+                    options={allDepartmentOptions}
+                    value={departments}
+                    onChange={(e) => setDepartments(e)}
+                  />
+                </div>
+              </div>
+              <AlertDialogFooter className="pt-2">
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className={cn(buttonVariants({ variant: "default" }))}
+                  onClick={handleUpdateBulkSalaryEntry}
+                >
+                  Update
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {disable ? (

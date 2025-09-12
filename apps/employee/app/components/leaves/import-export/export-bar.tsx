@@ -22,7 +22,7 @@ export function ExportBar({
   const count = data.filter(
     (leave) =>
       leave.start_date === today ||
-      (leave.start_date <= today && leave.end_date && leave.end_date >= today),
+      (leave.start_date <= today && leave.end_date && leave.end_date >= today)
   ).length;
 
   const toBeExportedData = data.map((element) => {
@@ -77,15 +77,15 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        "z-40 fixed bottom-16 md:bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
       <div className="h-full flex justify-center items-center gap-2">
-        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+        <div className="h-full tracking-wide font-medium rounded-full hidden md:flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
           On Leave: <span className="ml-1.5">{count}</span>
         </div>
         <Button

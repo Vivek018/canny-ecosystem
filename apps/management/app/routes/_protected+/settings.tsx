@@ -1,3 +1,4 @@
+import { FooterTabs } from "@/components/footer-tabs";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -34,9 +35,25 @@ export default function Settings() {
   const { pathname } = useLocation();
 
   return (
-    <section>
-      <div className="py-[18px] px-4 border-b">
-        <SecondaryMenu
+    <section className="flex flex-col h-full w-full">
+      <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b">
+        <div className="hidden md:flex md:items-center md:gap-4 w-full">
+          <SecondaryMenu
+            items={[
+              { label: "General", path: "/settings/general" },
+              { label: "Locations", path: "/settings/locations" },
+              { label: "Relationships", path: "/settings/relationships" },
+              { label: "Users", path: "/settings/users" },
+              { label: "Payees", path: "/settings/payee" },
+              { label: "Documents", path: "/settings/documents" },
+            ]}
+            pathname={pathname}
+            Link={Link}
+            className="py-2"
+          />
+        </div>
+
+        <FooterTabs
           items={[
             { label: "General", path: "/settings/general" },
             { label: "Locations", path: "/settings/locations" },
@@ -49,7 +66,7 @@ export default function Settings() {
           Link={Link}
         />
       </div>
-      <div className="px-4">
+      <div className="px-4 max-sm:pb-12">
         <Outlet />
       </div>
     </section>

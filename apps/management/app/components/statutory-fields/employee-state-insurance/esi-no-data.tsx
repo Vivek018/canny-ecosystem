@@ -15,8 +15,7 @@ import { Link } from "@remix-run/react";
 export function ESINoData() {
   const { role } = useUser();
   return (
-    <div className="flex flex-col items-center justify-end m-auto">
-      <div className="p-14" />
+    <div className="flex items-center justify-center mt-4">
       <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
         <CardContent className="flex flex-col items-center justify-between gap-5">
           <CardTitle>Are you registered for ESI?</CardTitle>
@@ -35,8 +34,8 @@ export function ESINoData() {
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(
                 role,
-                `${createRole}:${attribute.statutoryFieldsEsi}`,
-              ) && "hidden",
+                `${createRole}:${attribute.statutoryFieldsEsi}`
+              ) && "hidden"
             )}
           >
             Enable ESI

@@ -1,3 +1,4 @@
+import { FooterTabs } from "@/components/footer-tabs";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -36,9 +37,24 @@ export default function Account() {
   const { pathname } = useLocation();
 
   return (
-    <section className="flex flex-col h-full">
-      <div className="py-[18px] px-4 border-b">
-        <SecondaryMenu
+    <section className="flex flex-col h-full w-full">
+      <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b">
+        <div className="hidden md:flex md:items-center md:gap-4 w-full">
+          <SecondaryMenu
+            items={[
+              { label: "Account", path: "/user/account" },
+              { label: "Feedback Form", path: "/user/feedback-form" },
+              hasPermission(role, `${readRole}:${attribute.feedbackList}`)
+                ? { label: "Feedback List", path: "/user/feedback-list" }
+                : {},
+            ]}
+            pathname={pathname}
+            Link={Link}
+            className="py-2"
+          />
+        </div>
+
+        <FooterTabs
           items={[
             { label: "Account", path: "/user/account" },
             { label: "Feedback Form", path: "/user/feedback-form" },
@@ -50,7 +66,7 @@ export default function Account() {
           Link={Link}
         />
       </div>
-      <div className="px-4 h-full">
+      <div className="px-4 max-sm:pb-12">
         <Outlet />
       </div>
     </section>

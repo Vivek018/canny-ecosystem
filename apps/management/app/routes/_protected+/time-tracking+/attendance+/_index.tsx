@@ -174,8 +174,8 @@ export default function Attendance() {
 
   return (
     <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center justify-between pb-4  max-sm:items-start  max-md:items-start">
+        <div className="flex w-[90%] flex-col items-start md:flex-row  md:items-center gap-2 mr-4">
           <Suspense fallback={<LoadingSpinner className="mt-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (

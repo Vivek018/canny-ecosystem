@@ -428,7 +428,7 @@ export default function PayrollImportFieldMapping() {
           companyId={companyId}
         />
       ) : (
-        <Card className="m-4 px-40">
+        <Card className="m-4 px-auto lg:px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -441,7 +441,7 @@ export default function PayrollImportFieldMapping() {
                 <h4 className="text-red-700 font-medium mb-2">
                   Validation Errors:
                 </h4>
-                <ul className="grid grid-cols-3 gap-y-1">
+                <ul className="grid grid-cols-3 max-sm:grid-cols-1 gap-y-1">
                   {validationErrors.map((error, index) => (
                     <li
                       key={error.toString() + index.toString()}
@@ -462,7 +462,7 @@ export default function PayrollImportFieldMapping() {
                 onChange={(e) => setRunDate(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-2 gap-8 mb-4">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-8 mb-4">
               <div className="mb-8 flex flex-col gap-1">
                 <Label className="text-sm font-medium">Project</Label>
                 <Combobox
@@ -486,7 +486,7 @@ export default function PayrollImportFieldMapping() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-8 mb-4">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-8 mb-4">
               <div className="flex  flex-col gap-1">
                 <Label className="text-sm font-medium">Month</Label>
 
@@ -525,7 +525,7 @@ export default function PayrollImportFieldMapping() {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5 mb-10">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-y-8 gap-x-10 mt-5 mb-10">
               {fieldConfigs.map((field) => (
                 <div key={field.key} className="flex flex-col relative">
                   <div className="flex flex-row justify-between items-center">

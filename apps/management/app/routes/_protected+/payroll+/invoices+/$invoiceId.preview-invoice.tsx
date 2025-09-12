@@ -12,6 +12,7 @@ import {
   getLocationById,
   getSalaryEntriesForInvoiceByInvoiceId,
   getUserById,
+  getPrimaryLocationByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -192,26 +193,28 @@ const InvoicePDF = ({
   type,
   proofType,
   location,
+  companyAddress,
 }: {
   type: string;
   data: DataTypeForRegister;
   terms: any;
   proofType: string;
   location: LocationDatabaseRow;
+  companyAddress: LocationDatabaseRow | null;
 }) => {
   const allEarningFields = Array.from(
     new Set(
       data.employeeData.flatMap(
-        (emp) => emp?.earnings?.map((e) => e.name) ?? [],
-      ),
-    ),
+        (emp) => emp?.earnings?.map((e) => e.name) ?? []
+      )
+    )
   );
   const allDeductionFields = Array.from(
     new Set(
       data.employeeData.flatMap(
-        (emp) => emp?.deductions?.map((e) => e.name) ?? [],
-      ),
-    ),
+        (emp) => emp?.deductions?.map((e) => e.name) ?? []
+      )
+    )
   );
   const earningTotals: Record<string, number> = {};
   const deductionTotals: Record<string, number> = {};
@@ -258,16 +261,16 @@ const InvoicePDF = ({
     roundToNearest(
       Number(
         data?.invoiceDetails?.payroll_data?.find(
-          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF",
-        )?.amount ?? 0,
-      ),
+          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF"
+        )?.amount ?? 0
+      )
     ) +
     roundToNearest(
       Number(
         data?.invoiceDetails?.payroll_data?.find(
-          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI",
-        )?.amount ?? 0,
-      ),
+          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI"
+        )?.amount ?? 0
+      )
     );
 
   const sum = data?.invoiceDetails?.payroll_data
@@ -284,11 +287,11 @@ const InvoicePDF = ({
             (Number(
               data?.invoiceDetails?.payroll_data.reduce(
                 (sum, item) => sum + Number(item.amount),
-                0,
-              ),
+                0
+              )
             ) *
               terms.reimbursement_charge) /
-              100,
+              100
           )
         : 0;
 
@@ -296,7 +299,7 @@ const InvoicePDF = ({
     type === "salary"
       ? roundToNearest(beforeService) + roundToNearest(service_charge)
       : roundToNearest(
-          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge,
+          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge
         );
 
   const cgst =
@@ -470,14 +473,14 @@ const InvoicePDF = ({
                     data?.invoiceDetails?.payroll_data?.find(
                       (item) =>
                         item.field.trim() === "ESIC" ||
-                        item.field.trim() === "ESI",
+                        item.field.trim() === "ESI"
                     )?.amount ?? 0;
                 } else if (trimmed === "PF" || trimmed === "EPF") {
                   amount =
                     data?.invoiceDetails?.payroll_data?.find(
                       (item) =>
                         item.field.trim() === "PF" ||
-                        item.field.trim() === "EPF",
+                        item.field.trim() === "EPF"
                     )?.amount ?? 0;
                 }
 
@@ -658,12 +661,10 @@ const InvoicePDF = ({
             <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={styles.companyName}>{data.companyData?.name}</Text>
               <Text style={styles.companyAddress}>{`${
-                data?.companyData?.address_line_1
-              }, ${data?.companyData?.address_line_2 ?? ""} ${
-                data?.companyData?.city
-              }, ${data?.companyData?.state}, ${
-                data?.companyData?.pincode
-              }`}</Text>
+                companyAddress?.address_line_1
+              }, ${companyAddress?.address_line_2 ?? ""} ${
+                companyAddress?.city
+              }, ${companyAddress?.state}, ${companyAddress?.pincode}`}</Text>
             </View>
             <View style={{ flex: 1 }} />
             <View style={{ flex: 1 }}>
@@ -784,7 +785,7 @@ const InvoicePDF = ({
               >
                 <Text>
                   {replaceUnderscore(
-                    employee.employeeProjectAssignmentData?.position,
+                    employee.employeeProjectAssignmentData?.position
                   )}
                 </Text>
               </View>
@@ -806,9 +807,9 @@ const InvoicePDF = ({
                     Number(
                       employee?.earnings.reduce(
                         (sum, earning) => sum + earning.amount,
-                        0,
-                      ),
-                    ),
+                        0
+                      )
+                    )
                   )}
                 </Text>
               </View>
@@ -827,9 +828,9 @@ const InvoicePDF = ({
                     Number(
                       employee?.deductions.reduce(
                         (sum, deduction) => sum + deduction?.amount,
-                        0,
-                      ),
-                    ),
+                        0
+                      )
+                    )
                   )}
                 </Text>
               </View>
@@ -839,15 +840,15 @@ const InvoicePDF = ({
                     Number(
                       employee?.earnings.reduce(
                         (sum, earning) => sum + earning?.amount,
-                        0,
-                      ),
+                        0
+                      )
                     ) -
                       Number(
                         employee?.deductions.reduce(
                           (sum, deduction) => sum + deduction?.amount,
-                          0,
-                        ),
-                      ),
+                          0
+                        )
+                      )
                   )}
                 </Text>
               </View>
@@ -884,11 +885,11 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const earningSum = emp?.earnings?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0,
+                        0
                       );
                       return sum + earningSum;
-                    }, 0),
-                  ),
+                    }, 0)
+                  )
                 )}
               </Text>
             </View>
@@ -908,11 +909,11 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const deductionSum = emp?.deductions?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0,
+                        0
                       );
                       return sum + deductionSum;
-                    }, 0),
-                  ),
+                    }, 0)
+                  )
                 )}
               </Text>
             </View>
@@ -924,20 +925,20 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const earningSum = emp?.earnings?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0,
+                        0
                       );
                       return sum + earningSum;
-                    }, 0),
+                    }, 0)
                   ) -
                     Number(
                       data.employeeData.reduce((sum, emp) => {
                         const deductionSum = emp?.deductions?.reduce(
                           (acc, d) => acc + Number(d?.amount ?? 0),
-                          0,
+                          0
                         );
                         return sum + deductionSum;
-                      }, 0),
-                    ),
+                      }, 0)
+                    )
                 )}
               </Text>
             </View>
@@ -962,8 +963,8 @@ const InvoicePDF = ({
                 label: "Basic",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "BASIC",
-                  )?.amount ?? 0,
+                    (item) => item.field === "BASIC"
+                  )?.amount ?? 0
                 ),
               },
               {
@@ -972,24 +973,24 @@ const InvoicePDF = ({
                   totalGross -
                   Number(
                     data?.invoiceDetails?.payroll_data?.find(
-                      (item) => item.field === "BASIC",
-                    )?.amount ?? 0,
+                      (item) => item.field === "BASIC"
+                    )?.amount ?? 0
                   ),
               },
               {
                 label: "P.F. (13%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "PF" || item.field === "EPF",
-                  )?.amount ?? 0,
+                    (item) => item.field === "PF" || item.field === "EPF"
+                  )?.amount ?? 0
                 ),
               },
               {
                 label: "ESIC (3.25%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "ESIC" || item.field === "ESI",
-                  )?.amount ?? 0,
+                    (item) => item.field === "ESIC" || item.field === "ESI"
+                  )?.amount ?? 0
                 ),
               },
               {
@@ -1164,6 +1165,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const invoiceId = params.invoiceId as string;
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  const { data: companyAddress } = await getPrimaryLocationByCompanyId({
+    companyId,
+    supabase,
+  });
+
   const { data: cannyData, error } = await getCannyCompanyIdByName({
     name: CANNY_NAME,
     supabase,
@@ -1235,7 +1242,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         invoiceId: invoiceData?.id!,
       });
     payrollDataAndOthers =
-      invoiceData?.type === "reimbursement" ? reimb ?? [] : exit ?? [];
+      invoiceData?.type === "reimbursement" ? (reimb ?? []) : (exit ?? []);
   }
 
   let contentType: string | undefined = undefined;
@@ -1254,14 +1261,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     },
     userData,
     locationData,
+    companyAddress,
     companyRelations: companyRelations?.terms,
     contentType,
   };
 }
 
 export default function PreviewInvoice() {
-  const { data, companyRelations, locationData, contentType, userData } =
-    useLoaderData<typeof loader>();
+  const {
+    data,
+    companyRelations,
+    locationData,
+    contentType,
+    userData,
+    companyAddress,
+  } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
@@ -1494,7 +1508,7 @@ export default function PreviewInvoice() {
 
     registerData = transformReimbursementDataForPayroll(
       data,
-      data?.invoiceData?.type,
+      data?.invoiceData?.type
     );
   }
 
@@ -1516,6 +1530,7 @@ export default function PreviewInvoice() {
             terms={companyRelations}
             location={locationData as unknown as LocationDatabaseRow}
             type={data?.invoiceData?.type!}
+            companyAddress={companyAddress as unknown as LocationDatabaseRow}
             proofType={contentType as string}
           />
         </PDFViewer>

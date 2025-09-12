@@ -72,7 +72,7 @@ export function ReimbursementsTableHeader({
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] bg-card">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+        <TableHead className="table-cell px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -91,8 +91,8 @@ export function ReimbursementsTableHeader({
                 className={cn(
                   "px-4 py-2 min-w-32 max-w-32",
                   id === "employee_name" &&
-                    "sticky left-12 bg-card z-10 min-w-48 max-w-48",
-                  id === "employee_code" && "sticky left-60 bg-card z-10 ",
+                    "md:sticky md:left-12 md:bg-card md:z-10 min-w-48 max-w-48",
+                  id === "employee_code" && "md:sticky md:left-60 md:bg-card md:z-10 ",
                   id === "email" && " min-w-60 max-w-60",
                 )}
               >

@@ -62,7 +62,7 @@ export function InvoiceTable<TData, TValue>({
   const { rowSelection, setRowSelection, setSelectedRows, setColumns } =
     useInvoiceStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
   const loadMoreInvoices = async () => {
     const formattedFrom = from;
@@ -149,7 +149,7 @@ export function InvoiceTable<TData, TValue>({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
@@ -184,7 +184,7 @@ export function InvoiceTable<TData, TValue>({
                     }}
                     className={cn(
                       "absolute flex cursor-default select-text",
-                      row.original?.invoice_id && "bg-primary/20",
+                      row.original?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -192,21 +192,21 @@ export function InvoiceTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 hidden md:table-cell min-w-32 max-w-32",
+                            "px-4 py-3 table-cell min-w-32 max-w-32",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "invoice_number" &&
-                              "sticky left-12 bg-card z-10 min-w-36 max-w-36",
+                              "md:sticky md:left-12 md:bg-card md:z-10 min-w-36 max-w-36",
                             cell.column.id === "subject" && "min-w-56 max-w-56",
                             cell.column.id === "service_charge" &&
                               "min-w-56 max-w-56",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -221,7 +221,7 @@ export function InvoiceTable<TData, TValue>({
                 <TableCell
                   colSpan={columns.length}
                   className={cn(
-                    "h-96 bg-background grid place-items-center text-center tracking-wide",
+                    "h-96 bg-background grid place-items-center text-center tracking-wide"
                   )}
                 >
                   <div className="flex flex-col items-center gap-1">
@@ -229,7 +229,7 @@ export function InvoiceTable<TData, TValue>({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -238,7 +238,7 @@ export function InvoiceTable<TData, TValue>({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

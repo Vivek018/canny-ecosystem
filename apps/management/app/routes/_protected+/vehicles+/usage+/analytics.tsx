@@ -120,7 +120,7 @@ export default function VehicleUsageAnalytics() {
           <VehicleUsageBars chartData={dataSource} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-3">
         <KilometersByMonth
           chartData={newData as unknown as any[]}
           chartConfig={chartConfig}
@@ -130,7 +130,7 @@ export default function VehicleUsageAnalytics() {
           chartConfig={chartConfig}
         />
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 max-sm:grid-cols-1 gap-3">
         <FuelByMonth
           chartData={newData as unknown as any[]}
           chartConfig={chartConfig}

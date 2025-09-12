@@ -128,13 +128,13 @@ export function SalaryEntryDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-2 hidden md:flex items-center min-w-24 max-w-24",
+                            "px-4 py-2 flex items-center min-w-24 max-w-24",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10 pb-3",
                             cell.column.id === "sr_no" &&
-                              "sticky left-12 bg-card min-w-20 max-w-20 z-10",
+                              "md:sticky md:left-12 md:bg-card min-w-20 max-w-20 md:z-10",
                             cell.column.id === "employee_code" &&
-                              "sticky left-32 z-10 min-w-36 max-w-36 bg-card",
+                              "md:sticky md:left-32 md:z-10 min-w-36 max-w-36 md:bg-card",
                             cell.column.id === "name" && "min-w-52 max-w-52",
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10",

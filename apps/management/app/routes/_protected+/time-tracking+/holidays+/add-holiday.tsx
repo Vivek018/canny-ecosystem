@@ -77,7 +77,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const holidaysData = submission.value;
@@ -164,7 +164,7 @@ export default function AddHolidays({
         <FormProvider context={form.context}>
           <Form method="POST" {...getFormProps(form)}>
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1  place-content-center justify-between gap-x-8 mt-10">
               <Field
                 className="w-full"
                 inputProps={{
@@ -188,7 +188,7 @@ export default function AddHolidays({
                 errors={fields.start_date.errors}
               />
             </div>
-            <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
               <Field
                 className="w-full"
                 inputProps={{

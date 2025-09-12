@@ -70,7 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const vehicleUsagePromise = getVehicleUsageByCompanyId({
@@ -126,7 +126,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.vehicle_usage}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -175,8 +175,8 @@ export default function VehicleUsageIndex() {
 
   return (
     <section className="py-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
           <Suspense fallback={<LoadingSpinner className="ml-14" />}>
             <Await resolve={sitePromise}>
               {(siteData) => (

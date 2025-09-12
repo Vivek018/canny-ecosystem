@@ -16,6 +16,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime, roundToNearest } from "@canny_ecosystem/utils";
 import type {
+  PayrollDatabaseRow,
   SupabaseEnv,
   TypedSupabaseClient,
 } from "@canny_ecosystem/supabase/types";
@@ -32,8 +33,8 @@ export const prepareEsiFormatWorkbook = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
-    ),
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
+    )
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -43,12 +44,14 @@ export const prepareEsiFormatWorkbook = async ({
 
   const extractedData = updatedData.map((formatData) => ({
     wages: roundToNearest(formatData?.amount),
-    ip_number: formatData?.statutoryDetails?.esic_number || "",
+    ip_number: (formatData?.statutoryDetails?.esic_number || "")
+      .toString()
+      .trim(),
     ip_name: `${formatData?.employees?.first_name} ${
       formatData?.employees?.middle_name || ""
-    } ${formatData?.employees?.last_name}`,
-    days: roundToNearest(formatData?.presentDays) || 0,
-    code: "",
+    } ${formatData?.employees?.last_name}`.trim(),
+    days: Number(formatData.days || 0),
+    code: "0",
     last_day: "",
   }));
 
@@ -101,39 +104,71 @@ export const prepareEsiFormatWorkbook = async ({
   }
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "ESI Format");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1"); 
+
+  workbook.Workbook = {
+    Views: [{ RTL: false }],
+    CalcPr: { calcMode: "auto" },
+  };
+
   const buffer = XLSX.write(workbook, {
-    bookType: "xls",
+    bookType: "biff8", 
     type: "array",
     cellStyles: true,
+    cellDates: true,
+    bookSST: false,
   });
 
-  return new Blob([buffer], { type: "application/vnd.ms-excel" });
+  return new Blob([buffer], {
+    type: "application/vnd.ms-excel",
+  });
 };
 
 export const DownloadEsiFormat = ({
   env,
   data,
+  payrollData,
 }: {
   env: SupabaseEnv;
   data: any[];
+  payrollData: Omit<PayrollDatabaseRow, "created_at"> & {
+    site?: { name: string } | null;
+    project?: { name: string } | null;
+  };
 }) => {
   const { supabase } = useSupabase({ env });
 
-  function transformSalaryData(data: any[]) {
+  function transformSalaryData(data: any[], payrollData: any) {
+    const excludedSites = ["hnpcl", "Baroda", "Ahmedabad"];
+    const globalSite = payrollData?.sites?.name;
+
     return data.map((emp: any) => {
+      const empSite =
+        emp.salary_entries?.site?.name ||
+        emp.salary_entries?.department?.sites?.name;
+
+      const siteName = globalSite || empSite;
+
+      const excludeBonus = excludedSites.includes(siteName);
+
       const earnings = emp.salary_entries.salary_field_values
         .filter(
           (e: {
             amount: number;
             payroll_fields: { type: string; name: string };
-          }) => e.payroll_fields.type === "earning",
+          }) =>
+            e.payroll_fields.type === "earning" &&
+            (!excludeBonus || e.payroll_fields.name !== "BONUS")
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
       return {
         amount: Number(earnings),
-        presentDays: emp?.present_days,
+        days:
+          Number(emp?.present_days) +
+          Number(emp?.paid_holidays) +
+          Number(emp?.paid_leaves) +
+          Number(emp?.casual_leaves),
         employee_id: emp.employee?.id,
         employees: {
           company_id: emp.employee?.company_id,
@@ -148,7 +183,7 @@ export const DownloadEsiFormat = ({
 
   const generateEsiFormatExcel = async () => {
     const blob = await prepareEsiFormatWorkbook({
-      data: transformSalaryData(data),
+      data: transformSalaryData(data, payrollData),
       supabase,
     });
     if (!blob) return;

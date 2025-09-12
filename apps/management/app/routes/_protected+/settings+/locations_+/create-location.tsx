@@ -241,7 +241,7 @@ export default function CreateLocation({
                 }}
                 errors={fields.address_line_2.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-3 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -280,7 +280,7 @@ export default function CreateLocation({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.pan_number, { type: "text" }),
@@ -306,7 +306,7 @@ export default function CreateLocation({
                   errors={fields.gst_number.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),

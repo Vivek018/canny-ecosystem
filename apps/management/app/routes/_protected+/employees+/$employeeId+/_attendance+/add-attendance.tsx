@@ -71,7 +71,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
     const data = submission.value;
@@ -97,7 +97,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -107,7 +107,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -184,7 +184,7 @@ export default function AddMonthlyAttendance({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey}
                   inputProps={{
@@ -204,7 +204,7 @@ export default function AddMonthlyAttendance({
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[],
+                    getYears(25, defaultYear) as unknown as string[]
                   )}
                   labelProps={{
                     children: "Year",
@@ -212,12 +212,12 @@ export default function AddMonthlyAttendance({
                   errors={fields.year.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.working_days, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.working_days.name,
+                      fields.working_days.name
                     )}`,
                   }}
                   labelProps={{
@@ -229,7 +229,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.present_days, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.present_days.name,
+                      fields.present_days.name
                     )}`,
                   }}
                   labelProps={{
@@ -238,12 +238,12 @@ export default function AddMonthlyAttendance({
                   errors={fields.present_days.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.absent_days, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.absent_days.name,
+                      fields.absent_days.name
                     )}`,
                   }}
                   labelProps={{
@@ -255,7 +255,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.paid_holidays, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_holidays.name,
+                      fields.paid_holidays.name
                     )}`,
                   }}
                   labelProps={{
@@ -264,12 +264,12 @@ export default function AddMonthlyAttendance({
                   errors={fields.paid_holidays.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.working_hours, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.working_hours.name,
+                      fields.working_hours.name
                     )}`,
                   }}
                   labelProps={{
@@ -281,7 +281,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.overtime_hours, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.overtime_hours.name,
+                      fields.overtime_hours.name
                     )}`,
                   }}
                   labelProps={{
@@ -290,12 +290,12 @@ export default function AddMonthlyAttendance({
                   errors={fields.overtime_hours.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.paid_leaves, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_leaves.name,
+                      fields.paid_leaves.name
                     )}`,
                   }}
                   labelProps={{
@@ -307,7 +307,7 @@ export default function AddMonthlyAttendance({
                   inputProps={{
                     ...getInputProps(fields.casual_leaves, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.casual_leaves.name,
+                      fields.casual_leaves.name
                     )}`,
                   }}
                   labelProps={{

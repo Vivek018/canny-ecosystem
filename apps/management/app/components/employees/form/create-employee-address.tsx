@@ -84,7 +84,7 @@ export function CreateEmployeeAddress({
           }}
           errors={fields.address_line_2.errors}
         />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-3 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.city, { type: "text" }),
@@ -120,7 +120,7 @@ export function CreateEmployeeAddress({
             errors={fields.pincode.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.latitude, { type: "number" }),

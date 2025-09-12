@@ -357,7 +357,7 @@ export default function CreateEmployee() {
           className="flex flex-col"
         >
           <Card>
-            <div className="h-[560px] overflow-scroll">
+            <div className="h-[560px] max-sm:h-[500px] overflow-scroll">
               {step === 1 ? (
                 <CreateEmployeeDetails key={resetKey} fields={fields as any} />
               ) : null}

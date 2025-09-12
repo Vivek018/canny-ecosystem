@@ -144,15 +144,15 @@ export default function RunPayrollIndex() {
                 );
 
               return (
-                <div className="w-full flex items-center justify-between">
-                  <div className="w-1/2 flex gap-4">
+                <div className="w-full flex items-center max-sm:items-start max-md:items-start justify-between gap-3">
+                  <div className="w-1/2 max-sm:w-full max-md:w-full flex flex-col md:flex-row gap-2">
                     <PayrollSearchFilter
                       disabled={!data?.length && noFilters}
                       from="run-payroll"
                     />
                     <FilterList filterList={filterList as PayrollFilters} />
                   </div>
-                  <div className="gap-4 hidden md:flex">
+                  <div className="gap-4 flex">
                     <div className="flex gap-2">
                       <ImportPayrollDialog />
                     </div>
@@ -183,8 +183,8 @@ export default function RunPayrollIndex() {
                 Boolean(
                   meta?.count && innitial?.length
                     ? meta.count > innitial.length
-                    : false,
-                ),
+                    : false
+                )
               );
 
               const [data, setData] = useState(innitial);
@@ -196,8 +196,8 @@ export default function RunPayrollIndex() {
                   Boolean(
                     meta?.count && innitial?.length
                       ? meta.count > innitial.length
-                      : false,
-                  ),
+                      : false
+                  )
                 );
               }, [innitial]);
 
@@ -246,7 +246,7 @@ export default function RunPayrollIndex() {
                     <CommandEmpty
                       className={cn(
                         "w-full py-40 capitalize text-lg tracking-wide text-center",
-                        !isDocument && "hidden",
+                        !isDocument && "hidden"
                       )}
                     >
                       No payrolls found.

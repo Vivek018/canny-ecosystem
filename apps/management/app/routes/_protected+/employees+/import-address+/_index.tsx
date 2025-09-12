@@ -263,7 +263,7 @@ export default function EmployeeAddressImportFieldMapping() {
       {loadNext ? (
         <EmployeeAddressImportData env={env} />
       ) : (
-        <Card className="m-4 px-40">
+        <Card className="m-4 pax-auto lg:px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -276,7 +276,7 @@ export default function EmployeeAddressImportFieldMapping() {
                 <h4 className="text-red-700 font-medium mb-2">
                   Validation Errors:
                 </h4>
-                <ul className="grid grid-cols-3 gap-y-1">
+                <ul className="grid grid-cols-3 max-sm:grid-cols-1 gap-y-1">
                   {validationErrors.map((error, index) => (
                     <li
                       key={error.toString() + index.toString()}
@@ -289,7 +289,7 @@ export default function EmployeeAddressImportFieldMapping() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
                 <div key={field.key} className="flex flex-col">
                   <div className="flex flex-row gap-1 pb-1">

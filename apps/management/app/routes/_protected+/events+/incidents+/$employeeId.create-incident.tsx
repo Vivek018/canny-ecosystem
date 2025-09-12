@@ -228,7 +228,7 @@ export default function RegisterIncident({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey}
                   className="capitalize"
@@ -270,7 +270,7 @@ export default function RegisterIncident({
                 }}
                 errors={fields.category.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 2}
                   className="capitalize"

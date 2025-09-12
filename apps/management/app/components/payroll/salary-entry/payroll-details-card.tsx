@@ -61,7 +61,7 @@ export const PayrollDetailsCard = React.memo<PayrollDetailsCardProps>(
     ];
 
     return (
-      <div className="flex flex-col gap-2">
+      <div className="hidden md:flex flex-col gap-2">
         <div className="relative h-full">
           <Card className="h-full flex flex-col justify-between px-4 py-3">
             <div className="absolute top-2 right-2 z-10">
