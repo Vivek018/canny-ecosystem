@@ -56,13 +56,13 @@ export function CreateCompanyDetails({ fields }: { fields: FieldsType }) {
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              company_type as unknown as string[]
+              company_type as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.company_type, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.company_type.name
+              fields.company_type.name,
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.company_type.name),
@@ -72,13 +72,13 @@ export function CreateCompanyDetails({ fields }: { fields: FieldsType }) {
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              company_size as unknown as string[]
+              company_size as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.company_size, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.company_size.name
+              fields.company_size.name,
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.company_size.name),

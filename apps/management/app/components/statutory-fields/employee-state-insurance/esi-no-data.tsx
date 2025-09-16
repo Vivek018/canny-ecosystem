@@ -34,8 +34,8 @@ export function ESINoData() {
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(
                 role,
-                `${createRole}:${attribute.statutoryFieldsEsi}`
-              ) && "hidden"
+                `${createRole}:${attribute.statutoryFieldsEsi}`,
+              ) && "hidden",
             )}
           >
             Enable ESI

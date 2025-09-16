@@ -124,7 +124,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

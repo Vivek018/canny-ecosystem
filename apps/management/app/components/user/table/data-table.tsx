@@ -35,7 +35,7 @@ export function UserDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border rounded overflow-hidden",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative overflow-x-auto -mr-3 md:mr-0">
@@ -60,12 +60,12 @@ export function UserDataTable<TData, TValue>({
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-[60px] md:min-w-20 md:max-w-20 bg-card z-10",
                             cell.column.id === "email" &&
-                              "min-w-[180px] md:min-w-60 md:max-w-60"
+                              "min-w-[180px] md:min-w-60 md:max-w-60",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );

@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const casesPromise = getCasesByCompanyId({
@@ -115,7 +115,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return clientCaching(
     `${cacheKeyPrefix.case}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

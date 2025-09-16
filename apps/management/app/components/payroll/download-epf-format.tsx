@@ -34,8 +34,8 @@ export const prepareEpfFormat = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
+    ),
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -71,8 +71,8 @@ export const prepareEpfFormat = async ({
           ? formatData?.amount > 15000
             ? 15000
             : formatData?.amount
-          : formatData?.amount) * 0.12
-      )
+          : formatData?.amount) * 0.12,
+      ),
     ),
     eps_contribution: roundToNearest(
       Number(
@@ -80,8 +80,8 @@ export const prepareEpfFormat = async ({
           ? formatData?.amount > 15000
             ? 15000
             : formatData?.amount
-          : formatData?.amount) * 0.0833
-      )
+          : formatData?.amount) * 0.0833,
+      ),
     ),
     diffEpf_Eps:
       roundToNearest(
@@ -90,8 +90,8 @@ export const prepareEpfFormat = async ({
             ? formatData?.amount > 15000
               ? 15000
               : formatData?.amount
-            : formatData?.amount * 0.12
-        )
+            : formatData?.amount * 0.12,
+        ),
       ) -
       roundToNearest(
         Number(
@@ -99,8 +99,8 @@ export const prepareEpfFormat = async ({
             ? formatData?.amount > 15000
               ? 15000
               : formatData?.amount
-            : formatData?.amount) * 0.0833
-        )
+            : formatData?.amount) * 0.0833,
+        ),
       ),
     ncp_days:
       formatData.absentDays ??
@@ -138,7 +138,7 @@ export const DownloadEpfFormat = ({
           }) =>
             e.payroll_fields.type === "earning" &&
             (allowedFields === null ||
-              allowedFields.includes(e.payroll_fields.name.toUpperCase()))
+              allowedFields.includes(e.payroll_fields.name.toUpperCase())),
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
@@ -159,7 +159,7 @@ export const DownloadEpfFormat = ({
   }
 
   const generateEpfFormat = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 

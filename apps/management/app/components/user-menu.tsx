@@ -50,7 +50,7 @@ export function UserMenu({
           className={cn(
             "flex flex-col items-start group-hover:opacity-70 group-hover:dark:opacity-100 gap-0.5",
             !isExpanded && "hidden",
-            "max-sm:flex"
+            "max-sm:flex",
           )}
         >
           <span className="truncate w-40 text-start">

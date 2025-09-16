@@ -33,8 +33,8 @@ export const prepareEsiFormatWorkbook = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
+    ),
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -104,7 +104,7 @@ export const prepareEsiFormatWorkbook = async ({
   }
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1"); 
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
   workbook.Workbook = {
     Views: [{ RTL: false }],
@@ -112,7 +112,7 @@ export const prepareEsiFormatWorkbook = async ({
   };
 
   const buffer = XLSX.write(workbook, {
-    bookType: "biff8", 
+    bookType: "biff8",
     type: "array",
     cellStyles: true,
     cellDates: true,
@@ -158,7 +158,7 @@ export const DownloadEsiFormat = ({
             payroll_fields: { type: string; name: string };
           }) =>
             e.payroll_fields.type === "earning" &&
-            (!excludeBonus || e.payroll_fields.name !== "BONUS")
+            (!excludeBonus || e.payroll_fields.name !== "BONUS"),
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 

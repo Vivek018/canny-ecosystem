@@ -38,7 +38,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
   const previousResult = previousData.reduce(
     (acc: Record<string, number>, item) => {
@@ -46,7 +46,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const reimbursementCurrentResult = reimbursementCurrentData.reduce(
@@ -56,7 +56,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + amount;
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const reimbursementPreviousResult = reimbursementPreviousData.reduce(
@@ -66,7 +66,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + amount;
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const salaryCalculation =
@@ -94,12 +94,12 @@ export function CountCards({
               "text-xs text-muted-foreground flex  max-sm:hidden",
               (previousResult.salary ? salaryCalculation : 100) > 0
                 ? "text-green"
-                : "text-destructive"
+                : "text-destructive",
             )}
           >
             {previousResult.salary
               ? Math.abs(salaryCalculation).toFixed(2)
-              : (currentResult.salary ?? 0)}
+              : currentResult.salary ?? 0}
             %
             <p className="text-xs text-muted-foreground ml-1">
               {(previousResult.salary ? salaryCalculation : 100) > 0
@@ -128,12 +128,12 @@ export function CountCards({
                 ? reimbursementCalculation
                 : 100) > 0
                 ? "text-green"
-                : "text-destructive"
+                : "text-destructive",
             )}
           >
             {reimbursementPreviousResult.reimbursement
               ? Math.abs(reimbursementCalculation).toFixed(2)
-              : (reimbursementCurrentResult.reimbursement ?? 0)}
+              : reimbursementCurrentResult.reimbursement ?? 0}
             %
             <p className="text-xs text-muted-foreground ml-1">
               {(reimbursementPreviousResult.reimbursement
@@ -176,7 +176,7 @@ export function CountCards({
               "text-xs text-muted-foreground flex max-sm:hidden",
               currentExits.length - previousExits.length > 0
                 ? "text-green"
-                : "text-destructive"
+                : "text-destructive",
             )}
           >
             {currentExits.length - previousExits.length > 0

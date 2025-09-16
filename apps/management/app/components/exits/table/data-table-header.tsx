@@ -92,7 +92,7 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
                     "md:sticky md:left-12 md:bg-card md:z-10 min-w-32 max-w-32",
                   id === "employee_name" &&
                     "md:sticky md:left-44 md:bg-card md:z-10 min-w-40 max-w-40",
-                  id === "final_settlement_date" && " min-w-40 max-w-40"
+                  id === "final_settlement_date" && " min-w-40 max-w-40",
                 )}
               >
                 <Button
@@ -110,14 +110,14 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

@@ -51,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.statutoryFieldsGraduity}`
+      `${createRole}:${attribute.statutoryFieldsGraduity}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -68,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -87,7 +87,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -116,7 +116,7 @@ export async function action({
         message: "Failed to create Gratuity",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -224,7 +224,7 @@ export default function CreateGratuity({
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.payment_days_per_year.name
+                    fields.payment_days_per_year.name,
                   ),
                 }}
                 errors={fields.payment_days_per_year.errors}

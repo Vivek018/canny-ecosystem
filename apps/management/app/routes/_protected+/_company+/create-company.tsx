@@ -51,7 +51,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const { status, error, companyId } = await createCompany({
@@ -81,7 +81,7 @@ export async function action({
         }).catch((error) => {
           console.error("LWF Creation Error:", error);
           return null;
-        })
+        }),
       );
       stateProfessionalTax.map((pt) =>
         createProfessionalTax({
@@ -97,7 +97,7 @@ export async function action({
         }).catch((error) => {
           console.error("PT Creation Error:", error, "Data:", pt);
           return null;
-        })
+        }),
       );
 
       await createEmployeeStateInsurance({
@@ -226,7 +226,7 @@ export async function action({
         returnTo: DEFAULT_ROUTE,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -87,7 +87,7 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
                   id === "employee_code" &&
                     "md:sticky md:left-12 md:bg-card md:z-10",
                   id === "employee_name" &&
-                    "md:sticky w-full md:left-48 md:bg-card md:z-10"
+                    "md:sticky w-full md:left-48 md:bg-card md:z-10",
                 )}
               >
                 <Button
@@ -104,14 +104,14 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

@@ -25,7 +25,10 @@ const SelectTrigger = React.forwardRef<
     {...props}
   >
     {children}
-    <SelectPrimitive.Icon asChild className={cn("ml-auto", noIcon && "hidden", "max-sm:flex")}>
+    <SelectPrimitive.Icon
+      asChild
+      className={cn("ml-auto", noIcon && "hidden", "max-sm:flex")}
+    >
       <Icon name="caret-sort" size="sm" className="shrink-0" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>

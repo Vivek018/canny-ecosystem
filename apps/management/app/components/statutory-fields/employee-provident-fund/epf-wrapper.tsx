@@ -69,8 +69,8 @@ export function EPFWrapper({
               "p-2 rounded-full bg-secondary grid place-items-center",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.statutoryFieldsEpf}`
-              ) && "hidden"
+                `${updateRole}:${attribute.statutoryFieldsEpf}`,
+              ) && "hidden",
             )}
           >
             <Icon name="edit" size="sm" />

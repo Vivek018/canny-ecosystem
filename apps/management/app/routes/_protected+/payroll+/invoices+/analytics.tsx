@@ -71,11 +71,11 @@ export default function InvoicesAnalytics() {
 
   return (
     <div className="w-full p-4 m-auto flex flex-col gap-4">
-        <div className="w-full">
-          <InvoiceTrend
-            chartData={dataSource}
-            companyRelations={companyRelations}
-          />
+      <div className="w-full">
+        <InvoiceTrend
+          chartData={dataSource}
+          companyRelations={companyRelations}
+        />
       </div>
 
       <div className="flex flex-col lg:flex-row w-full  gap-3">

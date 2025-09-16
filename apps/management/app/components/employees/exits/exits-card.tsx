@@ -107,8 +107,8 @@ export const ExitsCard = ({
                   "bg-card",
                   !hasPermission(
                     `${role}`,
-                    `${updateRole}:${attribute.employeeExits}`
-                  ) && "hidden"
+                    `${updateRole}:${attribute.employeeExits}`,
+                  ) && "hidden",
                 )}
               >
                 <Icon name={"edit"} className="mr-2" />
@@ -124,12 +124,12 @@ export const ExitsCard = ({
                       "bg-card",
                       !hasPermission(
                         role,
-                        `${updateRole}:${attribute.employeeExits}`
+                        `${updateRole}:${attribute.employeeExits}`,
                       ) && "hidden",
                       !hasPermission(
                         `${role}`,
-                        `${deleteRole}:${attribute.employeeExits}`
-                      ) && "hidden"
+                        `${deleteRole}:${attribute.employeeExits}`,
+                      ) && "hidden",
                     )}
                   >
                     <Icon name="dots-vertical" size="xs" className="mr-1.5" />
@@ -146,8 +146,8 @@ export const ExitsCard = ({
                 "bg-card",
                 !hasPermission(
                   `${role}`,
-                  `${createRole}:${attribute.employeeExits}`
-                ) && "hidden"
+                  `${createRole}:${attribute.employeeExits}`,
+                ) && "hidden",
               )}
             >
               <Icon name={"plus-circled"} className="mr-2" />

@@ -83,7 +83,12 @@ export const FilterControls = React.memo<FilterControlsProps>(
 
     return (
       <div className="flex-1 flex items-center justify-between gap-3">
-        <div className={cn("w-full md:w-2/3 md:max-w-96",!showFilters && "hidden")}>
+        <div
+          className={cn(
+            "w-full md:w-2/3 md:max-w-96",
+            !showFilters && "hidden",
+          )}
+        >
           <MultiSelectCombobox
             label="Groups"
             options={conditionalOptions() as any[]}
@@ -122,5 +127,5 @@ export const FilterControls = React.memo<FilterControlsProps>(
         </div>
       </div>
     );
-  }
+  },
 );

@@ -33,8 +33,8 @@ export function EPFNoData() {
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(
                 role,
-                `${createRole}:${attribute.statutoryFieldsEpf}`
-              ) && "hidden"
+                `${createRole}:${attribute.statutoryFieldsEpf}`,
+              ) && "hidden",
             )}
           >
             Enable EPF

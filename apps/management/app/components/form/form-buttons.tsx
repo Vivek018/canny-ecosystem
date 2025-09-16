@@ -30,12 +30,12 @@ export const FormButtons = ({
     <CardFooter
       className={cn(
         "max-sm:pt-4 flex flex-col md:flex-row max-sm:gap-3 max-md:gap-3 items-center justify-between",
-        className
+        className,
       )}
     >
       <div
         className={cn(
-          "flex flex-row items-center justify-center gap-4 max-sm:w-full max-md:w-full"
+          "flex flex-row items-center justify-center gap-4 max-sm:w-full max-md:w-full",
         )}
       >
         <Button
@@ -100,7 +100,7 @@ export const FormButtons = ({
           className={cn(
             "min-w-28",
             step === totalSteps && "hidden",
-            isSingle && "hidden"
+            isSingle && "hidden",
           )}
         >
           Next
@@ -116,7 +116,7 @@ export const FormButtons = ({
           value="submit"
           className={cn(
             "min-w-28",
-            !isSingle && step !== totalSteps ? "hidden" : "flex"
+            !isSingle && step !== totalSteps ? "hidden" : "flex",
           )}
         >
           Submit

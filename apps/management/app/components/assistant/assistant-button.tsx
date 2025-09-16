@@ -11,10 +11,12 @@ export function AssistantButton() {
       className={cn(
         buttonVariants({ variant: "ghost" }),
         "relative md:min-w-[265px] w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64 ml-4 p-0 hover:bg-transparent font-normal no-drag",
-        pathname === "/chat/chatbox" && "text-accent-foreground"
+        pathname === "/chat/chatbox" && "text-accent-foreground",
       )}
     >
-      <span className="md:ml-0 flex">Ask Canny <span className="ml-1 hidden md:flex">A Question...</span></span>
+      <span className="md:ml-0 flex">
+        Ask Canny <span className="ml-1 hidden md:flex">A Question...</span>
+      </span>
       <kbd className="hidden md:flex pointer-events-none ml-16 h-5 select-none justify-center items-center border bg-accent pt-[1.5px] px-1.5 font-mono text-[12px] font-medium opacity-100 sm:flex -mt-1.5">
         ⌘
       </kbd>

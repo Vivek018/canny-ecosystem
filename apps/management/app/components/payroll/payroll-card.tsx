@@ -25,7 +25,7 @@ export function PayrollCard({ data }: { data: PayrollDatabaseRow }) {
             <p
               className={cn(
                 "p-2 w-auto font-semibold text-center text-xs md:text-md rounded-md capitalize",
-                is_approved ? "bg-green" : "bg-muted"
+                is_approved ? "bg-green" : "bg-muted",
               )}
             >
               {data.status}
@@ -79,14 +79,14 @@ export function PayrollCard({ data }: { data: PayrollDatabaseRow }) {
             }
             className={cn(
               buttonVariants(),
-              "border-2 border-primary w-full md:w-36"
+              "border-2 border-primary w-full md:w-36",
             )}
           >
             View {is_approved ? "Pay History" : "Pay Run"}
           </Link>
           <DeletePayroll
             payrollId={data.id}
-            className={cn(is_approved && "hidden","w-full")}
+            className={cn(is_approved && "hidden", "w-full")}
           />
         </div>
       </CardContent>

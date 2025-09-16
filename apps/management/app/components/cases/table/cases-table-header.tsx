@@ -84,12 +84,7 @@ export function CasesTableHeader({ table, className, loading }: Props) {
         {CasesColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead
-                key={id}
-                className={cn(
-                  "px-4 py-2",
-                )}
-              >
+              <TableHead key={id} className={cn("px-4 py-2")}>
                 <Button
                   className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
                   variant="ghost"

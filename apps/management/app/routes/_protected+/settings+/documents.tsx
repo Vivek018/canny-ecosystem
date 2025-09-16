@@ -98,18 +98,20 @@ export default function Documents() {
                         "flex items-center gap-1 whitespace-nowrap",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.companyDocuments}`
-                        ) && "hidden"
+                          `${createRole}:${attribute.companyDocuments}`,
+                        ) && "hidden",
                       )}
                     >
                       <span>Add</span>
-                      <span className="hidden md:flex justify-end">Document</span>
+                      <span className="hidden md:flex justify-end">
+                        Document
+                      </span>
                     </Link>
                   </div>
                   <CommandEmpty
                     className={cn(
                       "w-full py-40 capitalize text-lg tracking-wide text-center",
-                      !isDocument && "hidden"
+                      !isDocument && "hidden",
                     )}
                   >
                     No document found.

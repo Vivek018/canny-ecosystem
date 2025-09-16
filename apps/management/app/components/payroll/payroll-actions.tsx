@@ -70,7 +70,7 @@ export function PayrollActions({
           size="icon"
           className={cn(
             "h-10 w-12 px-2 bg-muted border border-input",
-            className
+            className,
           )}
         >
           <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
@@ -87,13 +87,13 @@ export function PayrollActions({
               variant={"ghost"}
               className={cn(
                 "px-2 w-full flex flex-row justify-start gap-2 ",
-                status !== "approved" ? "hidden" : ""
+                status !== "approved" ? "hidden" : "",
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/create-invoice`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/create-invoice`
+                      `/payroll/payroll-history/${payrollId}/create-invoice`,
                     )
               }
             >
@@ -117,11 +117,7 @@ export function PayrollActions({
           </Button>
 
           <Button variant={"ghost"} className={cn(" w-full px-2")}>
-            <DownloadEpfFormat
-              env={env}
-              data={data}
-              epfData={epfData}
-            />
+            <DownloadEpfFormat env={env} data={data} epfData={epfData} />
           </Button>
 
           <DropdownMenuSeparator
@@ -133,13 +129,13 @@ export function PayrollActions({
               className={cn(
                 "hidden",
                 status === "approved" &&
-                  "flex flex-row justify-start gap-2 px-2 pr-1"
+                  "flex flex-row justify-start gap-2 px-2 pr-1",
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/salary-slips`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/salary-slips`
+                      `/payroll/payroll-history/${payrollId}/salary-slips`,
                     )
               }
             >
@@ -158,7 +154,7 @@ export function PayrollActions({
                 <Button
                   variant={"ghost"}
                   className={cn(
-                    "w-full flex flex-row justify-start gap-2 px-2 pr-1"
+                    "w-full flex flex-row justify-start gap-2 px-2 pr-1",
                   )}
                 >
                   <Icon name="import" />
@@ -189,10 +185,10 @@ export function PayrollActions({
                       newParams.set("location", locations);
                       fromWhere === "runpayroll"
                         ? navigate(
-                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`
+                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`,
                           )
                         : navigate(
-                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`
+                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`,
                           );
                     }}
                   >

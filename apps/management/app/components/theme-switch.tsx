@@ -54,7 +54,7 @@ export const ThemeSwitch = ({
             {
               method: "POST",
               action: "/cookie",
-            }
+            },
           );
         }}
       >

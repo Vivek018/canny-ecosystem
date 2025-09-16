@@ -73,8 +73,8 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.employeeGuardians}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.employeeGuardians}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -90,8 +90,8 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "px-2.5 h-min hidden",
                 hasPermission(
                   role,
-                  `${deleteRole}:${attribute.employeeGuardians}`
-                ) && "flex"
+                  `${deleteRole}:${attribute.employeeGuardians}`,
+                ) && "flex",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -134,7 +134,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.is_emergency_contact
                   ? "text-green"
-                  : "text-destructive"
+                  : "text-destructive",
               )}
             />
             <p>Is emergency contact</p>
@@ -147,7 +147,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.address_same_as_employee
                   ? "text-green"
-                  : "text-destructive"
+                  : "text-destructive",
               )}
             />
             <p>Address same as employee</p>
@@ -173,7 +173,7 @@ export const EmployeeGuardiansCard = ({
             to={
               hasPermission(
                 role,
-                `${createRole}:${attribute.employeeGuardians}`
+                `${createRole}:${attribute.employeeGuardians}`,
               )
                 ? "add-employee-guardian"
                 : DEFAULT_ROUTE
@@ -183,8 +183,8 @@ export const EmployeeGuardiansCard = ({
               "bg-card",
               !hasPermission(
                 role,
-                `${createRole}:${attribute.employeeGuardians}`
-              ) && "hidden"
+                `${createRole}:${attribute.employeeGuardians}`,
+              ) && "hidden",
             )}
           >
             <Icon name="plus-circled" className="mr-2" />

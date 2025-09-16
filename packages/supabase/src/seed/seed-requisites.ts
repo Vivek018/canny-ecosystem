@@ -28,7 +28,7 @@ export async function seedRequisitesForCompanyCreation({
 }) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
+    process.env.SUPABASE_ANON_KEY!,
   );
   await createLocation({
     supabase,
@@ -263,7 +263,7 @@ export async function seedRequisitesForEmployeeCreation({
 }) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
+    process.env.SUPABASE_ANON_KEY!,
   );
   for (let index = 0; index < employeeLetterTypesArray.length - 1; index++) {
     const letterType = employeeLetterTypesArray[index];

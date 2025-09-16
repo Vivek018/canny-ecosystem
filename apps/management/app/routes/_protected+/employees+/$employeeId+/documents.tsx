@@ -83,7 +83,7 @@ export default function Documents() {
             {(resolvedData) => {
               if (!resolvedData || !resolvedData.data) {
                 clearExactCacheEntry(
-                  `${cacheKeyPrefix.employee_documents}${employeeId}`
+                  `${cacheKeyPrefix.employee_documents}${employeeId}`,
                 );
                 return <ErrorBoundary message="Failed to fetch documents" />;
               }
@@ -102,8 +102,8 @@ export default function Documents() {
                         "flex items-center gap-1 whitespace-nowrap",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.employeeDocuments}`
-                        ) && "hidden"
+                          `${createRole}:${attribute.employeeDocuments}`,
+                        ) && "hidden",
                       )}
                     >
                       <span>Add</span>
@@ -115,7 +115,7 @@ export default function Documents() {
                   <CommandEmpty
                     className={cn(
                       "w-full py-40 capitalize text-lg tracking-wide text-center",
-                      !isDocument && "hidden"
+                      !isDocument && "hidden",
                     )}
                   >
                     No document found.

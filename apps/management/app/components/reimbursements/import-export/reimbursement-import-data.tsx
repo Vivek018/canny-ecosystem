@@ -65,8 +65,8 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -78,7 +78,7 @@ export function ReimbursementImportData({
 
       if (ofWhich === "employee") {
         const employeeCodes = importData.data!.map(
-          (value) => value.employee_code
+          (value) => value.employee_code,
         );
 
         const { data: employees, error: codeError } =
@@ -108,7 +108,7 @@ export function ReimbursementImportData({
       if (ofWhich === "employee") {
         updatedData = importData.data!.map((item: any) => {
           const employeeId = ids?.find(
-            (e: any) => e.employee_code === item.employee_code
+            (e: any) => e.employee_code === item.employee_code,
           )?.id;
           const { employee_code, ...rest } = item;
 
@@ -122,7 +122,7 @@ export function ReimbursementImportData({
       if (ofWhich === "payee") {
         updatedData = importData.data!.map((item: any) => {
           const payeeIds = ids?.find(
-            (e: any) => e.payee_code === item.payee_code
+            (e: any) => e.payee_code === item.payee_code,
           )?.id;
 
           const { payee_code, ...rest } = item;
@@ -158,7 +158,7 @@ export function ReimbursementImportData({
         });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         navigate(
-          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
+          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`,
         );
       }
     }
@@ -169,7 +169,7 @@ export function ReimbursementImportData({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden"
+          isImporting ? "block" : "hidden",
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />

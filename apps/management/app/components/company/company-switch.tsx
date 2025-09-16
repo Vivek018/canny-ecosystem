@@ -55,7 +55,7 @@ export const CompanySwitch = ({
       {
         method: "POST",
         action: "/cookie",
-      }
+      },
     );
     setOpen(false);
   };
@@ -70,7 +70,7 @@ export const CompanySwitch = ({
           disabled={!hasPermission(role, `${updateRole}:${attribute.company}`)}
           className={cn(
             "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-auto py-1 h-full disabled:opacity-100",
-            !currentCompany && "text-muted-foreground"
+            !currentCompany && "text-muted-foreground",
           )}
         >
           <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export const CompanySwitch = ({
             className={cn(
               "ml-2 shrink-0 opacity-75",
               !hasPermission(role, `${updateRole}:${attribute.company}`) &&
-                "hidden"
+                "hidden",
             )}
           />
         </Button>
@@ -137,7 +137,7 @@ export const CompanySwitch = ({
             to="/create-company"
             className={cn(
               buttonVariants({ variant: "primary-ghost" }),
-              "w-full cursor-pointer capitalize h-11"
+              "w-full cursor-pointer capitalize h-11",
             )}
             onClick={() => setOpen(false)}
           >

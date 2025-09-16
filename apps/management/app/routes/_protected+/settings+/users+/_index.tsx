@@ -54,9 +54,7 @@ export default function Users() {
         {(resolvedData) => {
           return (
             <UsersWrapper
-              data={
-                (resolvedData?.data as UserDatabaseRow[]) || []
-              }
+              data={(resolvedData?.data as UserDatabaseRow[]) || []}
             />
           );
         }}

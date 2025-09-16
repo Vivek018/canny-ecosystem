@@ -68,7 +68,7 @@ export default function ProtectedRoute() {
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
 
   return (
@@ -76,7 +76,7 @@ export default function ProtectedRoute() {
       <Sidebar
         className={cn(
           "flex-none hidden sm:flex fixed top-0 left-0 h-full",
-          openNav && "flex fixed z-50"
+          openNav && "flex fixed z-50",
         )}
         theme={theme ?? "system"}
         user={user}
@@ -86,7 +86,7 @@ export default function ProtectedRoute() {
         <div
           className={cn(
             "fixed inset-0 bg-background/80 backdrop-blur-sm z-40",
-            !openNav && "hidden"
+            !openNav && "hidden",
           )}
           onClick={() => setOpenNav(false)}
           onKeyDown={(e) => e.key === "Escape" && setOpenNav(false)}
