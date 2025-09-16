@@ -49,7 +49,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -74,7 +74,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -84,7 +84,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -165,12 +165,12 @@ export default function FeedbackForm() {
                 }}
                 errors={fields.subject.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-6 max-sm:gap-2">
                 <SearchableSelectField
                   key={resetKey}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    categoryArray as unknown as string[],
+                    categoryArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.category, { type: "text" }),
@@ -185,7 +185,7 @@ export default function FeedbackForm() {
                   key={resetKey + 1}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    severityArray as unknown as string[],
+                    severityArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.severity, { type: "text" }),

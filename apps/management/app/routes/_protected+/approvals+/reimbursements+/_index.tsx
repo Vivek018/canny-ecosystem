@@ -181,8 +181,8 @@ export default function ReimbursementsIndex() {
 
   return (
     <section className="p-4 overflow-hidden">
-      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start justify-between pb-4 gap-2">
+        <div className="flex w-[90%] max-sm:w-full flex-col md:flex-row items-start md:items-center gap-2">
           <Suspense fallback={<LoadingSpinner className="ml-14" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (

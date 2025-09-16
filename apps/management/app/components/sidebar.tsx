@@ -40,6 +40,7 @@ export function Sidebar({
       className={cn(
         "fixed flex h-full flex-col overflow-hidden w-20 z-50 bg-background border-r transition-[width]",
         isExpanded && "w-60 shadow-2xl dark:shadow-foreground/10",
+        "max-sm:w-60 max-sm:shadow-2xl max-sm:dark:shadow-foreground/10",
         className
       )}
       onMouseEnter={openSidebar}
@@ -74,6 +75,7 @@ export function Sidebar({
                   cn(
                     "flex mx-4 cursor-pointer text-start text-sm justify-start w-12 px-3.5 rounded py-2.5 tracking-wide hover:bg-accent gap-3 transition-[width]",
                     isExpanded && "w-[200px]",
+                    "max-sm:w-[200px]",
                     isActive &&
                       "bg-primary/15 text-primary hover:bg-primary/20",
                     link === pathname &&
@@ -83,7 +85,13 @@ export function Sidebar({
                 onClick={() => setOpenNav(false)}
               >
                 <Icon name={icon as IconName} size="md" className="shrink-0" />
-                <span className={cn("w-40 truncate", !isExpanded && "hidden")}>
+                <span
+                  className={cn(
+                    "w-40 truncate",
+                    !isExpanded && "hidden",
+                    "max-sm:flex"
+                  )}
+                >
                   {name}
                 </span>
               </NavLink>
@@ -107,6 +115,7 @@ export function Sidebar({
           isExpanded={isExpanded}
           dropdownContentRef={selectContentRef}
           Link={Link}
+          setOpenNav={setOpenNav}
         />
       </div>
     </aside>

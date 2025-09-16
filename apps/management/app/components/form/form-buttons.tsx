@@ -27,8 +27,17 @@ export const FormButtons = ({
     navigation.state === "submitting" || navigation.state === "loading";
 
   return (
-    <CardFooter className={cn("max-sm:pt-4 flex flex-col md:flex-row max-sm:gap-3 max-md:gap-3 items-center justify-between", className)}>
-      <div className={cn("flex flex-row items-center justify-center gap-4 max-sm:w-full max-md:w-full")}>
+    <CardFooter
+      className={cn(
+        "max-sm:pt-4 flex flex-col md:flex-row max-sm:gap-3 max-md:gap-3 items-center justify-between",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "flex flex-row items-center justify-center gap-4 max-sm:w-full max-md:w-full"
+        )}
+      >
         <Button
           variant="outline"
           size="full"
@@ -46,7 +55,7 @@ export const FormButtons = ({
           Skip
         </Button>
       </div>
-      <div className="ml-auto flex flex-row items-center justify-center gap-4 max-sm:gap-x-2 max-sm:w-full max-md:w-full max-sm:grid max-sm:grid-cols-2" >
+      <div className="ml-auto max-md:w-full flex flex-row items-center justify-center gap-4">
         <Button
           variant="secondary"
           size="full"
@@ -77,6 +86,8 @@ export const FormButtons = ({
         >
           Back
         </Button>
+      </div>
+      <div className="md:ml-4 max-md:w-full flex gap-4">
         <StatusButton
           status={navigation.state === "submitting" ? "pending" : "idle"}
           form={form.id}

@@ -9,7 +9,7 @@ export function EmployeesActions({
 }) {
   // const { columnVisibility, selectedRows } = useEmployeesStore();
   return (
-    <div className="gap-4flex">
+    <div className="gap-4 flex max-sm:justify-end max-sm:w-full">
       <div className="flex gap-2">
         <ColumnVisibility disabled={isEmpty} />
         {/* <EmployeesEmailMenu

@@ -51,11 +51,11 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
       {
         method: "POST",
         action: "/payroll/invoices/update-bulk-invoices",
-      },
+      }
     );
   };
   return (
-    <div className="gap-4 flex">
+    <div className="gap-4 flex max-sm:justify-end max-sm:w-full">
       <div className="flex gap-2">
         <ColumnVisibility disabled={isEmpty} />
         <Button
@@ -63,7 +63,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
           size="icon"
           className={cn(
             "h-10 w-10 bg-muted/70 text-muted-foreground",
-            !selectedRows?.length && "hidden",
+            !selectedRows?.length && "hidden"
           )}
           disabled={!selectedRows.length}
           onClick={() => navigate("/payroll/invoices/analytics")}
@@ -73,15 +73,15 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
         <div
           className={cn(
             "border border-dotted border-r-muted-foreground",
-            !selectedRows.length && "hidden",
+            !selectedRows.length && "hidden"
           )}
         />
-        <div className="h-full">
+        <div className={cn("h-full", !selectedRows.length && "hidden")}>
           <AlertDialog>
             <AlertDialogTrigger
               className={cn(
                 "h-10 w-10 bg-muted/70 text-muted-foreground rounded border border-input",
-                !selectedRows.length && "hidden",
+                !selectedRows.length && "hidden"
               )}
             >
               <Icon name="edit" className="h-[18px] w-[18px]" />
@@ -95,7 +95,7 @@ export function InvoiceActions({ isEmpty }: { isEmpty: boolean }) {
                   <Label className="text-sm font-medium">Is Paid</Label>
                   <Combobox
                     options={transformStringArrayIntoOptions(
-                      booleanArray as unknown as string[],
+                      booleanArray as unknown as string[]
                     )}
                     value={isPaid}
                     onChange={(e) => setIsPaid(e)}

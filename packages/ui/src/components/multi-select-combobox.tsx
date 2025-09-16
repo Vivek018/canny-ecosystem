@@ -54,7 +54,7 @@ export const MultiSelectCombobox = ({
         aria-controls="multi-select-options"
         aria-label={`Select ${label}`}
         tabIndex={0}
-        className="w-full flex h-10 min-w-[200px] cursor-pointer items-center justify-start gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+        className="w-full flex h-10 min-w-[180px] cursor-pointer items-center justify-start gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
         disabled={disabled}
         onClick={() => setOpen(!open)}
         onKeyDown={(e) => {

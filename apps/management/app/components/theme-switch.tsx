@@ -54,7 +54,7 @@ export const ThemeSwitch = ({
             {
               method: "POST",
               action: "/cookie",
-            },
+            }
           );
         }}
       >
@@ -63,6 +63,7 @@ export const ThemeSwitch = ({
           className={cn(
             "py-5 px-[13px] gap-2.5 h-12 w-12 rounded-full capitalize text-sm tracking-wide flex items-center justify-start transition-[width]",
             isExpanded && "w-full",
+            "max-sm:w-full",
           )}
         >
           <ThemeIcon
@@ -70,7 +71,7 @@ export const ThemeSwitch = ({
             className={cn("shrink-0")}
             size="md"
           />
-          <p className={cn(!isExpanded && "hidden")}>{theme}</p>
+          <p className={cn(!isExpanded && "hidden", "max-sm:flex")}>{theme}</p>
         </SelectTrigger>
         <SelectContent ref={selectContentRef}>
           <SelectGroup>

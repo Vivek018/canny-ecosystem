@@ -3,9 +3,11 @@ import { AddReimbursementDialog } from "./add-reimbursement-dialog";
 
 export function EmployeeReimbursementActions({
   isEmpty,
-}: { isEmpty: boolean }) {
+}: {
+  isEmpty: boolean;
+}) {
   return (
-    <div className="space-x-2 hidden md:flex">
+    <div className="gap-2 flex max-sm:justify-end max-sm:w-full">
       <ColumnVisibility disabled={isEmpty} />
       <AddReimbursementDialog />
     </div>

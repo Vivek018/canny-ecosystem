@@ -219,8 +219,8 @@ export function SalaryEntryComponent({
   );
 
   return (
-    <section className="p-2 md:p-4 flex flex-col max-h-full gap-4 overflow-hidden">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <section className="px-4 flex flex-col max-h-full gap-4 overflow-hidden">
+      <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <PayrollSummaryCard
           totals={totals}
           hasSelectedRows={selectedRows.length > 0}
@@ -234,7 +234,7 @@ export function SalaryEntryComponent({
       </div>
 
       <div className="w-full flex flex-col md:flex-row items-start gap-3">
-        <div className="w-full flex flex-col md:flex-row gap-3">
+        <div className="w-full flex flex-row gap-3 overflow-x-auto">
           <FilterControls
             searchString={searchString}
             onSearchChange={setSearchString}
@@ -247,7 +247,7 @@ export function SalaryEntryComponent({
           />
           <div
             className={cn(
-              "md:ml-auto flex flex-row gap-3",
+              "ml-auto flex flex-row max-sm:justify-end gap-3 max-sm:gap-2",
               noButtons && "hidden"
             )}
           >
@@ -278,7 +278,7 @@ export function SalaryEntryComponent({
             </Button>
           </div>
         </div>
-        <div className="flex flex-row gap-3">
+        <div className="flex flex-row gap-3 max-sm:justify-end max-sm:w-full max-md:justify-end max-md:w-full">
           <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
             <ImportDepartmentPayrollDialog
               payrollFields={payrollFields!}
@@ -304,7 +304,7 @@ export function SalaryEntryComponent({
           />
           <div
             className={cn(
-              "border border-dotted border-muted-foreground h-full md:h-10",
+              "border border-dotted border-muted-foreground",
               (payrollData?.status === "approved" || !selectedRows.length) &&
                 "hidden"
             )}

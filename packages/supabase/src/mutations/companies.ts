@@ -28,7 +28,7 @@ export async function createCompany({
     }
   }
 
-  const { error, status } = await supabase
+  const { data, error, status } = await supabase
     .from("companies")
     .insert(companyData)
     .select("id")
@@ -44,6 +44,7 @@ export async function createCompany({
 
   return {
     status,
+    companyId: data.id,
     error: null,
   };
 }

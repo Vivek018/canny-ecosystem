@@ -209,7 +209,7 @@ export default function CreateEmployeeProvidentFund({
               />
               <JSONBField
                 key={resetKey + 1}
-                labelProps={{ children: "Relationship Terms" }}
+                labelProps={{ children: "Terms" }}
                 inputProps={{
                   ...getInputProps(fields.terms, { type: "hidden" }),
                 }}

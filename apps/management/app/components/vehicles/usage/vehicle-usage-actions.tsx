@@ -10,7 +10,7 @@ export function VehicleUsageActions({ isEmpty }: { isEmpty: boolean }) {
   const { selectedRows } = useVehicleUsageStore();
   const navigate = useNavigate();
   return (
-    <div className="gap-4 flex">
+    <div className="gap-4 flex max-sm:justify-end max-sm:w-full">
       <div className="flex gap-2">
         <ColumnVisibility disabled={isEmpty} />
         <VehicleUsageAdd />

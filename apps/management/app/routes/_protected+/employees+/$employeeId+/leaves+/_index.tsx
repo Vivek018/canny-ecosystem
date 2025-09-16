@@ -200,7 +200,7 @@ export default function Leaves() {
                             />
                             <div className="w-full flex items-center justify-between pb-4">
                               <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start gap-x-2">
-                                <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-14">
+                                <div className="flex w-[90%] max-sm:w-full flex-col md:flex-row items-start md:items-center gap-2 mr-14">
                                   <LeavesSearchFilter
                                     disabled={!data?.length && noFilters}
                                     employeeId={employeeId}
@@ -215,7 +215,7 @@ export default function Leaves() {
                                   />
                                   <FilterList filters={filters} />
                                 </div>
-                                <div className="space-x-2 flex ">
+                                <div className="space-x-2 flex max-sm:justify-end max-sm:w-full">
                                   <ColumnVisibility disabled={!leavesPromise} />
                                   <AddLeaveDialog />
                                 </div>
