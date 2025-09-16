@@ -28,7 +28,7 @@ export async function seedRequisitesForCompanyCreation({
 }) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_ANON_KEY!
   );
   await createLocation({
     supabase,
@@ -216,6 +216,14 @@ export async function seedRequisitesForCompanyCreation({
     },
     bypassAuth: true,
   });
+
+  await addHolidaysFromData({
+    supabase,
+    data: publicHolidays.map((holiday) => ({
+      ...holiday,
+      company_id: companyId!,
+    })),
+  });
   await addLeaveTypeFromData({
     supabase,
     data: [
@@ -246,14 +254,6 @@ export async function seedRequisitesForCompanyCreation({
       },
     ],
   });
-
-  await addHolidaysFromData({
-    supabase,
-    data: publicHolidays.map((holiday) => ({
-      ...holiday,
-      company_id: companyId!,
-    })),
-  });
 }
 
 export async function seedRequisitesForEmployeeCreation({
@@ -263,7 +263,7 @@ export async function seedRequisitesForEmployeeCreation({
 }) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_ANON_KEY!
   );
   for (let index = 0; index < employeeLetterTypesArray.length - 1; index++) {
     const letterType = employeeLetterTypesArray[index];

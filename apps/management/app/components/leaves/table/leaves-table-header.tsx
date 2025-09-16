@@ -66,7 +66,7 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+        <TableHead className="table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -84,9 +84,10 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
                 key={id}
                 className={cn(
                   "px-4 py-2",
-                  id === "employee_code" && "sticky left-12 bg-card z-10",
+                  id === "employee_code" &&
+                    "md:sticky md:left-12 md:bg-card md:z-10",
                   id === "employee_name" &&
-                    "sticky w-full left-48 bg-card z-10",
+                    "md:sticky w-full md:left-48 md:bg-card md:z-10"
                 )}
               >
                 <Button
@@ -103,14 +104,14 @@ export function LeavesTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

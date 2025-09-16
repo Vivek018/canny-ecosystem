@@ -53,7 +53,7 @@ export function AttendanceTrend({ chartData }: { chartData: any[] }) {
         <CardTitle>Company-wide Attendance Summary</CardTitle>
         <CardDescription>Showing average per attendance field</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-sm:pl-0">
         <ChartContainer className="w-full h-[300px]" config={chartConfig}>
           <BarChart data={totalData} width={600} height={300}>
             <CartesianGrid strokeDasharray="3 3" />

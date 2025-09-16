@@ -76,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const exitsPromise = getExitsByCompanyId({
@@ -125,7 +125,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -168,8 +168,8 @@ export default function ExitsIndex() {
 
   return (
     <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start justify-between pb-4 gap-2">
+        <div className="w-[90%] max-sm:w-full flex flex-col md:flex-row items-start md:items-center gap-2">
           <Suspense fallback={<LoadingSpinner className="ml-10" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -204,9 +204,7 @@ export default function ExitsIndex() {
             </Await>
           </Suspense>
         </div>
-        <div className="flex-shrink-0">
-          <ExitActions isEmpty={!exitsPromise} env={env} />
-        </div>
+        <ExitActions isEmpty={!exitsPromise} env={env} />
       </div>
 
       <Suspense fallback={<LoadingSpinner className="ml-10" />}>
@@ -224,7 +222,7 @@ export default function ExitsIndex() {
               );
             }
             const hasNextPage = Boolean(
-              meta?.count && meta.count > LAZY_LOADING_LIMIT,
+              meta?.count && meta.count > LAZY_LOADING_LIMIT
             );
 
             return (

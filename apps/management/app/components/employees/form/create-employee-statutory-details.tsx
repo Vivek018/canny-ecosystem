@@ -39,7 +39,7 @@ export function CreateEmployeeStatutoryDetails({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-3 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.aadhaar_number, { type: "text" }),
@@ -72,7 +72,7 @@ export function CreateEmployeeStatutoryDetails({
             errors={fields.uan_number.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.pf_number, { type: "text" }),
@@ -94,7 +94,7 @@ export function CreateEmployeeStatutoryDetails({
             errors={fields.esic_number.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.driving_license_number, { type: "text" }),
@@ -120,7 +120,7 @@ export function CreateEmployeeStatutoryDetails({
             errors={fields.driving_license_expiry.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2   place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.passport_number, { type: "text" }),

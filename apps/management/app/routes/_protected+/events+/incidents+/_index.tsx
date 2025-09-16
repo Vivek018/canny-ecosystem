@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const incidentPromise = getIncidentsByCompanyId({
@@ -126,7 +126,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return clientCaching(
     `${cacheKeyPrefix.incidents}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -148,8 +148,8 @@ export default function IncidentsIndex() {
 
   return (
     <section className="p-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center justify-between pb-4  max-sm:items-start  max-md:items-start">
+        <div className="flex w-[90%] max-sm:w-full flex-col md:flex-row items-start md:items-center gap-2 mr-4">
           <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (

@@ -192,7 +192,7 @@ export default function CreatePayroll() {
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-10">
                 <SearchableSelectField
                   key={resetKey}
                   className="w-full capitalize flex-1 "
@@ -222,7 +222,7 @@ export default function CreatePayroll() {
                   errors={fields.year.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.title, {
@@ -247,7 +247,7 @@ export default function CreatePayroll() {
                   errors={fields.run_date.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1  place-content-center justify-between gap-x-8 mt-10">
                 <div className="w-full flex flex-col gap-1.5">
                   <div className="flex">
                     <Label>Link With</Label>

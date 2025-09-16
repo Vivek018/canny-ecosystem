@@ -62,7 +62,7 @@ export function CreateEmployeeGuardianDetails({
           }}
           errors={fields.relationship.errors}
         />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.first_name, { type: "text" }),
@@ -81,7 +81,7 @@ export function CreateEmployeeGuardianDetails({
             errors={fields.last_name.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
@@ -128,7 +128,7 @@ export function CreateEmployeeGuardianDetails({
             children: "Is the address same as employee?",
           }}
         />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-3 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.mobile_number, { type: "text" }),

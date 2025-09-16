@@ -51,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.statutoryFieldsGraduity}`,
+      `${createRole}:${attribute.statutoryFieldsGraduity}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -68,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -87,7 +87,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -116,7 +116,7 @@ export async function action({
         message: "Failed to create Gratuity",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -182,14 +182,15 @@ export default function CreateGratuity({
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
             <input {...getInputProps(fields.is_default, { type: "hidden" })} />
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-0 gap-6">
               <Field
                 inputProps={{
                   ...getInputProps(fields.eligibility_years, {
                     type: "number",
                   }),
                   autoFocus: true,
-                  placeholder: replaceUnderscore(fields.eligibility_years.name),
+                  placeholder:
+                    replaceUnderscore(fields.eligibility_years.name) ?? "",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.eligibility_years.name),
@@ -203,9 +204,8 @@ export default function CreateGratuity({
                     type: "number",
                   }),
                   autoFocus: true,
-                  placeholder: replaceUnderscore(
-                    fields.present_day_per_year.name,
-                  ),
+                  placeholder:
+                    replaceUnderscore(fields.present_day_per_year.name) ?? "",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.present_day_per_year.name),
@@ -219,13 +219,12 @@ export default function CreateGratuity({
                     type: "number",
                   }),
                   autoFocus: true,
-                  placeholder: replaceUnderscore(
-                    fields.payment_days_per_year.name,
-                  ),
+                  placeholder:
+                    replaceUnderscore(fields.payment_days_per_year.name) ?? "",
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.payment_days_per_year.name,
+                    fields.payment_days_per_year.name
                   ),
                 }}
                 errors={fields.payment_days_per_year.errors}
@@ -237,9 +236,8 @@ export default function CreateGratuity({
                     type: "number",
                   }),
                   autoFocus: true,
-                  placeholder: replaceUnderscore(
-                    fields.max_multiply_limit.name,
-                  ),
+                  placeholder:
+                    replaceUnderscore(fields.max_multiply_limit.name) ?? "",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.max_multiply_limit.name),
@@ -251,7 +249,8 @@ export default function CreateGratuity({
                 inputProps={{
                   ...getInputProps(fields.max_amount_limit, { type: "number" }),
                   autoFocus: true,
-                  placeholder: replaceUnderscore(fields.max_amount_limit.name),
+                  placeholder:
+                    replaceUnderscore(fields.max_amount_limit.name) ?? "",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.max_amount_limit.name),

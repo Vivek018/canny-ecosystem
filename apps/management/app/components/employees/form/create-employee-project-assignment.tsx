@@ -66,7 +66,7 @@ export const CreateEmployeeProjectAssignment = ({
           }}
           errors={fields.site_id.errors}
         />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-3 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
@@ -112,7 +112,7 @@ export const CreateEmployeeProjectAssignment = ({
             errors={fields.skill_level.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.start_date, { type: "date" }),

@@ -198,13 +198,13 @@ export function ExitPaymentTable<TData, TValue>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          "px-3 md:px-4 py-4 hidden md:table-cell min-w-36 max-w-36",
+                          "px-4 py-4 table-cell min-w-36 max-w-36",
                           cell.column.id === "select" &&
                             "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                           cell.column.id === "employee_code" &&
-                            "sticky left-12 min-w-32 max-w-32 bg-card z-10",
+                            "md:sticky md:left-12 min-w-32 max-w-32 md:bg-card md:z-10",
                           cell.column.id === "employee_name" &&
-                            "sticky left-44 min-w-40 max-w-40 bg-card z-10",
+                            "md:sticky md:left-44 min-w-40 max-w-40 md:bg-card md:z-10",
                           cell.column.id === "final_settlement_date" &&
                             " min-w-40 max-w-40",
                           cell.column.id === "actions" &&

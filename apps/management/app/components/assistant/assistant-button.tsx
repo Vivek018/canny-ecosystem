@@ -10,15 +10,15 @@ export function AssistantButton() {
       to="/chat/chatbox"
       className={cn(
         buttonVariants({ variant: "ghost" }),
-        "relative min-w-[265px] w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64 p-0 hover:bg-transparent font-normal no-drag",
-        pathname === "/chat/chatbox" && "text-accent-foreground",
+        "relative md:min-w-[265px] w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64 ml-4 p-0 hover:bg-transparent font-normal no-drag",
+        pathname === "/chat/chatbox" && "text-accent-foreground"
       )}
     >
-      <span className="ml-4 md:ml-0">Ask Canny A Question...</span>
-      <kbd className="pointer-events-none ml-16 h-5 select-none flex justify-center items-center border bg-accent pt-[1.5px] px-1.5 font-mono text-[12px] font-medium opacity-100 sm:flex -mt-1.5">
+      <span className="md:ml-0 flex">Ask Canny <span className="ml-1 hidden md:flex">A Question...</span></span>
+      <kbd className="hidden md:flex pointer-events-none ml-16 h-5 select-none justify-center items-center border bg-accent pt-[1.5px] px-1.5 font-mono text-[12px] font-medium opacity-100 sm:flex -mt-1.5">
         ⌘
       </kbd>
-      <kbd className="pointer-events-none ml-0.5 h-5 select-none flex justify-center items-center border bg-accent px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex -mt-1.5">
+      <kbd className="hidden md:flex pointer-events-none ml-0.5 h-5 select-none justify-center items-center border bg-accent px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex -mt-1.5">
         k
       </kbd>
     </Link>

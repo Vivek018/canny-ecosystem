@@ -13,7 +13,6 @@ import type { PayeeDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export type PayeeType = {
   id: PayeeDatabaseRow["id"] | string;
@@ -32,17 +31,7 @@ export type PayeeType = {
 };
 
 export const columns: ColumnDef<PayeeType>[] = [
-  {
-    id: "select",
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  
   {
     accessorKey: "payee_code",
     header: "Payee Code",
@@ -68,7 +57,7 @@ export const columns: ColumnDef<PayeeType>[] = [
     accessorKey: "fixed_amount",
     header: "Fixed Amount",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.fixed_amount}</p>;
+      return <p className="truncate">{row.original?.fixed_amount ?? "--"}</p>;
     },
   },
   {
@@ -115,28 +104,28 @@ export const columns: ColumnDef<PayeeType>[] = [
     accessorKey: "branch_name",
     header: "Branch Name",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.branch_name}</p>;
+      return <p className="truncate">{row.original?.branch_name ?? "--"}</p>;
     },
   },
   {
     accessorKey: "account_type",
     header: "Account Type",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.account_type}</p>;
+      return <p className="truncate">{row.original?.account_type ?? "--"}</p>;
     },
   },
   {
     accessorKey: "aadhaar_number",
     header: "Aadhaar Number",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.aadhaar_number}</p>;
+      return <p className="truncate">{row.original?.aadhaar_number ?? "--"}</p>;
     },
   },
   {
     accessorKey: "pan_number",
     header: "PAN Number",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.pan_number}</p>;
+      return <p className="truncate">{row.original?.pan_number ?? "--"}</p>;
     },
   },
   {
@@ -157,13 +146,13 @@ export const columns: ColumnDef<PayeeType>[] = [
                   "h-8 w-8 p-0",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingPayee}`,
+                    `${updateRole}:${attribute.settingPayee}`
                   ) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.settingPayee}`,
+                      `${deleteRole}:${attribute.settingPayee}`
                     ) &&
-                    "hidden",
+                    "hidden"
                 )}
               >
                 <span className="sr-only">Open menu</span>

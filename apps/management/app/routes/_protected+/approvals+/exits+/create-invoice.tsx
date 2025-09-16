@@ -340,7 +340,7 @@ export default function CreateInvoiceForExit({
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.invoice_number, { type: "text" }),
@@ -364,7 +364,7 @@ export default function CreateInvoiceForExit({
                   errors={fields.date.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
@@ -394,7 +394,7 @@ export default function CreateInvoiceForExit({
                   errors={fields.company_address_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.additional_text, { type: "text" }),
@@ -423,7 +423,7 @@ export default function CreateInvoiceForExit({
                   errors={fields.user_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 mb-6">
                 <SearchableSelectField
                   className="capitalize"
                   options={transformStringArrayIntoOptions([
@@ -445,7 +445,7 @@ export default function CreateInvoiceForExit({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <CheckboxField
                   buttonProps={getInputProps(fields.include_charge, {
                     type: "checkbox",
@@ -463,7 +463,7 @@ export default function CreateInvoiceForExit({
                   }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 my-5">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 my-5">
                 <CheckboxField
                   buttonProps={getInputProps(fields.include_sgst, {
                     type: "checkbox",
@@ -500,7 +500,7 @@ export default function CreateInvoiceForExit({
                 }}
                 errors={fields.proof.errors}
               />
-              <div className="grid grid-cols-2 gap-4 my-5">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 my-5">
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_paid, {
                     type: "checkbox",

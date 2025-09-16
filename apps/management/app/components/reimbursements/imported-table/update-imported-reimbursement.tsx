@@ -98,8 +98,8 @@ export const UpdateImportedReimbursement = ({
               className="gap-0"
               inputProps={{
                 type: "text",
-                value: data.email ?? "",
-                onChange: (e) => onChange("email", e.target.value),
+                value: data.user_id ?? "",
+                onChange: (e) => onChange("user_id", e.target.value),
                 placeholder: "Approval's Email",
               }}
             />

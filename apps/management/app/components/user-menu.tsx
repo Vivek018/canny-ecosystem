@@ -15,17 +15,20 @@ import {
 import { Logout } from "./auth/logout";
 import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import type { Dispatch, SetStateAction } from "react";
 
 export function UserMenu({
   userData,
   isExpanded,
   dropdownContentRef,
   Link,
+  setOpenNav,
 }: {
   userData: Omit<UserDatabaseRow, "created_at">;
   isExpanded?: boolean;
   dropdownContentRef?: React.RefObject<HTMLDivElement>;
   Link: React.ElementType;
+  setOpenNav: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
     <DropdownMenu>
@@ -47,6 +50,7 @@ export function UserMenu({
           className={cn(
             "flex flex-col items-start group-hover:opacity-70 group-hover:dark:opacity-100 gap-0.5",
             !isExpanded && "hidden",
+            "max-sm:flex"
           )}
         >
           <span className="truncate w-40 text-start">
@@ -82,10 +86,18 @@ export function UserMenu({
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <Link prefetch="intent" to="/user/account">
+            <Link
+              prefetch="intent"
+              to="/user/account"
+              onClick={() => setOpenNav(false)}
+            >
               <DropdownMenuItem>Account</DropdownMenuItem>
             </Link>
-            <Link prefetch="intent" to="/user/feedback-form">
+            <Link
+              prefetch="intent"
+              to="/user/feedback-form"
+              onClick={() => setOpenNav(false)}
+            >
               <DropdownMenuItem>Feedback</DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>

@@ -90,7 +90,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -183,7 +183,7 @@ export default function AddVehicleUsage({
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-0 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey}
                   inputProps={{
@@ -203,7 +203,7 @@ export default function AddVehicleUsage({
                     placeholder: "Select Year",
                   }}
                   options={transformStringArrayIntoOptions(
-                    getYears(25, defaultYear) as unknown as string[],
+                    getYears(25, defaultYear) as unknown as string[]
                   )}
                   labelProps={{
                     children: "Year",
@@ -225,14 +225,14 @@ export default function AddVehicleUsage({
                 }}
                 errors={fields.vehicle_id.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 ">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.kilometers, {
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.kilometers.name,
+                      fields.kilometers.name
                     )}`,
                     className: "",
                   }}
@@ -247,7 +247,7 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.fuel_in_liters.name,
+                      fields.fuel_in_liters.name
                     )}`,
                     className: "",
                   }}
@@ -258,14 +258,14 @@ export default function AddVehicleUsage({
                 />
               </div>
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 ">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.fuel_amount, {
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.fuel_amount.name,
+                      fields.fuel_amount.name
                     )}`,
                     className: "",
                   }}
@@ -280,7 +280,7 @@ export default function AddVehicleUsage({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.toll_amount.name,
+                      fields.toll_amount.name
                     )}`,
                     className: "",
                   }}
@@ -290,20 +290,20 @@ export default function AddVehicleUsage({
                   errors={fields.toll_amount.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 ">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.maintainance_amount, {
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.maintainance_amount.name,
+                      fields.maintainance_amount.name
                     )}`,
                     className: "",
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.maintainance_amount.name,
+                      fields.maintainance_amount.name
                     ),
                   }}
                   errors={fields.maintainance_amount.errors}

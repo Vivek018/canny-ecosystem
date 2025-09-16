@@ -1,7 +1,13 @@
-import { EmployeeAddressesCard } from "@/components/employees/employee/addresses-card";
+import {
+  type EmployeeAddress,
+  EmployeeAddressesCard,
+} from "@/components/employees/employee/addresses-card";
 import { EmployeeBankDetailsCard } from "@/components/employees/employee/bank-details-card";
 import { EmployeeDetailsCard } from "@/components/employees/employee/details-card";
-import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians-card";
+import {
+  type EmployeeGuardian,
+  EmployeeGuardiansCard,
+} from "@/components/employees/employee/guardians-card";
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -87,7 +93,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.employee_overview}${args.params.employeeId}`,
-    args,
+    args
   );
 }
 
@@ -119,7 +125,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData || !env) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return <ErrorBoundary message="Failed to load employee" />;
             }
@@ -151,7 +157,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message="Failed to load employee statutory details" />
@@ -176,7 +182,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message="Failed to load employee bank details" />
@@ -199,7 +205,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message="Failed to load employee addresses" />
@@ -210,7 +216,7 @@ export default function EmployeeIndex() {
                 error={resolvedData.error}
                 Component={
                   <EmployeeAddressesCard
-                    employeeAddresses={resolvedData.data}
+                    employeeAddresses={resolvedData.data as EmployeeAddress[]}
                   />
                 }
               />
@@ -224,7 +230,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message="Failed to load employee guardians details" />
@@ -235,7 +241,7 @@ export default function EmployeeIndex() {
                 error={resolvedData.error}
                 Component={
                   <EmployeeGuardiansCard
-                    employeeGuardians={resolvedData.data}
+                    employeeGuardians={resolvedData.data as EmployeeGuardian[]}
                   />
                 }
               />

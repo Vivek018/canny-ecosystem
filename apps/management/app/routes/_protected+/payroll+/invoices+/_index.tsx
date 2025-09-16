@@ -149,8 +149,8 @@ export default function Invoices() {
   const noFilters = Object.values(filterList).every((value) => !value);
   return (
     <section className="p-4 overflow-hidden">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
+      <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start justify-between pb-4">
+        <div className="flex w-[90%] max-sm:w-full flex-col md:flex-row items-start md:items-center gap-2 mr-4">
           <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={locationPromise}>
               {(locationData) => (

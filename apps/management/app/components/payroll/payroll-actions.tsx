@@ -1,4 +1,8 @@
-import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import type {
+  EmployeeProvidentFundDatabaseRow,
+  PayrollDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
@@ -38,6 +42,8 @@ export function PayrollActions({
   fromWhere,
   status,
   allLocationOptions,
+  payrollData,
+  epfData,
 }: {
   data: any[];
   env: SupabaseEnv;
@@ -45,7 +51,12 @@ export function PayrollActions({
   className?: string;
   fromWhere: "runpayroll" | "payrollhistory";
   status: string;
+  payrollData: Omit<PayrollDatabaseRow, "created_at"> & {
+    site?: { name: string } | null;
+    project?: { name: string } | null;
+  };
   allLocationOptions: ComboboxSelectOption[];
+  epfData: EmployeeProvidentFundDatabaseRow;
 }) {
   const [locations, setLocations] = useState("");
   const newParams = new URLSearchParams();
@@ -59,26 +70,30 @@ export function PayrollActions({
           size="icon"
           className={cn(
             "h-10 w-12 px-2 bg-muted border border-input",
-            className,
+            className
           )}
         >
           <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent
+        sideOffset={10}
+        align="end"
+        className="flex flex-row"
+      >
         <div className="flex flex-col">
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "px-2 w-full flex flex-row justify-start gap-2 ",
-                status !== "approved" ? "hidden" : "",
+                status !== "approved" ? "hidden" : ""
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/create-invoice`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/create-invoice`,
+                      `/payroll/payroll-history/${payrollId}/create-invoice`
                     )
               }
             >
@@ -94,11 +109,19 @@ export function PayrollActions({
             <DownloadBankAdvice env={env} data={data} />
           </Button>
           <Button variant={"ghost"} className={cn("w-full px-2")}>
-            <DownloadEsiFormat env={env} data={data} />
+            <DownloadEsiFormat
+              env={env}
+              data={data}
+              payrollData={payrollData}
+            />
           </Button>
 
           <Button variant={"ghost"} className={cn(" w-full px-2")}>
-            <DownloadEpfFormat env={env} data={data} />
+            <DownloadEpfFormat
+              env={env}
+              data={data}
+              epfData={epfData}
+            />
           </Button>
 
           <DropdownMenuSeparator
@@ -110,13 +133,13 @@ export function PayrollActions({
               className={cn(
                 "hidden",
                 status === "approved" &&
-                  "flex flex-row justify-start gap-2 px-2 pr-1",
+                  "flex flex-row justify-start gap-2 px-2 pr-1"
               )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(`/payroll/run-payroll/${payrollId}/salary-slips`)
                   : navigate(
-                      `/payroll/payroll-history/${payrollId}/salary-slips`,
+                      `/payroll/payroll-history/${payrollId}/salary-slips`
                     )
               }
             >
@@ -135,7 +158,7 @@ export function PayrollActions({
                 <Button
                   variant={"ghost"}
                   className={cn(
-                    "w-full flex flex-row justify-start gap-2 px-2 pr-1",
+                    "w-full flex flex-row justify-start gap-2 px-2 pr-1"
                   )}
                 >
                   <Icon name="import" />
@@ -166,10 +189,10 @@ export function PayrollActions({
                       newParams.set("location", locations);
                       fromWhere === "runpayroll"
                         ? navigate(
-                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`,
+                            `/payroll/run-payroll/${payrollId}/salary-register?${newParams.toString()}`
                           )
                         : navigate(
-                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`,
+                            `/payroll/payroll-history/${payrollId}/salary-register?${newParams.toString()}`
                           );
                     }}
                   >

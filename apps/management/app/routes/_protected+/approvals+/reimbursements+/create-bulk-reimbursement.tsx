@@ -281,7 +281,7 @@ export default function AddBulkReimbursements() {
               <input
                 {...getInputProps(singleField.company_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
                 <Field
                   inputProps={{
                     ...getInputProps(singleField.submitted_date, {
@@ -311,7 +311,7 @@ export default function AddBulkReimbursements() {
                   errors={singleField.status.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
                 <SearchableSelectField
                   key={resetKey + 2}
                   inputProps={{
@@ -338,7 +338,7 @@ export default function AddBulkReimbursements() {
                   errors={singleField.note.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
                 <SearchableSelectField
                   key={resetKey + 1}
                   inputProps={{
@@ -379,7 +379,7 @@ export default function AddBulkReimbursements() {
                     key={String(
                       fields?.reimbursements.key! + index + resetKey + 3,
                     )}
-                    className="flex flex-row items-center justify-center gap-2"
+                    className="flex flex-row items-center justify-center gap-2 max-sm:grid max-sm:grid-cols-2"
                   >
                     <div className="mb-6 py-[7px] px-3 border shadow rounded text-sm">
                       {index + 1}

@@ -78,7 +78,7 @@ export function SalaryTableHeader({
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] bg-card">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+        <TableHead className="md:table-cell px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -97,14 +97,14 @@ export function SalaryTableHeader({
               className={cn(
                 "px-4 py-2 min-w-24 max-w-24",
                 id === "sr_no" &&
-                  "sticky left-12 bg-card min-w-20 max-w-20 z-10",
+                  "md:sticky md:left-12 md:bg-card min-w-20 max-w-20 md:z-10",
                 id === "employee_code" &&
-                  "sticky left-32 bg-card z-10 min-w-36 max-w-36",
+                  "md:sticky md:left-32 md:bg-card md:z-10 min-w-36 max-w-36",
                 id === "name" && "min-w-52 max-w-52",
                 id.length > 7 &&
                   id !== "employee_code" &&
                   id !== "department" &&
-                  "min-w-40 max-w-40",
+                  "min-w-40 max-w-40"
               )}
             >
               <Button
@@ -118,14 +118,14 @@ export function SalaryTableHeader({
                   name="chevron-up"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "desc" && "flex",
+                    sortingId === id && sortingOrder === "desc" && "flex"
                   )}
                 />
                 <Icon
                   name="chevron-down"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "asc" && "flex",
+                    sortingId === id && sortingOrder === "asc" && "flex"
                   )}
                 />
               </Button>

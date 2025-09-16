@@ -104,7 +104,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const { data: companyName } = await getCompanyNameByCompanyId({
@@ -177,7 +177,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.leaves}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -257,13 +257,13 @@ export default function LeavesIndex() {
                               "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
                               !hasPermission(
                                 role,
-                                `${deleteRole}:${attribute.leaves}`,
+                                `${deleteRole}:${attribute.leaves}`
                               ) &&
                                 !hasPermission(
                                   role,
-                                  `${updateRole}:${attribute.leaves}`,
+                                  `${updateRole}:${attribute.leaves}`
                                 ) &&
-                                "hidden",
+                                "hidden"
                             )}
                           >
                             <Icon name="dots-vertical" size="xs" />
@@ -290,7 +290,7 @@ export default function LeavesIndex() {
                         if (
                           hasPermission(
                             role,
-                            `${createRole}:${attribute.leaves}`,
+                            `${createRole}:${attribute.leaves}`
                           )
                         )
                           navigate("add-leave-type");
@@ -310,8 +310,8 @@ export default function LeavesIndex() {
         </Suspense>
       </div>
       <div className="mt-5">
-        <div className="w-full flex items-center justify-between pb-4">
-          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+        <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center justify-between pb-4  max-sm:items-start  max-md:items-start">
+          <div className="flex w-[90%] max-sm:w-full flex-col md:flex-row items-start md:items-center gap-2 mr-4">
             <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
               <Await resolve={projectPromise}>
                 {(projectData) => (
@@ -324,7 +324,7 @@ export default function LeavesIndex() {
                             projectArray={
                               projectData?.data?.length
                                 ? projectData?.data?.map(
-                                    (project) => project!.name,
+                                    (project) => project!.name
                                   )
                                 : []
                             }
@@ -336,7 +336,7 @@ export default function LeavesIndex() {
                             userEmails={
                               userEmailsData?.data?.length
                                 ? userEmailsData?.data?.map(
-                                    (user) => user!.email,
+                                    (user) => user!.email
                                   )
                                 : []
                             }
@@ -350,7 +350,7 @@ export default function LeavesIndex() {
             </Suspense>
             <FilterList filters={filterList} />
           </div>
-          <div className="gap-4 hidden md:flex">
+          <div className="gap-4 flex max-sm:justify-end max-sm:w-full">
             <div className="flex gap-2">
               <ColumnVisibility />
               {/* <LeavesEmailMenu
@@ -365,7 +365,7 @@ export default function LeavesIndex() {
                 size="icon"
                 className={cn(
                   "h-10 w-10 bg-muted/70 text-muted-foreground",
-                  !selectedRows.length && "hidden",
+                  !selectedRows.length && "hidden"
                 )}
                 disabled={!selectedRows.length}
                 onClick={() => navigate("analytics")}

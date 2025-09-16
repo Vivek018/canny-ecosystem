@@ -155,7 +155,7 @@ export function AttendanceTable({
     <div
       className={cn(
         "border rounded max-h-fit overflow-hidden",
-        !tableLength && "border-none",
+        !tableLength && "border-none"
       )}
     >
       <div
@@ -197,7 +197,7 @@ export function AttendanceTable({
                     className={cn(
                       "absolute flex cursor-default select-text",
                       row.original?.monthly_attendance?.salary_entries
-                        ?.invoice_id && "bg-primary/20",
+                        ?.invoice_id && "bg-primary/20"
                     )}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -205,24 +205,24 @@ export function AttendanceTable({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 min-w-28 max-w-28 hidden md:table-cell",
+                            "px-4 py-2 min-w-28 max-w-28 table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "employee_code" &&
-                              "sticky left-12 min-w-32 max-w-32 bg-card z-10",
+                              "md:sticky md:left-12 min-w-32 max-w-32 md:bg-card md:z-10",
                             cell.column.id === "first_name" &&
-                              "sticky left-44 min-w-48 max-w-48 bg-card z-10",
+                              "md:sticky md:left-44 min-w-48 max-w-48 md:bg-card md:z-10",
                             cell.column.id === "project_name" &&
                               "min-w-32 max-w-32",
                             cell.column.id === "site_name" &&
                               "min-w-32 max-w-32",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -241,7 +241,7 @@ export function AttendanceTable({
                     <p
                       className={cn(
                         "text-muted-foreground",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                     >
                       Try another search, or adjusting the filters
@@ -250,7 +250,7 @@ export function AttendanceTable({
                       variant="outline"
                       className={cn(
                         "mt-4",
-                        !data?.length && noFilters && "hidden",
+                        !data?.length && noFilters && "hidden"
                       )}
                       onClick={() => {
                         setSearchParams();

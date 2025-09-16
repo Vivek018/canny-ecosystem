@@ -1,3 +1,4 @@
+import { FooterTabs } from "@/components/footer-tabs";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -34,9 +35,21 @@ export default function Vehicles() {
   const { pathname } = useLocation();
 
   return (
-    <section className="flex flex-col h-full">
-      <div className="py-[18px] px-4 border-b">
-        <SecondaryMenu
+    <section className="flex flex-col h-full w-full">
+      <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b">
+        <div className="hidden md:block w-full">
+          <SecondaryMenu
+            items={[
+              { label: "Vehicle", path: "/vehicles/vehicle" },
+              { label: "Usage", path: "/vehicles/usage" },
+            ]}
+            pathname={pathname}
+            Link={Link}
+            className="py-2 overflow-x-auto md:overflow-visible"
+          />
+        </div>
+
+        <FooterTabs
           items={[
             { label: "Vehicle", path: "/vehicles/vehicle" },
             { label: "Usage", path: "/vehicles/usage" },
@@ -45,7 +58,7 @@ export default function Vehicles() {
           Link={Link}
         />
       </div>
-      <div className="px-4 h-full">
+      <div className="px-4 pb-12 max-sm:px-2 w-full">
         <Outlet />
       </div>
     </section>

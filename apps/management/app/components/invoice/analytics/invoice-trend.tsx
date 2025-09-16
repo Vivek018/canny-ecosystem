@@ -144,8 +144,8 @@ export function InvoiceTrend({
   );
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 text-md max-sm:text-sm">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-2">
           <CardTitle>Invoice Amount Trend Over Time</CardTitle>
           <CardDescription>
             Showing total Invoices amount over the period.
@@ -173,7 +173,7 @@ export function InvoiceTrend({
           })}
         </div>
       </CardHeader>
-      <CardContent className="px-2 sm:px-6">
+      <CardContent className="px-2 sm:px-6 pt-5">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"

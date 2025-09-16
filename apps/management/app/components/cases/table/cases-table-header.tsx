@@ -70,7 +70,7 @@ export function CasesTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+        <TableHead className="table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -88,7 +88,6 @@ export function CasesTableHeader({ table, className, loading }: Props) {
                 key={id}
                 className={cn(
                   "px-4 py-2",
-                  id === "title" && "sticky left-12 bg-card z-10",
                 )}
               >
                 <Button

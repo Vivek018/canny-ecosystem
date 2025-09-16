@@ -24,7 +24,7 @@ export function FuelByMonth({
 
   return (
     <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-0 max-sm:text-sm">
         <CardTitle>Fuel used by Month</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

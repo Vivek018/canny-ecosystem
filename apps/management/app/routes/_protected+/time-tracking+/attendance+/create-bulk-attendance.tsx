@@ -258,7 +258,7 @@ export default function AddBulkAttendances() {
               </CardDescription>
             </CardHeader>
             <div className="flex flex-col px-6">
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
                 <SearchableSelectField
                   key={resetKey}
                   inputProps={{
@@ -314,7 +314,7 @@ export default function AddBulkAttendances() {
                     key={String(
                       fields?.attendances.key! + index + resetKey + 4,
                     )}
-                    className="flex flex-row items-center justify-center gap-1.5"
+                    className="flex flex-row items-center justify-center gap-1.5 max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-0.5"
                   >
                     <div className="mb-6 py-[7px] px-3 border shadow rounded text-sm">
                       {index + 1}

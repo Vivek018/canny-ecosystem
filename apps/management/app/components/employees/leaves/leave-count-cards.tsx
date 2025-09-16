@@ -20,12 +20,12 @@ export function LeaveCountCards({
     leaveTypeData?.reduce(
       (
         acc: { [x: string]: any },
-        item: { leave_type: string | number; leaves_per_year: any },
+        item: { leave_type: string | number; leaves_per_year: any }
       ) => {
         acc[item.leave_type] = item.leaves_per_year;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     ) || {};
 
   const cardInfo = [
@@ -42,15 +42,15 @@ export function LeaveCountCards({
       acc[leave_type] = (acc[leave_type] || 0) + 1;
       return acc;
     },
-    {},
+    {}
   );
 
   return (
-    <div className="mb-5 grid grid-cols-5 gap-5">
+    <div className="mb-5 grid grid-cols-1 gap-2 md:grid-cols-3 lg:grid-cols-5 md:gap-3 lg:gap-5">
       {cardInfo.map(({ title, key }) => (
         <Card
           key={title}
-          className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
+          className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between "
         >
           <CardHeader className="flex flex-row space-y-0 items-center justify-center py-4">
             <CardTitle className="font-bold">{title}</CardTitle>

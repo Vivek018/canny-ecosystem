@@ -90,7 +90,7 @@ export function SalaryEntrySheet({
       >
         {triggerChild}
       </SheetTrigger>
-      <SheetContent className="flex flex-col w-[600px] h-full">
+      <SheetContent className="flex flex-col w-[600px] max-sm:w-full h-full">
         <SheetHeader className="px-6 pt-4 pb-8 flex-shrink-0">
           <SheetTitle className="flex justify-between">
             <div>

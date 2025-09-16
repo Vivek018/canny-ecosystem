@@ -49,7 +49,7 @@ export function AttendanceBars({ chartData }: { chartData: any[] }) {
           Showing total present days per employee
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-sm:pl-0">
         <ChartContainer className="w-full h-[300px]" config={chartConfig}>
           <BarChart data={limitedTrendData} width={600} height={200}>
             <CartesianGrid strokeDasharray="3 3" />

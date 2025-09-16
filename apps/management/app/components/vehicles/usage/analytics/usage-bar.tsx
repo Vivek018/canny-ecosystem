@@ -72,7 +72,7 @@ export function VehicleUsageBars({
   const limitedData = newData.slice(0, MAX_VEHICLES);
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="max-sm:text-sm">
         <CardTitle>
           Vehicle Usage Analytics (Max Vehicles: {MAX_VEHICLES})
         </CardTitle>

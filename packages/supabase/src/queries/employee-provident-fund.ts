@@ -26,6 +26,7 @@ export const getEmployeeProvidentFundById = async ({
     "include_employer_contribution",
     "include_employer_edli_contribution",
     "include_admin_charges",
+    "terms",
   ] as const;
 
   const { data, error } = await supabase
@@ -64,6 +65,7 @@ export const getEmployeeProvidentFundByEPFNumber = async ({
     "include_employer_contribution",
     "include_employer_edli_contribution",
     "include_admin_charges",
+    "terms",
   ] as const;
 
   const { data, error } = await supabase
@@ -102,6 +104,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     "include_employer_edli_contribution",
     "include_admin_charges",
     "is_default",
+    "terms",
   ] as const;
 
   const { data, error } = await supabase
@@ -133,6 +136,7 @@ export const getEmployeeProvidentFundForEpfChallanByCompanyId = async ({
     "id",
     "company_id",
     "restrict_employee_contribution",
+    "terms",
     "is_default",
   ] as const;
 

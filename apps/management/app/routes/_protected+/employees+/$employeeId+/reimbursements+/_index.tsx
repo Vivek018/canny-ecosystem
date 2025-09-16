@@ -51,13 +51,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
       status: searchParams.get("status") ?? undefined,
       users: searchParams.get("users") ?? undefined,
+      type: searchParams.get("type") ?? undefined,
       name: query,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const usersPromise = getUsersEmail({ supabase, companyId });
@@ -104,7 +105,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.employee_reimbursements}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -153,7 +154,7 @@ export default function ReimbursementsIndex() {
                 {({ data, meta, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
+                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
                     );
                     toast({
                       variant: "destructive",
@@ -165,14 +166,14 @@ export default function ReimbursementsIndex() {
                   }
 
                   const hasNextPage = Boolean(
-                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
+                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
                   );
 
                   return (
                     <>
                       <div className="w-full flex items-center justify-between pb-4">
-                        <div className="w-full flex justify-between items-center">
-                          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+                        <div className="w-full flex flex-row max-sm:flex-col max-sm:gap-y-3 items-center max-sm:items-start max-md:items-start">
+                          <div className="flex w-[90%] max-sm:w-full flex-col md:flex-row items-start md:items-center gap-2 mr-4">
                             <ReimbursementSearchFilter
                               disabled={!data?.length && noFilters}
                               userEmails={

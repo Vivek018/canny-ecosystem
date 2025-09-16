@@ -111,7 +111,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.payroll_invoice}${args.params.payrollId}`,
-    args,
+    args
   );
 }
 
@@ -124,7 +124,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
     const selectedRowData = formData.get("selected_rows") as string;
     const selectedSalaryEntriesData = JSON.parse(selectedRowData || "[]");
@@ -135,7 +135,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -219,7 +219,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -292,7 +292,7 @@ export default function CreateInvoice({
 
     function orderFields(
       fieldsArr: Array<{ field: string; data: (typeof fieldTotals)[string] }>,
-      preferredOrder: string[],
+      preferredOrder: string[]
     ) {
       const map = new Map(fieldsArr.map((e) => [e.field, e]));
       const ordered: Array<{
@@ -417,12 +417,12 @@ export default function CreateInvoice({
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.invoice_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.invoice_number.name,
+                      fields.invoice_number.name
                     )}`,
                   }}
                   labelProps={{
@@ -441,12 +441,12 @@ export default function CreateInvoice({
                   errors={fields.date.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name,
+                      fields.subject.name
                     )}`,
                   }}
                   labelProps={{
@@ -471,12 +471,12 @@ export default function CreateInvoice({
                   errors={fields.company_address_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.additional_text, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.additional_text.name,
+                      fields.additional_text.name
                     )}`,
                   }}
                   labelProps={{
@@ -500,7 +500,7 @@ export default function CreateInvoice({
                   errors={fields.user_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 mb-6">
                 <SearchableSelectField
                   className="capitalize"
                   options={transformStringArrayIntoOptions([
@@ -522,7 +522,7 @@ export default function CreateInvoice({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
                 <CheckboxField
                   buttonProps={getInputProps(fields.include_charge, {
                     type: "checkbox",
@@ -540,7 +540,7 @@ export default function CreateInvoice({
                   }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 my-5">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 my-5">
                 <CheckboxField
                   buttonProps={getInputProps(fields.include_sgst, {
                     type: "checkbox",
@@ -577,7 +577,7 @@ export default function CreateInvoice({
                 }}
                 errors={fields.proof.errors}
               />
-              <div className="grid grid-cols-2 gap-4 my-5">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 my-5">
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_paid, {
                     type: "checkbox",
@@ -598,7 +598,7 @@ export default function CreateInvoice({
                   inputProps={{
                     ...getInputProps(fields.paid_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.paid_date.name,
+                      fields.paid_date.name
                     )}`,
                   }}
                   labelProps={{
@@ -616,7 +616,7 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                      fields.payroll_data.value,
+                      fields.payroll_data.value
                   ),
                 }}
                 fields={[

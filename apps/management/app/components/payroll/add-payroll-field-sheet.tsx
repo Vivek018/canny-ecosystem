@@ -55,7 +55,7 @@ export function AddPayrollFieldSheet({
       <SheetTrigger asChild className={cn("cursor-pointer py-2")}>
         {triggerChild}
       </SheetTrigger>
-      <SheetContent className="flex flex-col w-[600px] h-full">
+      <SheetContent className="flex flex-col w-[600px] max-sm:w-full h-full">
         <SheetHeader className="px-6 pt-4 pb-8 flex-shrink-0">
           <SheetTitle className="flex justify-between">
             <div>
@@ -64,7 +64,7 @@ export function AddPayrollFieldSheet({
           </SheetTitle>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-3 pb-3">
-          <div className="w-full grid grid-cols-2 gap-4 mb-8">
+          <div className="w-full grid grid-cols-2 max-sm:grid-cols-1 gap-4 mb-8">
             <div className="mb-8 flex flex-col gap-1">
               <Label className="text-sm font-medium">Field Name</Label>
               <Input

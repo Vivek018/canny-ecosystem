@@ -41,7 +41,7 @@ export function CreateEmployeeBankDetails({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.account_number, { type: "text" }),
@@ -66,7 +66,7 @@ export function CreateEmployeeBankDetails({
             errors={fields.ifsc_code.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2  max-sm:grid-cols-1 max-sm:gap-2place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.account_holder_name, { type: "text" }),
@@ -96,7 +96,7 @@ export function CreateEmployeeBankDetails({
             errors={fields.account_type.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.bank_name, { type: "text" }),

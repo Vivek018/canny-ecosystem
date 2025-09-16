@@ -193,7 +193,7 @@ export default function CreateExit({
                   errors={fields.payable_days.errors}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.bonus, { type: "number" }),
@@ -249,7 +249,7 @@ export default function CreateExit({
                   errors={fields.deduction.errors}
                 />
               </div>
-              <div className="flex gap-7">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.last_working_day, { type: "date" }),

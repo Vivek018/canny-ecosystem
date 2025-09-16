@@ -14,7 +14,6 @@ export const ImportReimbursementDataArray = [
   "employee_code",
   "submitted_date",
   "amount",
-  "email",
   "status",
 ];
 

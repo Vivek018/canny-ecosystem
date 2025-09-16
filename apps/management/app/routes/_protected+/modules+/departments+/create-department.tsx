@@ -188,10 +188,10 @@ export default function CreateDepartment({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 max-sm:px-0 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
-          <Card>
+          <Card className="max-sm:px-0">
             <CardHeader>
               <CardTitle className="text-3xl capitalize">
                 {replaceDash(DEPARTMENT_TAG)}

@@ -38,7 +38,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
       return acc;
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
   const previousResult = previousData.reduce(
     (acc: Record<string, number>, item) => {
@@ -46,7 +46,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
       return acc;
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
 
   const reimbursementCurrentResult = reimbursementCurrentData.reduce(
@@ -56,7 +56,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + amount;
       return acc;
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
 
   const reimbursementPreviousResult = reimbursementPreviousData.reduce(
@@ -66,7 +66,7 @@ export function CountCards({
       acc[type] = (acc[type] || 0) + amount;
       return acc;
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
 
   const salaryCalculation =
@@ -81,25 +81,25 @@ export function CountCards({
     100;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <div className="grid gap-2 grid-cols-2 md:gap-4 lg:grid-cols-4">
+      <Card className="max-sm:flex max-sm:flex-col max-sm:justify-between">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 max-sm:text-sm">
           <CardTitle className="text-sm font-medium">Salary Payment</CardTitle>
-          <Icon name="rupees" size="xs" />
+          <Icon name="rupees" size="xs" className="max-sm:hidden" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{currentResult.salary ?? 0}</div>
           <p
             className={cn(
-              "text-xs text-muted-foreground flex",
+              "text-xs text-muted-foreground flex  max-sm:hidden",
               (previousResult.salary ? salaryCalculation : 100) > 0
                 ? "text-green"
-                : "text-destructive",
+                : "text-destructive"
             )}
           >
             {previousResult.salary
               ? Math.abs(salaryCalculation).toFixed(2)
-              : currentResult.salary ?? 0}
+              : (currentResult.salary ?? 0)}
             %
             <p className="text-xs text-muted-foreground ml-1">
               {(previousResult.salary ? salaryCalculation : 100) > 0
@@ -110,12 +110,12 @@ export function CountCards({
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="max-sm:flex max-sm:flex-col max-sm:justify-between">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Reimbursement Payment
           </CardTitle>
-          <Icon name="rupees" size="xs" />
+          <Icon name="rupees" size="xs" className="max-sm:hidden" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -123,17 +123,17 @@ export function CountCards({
           </div>
           <p
             className={cn(
-              "text-xs text-muted-foreground flex",
+              "text-xs text-muted-foreground flex  max-sm:hidden",
               (reimbursementPreviousResult.reimbursement
                 ? reimbursementCalculation
                 : 100) > 0
                 ? "text-green"
-                : "text-destructive",
+                : "text-destructive"
             )}
           >
             {reimbursementPreviousResult.reimbursement
               ? Math.abs(reimbursementCalculation).toFixed(2)
-              : reimbursementCurrentResult.reimbursement ?? 0}
+              : (reimbursementCurrentResult.reimbursement ?? 0)}
             %
             <p className="text-xs text-muted-foreground ml-1">
               {(reimbursementPreviousResult.reimbursement
@@ -146,35 +146,37 @@ export function CountCards({
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="max-sm:flex max-sm:flex-col max-sm:justify-between">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Active Employees
           </CardTitle>
-          <Icon name="employee" />
+          <Icon name="employee" className="max-sm:hidden" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{activeEmployeeCount.length}</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-2xl font-bold ">
+            {activeEmployeeCount.length}
+          </div>
+          <p className="text-xs text-muted-foreground  max-sm:hidden">
             {totalEmployeeCount.length} total employees
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="max-sm:flex max-sm:flex-col max-sm:justify-between">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Exited Employees
           </CardTitle>
-          <Icon name="employee" />
+          <Icon name="employee" className="max-sm:hidden" />
         </CardHeader>{" "}
         <CardContent>
           <div className="text-2xl font-bold">{currentExits.length}</div>
           <p
             className={cn(
-              "text-xs text-muted-foreground flex",
+              "text-xs text-muted-foreground flex max-sm:hidden",
               currentExits.length - previousExits.length > 0
                 ? "text-green"
-                : "text-destructive",
+                : "text-destructive"
             )}
           >
             {currentExits.length - previousExits.length > 0

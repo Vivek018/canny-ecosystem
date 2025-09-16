@@ -78,7 +78,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -97,7 +97,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -115,7 +115,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Project creation failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -124,7 +124,7 @@ export async function action({
         message: "An error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -221,14 +221,14 @@ export default function CreateProject({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_type, {
                       type: "text",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_type.name,
+                      fields.project_type.name
                     )}`,
                   }}
                   labelProps={{
@@ -245,7 +245,7 @@ export default function CreateProject({
                     placeholder: `Select ${fields.status.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[],
+                    statusArray as unknown as string[]
                   )}
                   labelProps={{
                     children: fields.status.name,
@@ -261,16 +261,16 @@ export default function CreateProject({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -284,11 +284,11 @@ export default function CreateProject({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name,
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{

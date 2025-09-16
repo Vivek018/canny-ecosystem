@@ -114,7 +114,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return acc;
       },
-      {} as Record<string, Record<string, number>>,
+      {} as Record<string, Record<string, number>>
     );
 
     return json({ employeeSalaryData, error: null });
@@ -137,7 +137,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
     const employeeLetterData = submission.value;
@@ -160,7 +160,7 @@ export async function action({
         message: "Employee Letter creation failed",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -169,7 +169,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -246,18 +246,18 @@ export default function CreateEmployeeLetter({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-5">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8 mt-5">
                 <SearchableSelectField
                   key={resetKey}
                   className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    employeeLetterTypesArray as unknown as string[],
+                    employeeLetterTypesArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.letter_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.letter_type.name,
+                    fields.letter_type.name
                   )}`}
                   labelProps={{
                     children: "Letter Type",
@@ -284,7 +284,7 @@ export default function CreateEmployeeLetter({
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name,
+                      fields.subject.name
                     )}`,
                   }}
                   labelProps={{
@@ -301,15 +301,15 @@ export default function CreateEmployeeLetter({
                     ...getInputProps(fields.content, { type: "hidden" }),
                     placeholder: "Write your letter content here...",
                     defaultValue: !updateValues
-                      ? bringDefaultLetterContent(
+                      ? (bringDefaultLetterContent(
                           fields.letter_type.value,
-                          employeeSalaryData,
-                        ) ?? fields.content.value
-                      : fields.content.value ??
+                          employeeSalaryData
+                        ) ?? fields.content.value)
+                      : (fields.content.value ??
                         bringDefaultLetterContent(
                           fields.letter_type.value,
-                          employeeSalaryData,
-                        ),
+                          employeeSalaryData
+                        )),
                   }}
                   labelProps={{
                     children: "Content",
@@ -319,7 +319,7 @@ export default function CreateEmployeeLetter({
                 />
               </div>
 
-              <div className="grid grid-cols-3 place-content-center justify-between gap-x-8 px-2">
+              <div className="grid grid-cols-3 max-sm:grid-cols-2 place-content-center justify-between gap-x-8 px-2">
                 <CheckboxField
                   className="mt-8"
                   buttonProps={getInputProps(fields.include_letter_head, {
@@ -362,7 +362,7 @@ export default function CreateEmployeeLetter({
                     fields.include_employee_signature,
                     {
                       type: "checkbox",
-                    },
+                    }
                   )}
                   labelProps={{
                     children: "Include Employee Signature",

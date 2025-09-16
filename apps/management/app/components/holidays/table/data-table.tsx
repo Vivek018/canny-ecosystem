@@ -35,7 +35,7 @@ export function HolidaysDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <div className="relative">
@@ -56,16 +56,16 @@ export function HolidaysDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
+                            "h-[60px] px-4 py-2 table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "md:sticky md:right-0 min-w-20 max-w-20 md:bg-card md:z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );

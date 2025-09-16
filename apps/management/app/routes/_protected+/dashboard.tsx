@@ -1,6 +1,4 @@
 import { DashboardFilter } from "@/components/dashboard/dashboard-filter";
-import { FilterList } from "@/components/dashboard/filter-list";
-import { CountCards } from "@/components/dashboard/count-cards";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PayrollTrend } from "@/components/payroll/analytics/payroll-trend";
 import { cacheKeyPrefix } from "@/constant";
@@ -32,11 +30,13 @@ import type {
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import { ActiveEmployeesBySite } from "@/components/payroll/analytics/active-employees-by-site";
-import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
 import { useAnimateTextScroll } from "@canny_ecosystem/ui/animate-text-scroll";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { FilterList } from "@/components/dashboard/filter-list";
+import { CountCards } from "@/components/dashboard/count-cards";
+import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -144,7 +144,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.dashboard}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -200,7 +200,7 @@ export default function Dashboard() {
                 ref={containerRef}
                 className={cn(
                   "overflow-hidden w-full border-b bg-primary/15",
-                  !notificationData?.text && "hidden",
+                  !notificationData?.text && "hidden"
                 )}
               >
                 <div
@@ -323,7 +323,7 @@ export default function Dashboard() {
             </Await>
           </Suspense>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 max-sm:grid-cols-1 max-md:grid-cols-1 gap-4 max-sm:gap-0 max-sm:gap-y-5 max-md:gap-0 max-md:gap-y-5 ">
             <Suspense fallback={<LoadingSpinner className="h-64" />}>
               <Await resolve={employeesPromise}>
                 {({ activeEmployeesBySites, activeEmployeeErrorBySites }) => {

@@ -233,6 +233,9 @@ export const getSalaryEntriesByPayrollId = async ({
       overtime_hours,
       working_days,
       absent_days,
+      paid_leaves,
+      paid_holidays,
+      casual_leaves,
       employee:employee_id (
         id,
         first_name,

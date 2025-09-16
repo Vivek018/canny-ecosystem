@@ -15,8 +15,7 @@ import { Link } from "@remix-run/react";
 export function StatutoryBonusNoData() {
   const { role } = useUser();
   return (
-    <div className="flex flex-col items-center justify-end m-auto">
-      <div className="p-14" />
+    <div className="flex flex-col items-center justify-center mt-4">
       <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
         <CardContent className="flex flex-col items-center justify-between gap-5">
           <CardTitle>

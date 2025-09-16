@@ -96,7 +96,7 @@ export default function AttendanceImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== "",
+            (header) => header !== null && header.trim() !== ""
           );
           setHeaderArray(headers);
         },
@@ -115,7 +115,7 @@ export default function AttendanceImportFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
           );
 
           if (matchedHeader) {
@@ -124,7 +124,7 @@ export default function AttendanceImportFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
       );
 
       setFieldMapping(initialMapping);
@@ -138,13 +138,13 @@ export default function AttendanceImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ]),
-        ),
+          ])
+        )
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message,
+          (err) => err.message
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -166,7 +166,7 @@ export default function AttendanceImportFieldMapping() {
       });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`,
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -199,7 +199,7 @@ export default function AttendanceImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
+      Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
     if (file) {
@@ -211,9 +211,7 @@ export default function AttendanceImportFieldMapping() {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results?.data
             .filter((entry) =>
-              Object.values(entry!).some(
-                (value) => String(value).trim() !== "",
-              ),
+              Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -222,12 +220,12 @@ export default function AttendanceImportFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== "",
+                      String(value).trim() !== ""
                   )
                   .filter(([key]) =>
-                    allowedFields.includes(key as unknown as any),
+                    allowedFields.includes(key as unknown as any)
                   )
-                  .map(([key, value]) => [key, String(value).trim()]),
+                  .map(([key, value]) => [key, String(value).trim()])
               );
               return cleanEntry;
             });
@@ -261,7 +259,7 @@ export default function AttendanceImportFieldMapping() {
       {loadNext ? (
         <EmployeeAttendanceImportData env={env} />
       ) : (
-        <Card className="m-4 px-40">
+        <Card className="m-4 pax-auto lg:px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -269,7 +267,7 @@ export default function AttendanceImportFieldMapping() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-8 mb-8">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 gap-8 mb-8">
               <Combobox
                 options={payoutMonths}
                 placeholder="Select Payroll Month"
@@ -296,7 +294,7 @@ export default function AttendanceImportFieldMapping() {
                 <h4 className="text-red-700 font-medium mb-2">
                   Validation Errors:
                 </h4>
-                <ul className="grid grid-cols-3 gap-y-1">
+                <ul className="grid grid-cols-3 max-sm:grid-cols-1 gap-y-1">
                   {validationErrors.map((error, index) => (
                     <li
                       key={error.toString() + index.toString()}
@@ -308,7 +306,7 @@ export default function AttendanceImportFieldMapping() {
                 </ul>
               </div>
             )}
-            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
                 <div key={field.key} className="flex flex-col">
                   <div className="flex flex-row gap-1 pb-1">
@@ -318,7 +316,7 @@ export default function AttendanceImportFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline",
+                        field.required && "inline"
                       )}
                     >
                       *
@@ -332,11 +330,11 @@ export default function AttendanceImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(field.key?.toLowerCase())
                         );
                       }) ||

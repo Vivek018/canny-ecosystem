@@ -114,7 +114,7 @@ export async function loader({
         siteOptions: null,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -133,7 +133,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -225,8 +225,8 @@ export default function CreateUser({
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-3xl capitalize">
+            <CardHeader className="">
+              <CardTitle className="text-3xl max-sm:text-lg capitalize">
                 {replaceDash(USER_TAG)}
               </CardTitle>
               <CardDescription>
@@ -240,13 +240,13 @@ export default function CreateUser({
               />
               <input {...getInputProps(fields.id, { type: "hidden" })} />
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.first_name, { type: "text" }),
                     autoFocus: true,
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.first_name.name,
+                      fields.first_name.name
                     )}`,
                   }}
                   labelProps={{
@@ -258,7 +258,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.last_name, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.last_name.name,
+                      fields.last_name.name
                     )}`,
                   }}
                   labelProps={{
@@ -268,12 +268,12 @@ export default function CreateUser({
                 />
               </div>
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-x-8">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.email, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.email.name,
+                      fields.email.name
                     )}`,
                   }}
                   labelProps={{
@@ -285,7 +285,7 @@ export default function CreateUser({
                   inputProps={{
                     ...getInputProps(fields.mobile_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.mobile_number.name,
+                      fields.mobile_number.name
                     )}`,
                   }}
                   labelProps={{
@@ -299,7 +299,7 @@ export default function CreateUser({
                 key={resetKey}
                 className="mb-2"
                 options={transformStringArrayIntoOptions(
-                  userRoles as unknown as string[],
+                  userRoles as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.role, { type: "text" }),

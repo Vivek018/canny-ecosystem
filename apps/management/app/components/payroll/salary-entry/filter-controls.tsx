@@ -82,8 +82,8 @@ export const FilterControls = React.memo<FilterControlsProps>(
     const showFilters = siteOptions.length > 0 || departmentOptions.length > 0;
 
     return (
-      <div className="w-full flex items-center justify-between gap-3">
-        <div className={cn("w-2/3", !showFilters && "hidden")}>
+      <div className="flex-1 flex items-center justify-between gap-3">
+        <div className={cn("w-full md:w-2/3 md:max-w-96",!showFilters && "hidden")}>
           <MultiSelectCombobox
             label="Groups"
             options={conditionalOptions() as any[]}
@@ -109,7 +109,7 @@ export const FilterControls = React.memo<FilterControlsProps>(
           </span>
         </div>
 
-        <div className="relative w-full">
+        <div className="relative w-full max-md:hidden">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
           </div>
@@ -122,5 +122,5 @@ export const FilterControls = React.memo<FilterControlsProps>(
         </div>
       </div>
     );
-  },
+  }
 );

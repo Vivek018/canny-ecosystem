@@ -63,7 +63,7 @@ export function ImportedDataTable<TData, TValue>({
                           <TableCell
                             key={cell.id}
                             className={cn(
-                              "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
+                              "h-[60px] px-4 py-2 table-cell",
                               cell.column.id === "payment_status" &&
                                 (cell.getValue() === "approved"
                                   ? "text-green"

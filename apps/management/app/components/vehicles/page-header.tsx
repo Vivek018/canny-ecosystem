@@ -66,11 +66,11 @@ export function VehiclePageHeader({
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div className="w-full flex flex-row gap-6 justify-between">
+      <div className="w-full flex flex-col md:flex-row gap-6 justify-between">
         <div className="flex flex-row gap-6 items-center">
           <div>
             <Avatar
-              className="w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40 cursor-pointer"
+              className="w-20 h-20 sm:w-28 sm:h-28 border border-muted-foreground/30 shadow-sm hover:z-40 cursor-pointer"
               onClick={() => inputRef?.current?.click()}
             >
               <>
@@ -102,7 +102,7 @@ export function VehiclePageHeader({
               </p>
             </div>
             <div className="mt-3">
-              <h1 className="text-3xl tracking-wide font-bold capitalize">
+              <h1 className="text:lg sm:text-3xl tracking-wide font-bold capitalize">
                 {`${vehicle?.registration_number}`}
               </h1>
               <p className="w-max bg-muted text-sm text-muted-foreground px-1.5 pb-0.5 mt-0.5 rounded">
@@ -133,7 +133,7 @@ export function VehiclePageHeader({
               <DropdownMenuTrigger
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "bg-card",
+                  "w-full bg-card",
                   !hasPermission(role, `${updateRole}:${attribute.vehicles}`) &&
                     "hidden",
                 )}
