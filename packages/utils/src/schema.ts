@@ -776,6 +776,7 @@ export const reimbursementTypeArray = [
   "advances",
   "loan",
   "rent",
+  "bonus",
   "vehicle",
   "vehicle_related",
   "others",
