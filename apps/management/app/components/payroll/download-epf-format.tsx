@@ -34,8 +34,8 @@ export const prepareEpfFormat = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
-    ),
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
+    )
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -43,70 +43,39 @@ export const prepareEpfFormat = async ({
     statutoryDetails: statutoryDetailsResults[index]?.data || null,
   }));
 
-  const extractedData = updatedData.map((formatData) => ({
-    uan_number: formatData?.statutoryDetails?.uan_number || null,
-    name:
-      `${formatData?.employees?.first_name} ${
-        formatData?.employees?.middle_name || ""
-      } ${formatData?.employees?.last_name}` || null,
-    gross_wages: formatData?.amount,
-    epf_wages: isRestricted
-      ? formatData?.amount > 15000
+  const extractedData = updatedData.map((formatData) => {
+    const baseAmount = Number(formatData?.amount) || 0;
+    const restrictedAmount = isRestricted
+      ? baseAmount > 15000
         ? 15000
-        : formatData?.amount
-      : formatData?.amount,
-    eps_wages: isRestricted
-      ? formatData?.amount > 15000
-        ? 15000
-        : formatData?.amount
-      : formatData?.amount,
-    edli_wages: isRestricted
-      ? formatData?.amount > 15000
-        ? 15000
-        : formatData?.amount
-      : formatData?.amount,
-    epf_contribution: roundToNearest(
-      Number(
-        (isRestricted
-          ? formatData?.amount > 15000
-            ? 15000
-            : formatData?.amount
-          : formatData?.amount) * 0.12,
-      ),
-    ),
-    eps_contribution: roundToNearest(
-      Number(
-        (isRestricted
-          ? formatData?.amount > 15000
-            ? 15000
-            : formatData?.amount
-          : formatData?.amount) * 0.0833,
-      ),
-    ),
-    diffEpf_Eps:
-      roundToNearest(
-        Number(
-          isRestricted
-            ? formatData?.amount > 15000
-              ? 15000
-              : formatData?.amount
-            : formatData?.amount * 0.12,
-        ),
-      ) -
-      roundToNearest(
-        Number(
-          (isRestricted
-            ? formatData?.amount > 15000
-              ? 15000
-              : formatData?.amount
-            : formatData?.amount) * 0.0833,
-        ),
-      ),
-    ncp_days:
-      formatData.absentDays ??
-      Number(formatData.workingDays) - Number(formatData.presentDays),
-    refund: 0,
-  }));
+        : baseAmount
+      : baseAmount;
+      
+    const cappedAmount = baseAmount > 15000 ? 15000 : baseAmount;
+
+    const epfContribution = roundToNearest(restrictedAmount * 0.12);
+    const epsContribution = roundToNearest(cappedAmount * 0.0833);
+    const diffEpf_Eps = epfContribution - epsContribution;
+
+    return {
+      uan_number: formatData?.statutoryDetails?.uan_number || null,
+      name:
+        `${formatData?.employees?.first_name} ${
+          formatData?.employees?.middle_name || ""
+        } ${formatData?.employees?.last_name}`.trim() || null,
+      gross_wages: formatData?.gross,
+      epf_wages: restrictedAmount,
+      eps_wages: cappedAmount,
+      edli_wages: cappedAmount,
+      epf_contribution: epfContribution,
+      eps_contribution: epsContribution,
+      diffEpf_Eps: diffEpf_Eps,
+      ncp_days:
+        formatData.absentDays ??
+        Number(formatData.workingDays) - Number(formatData.presentDays),
+      refund: 0,
+    };
+  });
 
   return await extractedData;
 };
@@ -130,6 +99,15 @@ export const DownloadEpfFormat = ({
         : null;
 
     return data.map((emp: any) => {
+      const gross = emp.salary_entries.salary_field_values
+        .filter(
+          (e: {
+            amount: number;
+            payroll_fields: { type: string; name: string };
+          }) => e.payroll_fields.type === "earning"
+        )
+        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
+
       const earnings = emp.salary_entries.salary_field_values
         .filter(
           (e: {
@@ -138,12 +116,13 @@ export const DownloadEpfFormat = ({
           }) =>
             e.payroll_fields.type === "earning" &&
             (allowedFields === null ||
-              allowedFields.includes(e.payroll_fields.name.toUpperCase())),
+              allowedFields.includes(e.payroll_fields.name.toUpperCase()))
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
       return {
         amount: earnings,
+        gross: gross,
         presentDays: emp?.present_days ?? null,
         workingDays: emp?.working_days ?? null,
         absentDays: emp?.absent_days ?? null,
@@ -159,7 +138,7 @@ export const DownloadEpfFormat = ({
   }
 
   const generateEpfFormat = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
 
