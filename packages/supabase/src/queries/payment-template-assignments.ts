@@ -4,7 +4,7 @@ import type {
   PaymentTemplateAssignmentsDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
-import { getEmployeeProjectAssignmentByEmployeeId } from "./employees";
+import { getEmployeeWorkDetailsByEmployeeId } from "./employees";
 import { getDefaultTemplateIdByCompanyId } from "./payment-templates";
 
 export async function getLinkedPaymentTemplateIdByEmployeeId({
@@ -23,7 +23,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (templateError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (templateData)",
-        templateError,
+        templateError
       );
       return { data: null, error: templateError };
     }
@@ -33,12 +33,12 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     }
 
     const { data: employeeProjectAssignment, error: employeeProjectError } =
-      await getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId });
+      await getEmployeeWorkDetailsByEmployeeId({ supabase, employeeId });
 
     if (employeeProjectError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (employeeProjectAssignment)",
-        employeeProjectError,
+        employeeProjectError
       );
       return { data: null, error: employeeProjectError };
     }
@@ -54,7 +54,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (sitePaymentError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (sitePaymentTemplateAssignment)",
-        sitePaymentError,
+        sitePaymentError
       );
       return { data: null, error: sitePaymentError };
     }
@@ -72,7 +72,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (defaultTemplateError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (defaultTemplateData)",
-        defaultTemplateError,
+        defaultTemplateError
       );
       return { data: null, error: defaultTemplateError };
     }
@@ -81,7 +81,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
   } catch (error) {
     console.error(
       "getLinkedPaymentTemplateIdByEmployeeId Unexpected Error",
-      error,
+      error
     );
     return { data: null, error };
   }
@@ -90,7 +90,10 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
 export async function getTemplateIdByEmployeeId({
   supabase,
   employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
   const columns = ["template_id"] as const;
 
   const { data, error } = await supabase
@@ -113,7 +116,10 @@ export async function getTemplateIdByEmployeeId({
 export async function getPaymentTemplateAssignmentByEmployeeId({
   supabase,
   employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
   const columns = [
     "id",
     "template_id",
@@ -150,7 +156,10 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
 export async function getPaymentTemplateAssignmentById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "template_id",
@@ -201,7 +210,10 @@ export type PaymentTemplateAssignmentsType = Pick<
 export async function getPaymentTemplateAssignmentBySiteId({
   supabase,
   site_id,
-}: { supabase: TypedSupabaseClient; site_id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  site_id: string;
+}) {
   const columns = [
     "id",
     "template_id",
@@ -285,7 +297,7 @@ export async function getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
   if (error) {
     console.error(
       "getPaymentTemplateAssignmentBySiteAndPositionOrSkillType Error",
-      error,
+      error
     );
   }
 
@@ -295,7 +307,10 @@ export async function getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
 export async function getPaymentTemplateAssignmentsBySiteId({
   supabase,
   siteId,
-}: { supabase: TypedSupabaseClient; siteId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  siteId: string;
+}) {
   const columns = [
     "id",
     "template_id",

@@ -4,6 +4,7 @@ import {
   replaceUnderscore,
   hasPermission,
   createRole,
+  generatePrefix,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -24,8 +25,9 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useSearchParams,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
@@ -44,6 +46,7 @@ import { UPDATE_SITE } from "./$siteId+/update-site";
 import {
   getLocationsForSelectByCompanyId,
   getProjectsByCompanyId,
+  getSiteIdsBySitePrefix,
 } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { FormButtons } from "@/components/form/form-buttons";
@@ -54,6 +57,9 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { Button } from "@canny_ecosystem/ui/button";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export const CREATE_SITE = "create-site";
 
@@ -67,8 +73,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
+  const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
   try {
+    const siteName = urlSearchParams.get("site_name") ?? "";
+    const firstPrefix = generatePrefix(siteName);
+
     const { data, error } = await getLocationsForSelectByCompanyId({
       supabase,
       companyId,
@@ -82,6 +92,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return json({
       error: null,
       companyId,
+      firstPrefix,
       locationOptions: data?.map((location) => ({
         label: location?.name,
         value: location?.id,
@@ -96,10 +107,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       {
         error,
         companyId,
+        firstPrefix: "",
         locationOptions: null,
         projectOptions: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -118,7 +130,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -142,7 +154,7 @@ export async function action({
         error,
         returnTo: "/modules/sites",
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -152,7 +164,7 @@ export async function action({
         error,
         returnTo: "/modules/sites",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -166,11 +178,13 @@ export default function CreateSite({
   projectFromUpdate: ComboboxSelectOption[] | undefined | null;
   updateValues?: SiteDatabaseUpdate | null;
 }) {
-  const { companyId, locationOptions, projectOptions, error } =
+  const { companyId, locationOptions, projectOptions, error, firstPrefix } =
     useLoaderData<typeof loader>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const actionData = useActionData<typeof action>();
   const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
-
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -233,17 +247,49 @@ export default function CreateSite({
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.name, { type: "text" }),
-                  autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(fields.name.name)}`,
-                }}
-                labelProps={{
-                  children: replaceUnderscore(fields.name.name),
-                }}
-                errors={fields.name.errors}
-              />
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.name, { type: "text" }),
+                    ref: inputRef,
+
+                    autoFocus: true,
+                    placeholder: `Enter ${replaceUnderscore(fields.name.name)}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.name.name),
+                  }}
+                  errors={fields.name.errors}
+                />
+                <div className="flex justify-between items-center gap-2">
+                  <Field
+                    inputProps={{
+                      ...getInputProps(fields.prefix, { type: "text" }),
+                      defaultValue: firstPrefix,
+                      placeholder: `Enter ${replaceUnderscore(fields.prefix.name)}`,
+                    }}
+                    labelProps={{
+                      children: replaceUnderscore(fields.prefix.name),
+                    }}
+                    errors={fields.prefix.errors}
+                  />
+                  <Button
+                    variant="primary-outline"
+                    size="icon"
+                    className={cn("h-6 w-6")}
+                    onClick={() => {
+                      if (inputRef.current) {
+                        searchParams.set("site_name", inputRef.current?.value);
+                      } else {
+                        searchParams.delete("site_name");
+                      }
+                      setSearchParams(searchParams);
+                    }}
+                  >
+                    <Icon name="update" className="h-[16px] w-[16px]" />
+                  </Button>
+                </div>
+              </div>
               <div className="grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-1 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey}
@@ -339,7 +385,7 @@ export default function CreateSite({
                     ...getInputProps(fields.pincode, { type: "text" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name,
+                      fields.pincode.name
                     )}`,
                   }}
                   labelProps={{
@@ -376,7 +422,7 @@ export default function CreateSite({
                     ...getInputProps(fields.longitude, { type: "number" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name,
+                      fields.longitude.name
                     )}`,
                   }}
                   labelProps={{

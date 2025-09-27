@@ -51,6 +51,7 @@ export const PLACEHOLDERS = [
   "Reimbursements submitted before 2019 for Site 'XYZ'",
   "Pending reimbursements from employees not in Invoice",
   "Reimbursements created in last 10 mins",
+  "Reimbursements of payees with name 'ABC'",
 ];
 
 export function ReimbursementSearchFilter({
@@ -59,12 +60,14 @@ export function ReimbursementSearchFilter({
   employeeId,
   projectArray,
   siteArray,
+  payeeArray,
 }: {
   disabled?: boolean;
   userEmails?: (string | null | undefined)[];
   employeeId?: string | undefined;
   projectArray?: string[];
   siteArray?: string[];
+  payeeArray?: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -103,6 +106,7 @@ export function ReimbursementSearchFilter({
     name: "",
     project: "",
     site: "",
+    payee: "",
     in_invoice: "",
     month: "",
     year: "",
@@ -135,6 +139,7 @@ export function ReimbursementSearchFilter({
     users: searchParams.get("users"),
     project: searchParams.get("project"),
     site: searchParams.get("site"),
+    payee: searchParams.get("payee"),
     in_invoice: searchParams.get("in_invoice"),
     month: searchParams.get("month"),
     year: searchParams.get("year"),
@@ -159,7 +164,7 @@ export function ReimbursementSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -194,7 +199,7 @@ export function ReimbursementSearchFilter({
         {
           action: "/approvals/reimbursements?index",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -206,7 +211,7 @@ export function ReimbursementSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -223,7 +228,7 @@ export function ReimbursementSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -256,7 +261,7 @@ export function ReimbursementSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -471,6 +476,7 @@ export function ReimbursementSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
+
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -552,6 +558,36 @@ export function ReimbursementSearchFilter({
                       setFilterParams((prev) => ({
                         ...prev,
                         year: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Payees</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {payeeArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    checked={filterParams?.payee === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        payee: name,
                       }));
                     }}
                   >

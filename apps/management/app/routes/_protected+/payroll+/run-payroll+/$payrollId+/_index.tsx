@@ -7,7 +7,6 @@ import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
-  getDepartmentsByCompanyId,
   getEmployeeProvidentFundForEpfChallanByCompanyId,
   getEmployeesBySiteId,
   getLocationsByCompanyId,
@@ -25,7 +24,11 @@ import type {
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  defaultMonth,
+  defaultYear,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -93,19 +96,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       pseudoLabel: siteData?.projects?.name,
     }));
 
-    const { data: allDepartmentData, error: departmentError } =
-      await getDepartmentsByCompanyId({
-        supabase,
-        companyId,
-      });
-    if (departmentError) throw departmentError;
-
-    const allDepartmentOptions = allDepartmentData?.map((departmentData) => ({
-      label: departmentData.name?.toLowerCase(),
-      value: departmentData.id,
-      pseudoLabel: departmentData?.site?.name,
-    }));
-
     const { data: allLocationData, error: locationError } =
       await getLocationsByCompanyId({
         supabase,
@@ -126,6 +116,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const salaryEntriesPromise = getSalaryEntriesByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
+      month: payrollData?.month ?? defaultMonth,
+      year: payrollData?.year ?? defaultYear,
     });
 
     const { data: payrollFields } = await getPayrollFieldByPayrollId({
@@ -142,7 +134,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollData,
       salaryEntriesPromise,
       allSiteOptions,
-      allDepartmentOptions,
       allLocationOptions,
       allEmployeeOptions,
       allProjectOptions,
@@ -157,7 +148,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollData: null,
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
       allSiteOptions: [],
-      allDepartmentOptions: [],
       allLocationOptions: [],
       allEmployeeOptions: [],
       allProjectOptions: [],
@@ -175,7 +165,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.run_payroll_id}${
       args.params.payrollId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -195,10 +185,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
       status: parsedData.status as PayrollDatabaseRow["status"],
       run_date: new Date().toISOString() as PayrollDatabaseRow["run_date"],
-      total_employees:
-        parsedData.total_employees as PayrollDatabaseRow["total_employees"],
-      total_net_amount:
-        parsedData.total_net_amount as PayrollDatabaseRow["total_net_amount"],
     };
 
     const { status, error } = await updatePayroll({
@@ -215,7 +201,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     return json(
       { status: "error", message: "Payroll update failed", redirectUrl, error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Payroll Id Action error", error);
@@ -227,7 +213,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -238,7 +224,6 @@ export default function RunPayrollId() {
     salaryEntriesPromise,
     env,
     allSiteOptions,
-    allDepartmentOptions,
     allLocationOptions,
     allEmployeeOptions,
     allProjectOptions,
@@ -295,7 +280,7 @@ export default function RunPayrollId() {
           {({ data, error }) => {
             if (error || !data) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.run_payroll_id}${payrollId}`,
+                `${cacheKeyPrefix.run_payroll_id}${payrollId}`
               );
               return (
                 <ErrorBoundary
@@ -311,7 +296,6 @@ export default function RunPayrollId() {
                 data={data as any}
                 env={env as SupabaseEnv}
                 allSiteOptions={allSiteOptions ?? []}
-                allDepartmentOptions={allDepartmentOptions ?? []}
                 allProjectOptions={allProjectOptions ?? []}
                 fromWhere="runpayroll"
                 epfData={epfData as unknown as EmployeeProvidentFundDatabaseRow}

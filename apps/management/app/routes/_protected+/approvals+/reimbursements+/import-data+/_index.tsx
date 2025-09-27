@@ -69,7 +69,7 @@ export default function ReimbursementFieldMapping() {
 
   const FIELD_CONFIGS: FieldConfig[] = [
     {
-      key: ofWhich === "employee" ? "employee_code" : "payee_code",
+      key: ofWhich === "employee" ? "employee_code" : "name",
       required: true,
     },
     {

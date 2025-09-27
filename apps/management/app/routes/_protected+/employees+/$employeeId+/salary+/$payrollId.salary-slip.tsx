@@ -14,10 +14,11 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getCompanyById,
-  getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeStatutoryDetailsById,
   getPrimaryLocationByCompanyId,
   getSalaryEntriesByPayrollAndEmployeeId,
+  getPayrollById,
+  getEmployeeWorkDetailsByEmployeeIdForOthers,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
@@ -26,6 +27,8 @@ import {
   SALARY_SLIP_TITLE,
 } from "@/constant";
 import {
+  defaultMonth,
+  defaultYear,
   formatDate,
   formatDateTime,
   formatNumber,
@@ -231,17 +234,7 @@ type DataType = {
       site: string;
       location: string;
       project: string;
-      salary_entry_site: string;
-      salary_entry_location: string;
-      salary_entry_department: string;
-      salary_entry_site_project: string;
-      salary_location: {
-        address_line_1: string;
-        address_line_2: string;
-        city: string;
-        state: string;
-        pincode: string;
-      };
+      department: string;
       project_assignment_location: {
         address_line_1: string;
         address_line_2: string;
@@ -257,11 +250,21 @@ type DataType = {
 };
 
 const SalarySlipPDF = ({ data }: { data: DataType }) => {
+  const hasAddress = (addr: any) =>
+    addr &&
+    (addr.address_line_1 ||
+      addr.address_line_2 ||
+      addr.city ||
+      addr.state ||
+      addr.pincode);
+
   const getFullAddress = (emp: any) => {
+    const { employeeProjectAssignmentData } = emp || {};
+
     const address =
-      emp?.employeeProjectAssignmentData?.salary_location ||
-      emp?.employeeProjectAssignmentData?.project_assignment_location ||
-      data?.companyData;
+      (hasAddress(employeeProjectAssignmentData?.project_assignment_location)
+        ? employeeProjectAssignmentData?.project_assignment_location
+        : null) || (hasAddress(data?.companyData) ? data?.companyData : null);
 
     if (!address) return null;
 
@@ -312,28 +315,19 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             </Text>
             <Text style={styles.department}>
               Location:{" "}
-              {data?.employee?.employeeProjectAssignmentData
-                ?.salary_entry_location ??
-                data?.employee?.employeeProjectAssignmentData?.location}
+              {data?.employee?.employeeProjectAssignmentData?.location}
             </Text>
             <Text style={styles.department}>
-              Site:{" "}
-              {data?.employee?.employeeProjectAssignmentData
-                ?.salary_entry_site ??
-                data?.employee?.employeeProjectAssignmentData?.site}
+              Site: {data?.employee?.employeeProjectAssignmentData?.site}
             </Text>
             <Text style={styles.department}>
               Department:{" "}
-              {data?.employee?.employeeProjectAssignmentData
-                ?.salary_entry_department ??
-                data?.employee?.employeeProjectAssignmentData
-                  ?.salary_entry_site_project ??
-                data?.employee?.employeeProjectAssignmentData?.project}
+              {data?.employee?.employeeProjectAssignmentData?.department}
             </Text>
             <Text style={styles.department}>
               Designation:{" "}
               {replaceUnderscore(
-                data?.employee?.employeeProjectAssignmentData?.position,
+                data?.employee?.employeeProjectAssignmentData?.position
               )}
             </Text>
           </View>
@@ -403,7 +397,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.infoLabel}>Date of Joining</Text>
             <Text style={styles.infoValue}>
               {formatDate(
-                data?.employee?.employeeProjectAssignmentData?.start_date,
+                data?.employee?.employeeProjectAssignmentData?.start_date
               )}
             </Text>
           </View>
@@ -431,8 +425,8 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                   Number(
                     data?.employee?.earnings
                       ?.reduce((sum, earning) => sum + earning.amount, 0)
-                      .toFixed(2),
-                  ),
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -458,8 +452,8 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                   Number(
                     data?.employee?.deductions
                       ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                      .toFixed(2),
-                  ),
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -474,13 +468,13 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             Number(
               data?.employee?.earnings
                 ?.reduce((sum, earning) => sum + earning.amount, 0)
-                .toFixed(2),
+                .toFixed(2)
             ) -
               Number(
                 data?.employee?.deductions
                   ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                  .toFixed(2),
-              ),
+                  .toFixed(2)
+              )
           )}`}</Text>
           <Text style={styles.netPayableWords}>
             {numberToWordsIndian(
@@ -488,14 +482,14 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                 Number(
                   data?.employee?.earnings
                     ?.reduce((sum, earning) => sum + earning.amount, 0)
-                    .toFixed(2),
+                    .toFixed(2)
                 ) -
                   Number(
                     data?.employee?.deductions
                       ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                      .toFixed(2),
-                  ),
-              ),
+                      .toFixed(2)
+                  )
+              )
             )}
           </Text>
         </View>
@@ -515,6 +509,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId as string;
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data: payroll } = await getPayrollById({ payrollId, supabase });
 
   const { data: employeeCompanyData } = await getCompanyById({
     supabase,
@@ -527,7 +522,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   const { data: employeeProjectAssignmentData } =
-    await getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId });
+    await getEmployeeWorkDetailsByEmployeeIdForOthers({
+      supabase,
+      employeeId,
+      month: payroll?.month ?? defaultMonth,
+      year: payroll?.year ?? defaultYear,
+    });
   const { data: employeeCompanyLocationData } =
     await getPrimaryLocationByCompanyId({ supabase, companyId });
   const { data: employeeStatutoryDetails } =
@@ -555,7 +555,7 @@ export default function SalarySlip() {
       first_name: data?.payrollData?.employee?.first_name,
       middle_name: data?.payrollData?.employee?.middle_name,
       last_name: data?.payrollData?.employee?.last_name,
-      employee_code: data?.payrollData?.employee?.employee_code,
+      employee_code: data?.employeeProjectAssignmentData?.employee_code,
     };
 
     const companyData = {
@@ -570,31 +570,12 @@ export default function SalarySlip() {
     const projectAssignment = {
       position: data?.employeeProjectAssignmentData?.position || "",
       start_date: data?.employeeProjectAssignmentData?.start_date || "",
-      site: data?.employeeProjectAssignmentData?.sites?.name || "",
       location:
         data?.employeeProjectAssignmentData?.sites?.company_locations?.name ||
         "",
+      site: data?.employeeProjectAssignmentData?.sites?.name || "",
+      department: data?.employeeProjectAssignmentData?.departments?.name || "",
       project: data?.employeeProjectAssignmentData?.sites?.projects?.name || "",
-      salary_entry_site: data?.payrollData?.salary_entries?.site?.name,
-      salary_entry_location:
-        data?.payrollData?.salary_entries?.site?.company_locations?.name,
-      salary_entry_department:
-        data?.payrollData?.salary_entries?.department?.name,
-      salary_entry_site_project:
-        data?.payrollData?.salary_entries?.site?.projects?.name,
-      salary_location: {
-        address_line_1:
-          data?.payrollData?.salary_entries?.site?.company_locations
-            ?.address_line_1,
-        address_line_2:
-          data?.payrollData?.salary_entries?.site?.company_locations
-            ?.address_line_2,
-        city: data?.payrollData?.salary_entries?.site?.company_locations?.city,
-        state:
-          data?.payrollData?.salary_entries?.site?.company_locations?.state,
-        pincode:
-          data?.payrollData?.salary_entries?.site?.company_locations?.pincode,
-      },
       project_assignment_location: {
         address_line_1:
           data?.employeeProjectAssignmentData?.sites?.company_locations
@@ -641,16 +622,16 @@ export default function SalarySlip() {
     }
 
     const orderedEarnings = preferredEarningOrder.filter((f) =>
-      earningFields.has(f),
+      earningFields.has(f)
     );
     const remainingEarnings = [...earningFields.keys()].filter(
-      (f) => !preferredEarningOrder.includes(f),
+      (f) => !preferredEarningOrder.includes(f)
     );
     const orderedDeductions = preferredDeductionOrder.filter((f) =>
-      deductionFields.has(f),
+      deductionFields.has(f)
     );
     const remainingDeductions = [...deductionFields.keys()].filter(
-      (f) => !preferredDeductionOrder.includes(f),
+      (f) => !preferredDeductionOrder.includes(f)
     );
 
     const earnings = [...orderedEarnings, ...remainingEarnings].map((name) => ({
@@ -658,7 +639,7 @@ export default function SalarySlip() {
       amount: earningsMap[name],
     }));
     const deductions = [...orderedDeductions, ...remainingDeductions].map(
-      (name) => ({ name, amount: deductionsMap[name] }),
+      (name) => ({ name, amount: deductionsMap[name] })
     );
 
     return {

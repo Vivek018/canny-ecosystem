@@ -126,29 +126,13 @@ export type EmployeeGuardianDatabaseInsert =
 export type EmployeeGuardianDatabaseUpdate =
   Database["public"]["Tables"]["employee_guardians"]["Update"];
 
-// Employee Project Assignments
-export type EmployeeProjectAssignmentDatabaseRow =
-  Database["public"]["Tables"]["employee_project_assignment"]["Row"];
-export type EmployeeProjectAssignmentDatabaseInsert =
-  Database["public"]["Tables"]["employee_project_assignment"]["Insert"];
-export type EmployeeProjectAssignmentDatabaseUpdate =
-  Database["public"]["Tables"]["employee_project_assignment"]["Update"];
+export type EmployeeWorkDetailsDatabaseRow =
+  Database["public"]["Tables"]["work_details"]["Row"];
+export type EmployeeWorkDetailsDatabaseInsert =
+  Database["public"]["Tables"]["work_details"]["Insert"];
+export type EmployeeWorkDetailsDatabaseUpdate =
+  Database["public"]["Tables"]["work_details"]["Update"];
 
-// Employee Skills
-export type EmployeeSkillDatabaseRow =
-  Database["public"]["Tables"]["employee_skills"]["Row"];
-export type EmployeeSkillDatabaseInsert =
-  Database["public"]["Tables"]["employee_skills"]["Insert"];
-export type EmployeeSkillDatabaseUpdate =
-  Database["public"]["Tables"]["employee_skills"]["Update"];
-
-// Employee Work History
-export type EmployeeWorkHistoryDatabaseRow =
-  Database["public"]["Tables"]["employee_work_history"]["Row"];
-export type EmployeeWorkHistoryDatabaseInsert =
-  Database["public"]["Tables"]["employee_work_history"]["Insert"];
-export type EmployeeWorkHistoryDatabaseUpdate =
-  Database["public"]["Tables"]["employee_work_history"]["Update"];
 
 // Employee Documents
 export type EmployeeDocumentsDatabaseRow =

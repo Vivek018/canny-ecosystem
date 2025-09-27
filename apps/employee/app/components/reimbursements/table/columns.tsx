@@ -46,23 +46,13 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
   },
   {
     enableSorting: false,
-    accessorKey: "payee_code",
-    header: "Payee Code",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate">{row.original.payee?.payee_code ?? "--"}</p>
-      );
-    },
-  },
-  {
-    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original.employees?.employee_project_assignment?.sites?.projects
-            ?.name ?? "--"}
+          {row.original.employees?.work_details[0]?.sites?.projects?.name ??
+            "--"}
         </p>
       );
     },
@@ -74,8 +64,7 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original.employees?.employee_project_assignment?.sites?.name ??
-            "--"}
+          {row.original.employees?.work_details[0]?.sites?.name ?? "--"}
         </p>
       );
     },

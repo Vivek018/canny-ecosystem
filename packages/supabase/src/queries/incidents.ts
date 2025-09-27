@@ -43,10 +43,7 @@ export type IncidentsDatabaseType = Pick<
     EmployeeDatabaseRow,
     "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
-    employee_project_assignment: Pick<
-      EmployeeProjectAssignmentDatabaseRow,
-      "employee_id"
-    > & {
+    work_details: Pick<EmployeeProjectAssignmentDatabaseRow, "employee_id"> & {
       sites: {
         id: SiteDatabaseRow["id"];
         name: SiteDatabaseRow["name"];
@@ -127,7 +124,7 @@ export async function getIncidentsByCompanyId({
         ${columns.join(",")},
         employees!left(
           id, first_name, middle_name, last_name, employee_code,
-          employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"}(
+          work_details!work_details_employee_id_fkey!${foreignFilters ? "inner" : "left"}(
             sites!${foreignFilters ? "inner" : "left"}(
               id, name, projects!${project ? "inner" : "left"}(id, name)
             )
@@ -138,7 +135,7 @@ export async function getIncidentsByCompanyId({
       `,
       {
         count: "exact",
-      },
+      }
     )
     .eq("company_id", companyId);
 
@@ -171,13 +168,13 @@ export async function getIncidentsByCompanyId({
       for (const q of searchQueryArray) {
         query.or(
           `first_name.ilike.*${q}*,middle_name.ilike.*${q}*,last_name.ilike.*${q}*,employee_code.ilike.*${q}*`,
-          { referencedTable: "employees" },
+          { referencedTable: "employees" }
         );
       }
     } else {
       query.or(
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-        { referencedTable: "employees" },
+        { referencedTable: "employees" }
       );
     }
   }
@@ -193,13 +190,10 @@ export async function getIncidentsByCompanyId({
   if (category) query.eq("category", category);
   if (severity) query.eq("severity", severity);
   if (project) {
-    query.eq(
-      "employees.employee_project_assignment.sites.projects.name",
-      project,
-    );
+    query.eq("employees.work_details.sites.projects.name", project);
   }
   if (site) {
-    query.eq("employees.employee_project_assignment.sites.name", site);
+    query.eq("employees.work_details.sites.name", site);
   }
 
   const { data, count, error } = await query.range(from, to);

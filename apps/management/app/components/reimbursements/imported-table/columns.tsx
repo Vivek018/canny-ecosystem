@@ -20,7 +20,7 @@ export const ImportedDataColumns: ColumnDef<ImportReimbursementDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate group-hover:text-primary">
-          {row.original.employee_code ?? row.original.payee_code}
+          {row.original.employee_code ?? row.original.name}
         </p>
       );
     },

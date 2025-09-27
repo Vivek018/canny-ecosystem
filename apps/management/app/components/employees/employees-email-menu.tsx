@@ -62,23 +62,19 @@ export default function EmployeesEmailMenu({
       } else if (key === "status") {
         exportedData[key] = element?.is_active ? "Active" : "Inactive";
       } else if (key === "project_name") {
-        exportedData[key] =
-          element?.employee_project_assignment?.sites?.projects?.name;
+        exportedData[key] = element?.work_details[0]?.sites?.projects?.name;
       } else if (key === "site_name") {
-        exportedData[key] = element?.employee_project_assignment?.sites?.name;
+        exportedData[key] = element?.work_details[0]?.sites?.name;
       } else if (key === "assignment_type") {
-        exportedData[key] =
-          element?.employee_project_assignment?.assignment_type ?? "";
+        exportedData[key] = element?.work_details?.assignment_type ?? "";
       } else if (key === "position") {
-        exportedData[key] = element?.employee_project_assignment?.position!;
+        exportedData[key] = element?.work_details?.position!;
       } else if (key === "skill_level") {
-        exportedData[key] =
-          element?.employee_project_assignment?.skill_level ?? "";
+        exportedData[key] = element?.work_details?.skill_level ?? "";
       } else if (key === "start_date") {
-        exportedData[key] = element?.employee_project_assignment?.start_date!;
+        exportedData[key] = element?.work_details?.start_date!;
       } else if (key === "end_date") {
-        exportedData[key] =
-          element?.employee_project_assignment?.end_date ?? "";
+        exportedData[key] = element?.work_details?.end_date ?? "";
       } else {
         exportedData[key] = element[key as keyof EmployeeDataType] as
           | string
@@ -102,7 +98,7 @@ export default function EmployeesEmailMenu({
     <div
       className={cn(
         !hasPermission(role, `${emailRole}:${attribute.employees}`) && "hidden",
-        !selectedRows.length && "hidden",
+        !selectedRows.length && "hidden"
       )}
     >
       <Dialog>

@@ -43,7 +43,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   const { data, meta, error } = await getEmployeesReportByCompanyId({
@@ -65,7 +65,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize,
+    meta?.count && meta.count / (page + 1) > pageSize
   );
 
   if (error || gratuityError) {
@@ -93,9 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const gratuityReportData = data.map((employee: EmployeeReportDataType) => {
     const gratuityEligibleYears: number = gratuityData?.eligibility_years ?? 5;
-    const joining_date = new Date(
-      employee?.employee_project_assignment?.start_date ?? "",
-    );
+    const joining_date = new Date(employee?.work_details?.start_date ?? "");
     const totalDays = gratuityEligibleYears * 365.25;
 
     const employeeWorkingYears = defaultYear - joining_date.getFullYear();
@@ -113,7 +111,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ...presentDaysInYears,
       is_eligible_for_gratuity: employeeWorkingYears >= gratuityEligibleYears,
       employee_eligible_date: new Date(
-        joining_date.setDate(joining_date.getDate() + totalDays),
+        joining_date.setDate(joining_date.getDate() + totalDays)
       ),
     };
   });

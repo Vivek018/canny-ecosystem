@@ -27,10 +27,7 @@ export type LeavesDataType = Pick<
     EmployeeDatabaseRow,
     "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
-    employee_project_assignment: Pick<
-      EmployeeProjectAssignmentDatabaseRow,
-      "employee_id"
-    > & {
+    work_details: Pick<EmployeeProjectAssignmentDatabaseRow, "employee_id"> & {
       sites: {
         id: SiteDatabaseRow["id"];
         name: SiteDatabaseRow["name"];
@@ -92,13 +89,13 @@ export async function getLeavesByEmployeeId({
         ${columns.join(",")},
         employees!inner(
           id, company_id, first_name, middle_name, last_name, employee_code,
-          employee_project_assignment!employee_project_assignments_employee_id_fkey!left(
+          work_details!work_details_employee_id_fkey!left(
             sites!left(id, name, projects!left(id, name))
           )
         ),
         users!${users ? "inner" : "left"}(id, email)
       `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employee_id", employeeId);
 
@@ -118,11 +115,11 @@ export async function getLeavesByEmployeeId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(date_end)},end_date.gte.${formatUTCDate(
-          date_start,
+          date_start
         )}),` +
           `and(start_date.gte.${formatUTCDate(
-            date_start,
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
+            date_start
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
 
@@ -224,7 +221,7 @@ export async function getLeavesByCompanyId({
         ${columns.join(",")},
         employees!inner(
           id, company_id, first_name, middle_name, last_name, employee_code,
-          employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          work_details!work_details_employee_id_fkey!${
             foreignFilters ? "inner" : "left"
           }(
             sites!${foreignFilters ? "inner" : "left"}(
@@ -235,7 +232,7 @@ export async function getLeavesByCompanyId({
         ),
         users!${users ? "inner" : "left"}(id,email)
       `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employees.company_id", companyId);
 
@@ -255,11 +252,11 @@ export async function getLeavesByCompanyId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(date_end)},end_date.gte.${formatUTCDate(
-          date_start,
+          date_start
         )}),` +
           `and(start_date.gte.${formatUTCDate(
-            date_start,
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
+            date_start
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
 
@@ -278,10 +275,7 @@ export async function getLeavesByCompanyId({
     }
 
     if (project) {
-      query.eq(
-        "employees.employee_project_assignment.sites.projects.name",
-        project,
-      );
+      query.eq("employees.work_details.sites.projects.name", project);
     }
 
     if (year) {
@@ -291,7 +285,7 @@ export async function getLeavesByCompanyId({
     }
 
     if (site) {
-      query.eq("employees.employee_project_assignment.sites.name", site);
+      query.eq("employees.work_details.sites.name", site);
     }
 
     if (users) {
@@ -314,15 +308,6 @@ export async function getLeavesByCompanyId({
           return leave.employees?.first_name || "";
         case "employee_code":
           return leave.employees?.employee_code || "";
-        case "site":
-          return (
-            leave.employees?.employee_project_assignment?.sites?.name || ""
-          );
-        case "project":
-          return (
-            leave.employees?.employee_project_assignment?.sites?.projects
-              ?.name || ""
-          );
         case "email":
           return leave.users?.email || "";
         default:
@@ -331,8 +316,8 @@ export async function getLeavesByCompanyId({
     };
 
     if (
-      ["employee_name", "employee_code", "site", "project", "email"].includes(
-        column,
+      ["employee_name", "employee_code","email"].includes(
+        column
       )
     ) {
       data.sort((a: any, b: any) => {
@@ -372,7 +357,7 @@ export async function getLeaveTypeByCompanyId({
     .select(
       `
         ${columns.join(",")}
-      `,
+      `
     )
     .eq("company_id", companyId)
     .order("created_at", { ascending: true })

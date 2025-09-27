@@ -2,7 +2,7 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
+import { deleteEmployeeWorkDetails } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -22,50 +22,38 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(user?.role!, `${deleteRole}:${attribute.employeeSkills}`)
-  ) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.employees}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-
-  const skillId = params.skillId;
-  const employeeId = params.employeeId;
-
+  const workDetailsId = params.workDetailsId ?? "";
   try {
-    const { status, error } = await deleteEmployeeSkill({
+    const { status, error } = await deleteEmployeeWorkDetails({
       supabase,
-      id: skillId ?? "",
+      id: workDetailsId ?? "",
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Employee skill deleted successfully",
+        message: "Work Detail deleted successfully",
         error: null,
-        employeeId,
       });
     }
 
     return json(
-      {
-        status: "error",
-        message: "Failed to delete employee skill",
-        error,
-        employeeId,
-      },
-      { status: 500 },
+      { status: "error", message: "Failed to delete Work Detail", error },
+      { status: 500 }
     );
   } catch (error) {
     return json({
       status: "error",
       message: "An unexpected error occurred",
       error,
-      employeeId,
     });
   }
 }
 
-export default function DeleteEmployeeSkill() {
+export default function DeleteWorkDetails() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -75,22 +63,24 @@ export default function DeleteEmployeeSkill() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({
           title: "Success",
-          description: actionData?.message || "Employee skill deleted",
+          description: actionData?.message || "Work Detail deleted",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Employee skill delete failed",
+            actionData?.error?.message ||
+            actionData?.error ||
+            "Work Detail delete failed",
           variant: "destructive",
         });
       }
-      navigate(`/employees/${actionData?.employeeId}/work-portfolio`);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
   }, [actionData]);
 

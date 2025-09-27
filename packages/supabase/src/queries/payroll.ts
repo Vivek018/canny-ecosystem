@@ -15,7 +15,7 @@ import type {
 } from "../types";
 import type { DashboardFilters } from "./exits";
 import { months } from "@canny_ecosystem/utils/constant";
-import { SOFT_QUERY_LIMIT } from "../constant";
+import { SINGLE_QUERY_LIMIT, SOFT_QUERY_LIMIT } from "../constant";
 
 export type PayrollFilters = {
   date_start?: string | undefined | null;
@@ -214,15 +214,20 @@ export async function getPayrollById({
 
   return { data, error };
 }
-
 export const getSalaryEntriesByPayrollId = async ({
   supabase,
   payrollId,
+  month,
+  year,
 }: {
   supabase: TypedSupabaseClient;
   payrollId: string;
+  month: number;
+  year: number;
 }) => {
-  const { data, error } = await supabase
+  const endOfMonth = new Date(year, month, 0).toISOString().slice(0, 10);
+
+  const { data: attendanceData, error: attendanceError } = await supabase
     .from("monthly_attendance")
     .select(
       `
@@ -236,38 +241,78 @@ export const getSalaryEntriesByPayrollId = async ({
       paid_leaves,
       paid_holidays,
       casual_leaves,
-      employee:employee_id (
-        id,
-        first_name,
-        last_name,
-        employee_code
-      ),
-      salary_entries!inner (
-        id,
-        payroll_id,
-        site_id,
-        department_id,
-        invoice_id,
-        site:sites!salary_entries_site_id_fkey (id, name, projects!left(name)),
-        department:departments!salary_entries_department_id_fkey (id, name, sites!left(name)),
-        salary_field_values!inner (
-          id,
-          amount,
-          payroll_fields!inner (
-            id,
-            name,
-            type
-          )
-        )
-      )
-    `,
+      employee_id,
+      salary_entries!inner ( id, payroll_id, invoice_id, salary_field_values!inner ( id, amount, payroll_fields!inner ( id, name, type ) ) )
+    `
     )
     .eq("salary_entries.payroll_id", payrollId)
     .limit(SOFT_QUERY_LIMIT);
 
-  if (error) console.error("getSalaryEntriesByPayrollId Error", error);
+  if (attendanceError) return { data: null, error: attendanceError };
 
-  return { data, error };
+  const employeeIds = attendanceData.map((a) => a.employee_id);
+
+  const { data: employees, error: employeeError } = await supabase
+    .from("employees")
+    .select(
+      `
+      id,
+      first_name,
+      last_name,
+      employee_code
+    `
+    )
+    .in("id", employeeIds);
+
+  if (employeeError) return { data: null, error: employeeError };
+
+  const workDetailsMap: Record<string, any> = {};
+  for (const empId of employeeIds) {
+    const { data: wd, error: wdError } = await supabase
+      .from("work_details")
+      .select(
+        `
+        id,
+        employee_id,
+        site_id,
+        department_id,
+        start_date,
+        end_date,
+        site:sites (
+          id,
+          name,
+          projects!left(name)
+        ),
+        department:departments (
+          id,
+          name,
+          sites!left(name)
+        )
+      `
+      )
+      .eq("employee_id", empId)
+      .lte("start_date", endOfMonth)
+      .order("start_date", { ascending: false })
+      .limit(SINGLE_QUERY_LIMIT)
+      .maybeSingle();
+
+    if (wdError) return { data: null, error: wdError };
+    workDetailsMap[empId] = wd || null;
+  }
+
+  const mergedData = attendanceData.map((att) => {
+    const employee = employees.find((e) => e.id === att.employee_id);
+    const workDetail = workDetailsMap[att.employee_id];
+    return {
+      ...att,
+      employee: {
+        ...employee,
+        work_details: workDetail,
+      },
+    };
+  });
+
+  return { data: mergedData, error: null };
 };
 
 export const getSalaryEntriesByPayrollAndEmployeeId = async ({
@@ -300,10 +345,6 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
       salary_entries!inner (
         id,
         payroll_id,
-        site_id,
-        department_id,
-        site:sites!salary_entries_site_id_fkey (name, projects!left(name),company_locations!left(name,address_line_1,address_line_2,city,state,pincode)),
-        department:departments!salary_entries_department_id_fkey (name, sites!left(name)),
         salary_field_values!inner (
           id,
           amount,
@@ -314,7 +355,7 @@ export const getSalaryEntriesByPayrollAndEmployeeId = async ({
           )
         )
       )
-    `,
+    `
     )
     .eq("employee_id", employeeId)
     .eq("salary_entries.payroll_id", payrollId)
@@ -378,7 +419,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   if (currentMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      currentMonthError,
+      currentMonthError
     );
 
   const { data: previousMonth, error: previousMonthError } = await supabase
@@ -394,7 +435,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   if (previousMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      previousMonthError,
+      previousMonthError
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
@@ -417,7 +458,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   const filterYear = filters?.year ? Number(filters.year) : defaultYear;
 
   const startOfYear = new Date(
-    Date.UTC(Number(filterYear) - 1, filterMonth, 1),
+    Date.UTC(Number(filterYear) - 1, filterMonth, 1)
   );
 
   const endOfYear = new Date(Number(filterYear), filterMonth, 1);
@@ -433,7 +474,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     .eq("company_id", companyId)
     .in("status", ["approved"])
     .or(
-      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`,
+      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`
     )
 
     .order("run_date", { ascending: true })
@@ -479,7 +520,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   for (const item of payrollData) {
     const monthName = new Date(item.year!, item.month! - 1).toLocaleString(
       "default",
-      { month: "short" },
+      { month: "short" }
     );
     const key = `${monthName} ${item.year}`;
 
@@ -492,7 +533,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     ([month, data]) => ({
       month,
       data,
-    }),
+    })
   );
 
   for (const item of restData) {
@@ -519,11 +560,17 @@ export async function getApprovedPayrollsByCompanyIdByYears({
 export async function getSalaryEntriesForSalaryRegisterAndAll({
   supabase,
   payrollId,
+  month,
+  year,
 }: {
   supabase: TypedSupabaseClient;
   payrollId: string;
+  month: number;
+  year: number;
 }) {
-  const { data, error } = await supabase
+  const endOfMonth = new Date(year, month, 0).toISOString().slice(0, 10);
+
+  const { data: attendanceData, error: attendanceError } = await supabase
     .from("monthly_attendance")
     .select(
       `
@@ -538,35 +585,8 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
       paid_leaves,
       casual_leaves,
       absent_days,
-      employee:employee_id (
-        id,
-        company_id,
-        first_name,
-        middle_name,
-        last_name,
-        employee_code,
-        employee_project_assignment!left (
-          position,
-          start_date,
-          sites(name, projects(name),company_locations!left(name,address_line_1,address_line_2,city,state,pincode))
-        ),
-        employee_statutory_details!left (
-          aadhaar_number,
-          pan_number,
-          uan_number,
-          pf_number,
-          esic_number
-        ),
-        employee_bank_details!left (
-          account_number,
-          bank_name
-        )
-      ),
+      employee_id,
       salary_entries!inner (
-        site_id,
-        department_id,
-        site:sites!salary_entries_site_id_fkey!left (name, projects!left(name),company_locations!left(name,address_line_1,address_line_2,city,state,pincode)),
-        department:departments!salary_entries_department_id_fkey!left (name, sites!left(name)),
         salary_field_values!inner (
           amount,
           payroll_fields!inner (
@@ -575,15 +595,89 @@ export async function getSalaryEntriesForSalaryRegisterAndAll({
           )
         )
       )
-    `,
+    `
     )
-    .eq("salary_entries.payroll_id", payrollId);
+    .eq("salary_entries.payroll_id", payrollId)
+    .limit(SOFT_QUERY_LIMIT);
+  if (attendanceError) return { data: null, error: attendanceError };
 
-  if (error) {
-    console.error("getSalaryEntriesForSalaryRegisterAndAll Error", error);
+  const employeeIds = attendanceData.map((a) => a.employee_id);
+
+  const { data: employees, error: employeeError } = await supabase
+    .from("employees")
+    .select(
+      `
+      id,
+      company_id,
+      first_name,
+      middle_name,
+      last_name,
+      employee_code,
+      employee_statutory_details!left (
+        aadhaar_number,
+        pan_number,
+        uan_number,
+        pf_number,
+        esic_number
+      ),
+      employee_bank_details!left (
+        account_number,
+        bank_name
+      )
+    `
+    )
+    .in("id", employeeIds);
+
+  if (employeeError) return { data: null, error: employeeError };
+
+  const workDetailsMap: Record<string, any> = {};
+  for (const empId of employeeIds) {
+    const { data: wd, error: wdError } = await supabase
+      .from("work_details")
+      .select(
+        `
+        id,
+        employee_id,
+        employee_code,
+        position,
+        site_id,
+        department_id,
+        start_date,
+        end_date,
+        site:sites (
+          id,
+          name,
+          projects!left(name),company_locations!left(name,address_line_1,address_line_2,city,state,pincode)
+        ),
+        department:departments (
+          id,
+          name,
+          sites!left(name)
+        )
+      `
+      )
+      .eq("employee_id", empId)
+      .lte("start_date", endOfMonth)
+      .order("start_date", { ascending: false })
+      .limit(SINGLE_QUERY_LIMIT)
+      .maybeSingle();
+
+    if (wdError) return { data: null, error: wdError };
+    workDetailsMap[empId] = wd || null;
   }
 
-  return { data, error: null };
+  const mergedData = attendanceData.map((att) => {
+    const employee = employees.find((e) => e.id === att.employee_id);
+    const workDetail = workDetailsMap[att.employee_id];
+    return {
+      ...att,
+      employee: {
+        ...employee,
+        work_details: workDetail,
+      },
+    };
+  });
+  return { data: mergedData, error: null };
 }
 
 export async function getSalaryEntriesByEmployeeId({
@@ -617,8 +711,6 @@ export async function getSalaryEntriesByEmployeeId({
       salary_entries!inner (
         id,
         payroll_id,
-        site_id,
-        department_id,
         salary_field_values!inner (
           id,
           amount,
@@ -629,7 +721,7 @@ export async function getSalaryEntriesByEmployeeId({
           )
         )
       )
-    `,
+    `
     )
     .eq("employee_id", employeeId)
     .eq("year", filterYear)
@@ -722,7 +814,9 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
         middle_name,
         last_name,
         employee_code,
-        employee_project_assignment!left (
+        work_details!left (
+          employee_code,
+          end_date,
           position,
           start_date
         ),
@@ -739,8 +833,6 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
         )
       ),
       salary_entries!inner (
-        site_id,
-        department_id,
         salary_field_values!inner (
           amount,
           payroll_fields!inner (
@@ -749,7 +841,7 @@ export async function getSalaryEntriesForInvoiceByInvoiceId({
           )
         )
       )
-    `,
+    `
     )
     .eq("salary_entries.invoice_id", invoiceId);
 
@@ -780,7 +872,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
       absent_days,
       salary_entries!inner (
         id)       
-    `,
+    `
     )
     .eq("salary_entries.payroll_id", payrollId);
 
@@ -789,7 +881,7 @@ export const getSalaryEntriesByPayrollIdForAddingSalaryEntry = async ({
   if (error)
     console.error(
       "getSalaryEntriesByPayrollIdForAddingSalaryEntry Error",
-      error,
+      error
     );
 
   return { data, error };
@@ -832,7 +924,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIds({
     .from("payroll")
     .select(columns.join(","), { count: "exact" })
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
     )
     .order("created_at", { ascending: false })
     .in("status", ["approved"]);
@@ -896,7 +988,7 @@ export async function getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
     .from("payroll")
     .select(columns.join(","))
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
     )
     .in("status", ["approved"])
     .eq("month", monthFilter)
@@ -907,14 +999,14 @@ export async function getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
   if (currentMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      currentMonthError,
+      currentMonthError
     );
 
   const { data: previousMonth, error: previousMonthError } = await supabase
     .from("payroll")
     .select(columns.join(","))
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
     )
     .in("status", ["approved"])
     .eq("month", monthFilter - 1)
@@ -925,7 +1017,7 @@ export async function getApprovedPayrollsAmountsBySiteIdsAndProjectIdsByMonths({
   if (previousMonthError)
     console.error(
       "getApprovedPayrollsByCompanyIdByMonths Error",
-      previousMonthError,
+      previousMonthError
     );
 
   return { currentMonth, currentMonthError, previousMonth, previousMonthError };
@@ -952,7 +1044,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
   const filterYear = filters?.year ? Number(filters.year) : defaultYear;
 
   const startOfYear = new Date(
-    Date.UTC(Number(filterYear) - 1, filterMonth, 1),
+    Date.UTC(Number(filterYear) - 1, filterMonth, 1)
   );
 
   const endOfYear = new Date(Number(filterYear), filterMonth, 1);
@@ -966,11 +1058,11 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
     .from("payroll")
     .select(payrollColumns.join(","))
     .or(
-      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`,
+      `project_id.in.(${projectIds.join(",")}),site_id.in.(${siteIds.join(",")})`
     )
     .in("status", ["approved"])
     .or(
-      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`,
+      `and(year.eq.${startYear},month.gte.${startMonth}),and(year.eq.${endYear},month.lte.${endMonth})`
     )
 
     .order("run_date", { ascending: true })
@@ -1016,7 +1108,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
   for (const item of payrollData) {
     const monthName = new Date(item.year!, item.month! - 1).toLocaleString(
       "default",
-      { month: "short" },
+      { month: "short" }
     );
     const key = `${monthName} ${item.year}`;
 
@@ -1029,7 +1121,7 @@ export async function getApprovedPayrollsBySiteIdsAndProjectIdsByYears({
     ([month, data]) => ({
       month,
       data,
-    }),
+    })
   );
 
   for (const item of restData) {

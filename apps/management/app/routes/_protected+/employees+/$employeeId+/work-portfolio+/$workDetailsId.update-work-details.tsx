@@ -6,22 +6,29 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
-  createRole,
-  EmployeeProjectAssignmentSchema,
-  getInitialValueFromZod,
+  EmployeeWorkDetailsSchema,
   hasPermission,
   isGoodStatus,
+  updateRole,
 } from "@canny_ecosystem/utils";
-import { getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
-import { createEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
+import {
+  getDepartmentsByCompanyId,
+  getEmployeeWorkDetailsById,
+  getSiteNamesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
+import {
+  updateEmployee,
+  updateEmployeeWorkDetails,
+} from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { CreateEmployeeProjectAssignment } from "@/components/employees/form/create-employee-project-assignment";
+import { CreateEmployeeWorkDetails } from "@/components/employees/form/create-employee-work-details";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -30,27 +37,55 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 
-export const ADD_EMPLOYEE_PROJECT_ASSIGNMENT =
-  "add-employee-project-assignment";
+export const UPDATE_EMPLOYEE_WORK_DETAILS = "update-employee-work-details";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
+  const workDetailsId = params.workDetailsId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
     !hasPermission(
-      `${user?.role!}`,
-      `${createRole}:${attribute.employeeProjectAssignment}`,
+      user?.role!,
+      `${updateRole}:${attribute.employeeWorkDetails}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
   try {
+    let workDetailsData = null;
+
+    if (workDetailsId) {
+      workDetailsData = await getEmployeeWorkDetailsById({
+        supabase,
+        id: workDetailsId,
+      });
+    }
+
+    if (workDetailsData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to get employee work details",
+        data: null,
+        siteOptions: null,
+        departmentOptions: null,
+        error: workDetailsData.error,
+      });
+    }
+
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+    const { data: departments } = await getDepartmentsByCompanyId({
+      supabase,
+      companyId,
+    });
+    const departmentOptions = departments?.map((department) => ({
+      label: department?.name,
+      value: department?.id,
+    }));
+
     const { data: sites } = await getSiteNamesByCompanyId({
       supabase,
       companyId,
@@ -64,17 +99,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     return json({
       status: "success",
-      employeeId,
+      message: "Employee work details found",
+      data: workDetailsData?.data,
       siteOptions,
-      message: "Employee Project Assignment Form Loaded",
+      departmentOptions,
       error: null,
     });
   } catch (error) {
     return json({
       status: "error",
-      employeeId,
-      siteOptions: null,
       message: "An unexpected error occurred",
+      data: null,
+      departmentOptions: null,
+      siteOptions: null,
       error,
     });
   }
@@ -90,34 +127,41 @@ export async function action({
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: EmployeeProjectAssignmentSchema,
+      schema: EmployeeWorkDetailsSchema,
     });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
-
-    const { status, error } = await createEmployeeProjectAssignment({
+    const { update_main_employee_code, ...rest } = submission.value;
+    const { status, error } = await updateEmployeeWorkDetails({
       supabase,
-      data: {
-        ...submission.value,
-        employee_id: submission.value.employee_id ?? employeeId ?? "",
-      },
+      data: rest,
     });
-
+    if (isGoodStatus(status) && update_main_employee_code) {
+      await updateEmployee({
+        data: { id: employeeId, employee_code: submission.value.employee_code },
+        supabase,
+      });
+      return json({
+        status: "success",
+        message: "Employee work details updated successfully",
+        error: null,
+      });
+    }
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Employee project assignment created successfully",
+        message: "Employee work details updated successfully",
         error: null,
       });
     }
     return json({
       status: "error",
-      message: "Failed to create employee project assignment",
+      message: "Failed to update employee work details",
       error,
     });
   } catch (error) {
@@ -129,27 +173,26 @@ export async function action({
   }
 }
 
-export default function CreateEmployeeProjectAssignmentRoute() {
-  const { employeeId, siteOptions, status, error } =
+export default function UpdateEmployeeWorkDetails() {
+  const { data, siteOptions, status, error, departmentOptions } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
-  const currentSchema = EmployeeProjectAssignmentSchema;
-
-  const initialValues = getInitialValueFromZod(currentSchema);
+  const currentSchema = EmployeeWorkDetailsSchema;
 
   const [form, fields] = useForm({
-    id: ADD_EMPLOYEE_PROJECT_ASSIGNMENT,
+    id: UPDATE_EMPLOYEE_WORK_DETAILS,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: { ...initialValues, employee_id: employeeId },
+    defaultValue: data,
   });
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (status === "error") {
@@ -162,13 +205,13 @@ export default function CreateEmployeeProjectAssignmentRoute() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
+        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({
           title: "Success",
-          description:
-            actionData?.message || "Employee project assignment created",
+          description: actionData?.message || "Employee updated",
           variant: "success",
         });
       } else {
@@ -176,11 +219,12 @@ export default function CreateEmployeeProjectAssignmentRoute() {
           title: "Error",
           description:
             actionData?.error?.message ||
-            "Creating employee project assignmment failed",
+            actionData?.error ||
+            "Employee update failed",
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/work-portfolio`);
+      navigate(`/employees/${data?.employee_id}/work-portfolio`);
     }
   }, [actionData]);
 
@@ -194,10 +238,12 @@ export default function CreateEmployeeProjectAssignmentRoute() {
           className="flex flex-col"
         >
           <Card>
-            <CreateEmployeeProjectAssignment
+            <CreateEmployeeWorkDetails
               key={resetKey}
               fields={fields as any}
+              isUpdate={true}
               siteOptions={siteOptions}
+              departmentOptions={departmentOptions}
             />
             <FormButtons
               form={form}

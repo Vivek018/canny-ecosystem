@@ -13,7 +13,7 @@ export const useSalaryData = (data: any[]) => {
     const deptMap = new Map<string, ComboboxSelectOption>();
 
     for (const entry of data) {
-      const salaryEntry = entry.salary_entries;
+      const salaryEntry = entry.employee.work_details;
       if (!salaryEntry) continue;
 
       // Process site options
@@ -58,8 +58,8 @@ export const useSalaryData = (data: any[]) => {
 
     if (hasSiteFilter || hasDeptFilter) {
       result = result.filter((item) => {
-        const siteId = String(item.salary_entries?.site_id || "");
-        const deptId = String(item.salary_entries?.department_id || "");
+        const siteId = String(item.employee?.work_details?.site_id || "");
+        const deptId = String(item.employee?.work_details?.department_id || "");
 
         const matchesSite = !hasSiteFilter || selectedSiteIds.includes(siteId);
         const matchesDept = !hasDeptFilter || selectedDeptIds.includes(deptId);
@@ -83,13 +83,13 @@ export const useSalaryData = (data: any[]) => {
       const deptIds = departmentOptions.map((opt) => opt.value);
 
       setSelectedSiteIds(
-        newSelectedFields.filter((id) => siteIds.includes(id)),
+        newSelectedFields.filter((id) => siteIds.includes(id))
       );
       setSelectedDeptIds(
-        newSelectedFields.filter((id) => deptIds.includes(id)),
+        newSelectedFields.filter((id) => deptIds.includes(id))
       );
     },
-    [siteOptions, departmentOptions],
+    [siteOptions, departmentOptions]
   );
 
   return {

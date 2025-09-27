@@ -14,7 +14,6 @@ export async function getPayeeById({
 }) {
   const columns = [
     "id",
-    "payee_code",
     "company_id",
     "name",
     "type",
@@ -52,7 +51,6 @@ export async function getPayeesByCompanyId({
   const columns = [
     "id",
     "company_id",
-    "payee_code",
     "name",
     "type",
     "fixed_amount",
@@ -81,23 +79,23 @@ export async function getPayeesByCompanyId({
   return { data, error };
 }
 
-export async function getPayeeIdsByPayeeCodes({
+export async function getPayeeIdsByPayeeNames({
   supabase,
-  payeeCodes,
+  payeeNames,
 }: {
   supabase: TypedSupabaseClient;
-  payeeCodes: string[];
+  payeeNames: string[];
 }) {
-  const columns = ["payee_code", "id"] as const;
+  const columns = ["id"] as const;
 
   const { data, error } = await supabase
     .from("payee")
     .select(columns.join(","))
-    .in("payee_code", payeeCodes)
+    .in("name", payeeNames)
     .returns<InferredType<PayeeDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error("getPayeeIdsByPayeeCodes Error", error);
+    console.error("getPayeeIdsByPayeeNames Error", error);
     return { data: [], missing: [], error };
   }
 

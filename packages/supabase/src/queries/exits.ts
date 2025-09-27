@@ -86,7 +86,7 @@ export type ExitDataType = Pick<
     EmployeeDatabaseRow,
     "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
-    employee_project_assignment: {
+    work_details: {
       sites: { name: string; projects: { name: string } };
     };
   };
@@ -143,7 +143,7 @@ export const getExitsByCompanyId = async ({
       `${columns.join(",")},
         employees!inner(
           first_name, middle_name, last_name, employee_code,
-          employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          work_details!work_details_employee_id_fkey!${
             foreignFilters ? "inner" : "left"
           }(
             sites!${foreignFilters ? "inner" : "left"}(
@@ -152,7 +152,7 @@ export const getExitsByCompanyId = async ({
             )
           )
         )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employees.company_id", companyId);
 
@@ -187,7 +187,7 @@ export const getExitsByCompanyId = async ({
           `first_name.ilike.*${element}*,middle_name.ilike.*${element}*,last_name.ilike.*${element}*,employee_code.ilike.*${element}*`,
           {
             referencedTable: "employees",
-          },
+          }
         );
       }
     } else {
@@ -195,7 +195,7 @@ export const getExitsByCompanyId = async ({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        },
+        }
       );
     }
   }
@@ -231,13 +231,10 @@ export const getExitsByCompanyId = async ({
   }
 
   if (project) {
-    query.eq(
-      "employees.employee_project_assignment.sites.projects.name",
-      project,
-    );
+    query.eq("employees.work_details.sites.projects.name", project);
   }
   if (site) {
-    query.eq("employees.employee_project_assignment.sites.name", site);
+    query.eq("employees.work_details.sites.name", site);
   }
   if (in_invoice !== undefined && in_invoice !== null) {
     if (in_invoice === "true") {
@@ -364,7 +361,7 @@ export const getExitsByCompanyIdByMonths = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(employee_code)`,
+          employees!inner(employee_code)`
     )
     .eq("employees.company_id", companyId)
     .gte("created_at", startOfCurrentMonth.toISOString())
@@ -389,7 +386,7 @@ export const getExitsByCompanyIdByMonths = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(employee_code)`,
+          employees!inner(employee_code)`
     )
     .eq("employees.company_id", companyId)
     .gte("created_at", startOfPrevMonth.toISOString())
@@ -432,8 +429,8 @@ export async function getExitsEntriesForPayrollByPayrollId({
     .from("exits")
     .select(
       `${columns.join(
-        ",",
-      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`,
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
     )
     .eq("invoice_id", payrollId)
     .order("created_at", { ascending: false })
@@ -465,8 +462,8 @@ export async function getExitsEntryForPayrollById({
     .from("exits")
     .select(
       `${columns.join(
-        ",",
-      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`,
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
     )
     .eq("id", id)
     .single<ExitsPayrollEntriesWithEmployee>();
@@ -495,9 +492,12 @@ export async function getExitEntriesByPayrollIdForInvoicePreview({
   const { data, error } = await supabase
     .from("employees")
     .select(
-      `id, company_id, first_name, middle_name, last_name, employee_code, exits!inner(${columns.join(
-        ",",
-      )})`,
+      `id, company_id, first_name, middle_name, last_name, employee_code, work_details!left(
+          employee_code,
+          end_date,
+          position,
+          start_date
+        ),exits!inner(${columns.join(",")})`
     )
     .eq("exits.invoice_id", invoiceId)
     .returns<ExitsPayrollEntriesWithEmployee[]>();
@@ -574,16 +574,16 @@ export const getExitsBySiteIds = async ({
       `${columns.join(",")},
         employees!inner(
           first_name, middle_name, last_name, employee_code,
-          employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+          work_details!work_details_employee_id_fkey!inner(
             sites!inner(
               id, name, 
               projects!${project ? "inner" : "left"}(id, name)
             )
           )
         )`,
-      { count: "exact" },
+      { count: "exact" }
     )
-    .in("employees.employee_project_assignment.sites.id", siteIds);
+    .in("employees.work_details.sites.id", siteIds);
 
   const simpleSortable = [
     "payable_days",
@@ -616,7 +616,7 @@ export const getExitsBySiteIds = async ({
           `first_name.ilike.*${element}*,middle_name.ilike.*${element}*,last_name.ilike.*${element}*,employee_code.ilike.*${element}*`,
           {
             referencedTable: "employees",
-          },
+          }
         );
       }
     } else {
@@ -624,7 +624,7 @@ export const getExitsBySiteIds = async ({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        },
+        }
       );
     }
   }
@@ -660,13 +660,10 @@ export const getExitsBySiteIds = async ({
   }
 
   if (project) {
-    query.eq(
-      "employees.employee_project_assignment.sites.projects.name",
-      project,
-    );
+    query.eq("employees.work_details.sites.projects.name", project);
   }
   if (site) {
-    query.eq("employees.employee_project_assignment.sites.name", site);
+    query.eq("employees.work_details.sites.name", site);
   }
   if (in_invoice !== undefined && in_invoice !== null) {
     if (in_invoice === "true") {
@@ -712,13 +709,13 @@ export const getExitsBySiteIdsByMonthsAndSiteIds = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(employee_code,employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+          employees!inner(employee_code,work_details!work_details_employee_id_fkey!inner(
             sites!inner(
               id, name
             )
-          ))`,
+          ))`
     )
-    .in("employees.employee_project_assignment.sites.id", siteIds)
+    .in("employees.work_details.sites.id", siteIds)
     .gte("created_at", startOfCurrentMonth.toISOString())
     .lt("created_at", endOfCurrentMonth.toISOString());
 
@@ -741,13 +738,13 @@ export const getExitsBySiteIdsByMonthsAndSiteIds = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(employee_code,employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+          employees!inner(employee_code,work_details!work_details_employee_id_fkey!inner(
             sites!inner(
               id, name
             )
-          ))`,
+          ))`
     )
-    .in("employees.employee_project_assignment.sites.id", siteIds)
+    .in("employees.work_details.sites.id", siteIds)
     .gte("created_at", startOfPrevMonth.toISOString())
     .lt("created_at", endOfPrevMonth.toISOString());
 

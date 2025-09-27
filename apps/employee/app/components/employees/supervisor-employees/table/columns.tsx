@@ -97,7 +97,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.sites?.projects?.name}
+          {row.original?.work_details[0]?.sites?.projects?.name}
         </p>
       );
     },
@@ -109,7 +109,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.sites?.name}
+          {row.original?.work_details[0]?.sites?.name}
         </p>
       );
     },
@@ -121,9 +121,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="capitalize">
-          {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
-          )}
+          {replaceUnderscore(row.original?.work_details[0]?.assignment_type ?? "")}
         </p>
       );
     },
@@ -135,9 +133,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {replaceUnderscore(
-            row.original?.employee_project_assignment?.position ?? "",
-          )}
+          {replaceUnderscore(row.original?.work_details[0]?.position ?? "")}
         </p>
       );
     },
@@ -149,9 +145,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="capitalize">
-          {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
-          )}
+          {replaceUnderscore(row.original?.work_details[0]?.skill_level ?? "")}
         </p>
       );
     },
@@ -163,12 +157,8 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
-          {row.original?.employee_project_assignment?.start_date
-            ? String(
-                formatDate(
-                  row.original?.employee_project_assignment?.start_date,
-                ),
-              )
+          {row.original?.work_details[0]?.start_date
+            ? String(formatDate(row.original?.work_details[0]?.start_date))
             : ""}
         </p>
       );
@@ -181,10 +171,8 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
-          {row.original?.employee_project_assignment?.end_date
-            ? String(
-                formatDate(row.original?.employee_project_assignment?.end_date),
-              )
+          {row.original?.work_details[0]?.end_date
+            ? String(formatDate(row.original?.work_details[0]?.end_date))
             : ""}
         </p>
       );

@@ -79,7 +79,7 @@ export const UserAvatar = ({
             <>
               <AvatarImage src={avatar ?? ""} />
               <AvatarFallback className="rounded-md">
-                <span className="text-md uppercase">
+                <span className="text-base uppercase">
                   {first_name.charAt(0)}
                 </span>
               </AvatarFallback>

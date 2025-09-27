@@ -86,7 +86,7 @@ export const FilterControls = React.memo<FilterControlsProps>(
         <div
           className={cn(
             "w-full md:w-2/3 md:max-w-96",
-            !showFilters && "hidden",
+            !showFilters && "hidden"
           )}
         >
           <MultiSelectCombobox
@@ -127,5 +127,5 @@ export const FilterControls = React.memo<FilterControlsProps>(
         </div>
       </div>
     );
-  },
+  }
 );

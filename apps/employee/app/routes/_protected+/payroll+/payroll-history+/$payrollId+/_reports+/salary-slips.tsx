@@ -13,8 +13,9 @@ import { Dialog, DialogContent } from "@canny_ecosystem/ui/dialog";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  type EmployeeProjectAssignmentDataType,
+  type EmployeeWorkDetailsDataType,
   getCompanyById,
+  getPayrollById,
   getPrimaryLocationByCompanyId,
   getSalaryEntriesForSalaryRegisterAndAll,
 } from "@canny_ecosystem/supabase/queries";
@@ -32,6 +33,8 @@ import type {
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import {
+  defaultMonth,
+  defaultYear,
   formatDate,
   formatNumber,
   getMonthNameFromNumber,
@@ -126,7 +129,7 @@ type DataType = {
     };
     bankDetails: { bank: string; account_number: number };
     employeeData: EmployeeDatabaseRow;
-    employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
+    employeeProjectAssignmentData: EmployeeWorkDetailsDataType;
     employeeStatutoryDetails: EmployeeStatutoryDetailsDatabaseRow;
     earnings: { name: string; amount: number }[];
     deductions: { name: string; amount: number }[];
@@ -135,18 +138,28 @@ type DataType = {
 
 function chunkArray(array: any, size: number) {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size),
+    array.slice(i * size, i * size + size)
   );
 }
 
 const SalarySlipsPDF = ({ data }: { data: DataType }) => {
   const employeeChunks = chunkArray(data.employeeData, 2);
 
+  const hasAddress = (addr: any) =>
+    addr &&
+    (addr.address_line_1 ||
+      addr.address_line_2 ||
+      addr.city ||
+      addr.state ||
+      addr.pincode);
+
   const getFullAddress = (emp: any) => {
+    const { employeeProjectAssignmentData } = emp || {};
+
     const address =
-      emp?.employeeProjectAssignmentData?.salary_location ||
-      emp?.employeeProjectAssignmentData?.project_assignment_location ||
-      data?.companyData;
+      (hasAddress(employeeProjectAssignmentData?.project_assignment_location)
+        ? employeeProjectAssignmentData?.project_assignment_location
+        : null) || (hasAddress(data?.companyData) ? data?.companyData : null);
 
     if (!address) return null;
 
@@ -162,13 +175,16 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
           {chunk.map((emp: any, i: number) => {
             const earningsTotal = emp.earnings.reduce(
               (acc: number, e: any) => acc + e.amount,
-              0,
+              0
             );
             const deductionTotal = emp.deductions.reduce(
               (acc: number, d: any) => acc + d.amount,
-              0,
+              0
             );
             const netAmount = earningsTotal - deductionTotal;
+
+            const site = emp?.employeeProjectAssignmentData?.site;
+            const department = emp?.employeeProjectAssignmentData?.department;
 
             return (
               <View key={i.toString()} wrap={false}>
@@ -268,12 +284,12 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                       ]}
                     >
                       {replaceUnderscore(
-                        emp.employeeProjectAssignmentData.position,
+                        emp.employeeProjectAssignmentData.position
                       )}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>ESI No.</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
-                      {emp.employeeStatutoryDetails.esic_number || "-"}
+                      {emp.employeeStatutoryDetails.esic_number}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -284,8 +300,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         { flex: 2, textTransform: "capitalize" },
                       ]}
                     >
-                      {emp?.employeeProjectAssignmentData?.salary_entry_site ??
-                        emp?.employeeProjectAssignmentData?.site}
+                      {emp?.employeeProjectAssignmentData?.location}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>Bank</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
@@ -300,15 +315,13 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         { flex: 2, textTransform: "capitalize" },
                       ]}
                     >
-                      {emp?.employeeProjectAssignmentData
-                        ?.salary_entry_department ??
-                        emp?.employeeProjectAssignmentData
-                          ?.salary_entry_site_project ??
-                        emp?.employeeProjectAssignmentData?.project}
+                      {site && department
+                        ? `${site} - ${department}`
+                        : emp?.employeeProjectAssignmentData?.project}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>PAN No.</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
-                      {emp?.employeeStatutoryDetails?.pan_number ?? "-"}
+                      {emp?.employeeStatutoryDetails?.pan_number}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -321,13 +334,13 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp?.employeeProjectAssignmentData?.start_date,
+                          emp?.employeeProjectAssignmentData?.start_date
                         )}
                       </>
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>A/c No.</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
-                      {emp?.bankDetails?.account_number ?? "-"}
+                      {emp?.bankDetails?.account_number}
                     </Text>
                   </View>
                   <View style={[styles.row]}>
@@ -356,7 +369,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                   {Array.from({
                     length: Math.max(
                       emp.earnings.length,
-                      emp.deductions.length,
+                      emp.deductions.length
                     ),
                   }).map((_, idx) => (
                     <View style={styles.row} key={idx.toString()}>
@@ -448,6 +461,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
+  const { data: payroll } = await getPayrollById({ payrollId, supabase });
+
   const { data: employeeCompanyData } = await getCompanyById({
     supabase,
     id: companyId,
@@ -459,6 +474,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     await getSalaryEntriesForSalaryRegisterAndAll({
       supabase,
       payrollId,
+      month: payroll?.month ?? defaultMonth,
+      year: payroll?.year ?? defaultYear,
     });
 
   return {
@@ -508,6 +525,7 @@ export default function SalarySlips() {
       const deductionFields = new Map<string, true>();
       const earningsMap: Record<string, number> = {};
       const deductionsMap: Record<string, number> = {};
+
       for (const entry of emp.salary_entries.salary_field_values) {
         const name = entry?.payroll_fields?.name;
         const type = entry?.payroll_fields?.type ?? "earning";
@@ -522,23 +540,29 @@ export default function SalarySlips() {
       }
 
       const orderedEarnings = preferredEarningOrder.filter((f) =>
-        earningFields.has(f),
+        earningFields.has(f)
       );
       const remainingEarnings = [...earningFields.keys()].filter(
-        (f) => !preferredEarningOrder.includes(f),
+        (f) => !preferredEarningOrder.includes(f)
       );
       const orderedDeductions = preferredDeductionOrder.filter((f) =>
-        deductionFields.has(f),
+        deductionFields.has(f)
       );
       const remainingDeductions = [...deductionFields.keys()].filter(
-        (f) => !preferredDeductionOrder.includes(f),
+        (f) => !preferredDeductionOrder.includes(f)
       );
 
       const earnings = [...orderedEarnings, ...remainingEarnings].map(
-        (name) => ({ name, amount: earningsMap[name] }),
+        (name) => ({
+          name,
+          amount: earningsMap[name],
+        })
       );
       const deductions = [...orderedDeductions, ...remainingDeductions].map(
-        (name) => ({ name, amount: deductionsMap[name] }),
+        (name) => ({
+          name,
+          amount: deductionsMap[name],
+        })
       );
 
       return {
@@ -546,44 +570,27 @@ export default function SalarySlips() {
           first_name: emp?.employee?.first_name,
           middle_name: emp?.employee?.middle_name,
           last_name: emp?.employee?.last_name,
-          employee_code: emp?.employee?.employee_code,
+          employee_code: emp?.employee?.work_details?.employee_code,
         },
         employeeProjectAssignmentData: {
-          position: emp?.employee?.employee_project_assignment?.position || "",
-          start_date:
-            emp.employee?.employee_project_assignment?.start_date || "",
-          site: emp?.employee?.employee_project_assignment?.sites?.name || "",
-          project:
-            emp?.employee?.employee_project_assignment?.sites?.projects?.name ||
-            "",
-          salary_entry_site: emp?.salary_entries?.site?.name,
-          salary_entry_department: emp?.salary_entries?.department?.name,
-          salary_entry_site_project: emp?.salary_entries?.site?.projects?.name,
-
-          salary_location: {
-            address_line_1:
-              emp?.salary_entries?.site?.company_locations?.address_line_1,
-            address_line_2:
-              emp?.salary_entries?.site?.company_locations?.address_line_2,
-            city: emp?.salary_entries?.site?.company_locations?.city,
-            state: emp?.salary_entries?.site?.company_locations?.state,
-            pincode: emp?.salary_entries?.site?.company_locations?.pincode,
-          },
+          position: emp?.employee?.work_details?.position || "",
+          start_date: emp?.employee?.work_details?.start_date || "",
+          site: emp?.employee?.work_details?.site?.name || "",
+          location:
+            emp?.employee?.work_details?.site?.company_locations?.name || "",
+          project: emp?.employee?.work_details?.site?.projects?.name || "",
+          department: emp?.employee?.work_details?.department?.name || "",
           project_assignment_location: {
             address_line_1:
-              emp?.employee?.employee_project_assignment?.sites
-                ?.company_locations?.address_line_1,
+              emp?.employee?.work_details?.sites?.company_locations
+                ?.address_line_1,
             address_line_2:
-              emp?.employee?.employee_project_assignment?.sites
-                ?.company_locations?.address_line_2,
-            city: emp?.employee?.employee_project_assignment?.sites
-              ?.company_locations?.city,
-            state:
-              emp?.employee?.employee_project_assignment?.sites
-                ?.company_locations?.state,
+              emp?.employee?.work_details?.sites?.company_locations
+                ?.address_line_2,
+            city: emp?.employee?.work_details?.sites?.company_locations?.city,
+            state: emp?.employee?.work_details?.sites?.company_locations?.state,
             pincode:
-              emp?.employee?.employee_project_assignment?.sites
-                ?.company_locations?.pincode,
+              emp?.employee?.work_details?.sites?.company_locations?.pincode,
           },
         },
         employeeStatutoryDetails: {

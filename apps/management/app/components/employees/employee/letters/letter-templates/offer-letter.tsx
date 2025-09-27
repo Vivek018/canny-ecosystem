@@ -27,18 +27,17 @@ export function OfferLetter({
     } ${data?.employees?.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
-      data?.employees.employee_project_assignment?.start_date ?? "",
+      data?.employees.work_details?.start_date ?? ""
     ).toLocaleDateString("en-IN"),
 
     employeeLeavingDate: new Date(
-      data?.employees.employee_project_assignment?.end_date ?? "",
+      data?.employees.work_details?.end_date ?? ""
     ).toLocaleDateString("en-IN"),
-    employeePosition:
-      data?.employees.employee_project_assignment?.position ?? "",
+    employeePosition: data?.employees.work_details?.position ?? "",
     companyName: companyData?.data?.name ?? "",
     compantAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",
-    siteName: data?.employees.employee_project_assignment?.sites?.name ?? "",
+    siteName: data?.employees.work_details[0]?.sites?.name ?? "",
   };
 
   return (

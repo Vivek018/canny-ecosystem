@@ -16,7 +16,6 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 
 export type PayeeType = {
   id: PayeeDatabaseRow["id"] | string;
-  payee_code: PayeeDatabaseRow["payee_code"] | string;
   name: PayeeDatabaseRow["name"] | string;
   bank_name: PayeeDatabaseRow["bank_name"] | string;
   account_holder_name: PayeeDatabaseRow["account_holder_name"] | string;
@@ -31,13 +30,6 @@ export type PayeeType = {
 };
 
 export const columns: ColumnDef<PayeeType>[] = [
-  {
-    accessorKey: "payee_code",
-    header: "Payee Code",
-    cell: ({ row }) => {
-      return <p className="truncate w-28">{`${row.original?.payee_code}`}</p>;
-    },
-  },
   {
     accessorKey: "name",
     header: "Name",
@@ -145,13 +137,13 @@ export const columns: ColumnDef<PayeeType>[] = [
                   "h-8 w-8 p-0",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingPayee}`,
+                    `${updateRole}:${attribute.settingPayee}`
                   ) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.settingPayee}`,
+                      `${deleteRole}:${attribute.settingPayee}`
                     ) &&
-                    "hidden",
+                    "hidden"
                 )}
               >
                 <span className="sr-only">Open menu</span>

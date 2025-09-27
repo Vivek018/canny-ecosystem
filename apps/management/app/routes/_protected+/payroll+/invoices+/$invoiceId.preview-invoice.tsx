@@ -7,7 +7,7 @@ import {
   getInvoiceById,
   getReimbursementEntriesByInvoiceIdForInvoicePreview,
   getRelationshipsByParentAndChildCompanyId,
-  type EmployeeProjectAssignmentDataType,
+  type EmployeeWorkDetailsDataType,
   getExitEntriesByPayrollIdForInvoicePreview,
   getLocationById,
   getSalaryEntriesForInvoiceByInvoiceId,
@@ -175,7 +175,7 @@ type DataTypeForRegister = {
       absents: number;
     };
     employeeData: EmployeeDatabaseRow;
-    employeeProjectAssignmentData?: EmployeeProjectAssignmentDataType;
+    employeeProjectAssignmentData?: EmployeeWorkDetailsDataType;
     employeeStatutoryDetails?: EmployeeStatutoryDetailsDatabaseRow;
     invoiceFields?: {
       name: string;
@@ -205,16 +205,16 @@ const InvoicePDF = ({
   const allEarningFields = Array.from(
     new Set(
       data.employeeData.flatMap(
-        (emp) => emp?.earnings?.map((e) => e.name) ?? [],
-      ),
-    ),
+        (emp) => emp?.earnings?.map((e) => e.name) ?? []
+      )
+    )
   );
   const allDeductionFields = Array.from(
     new Set(
       data.employeeData.flatMap(
-        (emp) => emp?.deductions?.map((e) => e.name) ?? [],
-      ),
-    ),
+        (emp) => emp?.deductions?.map((e) => e.name) ?? []
+      )
+    )
   );
   const earningTotals: Record<string, number> = {};
   const deductionTotals: Record<string, number> = {};
@@ -261,16 +261,16 @@ const InvoicePDF = ({
     roundToNearest(
       Number(
         data?.invoiceDetails?.payroll_data?.find(
-          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF",
-        )?.amount ?? 0,
-      ),
+          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF"
+        )?.amount ?? 0
+      )
     ) +
     roundToNearest(
       Number(
         data?.invoiceDetails?.payroll_data?.find(
-          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI",
-        )?.amount ?? 0,
-      ),
+          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI"
+        )?.amount ?? 0
+      )
     );
 
   const sum = data?.invoiceDetails?.payroll_data
@@ -287,11 +287,11 @@ const InvoicePDF = ({
             (Number(
               data?.invoiceDetails?.payroll_data.reduce(
                 (sum, item) => sum + Number(item.amount),
-                0,
-              ),
+                0
+              )
             ) *
               terms.reimbursement_charge) /
-              100,
+              100
           )
         : 0;
 
@@ -299,7 +299,7 @@ const InvoicePDF = ({
     type === "salary"
       ? roundToNearest(beforeService) + roundToNearest(service_charge)
       : roundToNearest(
-          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge,
+          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge
         );
 
   const cgst =
@@ -473,14 +473,14 @@ const InvoicePDF = ({
                     data?.invoiceDetails?.payroll_data?.find(
                       (item) =>
                         item.field.trim() === "ESIC" ||
-                        item.field.trim() === "ESI",
+                        item.field.trim() === "ESI"
                     )?.amount ?? 0;
                 } else if (trimmed === "PF" || trimmed === "EPF") {
                   amount =
                     data?.invoiceDetails?.payroll_data?.find(
                       (item) =>
                         item.field.trim() === "PF" ||
-                        item.field.trim() === "EPF",
+                        item.field.trim() === "EPF"
                     )?.amount ?? 0;
                 }
 
@@ -785,7 +785,7 @@ const InvoicePDF = ({
               >
                 <Text>
                   {replaceUnderscore(
-                    employee.employeeProjectAssignmentData?.position,
+                    employee.employeeProjectAssignmentData?.position
                   )}
                 </Text>
               </View>
@@ -807,9 +807,9 @@ const InvoicePDF = ({
                     Number(
                       employee?.earnings.reduce(
                         (sum, earning) => sum + earning.amount,
-                        0,
-                      ),
-                    ),
+                        0
+                      )
+                    )
                   )}
                 </Text>
               </View>
@@ -828,9 +828,9 @@ const InvoicePDF = ({
                     Number(
                       employee?.deductions.reduce(
                         (sum, deduction) => sum + deduction?.amount,
-                        0,
-                      ),
-                    ),
+                        0
+                      )
+                    )
                   )}
                 </Text>
               </View>
@@ -840,15 +840,15 @@ const InvoicePDF = ({
                     Number(
                       employee?.earnings.reduce(
                         (sum, earning) => sum + earning?.amount,
-                        0,
-                      ),
+                        0
+                      )
                     ) -
                       Number(
                         employee?.deductions.reduce(
                           (sum, deduction) => sum + deduction?.amount,
-                          0,
-                        ),
-                      ),
+                          0
+                        )
+                      )
                   )}
                 </Text>
               </View>
@@ -885,11 +885,11 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const earningSum = emp?.earnings?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0,
+                        0
                       );
                       return sum + earningSum;
-                    }, 0),
-                  ),
+                    }, 0)
+                  )
                 )}
               </Text>
             </View>
@@ -909,11 +909,11 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const deductionSum = emp?.deductions?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0,
+                        0
                       );
                       return sum + deductionSum;
-                    }, 0),
-                  ),
+                    }, 0)
+                  )
                 )}
               </Text>
             </View>
@@ -925,20 +925,20 @@ const InvoicePDF = ({
                     data.employeeData.reduce((sum, emp) => {
                       const earningSum = emp?.earnings?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
-                        0,
+                        0
                       );
                       return sum + earningSum;
-                    }, 0),
+                    }, 0)
                   ) -
                     Number(
                       data.employeeData.reduce((sum, emp) => {
                         const deductionSum = emp?.deductions?.reduce(
                           (acc, d) => acc + Number(d?.amount ?? 0),
-                          0,
+                          0
                         );
                         return sum + deductionSum;
-                      }, 0),
-                    ),
+                      }, 0)
+                    )
                 )}
               </Text>
             </View>
@@ -963,8 +963,8 @@ const InvoicePDF = ({
                 label: "Basic",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "BASIC",
-                  )?.amount ?? 0,
+                    (item) => item.field === "BASIC"
+                  )?.amount ?? 0
                 ),
               },
               {
@@ -973,24 +973,24 @@ const InvoicePDF = ({
                   totalGross -
                   Number(
                     data?.invoiceDetails?.payroll_data?.find(
-                      (item) => item.field === "BASIC",
-                    )?.amount ?? 0,
+                      (item) => item.field === "BASIC"
+                    )?.amount ?? 0
                   ),
               },
               {
                 label: "P.F. (13%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "PF" || item.field === "EPF",
-                  )?.amount ?? 0,
+                    (item) => item.field === "PF" || item.field === "EPF"
+                  )?.amount ?? 0
                 ),
               },
               {
                 label: "ESIC (3.25%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "ESIC" || item.field === "ESI",
-                  )?.amount ?? 0,
+                    (item) => item.field === "ESIC" || item.field === "ESI"
+                  )?.amount ?? 0
                 ),
               },
               {
@@ -1236,13 +1236,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         supabase,
         invoiceId: invoiceData?.id!,
       });
+
     const { data: exit }: { data: any } =
       await getExitEntriesByPayrollIdForInvoicePreview({
         supabase,
         invoiceId: invoiceData?.id!,
       });
     payrollDataAndOthers =
-      invoiceData?.type === "reimbursement" ? reimb ?? [] : exit ?? [];
+      invoiceData?.type === "reimbursement" ? (reimb ?? []) : (exit ?? []);
   }
 
   let contentType: string | undefined = undefined;
@@ -1316,6 +1317,7 @@ export default function PreviewInvoice() {
       // Preferred order for earnings and deductions
       const preferredEarningsOrder = ["BASIC", "DA", "HRA"];
       const preferredDeductionsOrder = ["PF", "ESIC", "PT"];
+      const runDate = new Date(invoice?.date);
 
       const employeeData: any[] = data.payrollDataAndOthers?.map((emp: any) => {
         const earnings: EmployeeEarningsOrDeductions[] = [];
@@ -1360,17 +1362,30 @@ export default function PreviewInvoice() {
           }
         }
 
+        const matchedAssignment = emp?.employee?.work_details?.find(
+          (assignment: any) => {
+            const start = assignment?.start_date
+              ? new Date(assignment.start_date)
+              : null;
+            const end = assignment?.end_date
+              ? new Date(assignment.end_date)
+              : null;
+
+            if (!start) return false;
+            if (end) return runDate >= start && runDate <= end;
+            return runDate >= start;
+          }
+        );
         return {
           employeeData: {
             first_name: emp?.employee?.first_name,
             middle_name: emp?.employee?.middle_name,
             last_name: emp?.employee?.last_name,
-            employee_code: emp?.employee?.employee_code,
+            employee_code: matchedAssignment?.employee_code,
           },
           employeeProjectAssignmentData: {
-            position: emp.employee?.employee_project_assignment?.position || "",
-            department:
-              emp.employee?.employee_project_assignment?.department || "",
+            position: matchedAssignment?.position || "",
+            department: matchedAssignment?.department || "",
           },
           employeeStatutoryDetails: {
             pf_number:
@@ -1457,17 +1472,32 @@ export default function PreviewInvoice() {
         name: string;
         amount: number;
       }
+      const runDate = new Date(invoice?.date);
 
       const employeeData: TransformedEmployeeEntry[] = [];
       if (type === "reimbursement") {
         for (const emp of data.payrollDataAndOthers) {
+          const matchedAssignment = emp?.work_details?.find(
+            (assignment: any) => {
+              const start = assignment?.start_date
+                ? new Date(assignment.start_date)
+                : null;
+              const end = assignment?.end_date
+                ? new Date(assignment.end_date)
+                : null;
+
+              if (!start) return false;
+              if (end) return runDate >= start && runDate <= end;
+              return runDate >= start;
+            }
+          );
           for (const entry of emp.reimbursements) {
             employeeData.push({
               employeeData: {
                 first_name: emp?.first_name,
                 middle_name: emp?.middle_name,
                 last_name: emp?.last_name,
-                employee_code: emp?.employee_code,
+                employee_code: matchedAssignment?.employee_code,
               },
               invoiceFields: [
                 {
@@ -1481,13 +1511,27 @@ export default function PreviewInvoice() {
       }
       if (type === "exit") {
         for (const emp of data.payrollDataAndOthers) {
+          const matchedAssignment = emp?.work_details?.find(
+            (assignment: any) => {
+              const start = assignment?.start_date
+                ? new Date(assignment.start_date)
+                : null;
+              const end = assignment?.end_date
+                ? new Date(assignment.end_date)
+                : null;
+
+              if (!start) return false;
+              if (end) return runDate >= start && runDate <= end;
+              return runDate >= start;
+            }
+          );
           for (const entry of emp.exits) {
             employeeData.push({
               employeeData: {
                 first_name: emp?.first_name,
                 middle_name: emp?.middle_name,
                 last_name: emp?.last_name,
-                employee_code: emp?.employee_code,
+                employee_code: matchedAssignment?.employee_code,
               },
               invoiceFields: [
                 {
@@ -1508,7 +1552,7 @@ export default function PreviewInvoice() {
 
     registerData = transformReimbursementDataForPayroll(
       data,
-      data?.invoiceData?.type,
+      data?.invoiceData?.type
     );
   }
 

@@ -35,10 +35,9 @@ export function ExportBar({
         exportedData[key] =
           `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "project") {
-        exportedData[key] =
-          element?.employee_project_assignment?.sites?.projects?.name;
+        exportedData[key] = element?.work_details[0]?.sites?.projects?.name;
       } else if (key === "site") {
-        exportedData[key] = element?.employee_project_assignment?.sites?.name;
+        exportedData[key] = element?.work_details[0]?.sites?.name;
       } else if (key === "start_range") {
         exportedData[key] = element?.start_range;
       } else if (key === "end_range") {
@@ -64,7 +63,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Statutory Bonus Yearly Report - ${formatDateTime(Date.now())}`,
+      `Statutory Bonus Yearly Report - ${formatDateTime(Date.now())}`
     );
 
     document.body.appendChild(link);
@@ -77,7 +76,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-16 md:bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

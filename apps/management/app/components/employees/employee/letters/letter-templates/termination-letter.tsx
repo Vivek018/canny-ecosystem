@@ -25,12 +25,9 @@ export function TerminationLetter({
     employeeName: `${data?.employees.first_name} ${
       data?.employees?.middle_name ?? ""
     } ${data?.employees?.last_name}`,
-    employeePosition:
-      data?.employees.employee_project_assignment?.position ?? "",
-    employeeJoiningDate:
-      data?.employees.employee_project_assignment?.start_date ?? "",
-    employeeLeavingDate:
-      data?.employees.employee_project_assignment?.end_date ?? "",
+    employeePosition: data?.employees.work_details?.position ?? "",
+    employeeJoiningDate: data?.employees.work_details?.start_date ?? "",
+    employeeLeavingDate: data?.employees.work_details?.end_date ?? "",
     companyName: companyData?.data?.name ?? "",
     companyAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",

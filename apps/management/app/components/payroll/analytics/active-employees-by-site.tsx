@@ -27,12 +27,12 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
     const siteCounts: Record<string, Record<string, number>> = {};
 
     for (const item of chartData) {
-      const project = item.employee_project_assignment?.sites?.projects?.name;
-      const site = item.employee_project_assignment?.sites?.name;
+      const project = item.work_details[0]?.sites?.projects?.name;
+      const site = item.work_details[0]?.sites?.name;
 
-      if (!site) continue; // Skip if site is missing
+      if (!site) continue; 
 
-      const projectKey = project || site; // If no project, use site as project
+      const projectKey = project || site; 
 
       if (!siteCounts[projectKey]) {
         siteCounts[projectKey] = {};
@@ -50,7 +50,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
           fill: `hsl(var(--chart-${index + 1}))`,
           sites,
         };
-      },
+      }
     );
 
     return finalData;

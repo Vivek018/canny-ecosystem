@@ -89,8 +89,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       supabase,
     });
     const payeeOptions = payeeData?.map((payee: any) => ({
-      label: payee.payee_code as string,
-      pseudoLabel: payee?.name as string,
+      label: payee?.name as string,
       value: payee.id as string,
     }));
 
@@ -137,7 +136,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         siteOptions: [],
         employeeOptions: [],
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -149,7 +148,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
     const submission = parseWithZod(formData, {
       schema: VehiclesSchema,
@@ -158,7 +157,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
     if (submission.value.photo) {
@@ -198,7 +197,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Vehicles creation failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -207,7 +206,7 @@ export async function action({
         message: "An error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -313,7 +312,7 @@ export default function CreateVehicle({
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.registration_number.name,
+                      fields.registration_number.name
                     ),
                   }}
                   errors={fields.registration_number.errors}
@@ -339,7 +338,7 @@ export default function CreateVehicle({
                     placeholder: `Select ${fields.vehicle_type.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    vehicleTypeArray as unknown as string[],
+                    vehicleTypeArray as unknown as string[]
                   )}
                   labelProps={{
                     children: replaceUnderscore(fields.vehicle_type.name),
@@ -355,7 +354,7 @@ export default function CreateVehicle({
                     placeholder: `Select ${fields.ownership.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    vehicleOwnershipArray as unknown as string[],
+                    vehicleOwnershipArray as unknown as string[]
                   )}
                   labelProps={{
                     children: fields.ownership.name,
@@ -370,7 +369,7 @@ export default function CreateVehicle({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.price.name,
+                      fields.price.name
                     )}`,
                   }}
                   labelProps={{
@@ -415,9 +414,9 @@ export default function CreateVehicle({
                     }),
                     placeholder: "Select Site",
                   }}
-                  onChange={(project) => {
-                    if (project?.length) {
-                      searchParams.set("site", project);
+                  onChange={(site) => {
+                    if (site?.length) {
+                      searchParams.set("site", site);
                     } else {
                       searchParams.delete("site");
                     }

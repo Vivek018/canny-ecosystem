@@ -75,7 +75,7 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "z-40 fixed bottom-16 md:bottom-16 md:bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
+        "z-40 fixed bottom-16  md:bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
         className,
       )}
     >

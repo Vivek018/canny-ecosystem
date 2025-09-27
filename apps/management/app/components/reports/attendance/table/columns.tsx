@@ -17,7 +17,7 @@ const currentYear = currentDate.getFullYear();
 
 export const columns = (
   monthYearArray: string[],
-  filters: AttendanceReportFilters,
+  filters: AttendanceReportFilters
 ): ColumnDef<AttendanceReport>[] => {
   return useMemo(
     () => [
@@ -71,7 +71,7 @@ export const columns = (
         header: "Project",
         cell: ({ row }) => (
           <p className="truncate capitalize">
-            {row.original?.employee_project_assignment?.sites?.projects?.name}
+            {row.original?.work_details[0]?.sites?.projects?.name}
           </p>
         ),
       },
@@ -81,7 +81,7 @@ export const columns = (
         header: "Site",
         cell: ({ row }) => (
           <p className="truncate capitalize">
-            {row.original?.employee_project_assignment?.sites?.name}
+            {row.original?.work_details[0]?.sites?.name}
           </p>
         ),
       },
@@ -121,6 +121,6 @@ export const columns = (
         ),
       },
     ],
-    [monthYearArray, filters],
+    [monthYearArray, filters]
   );
 };

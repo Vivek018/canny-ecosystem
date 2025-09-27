@@ -13,7 +13,7 @@ import { Dialog, DialogContent } from "@canny_ecosystem/ui/dialog";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  type EmployeeProjectAssignmentDataType,
+  type EmployeeWorkDetailsDataType,
   getCompanyById,
   getPrimaryLocationByCompanyId,
   getSalaryEntriesForSalaryRegisterAndAll,
@@ -108,7 +108,7 @@ type DataType = {
       absents: number;
     };
     employeeData: EmployeeDatabaseRow;
-    employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
+    employeeProjectAssignmentData: EmployeeWorkDetailsDataType;
     employeeStatutoryDetails: EmployeeStatutoryDetailsDatabaseRow;
     earnings: { name: string; amount: number }[];
     deductions: { name: string; amount: number }[];
@@ -344,7 +344,7 @@ export default function OvertimeRegister() {
   const updatedData = {
     ...data,
     payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
-      selectedRows.some((emp2) => emp2.id === emp1.id),
+      selectedRows.some((emp2) => emp2.id === emp1.id)
     ),
   };
   const navigate = useNavigate();
@@ -438,7 +438,7 @@ export default function OvertimeRegister() {
           middle_name: string;
           last_name: string;
           employee_code: string;
-          employee_project_assignment?: EmployeeProjectAssignment;
+          work_details?: EmployeeProjectAssignment;
           employee_statutory_details?: EmployeeStatutoryDetails;
           salary_entries: SalaryEntry[];
           leaves: Leaves[];
@@ -467,8 +467,8 @@ export default function OvertimeRegister() {
               employee_code: emp?.employee_code,
             },
             employeeProjectAssignmentData: {
-              position: emp.employee_project_assignment?.position || "",
-              department: emp.employee_project_assignment?.department || "",
+              position: emp.work_details?.position || "",
+              department: emp.work_details?.department || "",
             },
             employeeStatutoryDetails: {
               pf_number: emp.employee_statutory_details?.pf_number || "",
@@ -493,7 +493,7 @@ export default function OvertimeRegister() {
             earnings,
             deductions,
           };
-        },
+        }
       );
 
     return {

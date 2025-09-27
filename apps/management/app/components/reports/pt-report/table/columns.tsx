@@ -14,7 +14,7 @@ export type PTReportType = {
   pt_amount: string;
   start_date: string;
   end_date: string;
-  employee_project_assignment: {
+  work_details: {
     start_date: string;
     end_date: string;
     sites: {
@@ -82,7 +82,7 @@ export const columns = (): ColumnDef<PTReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.sites?.projects?.name}
+          {row.original?.work_details[0]?.sites?.projects?.name}
         </p>
       );
     },
@@ -94,7 +94,7 @@ export const columns = (): ColumnDef<PTReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.sites?.name}
+          {row.original?.work_details[0]?.sites?.name}
         </p>
       );
     },

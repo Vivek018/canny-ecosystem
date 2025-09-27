@@ -26,7 +26,7 @@ export const pipe =
     fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
-  schema: T,
+  schema: T
 ): z.infer<T> {
   let unwrappedSchema = schema;
   while (unwrappedSchema instanceof z.ZodEffects) {
@@ -43,12 +43,12 @@ export function getInitialValueFromZod<T extends z.ZodTypeAny>(
         return [key, value._def.defaultValue()];
       }
       return [key, undefined];
-    }),
+    })
   ) as z.infer<T>;
 }
 
 export function transformStringArrayIntoOptions(
-  arr: string[],
+  arr: string[]
 ): { value: string; label: string }[] {
   return arr?.map((str) => ({
     value: String(str),
@@ -67,7 +67,7 @@ export function getOrdinalSuffix(n: number): string {
 
 export function deepEqualCheck(
   obj1: { [x: string]: any } | null | undefined,
-  obj2: { [x: string]: any } | null | undefined,
+  obj2: { [x: string]: any } | null | undefined
 ) {
   if (obj1 === obj2) {
     return true;
@@ -144,7 +144,7 @@ export function toCamelCase(str: string) {
     .toLowerCase()
     .split(" ")
     .map((word, index) =>
-      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
     )
     .join("");
 }
@@ -175,7 +175,7 @@ export const searchInObject = (obj: any, searchString: string): any => {
   }
 
   return Object.values(obj).some((value) =>
-    searchInObject(value, searchString),
+    searchInObject(value, searchString)
   );
 };
 
@@ -185,7 +185,7 @@ export const capitalizeFirstLetter = (val: any) => {
 
 export function extractKeys<T extends Record<string, any>, K extends string>(
   arr: T[],
-  keys: K[],
+  keys: K[]
 ): Partial<Record<K, any>>[] {
   return arr.map((obj) =>
     keys.reduce(
@@ -193,14 +193,14 @@ export function extractKeys<T extends Record<string, any>, K extends string>(
         acc[key] = key.split(".").reduce((o, k) => o?.[k], obj);
         return acc;
       },
-      {} as Partial<Record<K, any>>,
-    ),
+      {} as Partial<Record<K, any>>
+    )
   );
 }
 
 export function getMonthNameFromNumber(
   monthNumber: number,
-  shortName = false,
+  shortName = false
 ): string {
   const monthNames = [
     "January",
@@ -338,4 +338,90 @@ export const normalizeNames = (name: string) => {
 
 export function formatNumber(num: number): string | number {
   return Number.isInteger(num) ? num.toString() : num?.toFixed(2);
+}
+
+export function generatePrefix(siteName: string): string {
+  const words = siteName
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.toUpperCase());
+
+  if (words.length === 1) {
+    return words[0].slice(0, 4);
+  }
+
+  let prefix = "";
+  const totalNeeded = 4;
+  const perWord = Math.floor(totalNeeded / words.length);
+  let extra = totalNeeded % words.length;
+
+  for (const word of words) {
+    let take = perWord;
+    if (extra > 0) {
+      take++;
+      extra--;
+    }
+    prefix += word.slice(0, take);
+  }
+
+  return prefix;
+}
+
+export function generateEmployeeCodes(
+  sitePrefix: string,
+  count: number,
+  lastCode?: string
+): string[] {
+  let startNumber = 0;
+  if (lastCode?.startsWith(sitePrefix)) {
+    const match = lastCode.match(/\d+$/);
+    if (match) {
+      startNumber = Number.parseInt(match[0], 10);
+    }
+  }
+
+  const codes: string[] = [];
+  for (let i = 1; i <= count; i++) {
+    codes.push(`${sitePrefix}${startNumber + i}`);
+  }
+
+  return codes;
+}
+
+// export function generateNextCode(code: string) {
+//   const match = code?.match(/^(.*?)(\d+)$/) ?? "NOCODE";
+//   if (!match) return `${code}1`;
+
+//   const prefix = match[1];
+//   const number = Number.parseInt(match[2], 10);
+
+//   return prefix + (number + 1);
+// }
+
+export function generateRandomCode(prefix: string) {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
+
+  const numLetters = Math.floor(Math.random() * 4) + 1;
+  const numDigits = 5 - numLetters;
+
+  let suffix = "";
+
+  for (let i = 0; i < numLetters; i++) {
+    const randIndex = Math.floor(Math.random() * letters.length);
+    suffix += letters[randIndex];
+  }
+
+  for (let i = 0; i < numDigits - 1; i++) {
+    const randIndex = Math.floor(Math.random() * digits.length);
+    suffix += digits[randIndex];
+  }
+
+  suffix += digits[Math.floor(Math.random() * digits.length)];
+
+  return `${prefix}${suffix}`;
+}
+
+export function fixedDecimal(amount: number) {
+  return amount.toFixed(2);
 }

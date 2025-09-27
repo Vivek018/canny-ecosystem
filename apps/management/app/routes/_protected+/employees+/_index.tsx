@@ -5,7 +5,7 @@ import { ImportEmployeeAddressModal } from "@/components/employees/import-export
 import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
 import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
 import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
-import { ImportEmployeeProjectAssignmentModal } from "@/components/employees/import-export/import-modal-project-assignments";
+
 import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
@@ -75,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -128,7 +128,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -223,7 +223,6 @@ export default function EmployeesIndex() {
             }
 
             const hasNextPage = Boolean(meta?.count > data?.length);
-
             return (
               <DataTable
                 data={data ?? []}
@@ -245,7 +244,6 @@ export default function EmployeesIndex() {
         <ImportEmployeeBankDetailsModal />
         <ImportEmployeeAddressModal />
         <ImportEmployeeGuardiansModal />
-        <ImportEmployeeProjectAssignmentModal />
       </Suspense>
     </section>
   );

@@ -39,7 +39,7 @@ export const columns: ColumnDef<UsersType>[] = [
         <Avatar className="rounded-full w-7 h-7 flex items-center justify-center bg-accent">
           <AvatarImage src={row.original?.avatar ?? ""} />
           <AvatarFallback className="rounded-md">
-            <span className="text-md uppercase">
+            <span className="text-base uppercase">
               {row.original.first_name.charAt(0)}
             </span>
           </AvatarFallback>
@@ -126,13 +126,13 @@ export const columns: ColumnDef<UsersType>[] = [
                   "h-8 w-8 p-0",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingUsers}`,
+                    `${updateRole}:${attribute.settingUsers}`
                   ) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.settingUsers}`,
+                      `${deleteRole}:${attribute.settingUsers}`
                     ) &&
-                    "hidden",
+                    "hidden"
                 )}
               >
                 <span className="sr-only">Open menu</span>

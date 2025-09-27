@@ -1,6 +1,6 @@
 import type React from "react";
-import { useMemo, useCallback, useState } from "react";
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
+import { useMemo, useCallback } from "react";
+import { Button } from "@canny_ecosystem/ui/button";
 import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
@@ -30,22 +30,7 @@ import { useSalaryData } from "@/utils/hooks/salary-data";
 import { PayrollSummaryCard } from "./payroll-summary-card";
 import { PayrollDetailsCard } from "./payroll-details-card";
 import { FilterControls } from "./filter-controls";
-import {
-  Combobox,
-  type ComboboxSelectOption,
-} from "@canny_ecosystem/ui/combobox";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@canny_ecosystem/ui/alert-dialog";
-import { Icon } from "@canny_ecosystem/ui/icon";
-import { Label } from "@canny_ecosystem/ui/label";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export function SalaryEntryComponent({
   data,
@@ -54,7 +39,6 @@ export function SalaryEntryComponent({
   env,
   fromWhere,
   allSiteOptions,
-  allDepartmentOptions,
   allLocationOptions,
   payrollFields,
   allEmployeeOptions,
@@ -71,7 +55,6 @@ export function SalaryEntryComponent({
   fromWhere: "runpayroll" | "payrollhistory";
   allSiteOptions: ComboboxSelectOption[];
   allProjectOptions: ComboboxSelectOption[];
-  allDepartmentOptions: ComboboxSelectOption[];
   allLocationOptions: ComboboxSelectOption[];
   payrollFields?: PayrollFieldsDatabaseRow[];
   allEmployeeOptions?: ComboboxSelectOption[];
@@ -82,9 +65,6 @@ export function SalaryEntryComponent({
   const { payrollId } = useParams();
   const submit = useSubmit();
   const navigation = useNavigation();
-
-  const [sites, setSites] = useState("");
-  const [departments, setDepartments] = useState("");
 
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
@@ -104,18 +84,18 @@ export function SalaryEntryComponent({
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
-    [selectedRows, data],
+    [selectedRows, data]
   );
 
   const uniqueFields = useMemo(
     () => getUniqueFields(filteredData),
-    [filteredData],
+    [filteredData]
   );
 
   const updateStatusPayroll = useCallback(
     (
       e: React.MouseEvent<HTMLButtonElement>,
-      status: PayrollDatabaseRow["status"],
+      status: PayrollDatabaseRow["status"]
     ) => {
       e.preventDefault();
       clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
@@ -124,43 +104,17 @@ export function SalaryEntryComponent({
           data: JSON.stringify({
             id: payrollId ?? payrollData?.id,
             status: status,
-            total_employees: payrollData?.total_employees,
-            total_net_amount: payrollData?.total_net_amount,
           }),
           redirectUrl: `/payroll/run-payroll/${payrollId}`,
         },
         {
           method: "POST",
           action: `/payroll/run-payroll/${payrollId}`,
-        },
+        }
       );
     },
-    [payrollId, payrollData, submit],
+    [payrollId, payrollData, submit]
   );
-
-  const handleUpdateBulkSalaryEntry = () => {
-    const updates = selectedRows.map((entry: any) => {
-      return {
-        id: entry.salary_entries.id,
-        site_id: sites && sites.trim() !== "" ? sites : null,
-        department_id:
-          departments && departments.trim() !== "" ? departments : null,
-      };
-    });
-
-    clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
-    submit(
-      {
-        payrollId: payrollId ?? payrollData?.id,
-        salaryEntryData: JSON.stringify(updates),
-        failedRedirect: `/payroll/run-payroll/${payrollId}`,
-      },
-      {
-        method: "POST",
-        action: `/payroll/run-payroll/${payrollId}/update-bulk-salary-entries`,
-      },
-    );
-  };
 
   const handleUpdatePayroll = useCallback(
     (title: string, rundate: string, link: string, linked: string) => {
@@ -191,31 +145,31 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: "/payroll/run-payroll/update-payroll",
-        },
+        }
       );
     },
-    [payrollId, payrollData?.id, submit],
+    [payrollId, payrollData?.id, submit]
   );
 
   const showSubmitButton = useMemo(
     () =>
       (payrollData.status === "pending" || payrollData.status === "approved") &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role],
+    [payrollData.status, role]
   );
 
   const showUndoSubmitButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role],
+    [payrollData.status, role]
   );
 
   const showApproveButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${approveRole}:${attribute.payroll}`),
-    [payrollData.status, role],
+    [payrollData.status, role]
   );
 
   return (
@@ -248,7 +202,7 @@ export function SalaryEntryComponent({
           <div
             className={cn(
               "ml-auto flex flex-row max-sm:justify-end gap-3 max-sm:gap-2",
-              noButtons && "hidden",
+              noButtons && "hidden"
             )}
           >
             <Button
@@ -291,7 +245,7 @@ export function SalaryEntryComponent({
             className={cn(
               payrollData?.status === "pending" || !selectedRows.length
                 ? "hidden"
-                : "",
+                : ""
             )}
             epfData={epfData}
             payrollData={payrollData}
@@ -302,61 +256,6 @@ export function SalaryEntryComponent({
             fromWhere={fromWhere}
             status={payrollData?.status}
           />
-          <div
-            className={cn(
-              "border border-dotted border-muted-foreground",
-              (payrollData?.status === "approved" || !selectedRows.length) &&
-                "hidden",
-            )}
-          />
-          <AlertDialog>
-            <AlertDialogTrigger
-              className={cn(
-                (payrollData?.status === "approved" || !selectedRows.length) &&
-                  "hidden",
-              )}
-            >
-              <Button
-                variant={"muted"}
-                size={"icon"}
-                className="w-10 h-10 border border-input"
-              >
-                <Icon name="edit" className="h-[18px] w-[18px]" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Update Bulk Salary Entry</AlertDialogTitle>
-              </AlertDialogHeader>
-              <div className="grid grid-cols-2  max-sm:grid-cols-1 gap-4">
-                <div className="flex flex-col gap-1">
-                  <Label className="text-sm font-medium">Site</Label>
-                  <Combobox
-                    options={allSiteOptions}
-                    value={sites}
-                    onChange={(e) => setSites(e)}
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-sm font-medium">Department</Label>
-                  <Combobox
-                    options={allDepartmentOptions}
-                    value={departments}
-                    onChange={(e) => setDepartments(e)}
-                  />
-                </div>
-              </div>
-              <AlertDialogFooter className="pt-2">
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className={cn(buttonVariants({ variant: "default" }))}
-                  onClick={handleUpdateBulkSalaryEntry}
-                >
-                  Update
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </div>
 
@@ -369,8 +268,6 @@ export function SalaryEntryComponent({
             uniqueFields,
             data,
             editable: payrollData?.status === "pending",
-            allSiteOptions,
-            allDepartmentOptions,
           })}
           totalNet={totals.TOTAL as number}
           uniqueFields={uniqueFields}
