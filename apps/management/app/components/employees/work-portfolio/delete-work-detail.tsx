@@ -1,3 +1,4 @@
+import { useUser } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,30 +14,32 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteWorkHistory = ({
+export const DeleteWorkDetail = ({
   employeeId,
-  workHistoryId,
+  workDetailId,
 }: {
   employeeId: string;
-  workHistoryId: string;
+  workDetailId: string;
 }) => {
+  const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelWorkHistory = () => {
+  const handleCancelWorkDetail = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteWorkHistory = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  const handleDeleteWorkDetail = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -44,9 +47,9 @@ export const DeleteWorkHistory = ({
         {},
         {
           method: "post",
-          action: `/employees/${employeeId}/work-portfolio/${workHistoryId}/delete-work-history`,
+          action: `/employees/${employeeId}/work-portfolio/${workDetailId}/delete-work-details`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -59,17 +62,21 @@ export const DeleteWorkHistory = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9 hidden",
+          hasPermission(
+            role,
+            `${deleteRole}:${attribute.employeeWorkDetails}`
+          ) && "flex"
         )}
       >
-        Delete Work History
+        Delete Work Detail
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this work
-            history and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            details and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -95,13 +102,13 @@ export const DeleteWorkHistory = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelWorkHistory}>
+          <AlertDialogCancel onClick={handleCancelWorkDetail}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteWorkHistory}
-            onSelect={handleDeleteWorkHistory}
+            onClick={handleDeleteWorkDetail}
+            onSelect={handleDeleteWorkDetail}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

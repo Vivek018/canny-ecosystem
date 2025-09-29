@@ -11,14 +11,10 @@ import type {
   EmployeeDatabaseUpdate,
   EmployeeGuardianDatabaseInsert,
   EmployeeGuardianDatabaseUpdate,
-  EmployeeProjectAssignmentDatabaseInsert,
-  EmployeeProjectAssignmentDatabaseUpdate,
-  EmployeeSkillDatabaseInsert,
-  EmployeeSkillDatabaseUpdate,
   EmployeeStatutoryDetailsDatabaseInsert,
   EmployeeStatutoryDetailsDatabaseUpdate,
-  EmployeeWorkHistoryDatabaseInsert,
-  EmployeeWorkHistoryDatabaseUpdate,
+  EmployeeWorkDetailsDatabaseInsert,
+  EmployeeWorkDetailsDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 import type { ImportEmployeeDetailsDataType } from "../queries";
@@ -28,7 +24,7 @@ export async function createEmployee({
   employeeData,
   employeeStatutoryDetailsData,
   employeeBankDetailsData,
-  employeeProjectAssignmentData,
+  employeeWorkDetailsData,
   employeeAddressesData,
   employeeGuardiansData,
   bypassAuth = false,
@@ -43,8 +39,8 @@ export async function createEmployee({
     EmployeeBankDetailsDatabaseInsert,
     "employee_id"
   >;
-  employeeProjectAssignmentData?: Omit<
-    EmployeeProjectAssignmentDatabaseInsert,
+  employeeWorkDetailsData?: Omit<
+    EmployeeWorkDetailsDatabaseInsert,
     "employee_id"
   >;
   employeeAddressesData?: Omit<EmployeeAddressDatabaseInsert, "employee_id">;
@@ -75,7 +71,7 @@ export async function createEmployee({
       employeeError: error,
       employeeStatutoryDetailsError: null,
       employeeBankDetailsError: null,
-      employeeProjectAssignmentError: null,
+      employeeWorkDetailsError: null,
       employeeAddressesError: null,
       employeeGuardiansError: null,
     };
@@ -88,7 +84,7 @@ export async function createEmployee({
       employeeError: null,
       employeeStatutoryDetailsError: null,
       employeeBankDetailsError: null,
-      employeeProjectAssignmentError: null,
+      employeeWorkDetailsError: null,
       employeeAddressesError: null,
       employeeGuardiansError: null,
     };
@@ -115,10 +111,10 @@ export async function createEmployee({
           bypassAuth,
         })
       : { error: null, status: null },
-    employeeProjectAssignmentData
-      ? createEmployeeProjectAssignment({
+    employeeWorkDetailsData
+      ? createEmployeeWorkDetails({
           supabase,
-          data: { ...employeeProjectAssignmentData, employee_id: data.id },
+          data: { ...employeeWorkDetailsData, employee_id: data.id },
           bypassAuth,
         })
       : { error: null, status: null },
@@ -153,7 +149,7 @@ export async function createEmployee({
     employeeError: null,
     employeeStatutoryDetailsError: statutoryError,
     employeeBankDetailsError: bankError,
-    employeeProjectAssignmentError: projectError,
+    employeeWorkDetailsError: projectError,
     employeeAddressesError: addressError,
     employeeGuardiansError: guardianError,
   };
@@ -536,13 +532,13 @@ export async function deleteEmployeeGuardian({
   return { status, error };
 }
 
-export async function createEmployeeSkill({
+export async function createEmployeeWorkDetails({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: EmployeeSkillDatabaseInsert;
+  data: EmployeeWorkDetailsDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -556,24 +552,24 @@ export async function createEmployeeSkill({
   }
 
   const { error, status } = await supabase
-    .from("employee_skills")
+    .from("work_details")
     .insert(data)
     .single();
 
   if (error) {
-    console.error("createEmployeeSkill Error:", error);
+    console.error("createEmployeeWorkDetails Error:", error);
   }
 
   return { error, status };
 }
 
-export async function updateEmployeeSkill({
+export async function updateEmployeeWorkDetails({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: EmployeeSkillDatabaseUpdate;
+  data: EmployeeWorkDetailsDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -589,17 +585,18 @@ export async function updateEmployeeSkill({
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("employee_skills")
+    .from("work_details")
     .update(updateData)
     .eq("id", data.id!);
+
   if (error) {
-    console.error("updateEmployeeSkill Error:", error);
+    console.error("updateEmployeeWorkDetails Error:", error);
   }
 
   return { status, error };
 }
 
-export async function deleteEmployeeSkill({
+export async function deleteEmployeeWorkDetails({
   supabase,
   id,
   bypassAuth = false,
@@ -619,170 +616,12 @@ export async function deleteEmployeeSkill({
   }
 
   const { error, status } = await supabase
-    .from("employee_skills")
+    .from("work_details")
     .delete()
     .eq("id", id);
 
   if (error) {
-    console.error("deleteEmployeeSkill Error:", error);
-  }
-
-  return { status, error };
-}
-
-export async function createEmployeeWorkHistory({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: EmployeeWorkHistoryDatabaseInsert;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("employee_work_history")
-    .insert(data)
-    .single();
-
-  if (error) {
-    console.error("createEmployeeWorkHistory Error:", error);
-  }
-
-  return { error, status };
-}
-
-export async function updateEmployeeWorkHistory({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: EmployeeWorkHistoryDatabaseUpdate;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const updateData = convertToNull(data);
-
-  const { error, status } = await supabase
-    .from("employee_work_history")
-    .update(updateData)
-    .eq("id", data.id!);
-  if (error) {
-    console.error("updateEmployeeWorkHistory Error:", error);
-  }
-
-  return { status, error };
-}
-
-export async function deleteEmployeeWorkHistory({
-  supabase,
-  id,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  id: string;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("employee_work_history")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error("deleteEmployeeWorkHistory Error:", error);
-  }
-
-  return { status, error };
-}
-
-export async function createEmployeeProjectAssignment({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: EmployeeProjectAssignmentDatabaseInsert;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("employee_project_assignment")
-    .insert(data)
-    .single();
-
-  if (error) {
-    console.error("createEmployeeProjectAssignment Error:", error);
-  }
-
-  return { error, status };
-}
-
-export async function updateEmployeeProjectAssignment({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: EmployeeProjectAssignmentDatabaseUpdate;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const updateData = convertToNull(data);
-
-  const { error, status } = await supabase
-    .from("employee_project_assignment")
-    .update(updateData)
-    .eq("employee_id", data.employee_id!);
-
-  if (error) {
-    console.error("updateEmployeeProjectAssignment Error:", error);
+    console.error("deleteEmployeeWorkDetails Error:", error);
   }
 
   return { status, error };
@@ -815,7 +654,7 @@ export async function getEmployeeDetailsConflicts({
       primary_mobile_number,
       secondary_mobile_number,
       personal_email
-    `,
+    `
     )
     .or(
       [
@@ -827,7 +666,7 @@ export async function getEmployeeDetailsConflicts({
           .map((phone) => phone)
           .join(",")})`,
         `personal_email.in.(${emails.map((email) => email).join(",")})`,
-      ].join(","),
+      ].join(",")
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -844,7 +683,7 @@ export async function getEmployeeDetailsConflicts({
           existing.employee_code === record.employee_code ||
           existing.primary_mobile_number === record.primary_mobile_number ||
           existing.secondary_mobile_number === record.secondary_mobile_number ||
-          existing.personal_email === record.personal_email,
+          existing.personal_email === record.personal_email
       );
 
       if (hasConflict) {
@@ -852,7 +691,7 @@ export async function getEmployeeDetailsConflicts({
       }
       return indices;
     },
-    [],
+    []
   );
 
   return { conflictingIndices, error: null };
@@ -887,7 +726,7 @@ export async function createEmployeeDetailsFromImportedData({
       employee_code,
       primary_mobile_number,
       secondary_mobile_number,
-      personal_email`,
+      personal_email`
     )
     .or(
       [
@@ -895,7 +734,7 @@ export async function createEmployeeDetailsFromImportedData({
         `primary_mobile_number.in.(${primaryPhones.join(",")})`,
         `secondary_mobile_number.in.(${secondaryPhones.join(",")})`,
         `personal_email.in.(${emails.join(",")})`,
-      ].join(","),
+      ].join(",")
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -904,6 +743,8 @@ export async function createEmployeeDetailsFromImportedData({
     console.error("Error fetching conflicts:", error);
     return { status: 400, error };
   }
+  const insertedOrUpdatedEmployees: { id: string; employee_code: string }[] =
+    [];
 
   if (import_type === "skip") {
     const newData = data.filter((record) => {
@@ -912,7 +753,7 @@ export async function createEmployeeDetailsFromImportedData({
           existing.employee_code === record.employee_code ||
           existing.primary_mobile_number === record.primary_mobile_number ||
           existing.secondary_mobile_number === record.secondary_mobile_number ||
-          existing.personal_email === record.personal_email,
+          existing.personal_email === record.personal_email
       );
       return !hasConflict;
     });
@@ -929,16 +770,22 @@ export async function createEmployeeDetailsFromImportedData({
     for (let i = 0; i < newData.length; i += BATCH_SIZE) {
       const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
 
-      const { error: insertError } = await supabase
+      const { error: insertError, data: insertedBatch } = await supabase
         .from("employees")
-        .insert(batch);
+        .insert(batch)
+        .select("id, employee_code");
+
       if (insertError) {
         console.error("Error inserting batch:", insertError);
+      }
+      if (insertedBatch) {
+        insertedOrUpdatedEmployees.push(...insertedBatch);
       }
     }
 
     return {
       status: 200,
+      employees: insertedOrUpdatedEmployees,
       message: "Succesfull added details",
       error: null,
     };
@@ -953,24 +800,34 @@ export async function createEmployeeDetailsFromImportedData({
             existing.primary_mobile_number === record.primary_mobile_number ||
             existing.secondary_mobile_number ===
               record.secondary_mobile_number ||
-            existing.personal_email === record.personal_email,
+            existing.personal_email === record.personal_email
         );
 
         if (conflictingRecord) {
-          const { error: updateError } = await supabase
+          const { error: updateError, data: updatedData } = await supabase
             .from("employees")
             .update(record)
-            .eq("employee_code", conflictingRecord.employee_code);
+            .eq("employee_code", conflictingRecord.employee_code)
+            .select("id, employee_code")
+            .single();
 
+          if (!updateError && updatedData) {
+            insertedOrUpdatedEmployees.push(updatedData);
+          }
           return { type: "update", error: updateError };
         }
 
-        const { error: insertError } = await supabase
+        const { error: insertError, data: insertedData } = await supabase
           .from("employees")
-          .insert(record);
+          .insert(record)
+          .select("id, employee_code")
+          .single();
 
+        if (!insertError && insertedData) {
+          insertedOrUpdatedEmployees.push(insertedData);
+        }
         return { type: "insert", error: insertError };
-      }),
+      })
     );
 
     const errors = results.filter((r) => r.error);
@@ -983,11 +840,13 @@ export async function createEmployeeDetailsFromImportedData({
       status: 200,
       message: "Successfully processed updates and new insertions",
       error: null,
+      employees: insertedOrUpdatedEmployees,
     };
   }
 
   return {
     status: 500,
+    insertedOrUpdatedEmployees,
     error: new Error("Invalid import_type"),
   };
 }
@@ -1026,7 +885,7 @@ export async function getEmployeeStatutoryConflicts({
       esic_number,
       driving_license_number,
       passport_number
-    `,
+    `
     )
     .or(
       [
@@ -1038,7 +897,7 @@ export async function getEmployeeStatutoryConflicts({
         `esic_number.in.(${esicNumbers.map((num) => num).join(",")})`,
         `driving_license_number.in.(${drivings.map((num) => num).join(",")})`,
         `passport_number.in.(${passports.map((num) => num).join(",")})`,
-      ].join(","),
+      ].join(",")
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -1059,7 +918,7 @@ export async function getEmployeeStatutoryConflicts({
           existing.pf_number === record.pf_number ||
           existing.esic_number === record.esic_number ||
           existing.driving_license_number === record.driving_license_number ||
-          existing.passport_number === record.passport_number,
+          existing.passport_number === record.passport_number
       );
 
       if (hasConflict) {
@@ -1067,7 +926,7 @@ export async function getEmployeeStatutoryConflicts({
       }
       return indices;
     },
-    [],
+    []
   );
 
   return { conflictingIndices, error: null };
@@ -1100,11 +959,11 @@ export async function createEmployeeStatutoryFromImportedData({
   const { data: existingRecords, error: existingError } = await supabase
     .from("employee_statutory_details")
     .select(
-      "employee_id, aadhaar_number, pan_number, uan_number, pf_number, esic_number, driving_license_number, passport_number",
+      "employee_id, aadhaar_number, pan_number, uan_number, pf_number, esic_number, driving_license_number, passport_number"
     )
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean),
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -1119,17 +978,17 @@ export async function createEmployeeStatutoryFromImportedData({
   const existingSets = {
     ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
     aadhaars: new Set(
-      existingRecords?.map((e) => normalize(e.aadhaar_number)) || [],
+      existingRecords?.map((e) => normalize(e.aadhaar_number)) || []
     ),
     pans: new Set(existingRecords?.map((e) => normalize(e.pan_number)) || []),
     uans: new Set(existingRecords?.map((e) => normalize(e.uan_number)) || []),
     pfs: new Set(existingRecords?.map((e) => normalize(e.pf_number)) || []),
     esics: new Set(existingRecords?.map((e) => normalize(e.esic_number)) || []),
     drivingLicenses: new Set(
-      existingRecords?.map((e) => normalize(e.driving_license_number)) || [],
+      existingRecords?.map((e) => normalize(e.driving_license_number)) || []
     ),
     passports: new Set(
-      existingRecords?.map((e) => normalize(e.passport_number)) || [],
+      existingRecords?.map((e) => normalize(e.passport_number)) || []
     ),
   };
 
@@ -1148,7 +1007,7 @@ export async function createEmployeeStatutoryFromImportedData({
           existingSets.esics.has(normalize(entry.esic_number))) ||
         (entry.driving_license_number &&
           existingSets.drivingLicenses.has(
-            normalize(entry.driving_license_number),
+            normalize(entry.driving_license_number)
           )) ||
         (entry.passport_number &&
           existingSets.passports.has(normalize(entry.passport_number)));
@@ -1208,7 +1067,7 @@ export async function createEmployeeStatutoryFromImportedData({
                 normalize(record.driving_license_number)) ||
             (record.passport_number &&
               normalize(existing.passport_number) ===
-                normalize(record.passport_number)),
+                normalize(record.passport_number))
         );
 
         if (existingRecord) {
@@ -1225,7 +1084,7 @@ export async function createEmployeeStatutoryFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      }),
+      })
     );
 
     const errors = results.filter((r) => r.error);
@@ -1265,13 +1124,13 @@ export async function getEmployeeBankDetailsConflicts({
       `
       employee_id,
       account_number
-    `,
+    `
     )
     .or(
       [
         `employee_id.in.(${employeeIds.map((id) => id).join(",")})`,
         `account_number.in.(${accountNumbers.map((num) => num).join(",")})`,
-      ].join(","),
+      ].join(",")
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -1286,7 +1145,7 @@ export async function getEmployeeBankDetailsConflicts({
       const hasConflict = conflictingRecords?.some(
         (existing) =>
           existing.employee_id === record.employee_id ||
-          existing.account_number === record.account_number,
+          existing.account_number === record.account_number
       );
 
       if (hasConflict) {
@@ -1294,7 +1153,7 @@ export async function getEmployeeBankDetailsConflicts({
       }
       return indices;
     },
-    [],
+    []
   );
 
   return { conflictingIndices, error: null };
@@ -1323,7 +1182,7 @@ export async function createEmployeeBankDetailsFromImportedData({
     .select("employee_id, account_number")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean),
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -1338,7 +1197,7 @@ export async function createEmployeeBankDetailsFromImportedData({
   const existingSets = {
     ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
     accounts: new Set(
-      existingRecords?.map((e) => normalize(e.account_number)) || [],
+      existingRecords?.map((e) => normalize(e.account_number)) || []
     ),
   };
 
@@ -1387,7 +1246,7 @@ export async function createEmployeeBankDetailsFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.account_number &&
               normalize(existing.account_number) ===
-                normalize(record.account_number)),
+                normalize(record.account_number))
         );
 
         if (existingRecord) {
@@ -1404,7 +1263,7 @@ export async function createEmployeeBankDetailsFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      }),
+      })
     );
 
     const errors = results.filter((r) => r.error);
@@ -1465,7 +1324,7 @@ export async function getEmployeeGuardiansConflicts({
       mobile_number,
       alternate_mobile_number,
       email
-    `,
+    `
     )
     .or(
       [
@@ -1474,7 +1333,7 @@ export async function getEmployeeGuardiansConflicts({
           .map((num) => num)
           .join(",")})`,
         `email.in.(${emails.map((email) => email).join(",")})`,
-      ].join(","),
+      ].join(",")
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -1490,7 +1349,7 @@ export async function getEmployeeGuardiansConflicts({
         (existing) =>
           existing.mobile_number === record.mobile_number ||
           existing.alternate_mobile_number === record.alternate_mobile_number ||
-          existing.email === record.email,
+          existing.email === record.email
       );
 
       if (hasConflict) {
@@ -1498,7 +1357,7 @@ export async function getEmployeeGuardiansConflicts({
       }
       return indices;
     },
-    [],
+    []
   );
 
   return { conflictingIndices, error: null };
@@ -1531,7 +1390,7 @@ export async function createEmployeeGuardiansFromImportedData({
       entry.email ? `email.eq.${entry.email}` : null,
     ]
       .filter(Boolean)
-      .join(","),
+      .join(",")
   );
 
   const { data: existingRecords, error: fetchError } = await supabase
@@ -1546,10 +1405,10 @@ export async function createEmployeeGuardiansFromImportedData({
 
   const existingSets = {
     mobileNumbers: new Set(
-      existingRecords?.map((e) => normalize(e.mobile_number)) || [],
+      existingRecords?.map((e) => normalize(e.mobile_number)) || []
     ),
     alternateMobileNumbers: new Set(
-      existingRecords?.map((e) => normalize(e.alternate_mobile_number)) || [],
+      existingRecords?.map((e) => normalize(e.alternate_mobile_number)) || []
     ),
     emails: new Set(existingRecords?.map((e) => normalize(e.email)) || []),
   };
@@ -1559,7 +1418,7 @@ export async function createEmployeeGuardiansFromImportedData({
       const hasConflict =
         existingSets.mobileNumbers.has(normalize(entry.mobile_number)) ||
         existingSets.alternateMobileNumbers.has(
-          normalize(entry.alternate_mobile_number),
+          normalize(entry.alternate_mobile_number)
         ) ||
         existingSets.emails.has(normalize(entry.email));
 
@@ -1588,7 +1447,7 @@ export async function createEmployeeGuardiansFromImportedData({
           normalize(record.mobile_number) === normalize(entry.mobile_number) ||
           normalize(record.alternate_mobile_number) ===
             normalize(entry.alternate_mobile_number) ||
-          normalize(record.email) === normalize(entry.email),
+          normalize(record.email) === normalize(entry.email)
       );
 
       if (existing) {
@@ -1635,13 +1494,13 @@ export async function createEmployeeGuardiansFromImportedData({
   };
 }
 
-export async function createEmployeeProjectAssignmentsFromImportedData({
+export async function createEmployeeWorkDetailsFromImportedData({
   supabase,
   data,
   import_type,
 }: {
   supabase: TypedSupabaseClient;
-  data: EmployeeProjectAssignmentDatabaseInsert[];
+  data: EmployeeWorkDetailsDatabaseInsert[];
   import_type?: string;
 }) {
   if (!data || data.length === 0) {
@@ -1653,11 +1512,11 @@ export async function createEmployeeProjectAssignmentsFromImportedData({
   }));
 
   const { data: existingRecords, error: existingError } = await supabase
-    .from("employee_project_assignment")
+    .from("work_details")
     .select("employee_id")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean),
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -1693,7 +1552,7 @@ export async function createEmployeeProjectAssignmentsFromImportedData({
       const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
 
       const { error: insertError } = await supabase
-        .from("employee_project_assignment")
+        .from("work_details")
         .insert(batch);
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -1711,12 +1570,12 @@ export async function createEmployeeProjectAssignmentsFromImportedData({
       data.map(async (record) => {
         const existingRecord = existingRecords?.find(
           (existing) =>
-            normalize(existing.employee_id) === normalize(record.employee_id),
+            normalize(existing.employee_id) === normalize(record.employee_id)
         );
 
         if (existingRecord) {
           const { error: updateError } = await supabase
-            .from("employee_project_assignment")
+            .from("work_details")
             .update(record)
             .eq("employee_id", existingRecord.employee_id);
 
@@ -1724,11 +1583,11 @@ export async function createEmployeeProjectAssignmentsFromImportedData({
         }
 
         const { error: insertError } = await supabase
-          .from("employee_project_assignment")
+          .from("work_details")
           .insert(record);
 
         return { type: "insert", error: insertError };
-      }),
+      })
     );
 
     const errors = results.filter((r) => r.error);

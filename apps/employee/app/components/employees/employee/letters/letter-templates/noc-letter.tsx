@@ -24,11 +24,11 @@ export function NOCLetter({
     employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees?.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
-      data?.employees.employee_project_assignment?.start_date ?? "",
+      data?.employees.work_details?.start_date ?? ""
     ).toLocaleDateString("en-IN"),
 
     employeeLeavingDate: new Date(
-      data?.employees.employee_project_assignment?.end_date ?? "",
+      data?.employees.work_details?.end_date ?? ""
     ).toLocaleDateString("en-IN"),
   };
 

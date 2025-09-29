@@ -6,6 +6,7 @@ import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   createEmployeeDetailsFromImportedData,
+  createEmployeeWorkDetailsFromImportedData,
   getEmployeeDetailsConflicts,
 } from "@canny_ecosystem/supabase/mutations";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
@@ -19,12 +20,14 @@ import {
   duplicationTypeArray,
   ImportEmployeeDetailsDataSchema,
   isGoodStatus,
+  normalizeNames,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 import { useState, useEffect } from "react";
+import { getDepartmentsByCompanyId } from "@canny_ecosystem/supabase/queries";
 
 export function EmployeeDetailsImportData({
   env,
@@ -89,8 +92,8 @@ export function EmployeeDetailsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -98,34 +101,103 @@ export function EmployeeDetailsImportData({
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       setIsImporting(true);
-      const updatedData = importData.data.map((entry) => ({
-        ...entry,
+
+      const { data: departments, error: departmentError } =
+        await getDepartmentsByCompanyId({
+          supabase,
+          companyId,
+        });
+
+      if (departmentError) throw departmentError;
+
+      const departmentMap = new Map(
+        (departments ?? []).map((d) => [normalizeNames(d.name), d.id])
+      );
+
+      const preData = importData.data.map((item: any) => {
+        const departmentId = departmentMap.get(normalizeNames(item.department));
+
+        const { department, ...rest } = item;
+
+        return {
+          ...rest,
+          ...(departmentId ? { department_id: departmentId } : {}),
+        };
+      });
+
+      const employeesData = preData.map((entry) => ({
+        employee_code: entry.employee_code,
+        first_name: entry.first_name,
+        middle_name: entry.middle_name,
+        last_name: entry.last_name,
+        date_of_birth: entry.date_of_birth,
+        gender: entry.gender,
+        education: entry.education,
+        marital_status: entry.marital_status,
+        nationality: entry.nationality,
+        primary_mobile_number: entry.primary_mobile_number,
+        secondary_mobile_number: entry.secondary_mobile_number,
+        personal_email: entry.personal_email,
+        is_active: entry.is_active,
         company_id: companyId,
       }));
 
-      const { error, status } = await createEmployeeDetailsFromImportedData({
-        data: updatedData,
+      const {
+        error: employeeError,
+        status: employeeStatus,
+        employees,
+      } = await createEmployeeDetailsFromImportedData({
+        data: employeesData,
         import_type: importType,
         supabase,
       });
 
+      const empCodeToId = Object.fromEntries(
+        employees!.map((emp) => [emp.employee_code, emp.id])
+      );
+
+      const workDetailsData = preData.map((entry) => ({
+        employee_id: empCodeToId[entry.employee_code],
+        site_id: entry.site_id,
+        position: entry.position,
+        start_date: entry.start_date,
+        end_date: entry.end_date,
+        assignment_type: entry.assignment_type,
+        skill_level: entry.skill_level,
+        probation_period: entry.probation_period,
+        probation_end_date: entry.probation_end_date,
+        department_id: entry.department_id,
+        employee_code: entry.employee_code,
+      }));
+
+      const { error: workDetailsError, status: wordDetailsStatus } =
+        await createEmployeeWorkDetailsFromImportedData({
+          data: workDetailsData,
+          import_type: importType,
+          supabase,
+        });
+
       setIsImporting(false);
 
-      if (error) {
+      if (employeeError || workDetailsError) {
         toast({
           title: "Error",
-          description: JSON.stringify(error) ?? "Failed to import details",
+          description:
+            JSON.stringify(employeeError) ??
+            JSON.stringify(workDetailsError) ??
+            "Failed to import details",
           variant: "destructive",
         });
       }
 
-      if (isGoodStatus(status)) {
+      if (isGoodStatus(employeeStatus) && isGoodStatus(wordDetailsStatus)) {
         toast({
           title: "Success",
           description: "Details imported succesfully",
           variant: "success",
         });
         clearCacheEntry(cacheKeyPrefix.employee_overview);
+        clearCacheEntry(cacheKeyPrefix.employee_work_portfolio);
         clearCacheEntry(cacheKeyPrefix.employees);
         navigate("/employees");
       }
@@ -133,11 +205,11 @@ export function EmployeeDetailsImportData({
   };
 
   return (
-    <section className="p-4 relative">
+    <section className="px-4 relative">
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden",
+          isImporting ? "block" : "hidden"
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
@@ -163,10 +235,10 @@ export function EmployeeDetailsImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
+                duplicationTypeArray as unknown as string[]
               )}
               value={importType}
               onChange={(value: string) => {

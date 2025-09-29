@@ -13,9 +13,10 @@ import { Dialog, DialogContent } from "@canny_ecosystem/ui/dialog";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  type EmployeeProjectAssignmentDataType,
+  type EmployeeWorkDetailsDataType,
   getCompanyById,
   getLocationById,
+  getPayrollById,
   getPrimaryLocationByCompanyId,
   getSalaryEntriesForSalaryRegisterAndAll,
 } from "@canny_ecosystem/supabase/queries";
@@ -31,6 +32,8 @@ import type {
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import {
+  defaultMonth,
+  defaultYear,
   getMonthNameFromNumber,
   replaceUnderscore,
   roundToNearest,
@@ -113,7 +116,7 @@ type DataType = {
       absents: number;
     };
     employeeData: EmployeeDatabaseRow;
-    employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
+    employeeProjectAssignmentData: EmployeeWorkDetailsDataType;
     employeeStatutoryDetails: EmployeeStatutoryDetailsDatabaseRow;
     earnings: { name: string; amount: number }[];
     deductions: { name: string; amount: number }[];
@@ -124,16 +127,16 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
   const uniqueEarningFields = Array.from(
     new Set(
       data.employeeData.flatMap((emp: any) =>
-        emp.earnings.map((e: any) => e.name),
-      ),
-    ),
+        emp.earnings.map((e: any) => e.name)
+      )
+    )
   );
   const uniqueDeductingFields = Array.from(
     new Set(
       data.employeeData.flatMap((emp: any) =>
-        emp.deductions.map((e: any) => e.name),
-      ),
-    ),
+        emp.deductions.map((e: any) => e.name)
+      )
+    )
   );
 
   return (
@@ -410,11 +413,11 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
 
               <Text style={{ textTransform: "capitalize" }}>
                 {replaceUnderscore(
-                  employee?.employeeProjectAssignmentData?.position,
+                  employee?.employeeProjectAssignmentData?.position
                 )}
                 <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
               </Text>
-              <Text>{employee?.employeeStatutoryDetails?.pf_number}.</Text>
+              <Text>{employee?.employeeStatutoryDetails?.pf_number}</Text>
               <Text>{employee?.employeeStatutoryDetails?.esic_number}</Text>
             </View>
             <View
@@ -532,14 +535,14 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .reduce((sum, earning) => sum + earning.amount, 0)
-                    ?.toFixed(2),
+                    ?.toFixed(2)
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>0</Text>
@@ -594,7 +597,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .reduce((sum, earning) => sum + earning?.amount, 0)
-                    ?.toFixed(2),
+                    ?.toFixed(2)
                 )}
               </Text>
             </View>
@@ -609,13 +612,13 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                   Number(
                     employee?.earnings
                       .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2),
+                      ?.toFixed(2)
                   ) -
                     Number(
                       employee?.deductions
                         .reduce((sum, earning) => sum + earning?.amount, 0)
-                        ?.toFixed(2),
-                    ),
+                        ?.toFixed(2)
+                    )
                 )}
               </Text>
             </View>
@@ -636,6 +639,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId as string;
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data: payroll } = await getPayrollById({ payrollId, supabase });
 
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.searchParams);
@@ -665,6 +669,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     await getSalaryEntriesForSalaryRegisterAndAll({
       supabase,
       payrollId,
+      month: payroll?.month ?? defaultMonth,
+      year: payroll?.year ?? defaultYear,
     });
 
   return {
@@ -684,7 +690,7 @@ export default function SalaryRegister() {
   const updatedData = {
     ...data,
     payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1: any) =>
-      selectedRows.some((emp2: any) => emp2.employee.id === emp1.employee.id),
+      selectedRows.some((emp2: any) => emp2.employee.id === emp1.employee.id)
     ),
   };
 
@@ -712,6 +718,7 @@ export default function SalaryRegister() {
       const deductionFields = new Map<string, true>();
       const earningsMap: Record<string, number> = {};
       const deductionsMap: Record<string, number> = {};
+
       for (const entry of emp.salary_entries.salary_field_values) {
         const name = entry?.payroll_fields?.name;
         const type = entry?.payroll_fields?.type ?? "earning";
@@ -726,23 +733,23 @@ export default function SalaryRegister() {
       }
 
       const orderedEarnings = preferredEarningOrder.filter((f) =>
-        earningFields.has(f),
+        earningFields.has(f)
       );
       const remainingEarnings = [...earningFields.keys()].filter(
-        (f) => !preferredEarningOrder.includes(f),
+        (f) => !preferredEarningOrder.includes(f)
       );
       const orderedDeductions = preferredDeductionOrder.filter((f) =>
-        deductionFields.has(f),
+        deductionFields.has(f)
       );
       const remainingDeductions = [...deductionFields.keys()].filter(
-        (f) => !preferredDeductionOrder.includes(f),
+        (f) => !preferredDeductionOrder.includes(f)
       );
 
       const earnings = [...orderedEarnings, ...remainingEarnings].map(
-        (name) => ({ name, amount: earningsMap[name] }),
+        (name) => ({ name, amount: earningsMap[name] })
       );
       const deductions = [...orderedDeductions, ...remainingDeductions].map(
-        (name) => ({ name, amount: deductionsMap[name] }),
+        (name) => ({ name, amount: deductionsMap[name] })
       );
 
       return {
@@ -750,14 +757,12 @@ export default function SalaryRegister() {
           first_name: emp?.employee?.first_name,
           middle_name: emp?.employee?.middle_name,
           last_name: emp?.employee?.last_name,
-          employee_code: emp?.employee?.employee_code,
+          employee_code: emp?.employee?.work_details?.employee_code,
         },
         employeeProjectAssignmentData: {
-          position: emp?.employee?.employee_project_assignment?.position || "",
-          department:
-            emp?.employee?.employee_project_assignment?.department || "",
-          date_of_joining:
-            emp.employee?.employee_project_assignment?.start_date || "",
+          position: emp?.employee?.work_details?.position || "",
+          department: emp?.employee?.work_details?.department || "",
+          date_of_joining: emp?.employee?.work_details?.start_date || "",
         },
         employeeStatutoryDetails: {
           pf_number: emp.employee?.employee_statutory_details?.pf_number || "",

@@ -23,6 +23,14 @@ export const ImportEmployeeDataArray = [
   "personal_email",
   "primary_mobile_number",
   "secondary_mobile_number",
+  "department",
+  "assignment_type",
+  "start_date",
+  "end_date",
+  "position",
+  "skill_level",
+  "probation_period",
+  "probation_end_date",
 ];
 
 export function ImportedDataTableHeader({ table, className, loading }: Props) {

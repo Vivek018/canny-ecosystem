@@ -124,6 +124,76 @@ export const ImportedDataColumns: ColumnDef<ImportEmployeeDetailsDataType>[] = [
     },
   },
   {
+    accessorKey: "department",
+    header: "Department",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate group-hover:text-primary">
+          {row.original.department}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "assignment_type",
+    header: "Assignment Type",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate ">{row.original?.assignment_type ?? "--"}</p>
+      );
+    },
+  },
+
+  {
+    accessorKey: "start_date",
+    header: "Start Date",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.start_date ?? "--"}</p>;
+    },
+  },
+
+  {
+    accessorKey: "end_date",
+    header: "End Date",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.end_date ?? "--"}</p>;
+    },
+  },
+  {
+    accessorKey: "position",
+    header: "Position",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.position ?? "--"}</p>;
+    },
+  },
+  {
+    accessorKey: "skill_level",
+    header: "Skill Level",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.skill_level ?? "--"}</p>;
+    },
+  },
+  {
+    accessorKey: "probation_period",
+    header: "Probation Period",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate group-hover:text-primary">
+          {row.original.probation_period}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "probation_end_date",
+    header: "Probation End Date",
+    cell: ({ row }) => {
+      return (
+        <p className=" truncate">{row.original?.probation_end_date ?? "--"}</p>
+      );
+    },
+  },
+  {
     id: "actions",
     enableSorting: false,
     enableHiding: false,

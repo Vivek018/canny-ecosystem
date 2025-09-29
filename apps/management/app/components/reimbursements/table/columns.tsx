@@ -5,7 +5,6 @@ import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import {
   deleteRole,
   formatDate,
@@ -23,7 +22,7 @@ export const columns = ({
   isEmployeeRoute = false,
 }: {
   isEmployeeRoute?: boolean;
-}): ColumnDef<ReimbursementDataType>[] => [
+}): ColumnDef<any>[] => [
   {
     id: "select",
     cell: ({ row }) => (
@@ -73,29 +72,13 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "payee_code",
-    header: "Payee Code",
-    cell: ({ row }) => {
-      return row.original.payee_id ? (
-        <Link to={"/settings/payee"} prefetch="intent" className="group">
-          <p className="truncate text-primary/80 group-hover:text-primary ">
-            {row.original.payee?.payee_code ?? "--"}
-          </p>
-        </Link>
-      ) : (
-        <p>--</p>
-      );
-    },
-  },
-  {
-    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original.employees?.employee_project_assignment?.sites?.projects
-            ?.name ?? "--"}
+          {row.original.employees?.work_details[0]?.sites?.projects?.name ??
+            "--"}
         </p>
       );
     },
@@ -107,8 +90,7 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original.employees?.employee_project_assignment?.sites?.name ??
-            "--"}
+          {row.original.employees?.work_details[0]?.sites?.name ?? "--"}
         </p>
       );
     },
@@ -193,14 +175,14 @@ export const columns = ({
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.reimbursements}`,
+                  `${updateRole}:${attribute.reimbursements}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.reimbursements}`,
+                    `${deleteRole}:${attribute.reimbursements}`
                   ) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden",
+                !!row.original.invoice_id?.length && "hidden"
               )}
               asChild
             >

@@ -53,7 +53,7 @@ import {
   seedEmployeeWorkHistory,
 } from "./employees";
 import {
-  getEmployeeProjectAssignmentByEmployeeId,
+  getEmployeeWorkDetailsByEmployeeId,
   getEmployeesByCompanyId,
   getEmployeesBySiteId,
 } from "../queries";
@@ -88,7 +88,7 @@ dotenv.config();
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!,
+  process.env.SUPABASE_ANON_KEY!
 );
 
 // Function to generate a random number within a range
@@ -111,7 +111,7 @@ export async function seed(newCompanyId?: string) {
     }
 
     console.time(
-      "Created Locations and Relationships(with Project & Sites)...",
+      "Created Locations and Relationships(with Project & Sites)..."
     );
     for (let index = 0; index < 2; index++) {
       await createLocation({
@@ -243,7 +243,7 @@ export async function seed(newCompanyId?: string) {
                   caseData.reported_by_company_id = companyId!;
                 } else if (reportedBy === "project") {
                   const { data: assignmentData } =
-                    await getEmployeeProjectAssignmentByEmployeeId({
+                    await getEmployeeWorkDetailsByEmployeeId({
                       supabase,
                       employeeId: employeeData.id,
                     });
@@ -251,7 +251,7 @@ export async function seed(newCompanyId?: string) {
                     assignmentData?.sites.projects?.id!;
                 } else if (reportedBy === "site") {
                   const { data: assignmentData } =
-                    await getEmployeeProjectAssignmentByEmployeeId({
+                    await getEmployeeWorkDetailsByEmployeeId({
                       supabase,
                       employeeId: employeeData.id,
                     });
@@ -270,14 +270,14 @@ export async function seed(newCompanyId?: string) {
                   caseData.reported_on_company_id = companyId!;
                 } else if (reportedOn === "project") {
                   const { data: assignmentData } =
-                    await getEmployeeProjectAssignmentByEmployeeId({
+                    await getEmployeeWorkDetailsByEmployeeId({
                       supabase,
                       employeeId: employeeId!,
                     });
                   caseData.reported_on_project_id = assignmentData?.sites;
                 } else if (reportedOn === "site") {
                   const { data: assignmentData } =
-                    await getEmployeeProjectAssignmentByEmployeeId({
+                    await getEmployeeWorkDetailsByEmployeeId({
                       supabase,
                       employeeId: employeeId,
                     });
@@ -388,7 +388,7 @@ export async function seed(newCompanyId?: string) {
       console.timeEnd("Created Project and Sites(with Employees)...");
     }
     console.timeEnd(
-      "Created Locations and Relationships(with Project & Sites)...",
+      "Created Locations and Relationships(with Project & Sites)..."
     );
 
     console.time("Created Taxes...");

@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useReportsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreReport = async () => {
@@ -92,8 +92,8 @@ export function DataTable<TData, TValue>({
 
       const gratuityReportData = data?.map(
         (employee: EmployeeReportDataType) => {
-          const joining_date = employee.employee_project_assignment.start_date
-            ? new Date(employee.employee_project_assignment.start_date)
+          const joining_date = employee.work_details.start_date
+            ? new Date(employee.work_details.start_date)
             : new Date();
           const totalDays = gratuityEligibleYears * 365.25;
 
@@ -113,14 +113,14 @@ export function DataTable<TData, TValue>({
             is_eligible_for_gratuity:
               employeeWorkingYears >= gratuityEligibleYears,
             employee_eligible_date: joining_date.setDate(
-              joining_date.getDate() + totalDays,
+              joining_date.getDate() + totalDays
             ),
           };
-        },
+        }
       );
       if (data) {
         setData(
-          (prevData) => [...prevData, ...(gratuityReportData ?? [])] as TData[],
+          (prevData) => [...prevData, ...(gratuityReportData ?? [])] as TData[]
         );
       }
       setFrom(to + 1);
@@ -169,7 +169,7 @@ export function DataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <div className="relative">
@@ -204,12 +204,12 @@ export function DataTable<TData, TValue>({
                             cell.column.id === "employee_name" &&
                               "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -223,7 +223,7 @@ export function DataTable<TData, TValue>({
                   <TableCell
                     colSpan={columns.length}
                     className={cn(
-                      "h-96 bg-background grid place-items-center text-center tracking-wide",
+                      "h-96 bg-background grid place-items-center text-center tracking-wide"
                     )}
                   >
                     <div className="flex flex-col items-center gap-1">
@@ -231,7 +231,7 @@ export function DataTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -240,7 +240,7 @@ export function DataTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                         onClick={() => {
                           setSearchParams();

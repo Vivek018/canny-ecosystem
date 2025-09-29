@@ -19,7 +19,7 @@ import { LeavesOptionsDropdown } from "@/components/employees/leaves/table/leave
 import { Link } from "@remix-run/react";
 
 export const columns = (
-  isEmployeeRoute?: boolean,
+  isEmployeeRoute?: boolean
 ): ColumnDef<LeavesDataType>[] => [
   {
     id: "select",
@@ -72,8 +72,7 @@ export const columns = (
     header: "Project",
     cell: ({ row }) => {
       return (
-        row.original?.employees?.employee_project_assignment?.sites?.projects
-          ?.name ?? "--"
+        row.original?.employees?.work_details[0]?.sites?.projects?.name ?? "--"
       );
     },
   },
@@ -81,10 +80,7 @@ export const columns = (
     accessorKey: "site",
     header: "Site",
     cell: ({ row }) => {
-      return (
-        row.original?.employees?.employee_project_assignment?.sites?.name ??
-        "--"
-      );
+      return row.original?.employees?.work_details[0]?.sites?.name ?? "--";
     },
   },
   {
@@ -157,13 +153,13 @@ export const columns = (
               className={cn(
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.employeeLeaves}`,
+                  `${updateRole}:${attribute.employeeLeaves}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employeeLeaves}`,
+                    `${deleteRole}:${attribute.employeeLeaves}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

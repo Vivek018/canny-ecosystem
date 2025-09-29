@@ -3,12 +3,14 @@ import {
   EmployeeAddressesSchema,
   EmployeeBankDetailsSchema,
   EmployeeGuardiansSchema,
-  EmployeeProjectAssignmentSchema,
+  EmployeeWorkDetailsSchema,
   EmployeeSchema,
   EmployeeStatutorySchema,
   hasPermission,
   isGoodStatus,
   SIZE_10MB,
+  generateRandomCode,
+  generateEmployeeCodes,
 } from "@canny_ecosystem/utils";
 import { createEmployee } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -42,14 +44,20 @@ import { CreateEmployeeAddress } from "@/components/employees/form/create-employ
 import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/form/form-step-header";
-import { getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
-import { CreateEmployeeProjectAssignment } from "@/components/employees/form/create-employee-project-assignment";
+import {
+  getDepartmentsByCompanyId,
+  getLatestEmployeeOfTheSite,
+  getSiteById,
+  getSiteNamesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
+
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { seedRequisitesForEmployeeCreation } from "@canny_ecosystem/supabase/seed";
+import { CreateEmployeeWorkDetails } from "@/components/employees/form/create-employee-work-details";
 
 export const CREATE_EMPLOYEE = [
   "create-employee",
@@ -68,7 +76,7 @@ const schemas = [
   EmployeeSchema,
   EmployeeStatutorySchema,
   EmployeeBankDetailsSchema,
-  EmployeeProjectAssignmentSchema,
+  EmployeeWorkDetailsSchema,
   EmployeeAddressesSchema,
   EmployeeGuardiansSchema,
 ];
@@ -83,6 +91,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!hasPermission(user?.role!, `${createRole}:${attribute.employee}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+
+  const autoCode = generateRandomCode("NOEMP");
 
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
@@ -100,7 +110,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   let siteOptions: any = [];
+  let departmentOptions: any = [];
+  let workDetailCode = "";
   if (step === 4) {
+    const url = new URL(request.url);
+    const urlSearchParams = new URLSearchParams(url.searchParams);
+    const site = urlSearchParams.get("site") ?? "";
+
+    if (site) {
+      const { data } = await getLatestEmployeeOfTheSite({
+        supabase,
+        siteId: site,
+      });
+      const { data: siteData } = await getSiteById({ id: site, supabase });
+
+      workDetailCode = generateEmployeeCodes(
+        siteData?.prefix ?? "",
+        1,
+        data!
+      )[0];
+    }
+
+    const { data: departments } = await getDepartmentsByCompanyId({
+      supabase,
+      companyId,
+    });
+    departmentOptions = departments?.map((department) => ({
+      label: department?.name,
+      value: department?.id,
+    }));
     const { data: sites } = await getSiteNamesByCompanyId({
       supabase,
       companyId,
@@ -117,8 +155,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
     step,
     totalSteps,
     stepData,
+    autoCode,
+    workDetailCode,
     companyId,
     siteOptions,
+    departmentOptions,
   });
 }
 
@@ -133,7 +174,7 @@ export async function action({
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });
@@ -147,21 +188,26 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
       const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
       const employeeStatutoryDetailsData = session.get(
-        `${SESSION_KEY_PREFIX}2`,
+        `${SESSION_KEY_PREFIX}2`
       );
       const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
-      const employeeProjectAssignmentData = session.get(
-        `${SESSION_KEY_PREFIX}4`,
-      );
+      const employeeWorkDetailsData = session.get(`${SESSION_KEY_PREFIX}4`);
       const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}5`);
       const employeeGuardiansData =
         submission.value as EmployeeGuardianDatabaseInsert;
+
+      const { update_main_employee_code, ...rest } =
+        employeeWorkDetailsData ?? {};
+
+      if (update_main_employee_code) {
+        employeeData.employee_code = employeeWorkDetailsData.employee_code;
+      }
 
       const {
         id,
@@ -169,7 +215,7 @@ export async function action({
         employeeError,
         employeeStatutoryDetailsError,
         employeeBankDetailsError,
-        employeeProjectAssignmentError,
+        employeeWorkDetailsError,
         employeeAddressesError,
         employeeGuardiansError,
       } = await createEmployee({
@@ -177,7 +223,7 @@ export async function action({
         employeeData,
         employeeStatutoryDetailsData,
         employeeBankDetailsData,
-        employeeProjectAssignmentData,
+        employeeWorkDetailsData: rest,
         employeeAddressesData,
         employeeGuardiansData,
       });
@@ -192,14 +238,14 @@ export async function action({
             message: "Failed to create employee",
             returnTo: "/employees",
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
 
       if (
         employeeStatutoryDetailsError ||
         employeeBankDetailsError ||
-        employeeProjectAssignmentError ||
+        employeeWorkDetailsError ||
         employeeAddressesError ||
         employeeGuardiansError
       ) {
@@ -209,13 +255,13 @@ export async function action({
             error:
               employeeStatutoryDetailsError ||
               employeeBankDetailsError ||
-              employeeProjectAssignmentError ||
+              employeeWorkDetailsError ||
               employeeAddressesError ||
               employeeGuardiansError,
             message: "Failed to save employee details",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
 
@@ -234,7 +280,7 @@ export async function action({
             headers: {
               "Set-Cookie": await commitSession(session),
             },
-          },
+          }
         );
       }
     } else if (
@@ -253,7 +299,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -278,7 +324,7 @@ export async function action({
         message: `An unexpected error occurred${error}`,
         returnTo: "/employees",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -286,8 +332,16 @@ export async function action({
 }
 
 export default function CreateEmployee() {
-  const { step, totalSteps, stepData, companyId, siteOptions } =
-    useLoaderData<typeof loader>();
+  const {
+    step,
+    totalSteps,
+    stepData,
+    companyId,
+    siteOptions,
+    autoCode,
+    workDetailCode,
+    departmentOptions,
+  } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const actionData = useActionData<typeof action>();
@@ -334,10 +388,15 @@ export default function CreateEmployee() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: stepData[step - 1] ?? {
-      ...initialValues,
-      company_id: step === 1 ? companyId : null,
-    },
+    defaultValue: stepData[step - 1]
+      ? {
+          ...stepData[step - 1],
+          company_id: step === 1 ? companyId : null,
+        }
+      : {
+          ...initialValues,
+          company_id: step === 1 ? companyId : null,
+        },
   });
 
   return (
@@ -359,7 +418,11 @@ export default function CreateEmployee() {
           <Card>
             <div className="h-[560px] max-sm:h-[500px] overflow-scroll">
               {step === 1 ? (
-                <CreateEmployeeDetails key={resetKey} fields={fields as any} />
+                <CreateEmployeeDetails
+                  key={resetKey}
+                  fields={fields as any}
+                  autoCode={autoCode}
+                />
               ) : null}
               {step === 2 ? (
                 <CreateEmployeeStatutoryDetails
@@ -374,10 +437,12 @@ export default function CreateEmployee() {
                 />
               ) : null}
               {step === 4 ? (
-                <CreateEmployeeProjectAssignment
+                <CreateEmployeeWorkDetails
                   key={resetKey + 3}
                   fields={fields as any}
                   siteOptions={siteOptions}
+                  departmentOptions={departmentOptions}
+                  autoCode={workDetailCode}
                 />
               ) : null}
               {step === 5 ? (

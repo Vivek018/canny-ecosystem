@@ -87,7 +87,7 @@ export function EmployeePageHeader({
               <>
                 <AvatarImage src={employee.photo ?? undefined} />
                 <AvatarFallback className="rounded-md">
-                  <span className="text-md">
+                  <span className="text-base">
                     {employee.first_name?.charAt(0)}
                   </span>
                 </AvatarFallback>
@@ -106,7 +106,7 @@ export function EmployeePageHeader({
             <div
               className={cn(
                 "rounded-sm flex items-center",
-                employee.is_active ? "text-green" : "text-yellow-500",
+                employee.is_active ? "text-green" : "text-yellow-500"
               )}
             >
               <Icon name="dot-filled" className="mt-[1px]" />
@@ -135,8 +135,8 @@ export function EmployeePageHeader({
               "w-full bg-card",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.employeeDetails}`,
-              ) && "hidden",
+                `${updateRole}:${attribute.employeeDetails}`
+              ) && "hidden"
             )}
           >
             <Icon name="edit" size="xs" className="mr-1.5" />
@@ -156,8 +156,8 @@ export function EmployeePageHeader({
                   "w-full bg-card",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.employees}`,
-                  ) && "hidden",
+                    `${updateRole}:${attribute.employees}`
+                  ) && "hidden"
                 )}
               >
                 <Icon name="dots-vertical" size="xs" className="mr-1.5" />

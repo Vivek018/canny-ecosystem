@@ -10,7 +10,6 @@ import {
 } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  getDepartmentsByCompanyId,
   getLocationsByCompanyId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
@@ -18,6 +17,7 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { defaultMonth, defaultYear } from "@canny_ecosystem/utils";
 
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -52,19 +52,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       pseudoLabel: siteData?.projects?.name,
     }));
 
-    const { data: allDepartmentData, error: departmentError } =
-      await getDepartmentsByCompanyId({
-        supabase,
-        companyId,
-      });
-    if (departmentError) throw departmentError;
-
-    const allDepartmentOptions = allDepartmentData?.map((departmentData) => ({
-      label: departmentData.name?.toLowerCase(),
-      value: departmentData.id,
-      pseudoLabel: departmentData?.site?.name,
-    }));
-
     const { data: allLocationData, error: locationError } =
       await getLocationsByCompanyId({
         supabase,
@@ -88,13 +75,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const salaryEntriesPromise = getSalaryEntriesByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
+      month: payrollData?.month ?? defaultMonth,
+      year: payrollData?.year ?? defaultYear,
     });
 
     return defer({
       payrollData,
       salaryEntriesPromise,
       allSiteOptions,
-      allDepartmentOptions,
       allLocationOptions,
       error: null,
       env,
@@ -105,7 +93,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollData: null,
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
       allSiteOptions: [],
-      allDepartmentOptions: [],
       allLocationOptions: [],
       error,
       env: null,
@@ -119,7 +106,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.payroll_history_id}${
       args.params.payrollId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -131,7 +118,6 @@ export default function HistoryPayrollId() {
     salaryEntriesPromise,
     env,
     allSiteOptions,
-    allDepartmentOptions,
     allLocationOptions,
   } = useLoaderData<typeof loader>();
 
@@ -152,7 +138,7 @@ export default function HistoryPayrollId() {
         {({ data, error }) => {
           if (error || !data) {
             clearExactCacheEntry(
-              `${cacheKeyPrefix.payroll_history_id}${payrollId}`,
+              `${cacheKeyPrefix.payroll_history_id}${payrollId}`
             );
             return (
               <ErrorBoundary
@@ -170,7 +156,6 @@ export default function HistoryPayrollId() {
               fromWhere="payrollhistory"
               allLocationOptions={allLocationOptions ?? []}
               allSiteOptions={allSiteOptions ?? []}
-              allDepartmentOptions={allDepartmentOptions ?? []}
             />
           );
         }}

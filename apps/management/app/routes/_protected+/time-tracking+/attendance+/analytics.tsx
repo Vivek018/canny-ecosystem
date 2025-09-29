@@ -13,8 +13,8 @@ export default function AttendanceAnalytics() {
     employee_id: entry?.id,
     employee_code: entry?.employee_code,
     employee_name: `${entry?.first_name} ${entry?.last_name}`,
-    project: entry?.employee_project_assignment?.sites?.projects?.name,
-    site: entry?.employee_project_assignment?.sites?.name,
+    project: entry?.work_details[0]?.sites?.projects?.name,
+    site: entry?.work_details[0]?.sites?.name,
     attendance_summary: {
       year: entry?.monthly_attendance?.year,
       month: entry?.monthly_attendance?.month,

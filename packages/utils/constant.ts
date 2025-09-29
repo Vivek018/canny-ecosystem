@@ -9,7 +9,6 @@ export const modalSearchParamNames = {
   import_employee_bank_details: "import-employee-bank-details",
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
-  import_project_assignments: "import-project-assignments",
   import_attendance: "import-attendance",
   import_reimbursement: "import-reimbursement",
   import_exits: "import-exits",
@@ -119,9 +118,7 @@ export const attribute = {
   employeeBankDetails: "employee_bank_details",
   employeeAddresses: "employee_addresses",
   employeeGuardians: "employee_guardians",
-  employeeProjectAssignment: "employee_project_assignment",
-  employeeWorkHistory: "employee_work_history",
-  employeeSkills: "employee_skills",
+  employeeWorkDetails: " employee_work_details",
   employeeLetters: "employee_letters",
   employeeReimbursements: "employee_reimbursements",
   employeeAttendance: "employee_attendance",
@@ -337,11 +334,10 @@ export const SUPABASE_MEDIA_URL_PREFIX =
 
 export function getFilePathFromUrl(url: string) {
   return url.startsWith(
-    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
   )
     ? url.slice(
-        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
-          .length,
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
       )
     : url;
 }

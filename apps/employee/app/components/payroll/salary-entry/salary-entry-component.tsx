@@ -25,8 +25,6 @@ export function SalaryEntryComponent({
   payrollData,
   env,
   fromWhere,
-  allSiteOptions,
-  allDepartmentOptions,
   allLocationOptions,
 }: {
   data: any[];
@@ -37,7 +35,6 @@ export function SalaryEntryComponent({
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
   allSiteOptions: ComboboxSelectOption[];
-  allDepartmentOptions: ComboboxSelectOption[];
   allLocationOptions: ComboboxSelectOption[];
 }) {
   const { selectedRows } = useSalaryEntriesStore();
@@ -62,12 +59,12 @@ export function SalaryEntryComponent({
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
-    [selectedRows, data],
+    [selectedRows, data]
   );
 
   const uniqueFields = useMemo(
     () => getUniqueFields(filteredData),
-    [filteredData],
+    [filteredData]
   );
 
   return (
@@ -96,7 +93,7 @@ export function SalaryEntryComponent({
           className={cn(
             payrollData?.status === "pending" || !selectedRows.length
               ? "hidden"
-              : "",
+              : ""
           )}
           allLocationOptions={allLocationOptions}
           payrollId={payrollId ?? payrollData?.id}
@@ -116,8 +113,6 @@ export function SalaryEntryComponent({
             uniqueFields,
             data,
             editable: payrollData?.status === "pending",
-            allSiteOptions,
-            allDepartmentOptions,
           })}
           totalNet={totals.TOTAL as number}
           uniqueFields={uniqueFields}

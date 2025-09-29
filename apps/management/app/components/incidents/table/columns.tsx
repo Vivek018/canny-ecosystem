@@ -182,8 +182,7 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
       return (
         <p className="truncate w-28">
           {row.original?.employee_id
-            ? row.original?.employees?.employee_project_assignment?.sites
-                ?.projects?.name
+            ? row.original?.employees?.work_details[0]?.sites?.projects?.name
             : row.original?.vehicles?.sites?.projects?.name}
         </p>
       );
@@ -196,7 +195,7 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
       return (
         <p className="truncate w-28">
           {row.original?.employee_id
-            ? row.original?.employees?.employee_project_assignment?.sites?.name
+            ? row.original?.employees?.work_details[0]?.sites?.name
             : row.original?.vehicles?.sites?.name}
         </p>
       );
@@ -220,9 +219,9 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.incidents}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.incidents}`,
+                    `${deleteRole}:${attribute.incidents}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
               asChild
             >

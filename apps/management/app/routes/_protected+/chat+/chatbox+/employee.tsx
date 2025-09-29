@@ -74,7 +74,7 @@ TABLES AND RELATIONSHIPS:
 - address_same_as_employee = true means they live at the same address.
 - Not always filled; use cautiously.
 
-6. employee_project_assignment:
+6. work_details:
 - Captures all employee's work details - employee assignments to sites.
 - Fields include: site_id, position, start_date, end_date, assignment_type (full_time, part_time), skill_level (skilled, unskilled), probation_period.
 - Crucial for determining who worked where, when, and in what role.
@@ -97,7 +97,7 @@ TABLES AND RELATIONSHIPS:
 HOW TO USE:
 • Always begin from employees table.
 • Use joins with child tables (bank, address, work, statutory, etc.) when additional data is needed.
-• Join depth can go up to 2 to 3 levels comfortably. For example, employees → employee_project_assignment → sites.
+• Join depth can go up to 2 to 3 levels comfortably. For example, employees → work_details → sites.
 • Prefer readable data (e.g., names, dates, positions) over IDs.
 • If an employee has multiple rows in a child table (like multiple addresses), apply aggregation or filters (like is_primary = true).
 • Use COALESCE to handle nulls where useful (e.g., COALESCE(middle_name, '') for full name).

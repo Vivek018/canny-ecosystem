@@ -101,10 +101,12 @@ export function SalaryTableHeader({
                 id === "employee_code" &&
                   "md:sticky md:left-32 md:bg-card md:z-10 min-w-36 max-w-36",
                 id === "name" && "min-w-52 max-w-52",
+                id === "site" && "min-w-36 max-w-36",
+                id === "department" && "min-w-36 max-w-36",
                 id.length > 7 &&
                   id !== "employee_code" &&
                   id !== "department" &&
-                  "min-w-40 max-w-40",
+                  "min-w-40 max-w-40"
               )}
             >
               <Button
@@ -118,14 +120,14 @@ export function SalaryTableHeader({
                   name="chevron-up"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "desc" && "flex",
+                    sortingId === id && sortingOrder === "desc" && "flex"
                   )}
                 />
                 <Icon
                   name="chevron-down"
                   className={cn(
                     "hidden",
-                    sortingId === id && sortingOrder === "asc" && "flex",
+                    sortingId === id && sortingOrder === "asc" && "flex"
                   )}
                 />
               </Button>

@@ -17,22 +17,16 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { SalaryEntryDropdown } from "../salary-entry-dropdown";
 import { SalaryEntrySheet } from "./salary-entry-sheet";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-import { SalaryEntrySiteDepartmentSheet } from "./salary-entry-site-department-sheet";
-import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { Link } from "@remix-run/react";
 
 export const salaryEntryColumns = ({
   data,
   editable = false,
   uniqueFields,
-  allDepartmentOptions,
-  allSiteOptions,
 }: {
   data: any;
   editable?: boolean;
   uniqueFields: string[];
-  allSiteOptions: ComboboxSelectOption[];
-  allDepartmentOptions: ComboboxSelectOption[];
 }): ColumnDef<any>[] => {
   return [
     {
@@ -60,7 +54,7 @@ export const salaryEntryColumns = ({
       accessorFn: (row) => row.employee.employee_code,
       sortingFn: (a, b) =>
         String(a.getValue("employee_code") ?? "").localeCompare(
-          String(b.getValue("employee_code") ?? ""),
+          String(b.getValue("employee_code") ?? "")
         ),
       cell: ({ row }) => (
         <Link to={`/employees/${row.original.employee.id}`}>
@@ -80,7 +74,7 @@ export const salaryEntryColumns = ({
         }`,
       sortingFn: (a, b) =>
         String(a.getValue("name") ?? "").localeCompare(
-          String(b.getValue("name") ?? ""),
+          String(b.getValue("name") ?? "")
         ),
       cell: ({ row }) => (
         <Link to={`/employees/${row.original.employee.id}`}>
@@ -95,52 +89,36 @@ export const salaryEntryColumns = ({
     {
       accessorKey: "site",
       header: "Site",
-      accessorFn: (row) => row.salary_entries?.site?.name,
+      accessorFn: (row) => row.employee?.work_details?.site?.name,
       sortingFn: (a, b) =>
         String(a.getValue("site") ?? "").localeCompare(
-          String(b.getValue("site") ?? ""),
+          String(b.getValue("site") ?? "")
         ),
       cell: ({ row }) => {
         return (
-          <SalaryEntrySiteDepartmentSheet
-            triggerChild={
-              <p className="truncate">
-                {row.original.salary_entries?.site?.name ?? "--"}
-              </p>
-            }
-            editable={editable}
-            allSiteOptions={allSiteOptions}
-            allDepartmentOptions={allDepartmentOptions}
-            salaryEntry={row.original.salary_entries}
-            employee={row.original.employee}
-            payrollId={row.original.salary_entries.payroll_id}
-          />
+          <Link to={`/employees/${row.original.employee.id}/work-portfolio`}>
+            <p className="truncate text-primary cursor-pointer">
+              {row.original.employee?.work_details?.site?.name ?? "--"}
+            </p>
+          </Link>
         );
       },
     },
     {
       accessorKey: "department",
       header: "Department",
-      accessorFn: (row) => row.salary_entries?.department?.name,
+      accessorFn: (row) => row.employee?.work_details?.department?.name,
       sortingFn: (a, b) =>
         String(a.getValue("department") ?? "").localeCompare(
-          String(b.getValue("department") ?? ""),
+          String(b.getValue("department") ?? "")
         ),
       cell: ({ row }) => {
         return (
-          <SalaryEntrySiteDepartmentSheet
-            triggerChild={
-              <p className="truncate ">
-                {row.original.salary_entries?.department?.name ?? "--"}
-              </p>
-            }
-            editable={editable}
-            allSiteOptions={allSiteOptions}
-            allDepartmentOptions={allDepartmentOptions}
-            salaryEntry={row.original.salary_entries}
-            employee={row.original.employee}
-            payrollId={row.original.salary_entries.payroll_id}
-          />
+          <Link to={`/employees/${row.original.employee.id}/work-portfolio`}>
+            <p className="truncate text-primary cursor-pointer">
+              {row.original.employee?.work_details?.department?.name ?? "--"}
+            </p>
+          </Link>
         );
       },
     },
@@ -176,7 +154,7 @@ export const salaryEntryColumns = ({
         `${getMonthNameFromNumber(row.month, true)} ${row.year}`,
       sortingFn: (a, b) =>
         String(a.getValue("period") ?? "").localeCompare(
-          String(b.getValue("period") ?? ""),
+          String(b.getValue("period") ?? "")
         ),
       cell: ({ row }) => (
         <p className="truncate">
@@ -191,7 +169,7 @@ export const salaryEntryColumns = ({
       accessorFn: (row: any) =>
         row.salary_entries.salary_field_values.find(
           (entry: any) =>
-            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase(),
+            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase()
         )?.amount ?? 0,
       sortingFn: (a: any, b: any) =>
         (a.getValue(fieldName) ?? 0) - (b.getValue(fieldName) ?? 0),
@@ -199,7 +177,7 @@ export const salaryEntryColumns = ({
       cell: ({ row }: { row: { original: (typeof data)[0] } }) => {
         const valueObj = row.original.salary_entries.salary_field_values.find(
           (entry: any) =>
-            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase(),
+            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase()
         );
 
         const displayColor =
@@ -257,9 +235,9 @@ export const salaryEntryColumns = ({
                   !hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.employees}`,
+                      `${deleteRole}:${attribute.employees}`
                     ) &&
-                    "hidden",
+                    "hidden"
                 )}
               >
                 <Button variant="ghost" className="h-8 w-8 p-0">

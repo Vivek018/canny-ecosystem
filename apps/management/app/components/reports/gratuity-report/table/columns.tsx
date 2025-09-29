@@ -17,7 +17,7 @@ export type GratuityReportType = {
   fifth_year: number;
   is_eligible_for_gratuity: boolean;
   employee_eligible_date: string;
-  employee_project_assignment: {
+  work_details: {
     start_date: string;
     end_date: string;
     sites: {
@@ -160,7 +160,7 @@ export const columns = (): ColumnDef<GratuityReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.sites?.projects?.name}
+          {row.original?.work_details[0]?.sites?.projects?.name}
         </p>
       );
     },
@@ -172,7 +172,7 @@ export const columns = (): ColumnDef<GratuityReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.sites?.name}
+          {row.original?.work_details[0]?.sites?.name}
         </p>
       );
     },
@@ -184,8 +184,8 @@ export const columns = (): ColumnDef<GratuityReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
-          {row.original?.employee_project_assignment?.start_date &&
-            formatDate(row.original?.employee_project_assignment?.start_date)}
+          {row.original?.work_details?.start_date &&
+            formatDate(row.original?.work_details?.start_date)}
         </p>
       );
     },
@@ -197,8 +197,8 @@ export const columns = (): ColumnDef<GratuityReportType>[] => [
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
-          {row.original?.employee_project_assignment?.end_date &&
-            formatDate(row.original?.employee_project_assignment?.end_date)}
+          {row.original?.work_details?.end_date &&
+            formatDate(row.original?.work_details?.end_date)}
         </p>
       );
     },

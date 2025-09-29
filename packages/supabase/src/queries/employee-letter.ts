@@ -98,7 +98,7 @@ export type EmployeeWithLetterDataType = Omit<
     EmployeeDatabaseRow,
     "first_name" | "middle_name" | "last_name" | "gender" | "personal_email"
   > & {
-    employee_project_assignment: Pick<
+    work_details: Pick<
       EmployeeProjectAssignmentDatabaseRow,
       | "employee_id"
       | "assignment_type"
@@ -137,10 +137,10 @@ export async function getEmployeeLetterWithEmployeeById({
   const { data, error } = await supabase
     .from("employee_letter")
     .select(
-      `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(
+      `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, work_details!work_details_employee_id_fkey!left(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         sites, name)
-      ))`,
+      ))`
     )
     .eq("id", id)
     .order("created_at", { ascending: false })

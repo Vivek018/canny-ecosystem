@@ -25,6 +25,7 @@ export async function getSitesByCompanyId({
     "address_line_2",
     "city",
     "state",
+    "prefix",
     "pincode",
     "latitude",
     "longitude",
@@ -61,11 +62,13 @@ export async function getSiteNamesByCompanyId({
 }) {
   const { data, error } = await supabase
     .from("sites")
-    .select("id,name, projects!left(name)")
+    .select("id,name,prefix, projects!left(name)")
     .eq("company_id", companyId)
     .limit(MID_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<{ id: string; name: string; projects: { name: string } }[]>();
+    .returns<
+      { id: string; name: string; prefix: string; projects: { name: string } }[]
+    >();
 
   if (error) {
     console.error("getSiteNamesByCompanyId Error", error);
@@ -91,6 +94,7 @@ export async function getSitesByProjectId({
     "pincode",
     "latitude",
     "longitude",
+    "prefix",
     "company_location_id",
     "is_active",
     "capacity",
@@ -152,6 +156,7 @@ export async function getSiteById({
     "city",
     "state",
     "pincode",
+    "prefix",
     "latitude",
     "longitude",
     "company_location_id",
@@ -233,6 +238,29 @@ export async function getSitesByLocationId({
 
   if (error) {
     console.error("getSitesBylocationId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getSiteIdsBySitePrefix({
+  supabase,
+  prefixes,
+}: {
+  supabase: TypedSupabaseClient;
+  prefixes: string[];
+}) {
+  const columns = ["prefix", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("sites")
+    .select(columns.join(","))
+    .in("prefix", prefixes)
+    .returns<InferredType<SiteDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error("getSiteIdsBySitePrefix Error", error);
+    return { data: [], missing: [], error };
   }
 
   return { data, error };

@@ -79,7 +79,7 @@ export const CompanyLogo = ({
           <>
             <AvatarImage src={logo} />
             <AvatarFallback className="rounded-md">
-              <span className="text-md">{name?.charAt(0)}</span>
+              <span className="text-base">{name?.charAt(0)}</span>
             </AvatarFallback>
           </>
 

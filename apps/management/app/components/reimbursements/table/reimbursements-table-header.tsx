@@ -15,7 +15,6 @@ type Props = {
 export const ReimbursementsColumnIdArray = [
   "employee_name",
   "employee_code",
-  "payee_code",
   "project_name",
   "site_name",
   "submitted_date",
@@ -93,8 +92,8 @@ export function ReimbursementsTableHeader({
                   id === "employee_name" &&
                     "md:sticky md:left-12 md:bg-card md:z-10 min-w-48 max-w-48",
                   id === "employee_code" &&
-                    "md:sticky md:left-60 md:bg-card md:z-10 ",
-                  id === "email" && " min-w-60 max-w-60",
+                    "md:sticky md:left-60 md:bg-card min-w-36 max-w-36 md:z-10 ",
+                  id === "email" && " min-w-60 max-w-60"
                 )}
               >
                 <Button
@@ -111,14 +110,14 @@ export function ReimbursementsTableHeader({
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

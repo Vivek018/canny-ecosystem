@@ -1,11 +1,9 @@
 import { useImportStoreForSalaryPayroll } from "@/store/import";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
-  getDepartmentsByCompanyId,
   getEmployeeIdsByEmployeeCodes,
   getEmployeeIdsByEsicNumber,
   getEmployeeIdsByUanNumber,
-  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -20,16 +18,13 @@ import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../salary-imported-table/imported-data-table";
 import { ImportedDataColumns } from "../salary-imported-table/columns";
 import type { FieldConfig } from "@/routes/_protected+/payroll+/run-payroll+/import-salary-payroll+/_index";
-import { normalizeNames } from "@canny_ecosystem/utils";
 
 export function SalaryPayrollImportData({
   env,
   fieldConfigs,
-  companyId,
 }: {
   env: SupabaseEnv;
   fieldConfigs: FieldConfig[];
-  companyId: string;
 }) {
   const submit = useSubmit();
   const navigation = useNavigation();
@@ -45,8 +40,8 @@ export function SalaryPayrollImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -61,42 +56,7 @@ export function SalaryPayrollImportData({
     setIsImporting(true);
     const importEntries = importData.data! as any[];
 
-    const { data: sites, error: siteError } = await getSiteNamesByCompanyId({
-      supabase,
-      companyId,
-    });
-
-    if (siteError) throw siteError;
-
-    const { data: departments, error: departmentError } =
-      await getDepartmentsByCompanyId({
-        supabase,
-        companyId,
-      });
-
-    if (departmentError) throw departmentError;
-
-    const siteMap = new Map(
-      (sites ?? []).map((s) => [normalizeNames(s.name), s.id]),
-    );
-    const departmentMap = new Map(
-      (departments ?? []).map((d) => [normalizeNames(d.name), d.id]),
-    );
-
-    const preData = importEntries.map((item: any) => {
-      const siteId = siteMap.get(normalizeNames(item.site));
-      const departmentId = departmentMap.get(normalizeNames(item.department));
-
-      const { department, site, ...rest } = item;
-
-      return {
-        ...rest,
-        ...(siteId ? { site_id: siteId } : {}),
-        ...(departmentId ? { department_id: departmentId } : {}),
-      };
-    });
-
-    const employeeCodes = preData
+    const employeeCodes = importEntries
       .map((entry) => entry.employee_code)
       .filter(Boolean);
     const {
@@ -106,8 +66,8 @@ export function SalaryPayrollImportData({
     } = await getEmployeeIdsByEmployeeCodes({ supabase, employeeCodes });
     if (codeError) throw codeError;
 
-    let unresolvedEntries = preData.filter((entry) =>
-      missingCodes.includes(entry.employee_code),
+    let unresolvedEntries = importEntries.filter((entry) =>
+      missingCodes.includes(entry.employee_code)
     );
 
     const uanNumbers = unresolvedEntries
@@ -120,7 +80,7 @@ export function SalaryPayrollImportData({
 
     const resolvedUANs = employeesByUAN.map((e) => e.uan_number);
     unresolvedEntries = unresolvedEntries.filter(
-      (entry) => !resolvedUANs.includes(entry.uan_number),
+      (entry) => !resolvedUANs.includes(entry.uan_number)
     );
 
     const esicNumbers = unresolvedEntries
@@ -149,13 +109,13 @@ export function SalaryPayrollImportData({
       })) ?? []),
     ];
 
-    const updatedData = preData
+    const updatedData = importEntries
       .map((item) => {
         const matched = allEmployees.find(
           (e) =>
             (e.type === "employee_code" && e.matchKey === item.employee_code) ||
             (e.type === "uan_number" && e.matchKey === item.uan_number) ||
-            (e.type === "esic_number" && e.matchKey === item.esic_number),
+            (e.type === "esic_number" && e.matchKey === item.esic_number)
         );
 
         const { employee_code, uan_number, esic_number, ...rest } = item;
@@ -182,7 +142,7 @@ export function SalaryPayrollImportData({
       {
         method: "POST",
         action: "/create-payroll",
-      },
+      }
     );
   };
 
@@ -191,7 +151,7 @@ export function SalaryPayrollImportData({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden",
+          isImporting ? "block" : "hidden"
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />

@@ -32,9 +32,11 @@ type FieldsType = {
 export function CreateEmployeeDetails({
   fields,
   isUpdate = false,
+  autoCode,
 }: {
   fields: FieldsType;
   isUpdate?: boolean;
+  autoCode?: string;
 }) {
   return (
     <Fragment>
@@ -64,7 +66,7 @@ export function CreateEmployeeDetails({
             inputProps={{
               ...getInputProps(fields.middle_name, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.middle_name.name,
+                fields.middle_name.name
               )}`,
             }}
             labelProps={{
@@ -85,9 +87,12 @@ export function CreateEmployeeDetails({
           <Field
             inputProps={{
               ...getInputProps(fields.employee_code, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(
-                fields.employee_code.name,
-              )}`,
+              defaultValue: fields.employee_code.value ?? autoCode ?? "",
+              placeholder: `${
+                !autoCode
+                  ? "Failed to auto-generate code"
+                  : `Enter ${replaceUnderscore(fields.employee_code.name)}`
+              }`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.employee_code.name),
@@ -99,7 +104,7 @@ export function CreateEmployeeDetails({
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.date_of_birth.name,
+                fields.date_of_birth.name
               )}`,
               max: getValidDateForInput(new Date().toISOString()),
             }}
@@ -113,7 +118,7 @@ export function CreateEmployeeDetails({
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              genderArray as unknown as string[],
+              genderArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.gender, { type: "text" }),
@@ -127,7 +132,7 @@ export function CreateEmployeeDetails({
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              educationArray as unknown as string[],
+              educationArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.education, { type: "text" }),
@@ -141,13 +146,13 @@ export function CreateEmployeeDetails({
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              maritalStatusArray as unknown as string[],
+              maritalStatusArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.marital_status, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.marital_status.name,
+              fields.marital_status.name
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.marital_status.name),
@@ -170,7 +175,7 @@ export function CreateEmployeeDetails({
             inputProps={{
               ...getInputProps(fields.primary_mobile_number, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.primary_mobile_number.name,
+                fields.primary_mobile_number.name
               )}`,
             }}
             labelProps={{
@@ -184,7 +189,7 @@ export function CreateEmployeeDetails({
                 type: "text",
               }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.secondary_mobile_number.name,
+                fields.secondary_mobile_number.name
               )}`,
             }}
             labelProps={{
@@ -198,7 +203,7 @@ export function CreateEmployeeDetails({
                 type: "text",
               }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.personal_email.name,
+                fields.personal_email.name
               )}`,
             }}
             labelProps={{

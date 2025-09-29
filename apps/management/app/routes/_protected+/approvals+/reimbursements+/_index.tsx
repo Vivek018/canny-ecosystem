@@ -15,6 +15,7 @@ import {
   getProjectNamesByCompanyId,
   getUsersEmail,
   getSiteNamesByCompanyId,
+  getPayeesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -69,6 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       name: query,
       project: searchParams.get("project") ?? undefined,
       site: searchParams.get("site") ?? undefined,
+      payee: searchParams.get("payee") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
       month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
@@ -78,7 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
@@ -96,6 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
+    const payeesPromise = getPayeesByCompanyId({ supabase, companyId });
 
     const sitePromise = getSiteNamesByCompanyId({
       supabase,
@@ -106,6 +109,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       reimbursementsPromise: reimbursementsPromise as any,
       projectPromise,
       sitePromise,
+      payeesPromise,
       userEmailsPromise,
       query,
       filters,
@@ -119,6 +123,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       reimbursementsPromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
       sitePromise: Promise.resolve({ data: [] }),
+      payeesPromise: Promise.resolve({ data: [] }),
       userEmailsPromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
@@ -132,7 +137,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -170,6 +175,7 @@ export default function ReimbursementsIndex() {
     projectPromise,
     sitePromise,
     userEmailsPromise,
+    payeesPromise,
     query,
     filters,
     companyId,
@@ -188,27 +194,38 @@ export default function ReimbursementsIndex() {
               {(projectData) => (
                 <Await resolve={sitePromise}>
                   {(siteData) => (
-                    <Await resolve={userEmailsPromise}>
-                      {(userEmailsData) => (
-                        <ReimbursementSearchFilter
-                          projectArray={
-                            projectData?.data?.length
-                              ? projectData?.data?.map(
-                                  (project) => project!.name,
-                                )
-                              : []
-                          }
-                          siteArray={
-                            siteData?.data?.length
-                              ? siteData?.data?.map((site) => site!.name)
-                              : []
-                          }
-                          userEmails={
-                            userEmailsData?.data?.length
-                              ? userEmailsData?.data?.map((user) => user!.email)
-                              : []
-                          }
-                        />
+                    <Await resolve={payeesPromise}>
+                      {(payeeData) => (
+                        <Await resolve={userEmailsPromise}>
+                          {(userEmailsData) => (
+                            <ReimbursementSearchFilter
+                              projectArray={
+                                projectData?.data?.length
+                                  ? projectData?.data?.map(
+                                      (project) => project!.name
+                                    )
+                                  : []
+                              }
+                              siteArray={
+                                siteData?.data?.length
+                                  ? siteData?.data?.map((site) => site!.name)
+                                  : []
+                              }
+                              payeeArray={
+                                payeeData?.data?.length
+                                  ? payeeData?.data?.map((payee) => payee!.name)
+                                  : []
+                              }
+                              userEmails={
+                                userEmailsData?.data?.length
+                                  ? userEmailsData?.data?.map(
+                                      (user) => user!.email
+                                    )
+                                  : []
+                              }
+                            />
+                          )}
+                        </Await>
                       )}
                     </Await>
                   )}

@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { json, useLoaderData, useLocation } from "@remix-run/react";
+import {
+  json,
+  useLoaderData,
+  useLocation,
+  useSearchParams,
+} from "@remix-run/react";
 import Papa from "papaparse";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -11,7 +16,11 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { ImportEmployeeDetailsHeaderSchemaObject } from "@canny_ecosystem/utils";
-import type { ImportEmployeeDetailsDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getLatestEmployeeOfTheSite,
+  getSiteNamesByCompanyId,
+  type ImportEmployeeDetailsDataType,
+} from "@canny_ecosystem/supabase/queries";
 import {
   ImportEmployeeDetailsHeaderSchema,
   ImportEmployeeDetailsDataSchema,
@@ -19,6 +28,7 @@ import {
   replaceUnderscore,
   pipe,
   replaceDash,
+  generateEmployeeCodes,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
 import { getEmployeeDetailsConflicts } from "@canny_ecosystem/supabase/mutations";
@@ -37,8 +47,7 @@ type FieldConfig = {
 
 const FIELD_CONFIGS: FieldConfig[] = [
   {
-    key: "employee_code",
-    required: true,
+    key: "department",
   },
   {
     key: "first_name",
@@ -52,6 +61,7 @@ const FIELD_CONFIGS: FieldConfig[] = [
     required: true,
   },
   { key: "gender" },
+  { key: "education" },
   {
     key: "marital_status",
   },
@@ -59,7 +69,6 @@ const FIELD_CONFIGS: FieldConfig[] = [
     key: "date_of_birth",
     required: true,
   },
-  { key: "education" },
   { key: "is_active" },
   {
     key: "personal_email",
@@ -71,23 +80,70 @@ const FIELD_CONFIGS: FieldConfig[] = [
   {
     key: "secondary_mobile_number",
   },
+  {
+    key: "assignment_type",
+  },
+  {
+    key: "position",
+  },
+  {
+    key: "start_date",
+    required: true,
+  },
+  {
+    key: "end_date",
+  },
+  {
+    key: "skill_level",
+  },
+  {
+    key: "probation_period",
+  },
+  {
+    key: "probation_end_date",
+  },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
+  const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
+  const site = urlSearchParams.get("site") ?? "";
+  let lastCode = "";
+  if (site) {
+    const { data } = await getLatestEmployeeOfTheSite({
+      supabase,
+      siteId: site,
+    });
+    lastCode = data ?? "";
+  }
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ env, companyId });
+  const { data: sites } = await getSiteNamesByCompanyId({
+    supabase,
+    companyId,
+  });
+
+  const siteOptions = sites?.map((site) => ({
+    label: site?.name,
+    pseudoLabel: site?.projects?.name,
+    pseudoValue: site?.prefix,
+    value: site?.id,
+  }));
+  return json({ env, companyId, siteOptions, lastCode });
 }
 
 export default function EmployeeDetailsImportFieldMapping() {
-  const { env, companyId } = useLoaderData<typeof loader>();
+  const { env, companyId, siteOptions, lastCode } =
+    useLoaderData<typeof loader>();
   const { supabase } = useSupabase({ env });
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [site, setSite] = useState("");
+  const [pseudoValue, setPseudoValue] = useState("");
   const { setImportData } = useImportStoreForEmployeeDetails();
 
   const [loadNext, setLoadNext] = useState(false);
@@ -107,7 +163,7 @@ export default function EmployeeDetailsImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== "",
+            (header) => header !== null && header.trim() !== ""
           );
           setHeaderArray(headers);
         },
@@ -126,7 +182,7 @@ export default function EmployeeDetailsImportFieldMapping() {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
           );
 
           if (matchedHeader) {
@@ -135,7 +191,7 @@ export default function EmployeeDetailsImportFieldMapping() {
 
           return mapping;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
       );
 
       setFieldMapping(initialMapping);
@@ -149,13 +205,13 @@ export default function EmployeeDetailsImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ]),
-        ),
+          ])
+        )
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message,
+          (err) => err.message
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -175,7 +231,7 @@ export default function EmployeeDetailsImportFieldMapping() {
       const result = ImportEmployeeDetailsDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`,
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -208,7 +264,7 @@ export default function EmployeeDetailsImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
+      Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
     if (file) {
@@ -218,35 +274,38 @@ export default function EmployeeDetailsImportFieldMapping() {
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
+          const codes = generateEmployeeCodes(
+            pseudoValue,
+            results?.data.length,
+            lastCode
+          );
           const finalData = results?.data
             .filter((entry) =>
-              Object.values(entry!).some(
-                (value) => String(value).trim() !== "",
-              ),
+              Object.values(entry!).some((value) => String(value).trim() !== "")
             )
-            .map((entry) => {
+            .map((entry, index) => {
               const cleanEntry = Object.fromEntries(
                 Object.entries(entry as Record<string, any>)
                   .filter(
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== "",
+                      String(value).trim() !== ""
                   )
-                  .filter(([key]) =>
-                    allowedFields.includes(
-                      key as keyof ImportEmployeeDetailsDataType,
-                    ),
-                  )
+                  .filter(([key]) => allowedFields.includes(key as any))
                   .map(
                     ([key, value]) =>
                       [
                         key,
                         String(value).trim(),
-                      ] as unknown as ImportEmployeeDetailsDataType[],
-                  ),
+                      ] as unknown as ImportEmployeeDetailsDataType[]
+                  )
               );
-              return cleanEntry;
+              return {
+                ...cleanEntry,
+                site_id: site,
+                employee_code: codes[index],
+              } as ImportEmployeeDetailsDataType;
             });
 
           if (validateImportData(finalData)) {
@@ -312,6 +371,30 @@ export default function EmployeeDetailsImportFieldMapping() {
                 </ul>
               </div>
             )}
+            <div className="w-full">
+              <div className="pb-1">
+                <label className="text-sm text-muted-foreground capitalize">
+                  Site <span className="text-primary">*</span>
+                </label>
+              </div>
+              <Combobox
+                options={siteOptions ?? []}
+                value={site}
+                pseudoValue={pseudoValue}
+                onChange={(site, { pseudoValue }) => {
+                  setPseudoValue(pseudoValue!);
+                  setSite(site);
+                  if (site?.length) {
+                    searchParams.set("site", site);
+                  } else {
+                    searchParams.delete("site");
+                  }
+                  setSearchParams(searchParams);
+                }}
+                placeholder={"Select Site"}
+                className="w-full"
+              />
+            </div>
 
             <div className="grid grid-cols-2 max-sm:grid-cols-1 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
@@ -323,7 +406,7 @@ export default function EmployeeDetailsImportFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline",
+                        field.required && "inline"
                       )}
                     >
                       *
@@ -337,11 +420,11 @@ export default function EmployeeDetailsImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(field.key?.toLowerCase())
                         );
                       }) ||

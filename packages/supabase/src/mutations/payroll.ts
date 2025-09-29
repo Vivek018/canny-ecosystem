@@ -20,6 +20,8 @@ import {
   calculateNetAmountAfterEntryCreated,
   calculateSalaryTotalNetAmount,
   convertToNull,
+  defaultMonth,
+  defaultYear,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
 
@@ -142,11 +144,11 @@ export async function createSalaryPayroll({
     const newTotalEmployees = payrollData.total_employees! - skipped;
 
     const unSkippedEmployeeIds = salaryEntriesData.map(
-      (entry) => entry.monthly_attendance.employee_id,
+      (entry) => entry.monthly_attendance.employee_id
     );
 
     const unSkippedRawData = data.rawData.filter((entry) =>
-      unSkippedEmployeeIds.includes(entry.employee_id),
+      unSkippedEmployeeIds.includes(entry.employee_id)
     );
 
     const newTotalNetAmount = calculateSalaryTotalNetAmount(unSkippedRawData);
@@ -172,16 +174,16 @@ export async function createSalaryPayroll({
     const employeeId = record.employee_id;
 
     const salaryEntry = salaryEntriesData!.find(
-      (entry) => entry.monthly_attendance?.employee_id === employeeId,
+      (entry) => entry.monthly_attendance?.employee_id === employeeId
     );
 
     if (!salaryEntry) continue;
 
     for (const [normalizedKey, matchedField] of Object.entries(
-      payrollFieldMap,
+      payrollFieldMap
     )) {
       const rawKey = Object.keys(record).find(
-        (k) => k.trim().toUpperCase() === normalizedKey,
+        (k) => k.trim().toUpperCase() === normalizedKey
       );
 
       const rawValue = rawKey ? record[rawKey] : undefined;
@@ -276,7 +278,7 @@ export async function createSalaryPayrollByDepartment({
       .eq("id", data.payrollId!);
     console.error(
       "createSalaryPayrollByDepartment payroll error",
-      payrollError,
+      payrollError
     );
     return { status: payrollStatus, error: payrollError };
   }
@@ -360,7 +362,7 @@ export async function createSalaryPayrollByDepartment({
     const employeeId = record.employee_id;
 
     const salaryEntry = salaryEntriesData!.find(
-      (entry) => entry.monthly_attendance?.employee_id === employeeId,
+      (entry) => entry.monthly_attendance?.employee_id === employeeId
     );
 
     if (!salaryEntry) continue;
@@ -428,6 +430,8 @@ export async function deletePayroll({
   const { data } = await getSalaryEntriesByPayrollId({
     payrollId: id,
     supabase,
+    month: defaultMonth,
+    year: defaultYear,
   });
 
   const salaryEntries = data?.map((dat) => {
@@ -553,7 +557,7 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
     if (error) {
       console.error(
         "deleteSalaryEntriesFromPayrollAndEmployeeId Error:",
-        error,
+        error
       );
     }
 
@@ -562,7 +566,7 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
 
   console.error(
     "deleteSalaryEntriesFromPayrollAndEmployeeId Error:",
-    "No Salary Entries Found",
+    "No Salary Entries Found"
   );
 
   return { status: 404, error: "No Salary Entries Found" };
@@ -801,46 +805,6 @@ export async function updateSalaryEntryById({
   if (error) console.error("updateSalaryEntryById Error:", error);
 
   return { error, status };
-}
-
-export async function updateMultipleSalaryEntries({
-  supabase,
-  salaryEntries,
-}: {
-  supabase: TypedSupabaseClient;
-  salaryEntries: SalaryEntriesDatabaseUpdate[];
-}) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user?.email) {
-    return {
-      status: 400,
-      error: "No email found",
-    };
-  }
-
-  for (const entry of salaryEntries) {
-    const updateObj: Partial<SalaryEntriesDatabaseUpdate> = {};
-    updateObj.site_id = entry.site_id ?? null;
-    updateObj.department_id = entry.department_id ?? null;
-
-    if (Object.keys(updateObj).length === 0) continue;
-
-    const { error, status } = await supabase
-      .from("salary_entries")
-      .update(updateObj)
-      .eq("id", entry.id!)
-      .single();
-
-    if (error) {
-      console.error("Error updating entry:", error);
-      return { error, status };
-    }
-  }
-
-  return { error: null, status: 200 };
 }
 
 export async function deletePayrollFieldById({

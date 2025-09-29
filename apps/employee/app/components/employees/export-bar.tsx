@@ -19,7 +19,7 @@ export function ExportBar({
 }) {
   const totalActive = data.reduce(
     (count: number, { is_active }) => count + (is_active ? 1 : 0),
-    0,
+    0
   );
 
   const toBeExportedData = data.map((element) => {
@@ -47,23 +47,19 @@ export function ExportBar({
       } else if (key === "status") {
         exportedData[key] = element?.is_active ? "Active" : "Inactive";
       } else if (key === "project_name") {
-        exportedData[key] =
-          element?.employee_project_assignment?.sites?.projects?.name;
+        exportedData[key] = element?.work_details[0]?.sites?.projects?.name;
       } else if (key === "site_name") {
-        exportedData[key] = element?.employee_project_assignment?.sites?.name;
+        exportedData[key] = element?.work_details[0]?.sites?.name;
       } else if (key === "assignment_type") {
-        exportedData[key] =
-          element?.employee_project_assignment?.assignment_type ?? "";
+        exportedData[key] = element?.work_details[0]?.assignment_type ?? "";
       } else if (key === "position") {
-        exportedData[key] = element?.employee_project_assignment?.position!;
+        exportedData[key] = element?.work_details[0]?.position!;
       } else if (key === "skill_level") {
-        exportedData[key] =
-          element?.employee_project_assignment?.skill_level ?? "";
+        exportedData[key] = element?.work_details[0]?.skill_level ?? "";
       } else if (key === "start_date") {
-        exportedData[key] = element?.employee_project_assignment?.start_date!;
+        exportedData[key] = element?.work_details[0]?.start_date!;
       } else if (key === "end_date") {
-        exportedData[key] =
-          element?.employee_project_assignment?.end_date ?? "";
+        exportedData[key] = element?.work_details[0]?.end_date ?? "";
       } else if (key === "account_number") {
         exportedData[key] =
           element?.employee_bank_details?.account_number ?? "";
@@ -115,7 +111,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-6 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

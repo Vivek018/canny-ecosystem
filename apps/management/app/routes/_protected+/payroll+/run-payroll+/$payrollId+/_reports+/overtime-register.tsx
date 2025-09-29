@@ -13,7 +13,7 @@ import { Dialog, DialogContent } from "@canny_ecosystem/ui/dialog";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  type EmployeeProjectAssignmentDataType,
+  type EmployeeWorkDetailsDataType,
   getCompanyById,
   getPrimaryLocationByCompanyId,
   getSalaryEntriesForSalaryRegisterAndAll,
@@ -111,7 +111,7 @@ type DataType = {
       absents: number;
     };
     employeeData: EmployeeDatabaseRow;
-    employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
+    employeeProjectAssignmentData: EmployeeWorkDetailsDataType;
     employeeStatutoryDetails: EmployeeStatutoryDetailsDatabaseRow;
     earnings: { name: string; amount: number }[];
     deductions: { name: string; amount: number }[];
@@ -397,7 +397,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
 
               <Text style={{ textTransform: "capitalize" }}>
                 {replaceUnderscore(
-                  employee?.employeeProjectAssignmentData?.position,
+                  employee?.employeeProjectAssignmentData?.position
                 )}
                 <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
               </Text>
@@ -498,35 +498,35 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "HRA")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "LTA")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e.name === "Others")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BONUS")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
             </View>
@@ -540,14 +540,14 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .reduce((sum, earning) => sum + earning.amount, 0)
-                    ?.toFixed(2),
+                    ?.toFixed(2)
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>0</Text>
@@ -573,7 +573,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "EPF" || "PF")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -584,7 +584,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "ESIC")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -595,7 +595,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "PT")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -606,7 +606,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "PF")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -617,7 +617,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "LWF")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -628,7 +628,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e.name === "Advances")
-                    ?.amount?.toFixed(2) ?? 0.0,
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
             </View>
@@ -654,7 +654,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .reduce((sum, earning) => sum + earning?.amount, 0)
-                    ?.toFixed(2),
+                    ?.toFixed(2)
                 )}
               </Text>
             </View>
@@ -669,12 +669,12 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                   Number(
                     employee?.earnings
                       .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2),
+                      ?.toFixed(2)
                   ) -
                   Number(
                     employee?.deductions
                       .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2),
+                      ?.toFixed(2)
                   )
                 )?.toFixed(2)}
               </Text>
@@ -727,7 +727,7 @@ export default function OvertimeRegister() {
   const updatedData = {
     ...data,
     payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
-      selectedRows.some((emp2) => emp2.id === emp1.id),
+      selectedRows.some((emp2) => emp2.id === emp1.id)
     ),
   };
   const navigate = useNavigate();
@@ -821,7 +821,7 @@ export default function OvertimeRegister() {
           middle_name: string;
           last_name: string;
           employee_code: string;
-          employee_project_assignment?: EmployeeProjectAssignment;
+          work_details?: EmployeeProjectAssignment;
           employee_statutory_details?: EmployeeStatutoryDetails;
           salary_entries: SalaryEntry[];
           leaves: Leaves[];
@@ -850,8 +850,8 @@ export default function OvertimeRegister() {
               employee_code: emp?.employee_code,
             },
             employeeProjectAssignmentData: {
-              position: emp.employee_project_assignment?.position || "",
-              department: emp.employee_project_assignment?.department || "",
+              position: emp.work_details?.position || "",
+              department: emp.work_details?.department || "",
             },
             employeeStatutoryDetails: {
               pf_number: emp.employee_statutory_details?.pf_number || "",
@@ -876,7 +876,7 @@ export default function OvertimeRegister() {
             earnings,
             deductions,
           };
-        },
+        }
       );
 
     return {

@@ -40,15 +40,14 @@ export async function action({
 
     if (type === "salary-import") {
       const salaryImportData = JSON.parse(
-        formData.get("salaryImportData") as string,
+        formData.get("salaryImportData") as string
       );
 
       const transformedSalaryEntries: any[] = [];
       const uniqueComponentsSet = new Map();
 
       for (const entry of salaryImportData) {
-        const { month, year, employee_id, site_id, department_id, ...rest } =
-          entry;
+        const { month, year, employee_id, ...rest } = entry;
 
         const attendanceFieldKeys = [
           "working_days",
@@ -110,8 +109,7 @@ export async function action({
 
         transformedSalaryEntries.push({
           monthly_attendance_id,
-          site_id,
-          department_id,
+          site_id: site,
         });
       }
 
@@ -119,7 +117,7 @@ export async function action({
         ([name, type]) => ({
           name,
           type,
-        }),
+        })
       );
 
       let totalNetAmount = 0;
@@ -423,7 +421,7 @@ export async function action({
         failedRedirect,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Create Payroll error", error);

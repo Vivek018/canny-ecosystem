@@ -12,7 +12,6 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
-import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -24,7 +23,7 @@ export const columns = ({
 }: {
   env: SupabaseEnv;
   companyId: string;
-}): ColumnDef<EmployeeDataType>[] => [
+}): ColumnDef<any>[] => [
   {
     id: "select",
     cell: ({ row }) => (
@@ -114,7 +113,7 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employee_project_assignment?.sites?.projects?.name}
+          {row.original?.work_details[0]?.sites?.projects?.name}
         </p>
       );
     },
@@ -126,7 +125,7 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employee_project_assignment?.sites?.name}
+          {row.original?.work_details[0]?.sites?.name}
         </p>
       );
     },
@@ -139,7 +138,7 @@ export const columns = ({
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
+            row.original?.work_details[0]?.assignment_type ?? ""
           )}
         </p>
       );
@@ -152,9 +151,7 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className=" truncate capitalize">
-          {replaceUnderscore(
-            row.original?.employee_project_assignment?.position ?? "",
-          )}
+          {replaceUnderscore(row.original?.work_details[0]?.position ?? "")}
         </p>
       );
     },
@@ -166,9 +163,7 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize truncate">
-          {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
-          )}
+          {replaceUnderscore(row.original?.work_details[0]?.skill_level ?? "")}
         </p>
       );
     },
@@ -180,10 +175,8 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize truncate">
-          {row.original?.employee_project_assignment?.start_date &&
-            (formatDate(
-              row.original?.employee_project_assignment?.start_date,
-            ) as any)}
+          {row.original?.work_details[0]?.start_date &&
+            (formatDate(row.original?.work_details[0]?.start_date) as any)}
         </p>
       );
     },
@@ -195,10 +188,8 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize truncate">
-          {row.original?.employee_project_assignment?.end_date &&
-            (formatDate(
-              row.original?.employee_project_assignment?.end_date,
-            ) as any)}
+          {row.original?.work_details[0]?.end_date &&
+            (formatDate(row.original?.work_details[0]?.end_date) as any)}
         </p>
       );
     },
@@ -308,9 +299,9 @@ export const columns = ({
                 !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employees}`,
+                    `${deleteRole}:${attribute.employees}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

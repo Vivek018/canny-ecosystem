@@ -66,8 +66,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Project",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.sites?.projects?.name ??
-          "--"}
+        {row.original?.work_details[0]?.sites?.projects?.name ?? "--"}
       </p>
     ),
   },
@@ -77,7 +76,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Site",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.sites?.name ?? "--"}
+        {row.original?.work_details[0]?.sites?.name ?? "--"}
       </p>
     ),
   },
@@ -197,15 +196,15 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
               className={cn(
                 (!hasPermission(
                   role,
-                  `${updateRole}:${attribute.attendance}`,
+                  `${updateRole}:${attribute.attendance}`
                 ) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.attendance}`,
+                    `${deleteRole}:${attribute.attendance}`
                   )) ||
                   !row.original?.monthly_attendance?.id
                   ? "hidden"
-                  : "flex",
+                  : "flex"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

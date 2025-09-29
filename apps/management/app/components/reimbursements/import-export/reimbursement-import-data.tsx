@@ -3,7 +3,7 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { createReimbursementsFromImportedData } from "@canny_ecosystem/supabase/mutations";
 import {
   getEmployeeIdsByEmployeeCodes,
-  getPayeeIdsByPayeeCodes,
+  getPayeesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import type {
   ReimbursementInsert,
@@ -15,6 +15,7 @@ import { Input } from "@canny_ecosystem/ui/input";
 import {
   ImportReimbursementDataSchema,
   isGoodStatus,
+  normalizeNames,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -65,8 +66,8 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -78,7 +79,7 @@ export function ReimbursementImportData({
 
       if (ofWhich === "employee") {
         const employeeCodes = importData.data!.map(
-          (value) => value.employee_code,
+          (value) => value.employee_code
         );
 
         const { data: employees, error: codeError } =
@@ -92,23 +93,27 @@ export function ReimbursementImportData({
       }
 
       if (ofWhich === "payee") {
-        const payeeCodes = importData.data!.map((value) => value.payee_code);
+        const payeeNames = importData.data!.map((value) =>
+          normalizeNames(value.name)
+        );
 
-        const { data: payees, error: codeError } =
-          await getPayeeIdsByPayeeCodes({
-            supabase,
-            payeeCodes,
-          });
+        const { data: payees, error: codeError } = await getPayeesByCompanyId({
+          supabase,
+          companyId,
+        });
 
         if (codeError) throw codeError;
-        ids = payees;
+        ids =
+          payees
+            ?.filter((p) => payeeNames.includes(normalizeNames(p.name)))
+            .map((p) => p.id) ?? [];
       }
 
       let updatedData: any;
       if (ofWhich === "employee") {
         updatedData = importData.data!.map((item: any) => {
           const employeeId = ids?.find(
-            (e: any) => e.employee_code === item.employee_code,
+            (e: any) => e.employee_code === item.employee_code
           )?.id;
           const { employee_code, ...rest } = item;
 
@@ -120,21 +125,18 @@ export function ReimbursementImportData({
         });
       }
       if (ofWhich === "payee") {
-        updatedData = importData.data!.map((item: any) => {
-          const payeeIds = ids?.find(
-            (e: any) => e.payee_code === item.payee_code,
-          )?.id;
+        updatedData = importData.data!.map((item: any, index: number) => {
+          const payeeId = ids[index]; // already the matched payee_id
 
-          const { payee_code, ...rest } = item;
+          const { name, ...rest } = item;
 
           return {
             ...rest,
-            ...(payeeIds ? { payee_id: payeeIds } : {}),
+            ...(payeeId ? { payee_id: payeeId } : {}),
             company_id: companyId,
           };
         });
       }
-
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],
         supabase,
@@ -158,7 +160,7 @@ export function ReimbursementImportData({
         });
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         navigate(
-          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`,
+          `/approvals/reimbursements?recently_added=${recentlyAddedFilter[0]}`
         );
       }
     }
@@ -169,7 +171,7 @@ export function ReimbursementImportData({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden",
+          isImporting ? "block" : "hidden"
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
