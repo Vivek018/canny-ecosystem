@@ -16,7 +16,6 @@ import { CheckboxField, Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   assignmentTypeArray,
-  ImportSingleEmployeeProjectAssignmentsDataSchema,
   positionArray,
   skillLevelArray,
   transformStringArrayIntoOptions,
@@ -50,8 +49,9 @@ export const UpdateImportedEmployee = ({
   };
 
   const handleUpdate = () => {
-    const parsedResult =
-      ImportSingleEmployeeProjectAssignmentsDataSchema.safeParse(data);
+    // const parsedResult =
+    //   ImportSingleEmployeeProjectAssignmentsDataSchema.safeParse(data); // delete this entire file and replace it with work details import
+    const parsedResult = { success: true, data };
 
     if (parsedResult.success) {
       setImportData({

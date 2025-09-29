@@ -40,8 +40,8 @@ export function SalaryPayrollImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -67,7 +67,7 @@ export function SalaryPayrollImportData({
     if (codeError) throw codeError;
 
     let unresolvedEntries = importEntries.filter((entry) =>
-      missingCodes.includes(entry.employee_code)
+      missingCodes.includes(entry.employee_code),
     );
 
     const uanNumbers = unresolvedEntries
@@ -80,7 +80,7 @@ export function SalaryPayrollImportData({
 
     const resolvedUANs = employeesByUAN.map((e) => e.uan_number);
     unresolvedEntries = unresolvedEntries.filter(
-      (entry) => !resolvedUANs.includes(entry.uan_number)
+      (entry) => !resolvedUANs.includes(entry.uan_number),
     );
 
     const esicNumbers = unresolvedEntries
@@ -115,7 +115,7 @@ export function SalaryPayrollImportData({
           (e) =>
             (e.type === "employee_code" && e.matchKey === item.employee_code) ||
             (e.type === "uan_number" && e.matchKey === item.uan_number) ||
-            (e.type === "esic_number" && e.matchKey === item.esic_number)
+            (e.type === "esic_number" && e.matchKey === item.esic_number),
         );
 
         const { employee_code, uan_number, esic_number, ...rest } = item;
@@ -142,7 +142,7 @@ export function SalaryPayrollImportData({
       {
         method: "POST",
         action: "/create-payroll",
-      }
+      },
     );
   };
 
@@ -151,7 +151,7 @@ export function SalaryPayrollImportData({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden"
+          isImporting ? "block" : "hidden",
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />

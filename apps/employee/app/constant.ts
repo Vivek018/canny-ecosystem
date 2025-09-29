@@ -128,7 +128,7 @@ export function numberToWordsIndian(num: number) {
       if (remainder > 0) {
         const groupName = i > 0 ? units[i] : "";
         parts.unshift(
-          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
         );
       }
       n = Math.floor(n / (i === 0 ? 1000 : 100));
@@ -147,7 +147,7 @@ export function numberToWordsIndian(num: number) {
 
   const [integerPart, decimalPart] = num.toString().split(".");
   const integerWords = convertIntegerToWordsIndian(
-    Number.parseInt(integerPart, 10)
+    Number.parseInt(integerPart, 10),
   );
   const decimalWords = decimalPart
     ? `point ${convertDecimalPart(decimalPart)}`

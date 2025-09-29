@@ -48,7 +48,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeWorkDetails}`
+      `${updateRole}:${attribute.employeeWorkDetails}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -133,7 +133,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const { update_main_employee_code, ...rest } = submission.value;
@@ -207,7 +207,7 @@ export default function UpdateEmployeeWorkDetails() {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",

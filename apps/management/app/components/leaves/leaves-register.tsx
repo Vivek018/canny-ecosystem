@@ -72,7 +72,7 @@ export const prepareLeavesWorkbook = async ({
               paternity_leave: 0,
               sick_leave: 0,
             },
-          ])
+          ]),
         ),
       };
     }
@@ -105,7 +105,7 @@ export const prepareLeavesWorkbook = async ({
   const worksheet = workbook.addWorksheet("Leaves Register");
 
   const exlMonths = Object.keys(formattedLeaveData[0]).filter((key) =>
-    key.match(/^[A-Za-z]{3}-\d{4}$/)
+    key.match(/^[A-Za-z]{3}-\d{4}$/),
   );
 
   worksheet.mergeCells("A1:E1");
@@ -227,7 +227,7 @@ export const prepareLeavesWorkbook = async ({
           leaveData.paternity_leave || 0,
           leaveData.sick_leave || 0,
         ];
-      })
+      }),
     );
 
     rowData.push(totalLeaves);
@@ -266,7 +266,7 @@ export const LeavesRegister = ({
       new Blob([workbook], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       }),
-      `Leaves-Register ${formatDateTime(Date.now())}.xlsx`
+      `Leaves-Register ${formatDateTime(Date.now())}.xlsx`,
     );
   };
 
@@ -276,7 +276,7 @@ export const LeavesRegister = ({
         className={cn(
           buttonVariants({ variant: "muted" }),
           "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
-          selectedRows.length && "flex"
+          selectedRows.length && "flex",
         )}
       >
         <Icon name="plus-circled" />

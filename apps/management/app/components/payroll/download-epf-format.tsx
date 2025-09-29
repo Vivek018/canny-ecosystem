@@ -34,8 +34,8 @@ export const prepareEpfFormat = async ({
 }) => {
   const statutoryDetailsResults = await Promise.all(
     data.map(({ employee_id }) =>
-      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
-    )
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase }),
+    ),
   );
 
   const updatedData = data.map((entry, index) => ({
@@ -50,7 +50,7 @@ export const prepareEpfFormat = async ({
         ? 15000
         : baseAmount
       : baseAmount;
-      
+
     const cappedAmount = baseAmount > 15000 ? 15000 : baseAmount;
 
     const epfContribution = roundToNearest(restrictedAmount * 0.12);
@@ -104,7 +104,7 @@ export const DownloadEpfFormat = ({
           (e: {
             amount: number;
             payroll_fields: { type: string; name: string };
-          }) => e.payroll_fields.type === "earning"
+          }) => e.payroll_fields.type === "earning",
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
@@ -116,7 +116,7 @@ export const DownloadEpfFormat = ({
           }) =>
             e.payroll_fields.type === "earning" &&
             (allowedFields === null ||
-              allowedFields.includes(e.payroll_fields.name.toUpperCase()))
+              allowedFields.includes(e.payroll_fields.name.toUpperCase())),
         )
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
@@ -138,7 +138,7 @@ export const DownloadEpfFormat = ({
   }
 
   const generateEpfFormat = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 

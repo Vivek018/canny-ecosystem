@@ -327,7 +327,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.department}>
               Designation:{" "}
               {replaceUnderscore(
-                data?.employee?.employeeProjectAssignmentData?.position
+                data?.employee?.employeeProjectAssignmentData?.position,
               )}
             </Text>
           </View>
@@ -397,7 +397,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.infoLabel}>Date of Joining</Text>
             <Text style={styles.infoValue}>
               {formatDate(
-                data?.employee?.employeeProjectAssignmentData?.start_date
+                data?.employee?.employeeProjectAssignmentData?.start_date,
               )}
             </Text>
           </View>
@@ -425,8 +425,8 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                   Number(
                     data?.employee?.earnings
                       ?.reduce((sum, earning) => sum + earning.amount, 0)
-                      .toFixed(2)
-                  )
+                      .toFixed(2),
+                  ),
                 )}
               </Text>
             </View>
@@ -452,8 +452,8 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                   Number(
                     data?.employee?.deductions
                       ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                      .toFixed(2)
-                  )
+                      .toFixed(2),
+                  ),
                 )}
               </Text>
             </View>
@@ -468,13 +468,13 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             Number(
               data?.employee?.earnings
                 ?.reduce((sum, earning) => sum + earning.amount, 0)
-                .toFixed(2)
+                .toFixed(2),
             ) -
               Number(
                 data?.employee?.deductions
                   ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                  .toFixed(2)
-              )
+                  .toFixed(2),
+              ),
           )}`}</Text>
           <Text style={styles.netPayableWords}>
             {numberToWordsIndian(
@@ -482,14 +482,14 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
                 Number(
                   data?.employee?.earnings
                     ?.reduce((sum, earning) => sum + earning.amount, 0)
-                    .toFixed(2)
+                    .toFixed(2),
                 ) -
                   Number(
                     data?.employee?.deductions
                       ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                      .toFixed(2)
-                  )
-              )
+                      .toFixed(2),
+                  ),
+              ),
             )}
           </Text>
         </View>
@@ -622,16 +622,16 @@ export default function SalarySlip() {
     }
 
     const orderedEarnings = preferredEarningOrder.filter((f) =>
-      earningFields.has(f)
+      earningFields.has(f),
     );
     const remainingEarnings = [...earningFields.keys()].filter(
-      (f) => !preferredEarningOrder.includes(f)
+      (f) => !preferredEarningOrder.includes(f),
     );
     const orderedDeductions = preferredDeductionOrder.filter((f) =>
-      deductionFields.has(f)
+      deductionFields.has(f),
     );
     const remainingDeductions = [...deductionFields.keys()].filter(
-      (f) => !preferredDeductionOrder.includes(f)
+      (f) => !preferredDeductionOrder.includes(f),
     );
 
     const earnings = [...orderedEarnings, ...remainingEarnings].map((name) => ({
@@ -639,7 +639,7 @@ export default function SalarySlip() {
       amount: earningsMap[name],
     }));
     const deductions = [...orderedDeductions, ...remainingDeductions].map(
-      (name) => ({ name, amount: deductionsMap[name] })
+      (name) => ({ name, amount: deductionsMap[name] }),
     );
 
     return {

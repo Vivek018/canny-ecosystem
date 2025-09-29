@@ -121,7 +121,9 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="capitalize">
-          {replaceUnderscore(row.original?.work_details[0]?.assignment_type ?? "")}
+          {replaceUnderscore(
+            row.original?.work_details[0]?.assignment_type ?? "",
+          )}
         </p>
       );
     },

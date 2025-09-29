@@ -42,7 +42,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to delete Work Detail", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -63,7 +63,7 @@ export default function DeleteWorkDetails() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",

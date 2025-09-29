@@ -144,7 +144,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.dashboard}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -200,7 +200,7 @@ export default function Dashboard() {
                 ref={containerRef}
                 className={cn(
                   "overflow-hidden w-full border-b bg-primary/15",
-                  !notificationData?.text && "hidden"
+                  !notificationData?.text && "hidden",
                 )}
               >
                 <div

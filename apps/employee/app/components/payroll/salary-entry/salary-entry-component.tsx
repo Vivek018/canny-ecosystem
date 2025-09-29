@@ -59,12 +59,12 @@ export function SalaryEntryComponent({
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
-    [selectedRows, data]
+    [selectedRows, data],
   );
 
   const uniqueFields = useMemo(
     () => getUniqueFields(filteredData),
-    [filteredData]
+    [filteredData],
   );
 
   return (
@@ -93,7 +93,7 @@ export function SalaryEntryComponent({
           className={cn(
             payrollData?.status === "pending" || !selectedRows.length
               ? "hidden"
-              : ""
+              : "",
           )}
           allLocationOptions={allLocationOptions}
           payrollId={payrollId ?? payrollData?.id}

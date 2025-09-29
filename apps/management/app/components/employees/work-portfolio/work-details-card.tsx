@@ -66,8 +66,8 @@ export const EmployeeWorkDetailsCard = ({
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${createRole}:${attribute.employeeWorkDetails}`
-            ) && "hidden"
+              `${createRole}:${attribute.employeeWorkDetails}`,
+            ) && "hidden",
           )}
         >
           <Icon name="plus-circled" className="mr-2" />
@@ -94,8 +94,8 @@ export const EmployeeWorkDetailsCard = ({
                           "px-2.5 h-min",
                           !hasPermission(
                             role,
-                            `${updateRole}:${attribute.employeeWorkDetails}`
-                          ) && "hidden"
+                            `${updateRole}:${attribute.employeeWorkDetails}`,
+                          ) && "hidden",
                         )}
                       >
                         <Icon name="edit" size="xs" />
@@ -111,8 +111,8 @@ export const EmployeeWorkDetailsCard = ({
                       "px-2.5 h-min",
                       !hasPermission(
                         role,
-                        `${deleteRole}:${attribute.employeeWorkDetails}`
-                      ) && "hidden"
+                        `${deleteRole}:${attribute.employeeWorkDetails}`,
+                      ) && "hidden",
                     )}
                   >
                     <Icon name="dots-vertical" size="xs" />

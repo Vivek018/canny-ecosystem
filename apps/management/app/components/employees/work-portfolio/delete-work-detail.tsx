@@ -39,7 +39,7 @@ export const DeleteWorkDetail = ({
   };
 
   const handleDeleteWorkDetail = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -49,7 +49,7 @@ export const DeleteWorkDetail = ({
           method: "post",
           action: `/employees/${employeeId}/work-portfolio/${workDetailId}/delete-work-details`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -65,8 +65,8 @@ export const DeleteWorkDetail = ({
           "text-[13px] h-9 hidden",
           hasPermission(
             role,
-            `${deleteRole}:${attribute.employeeWorkDetails}`
-          ) && "flex"
+            `${deleteRole}:${attribute.employeeWorkDetails}`,
+          ) && "flex",
         )}
       >
         Delete Work Detail

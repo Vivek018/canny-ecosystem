@@ -111,7 +111,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         locationOptions: null,
         projectOptions: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -130,7 +130,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -154,7 +154,7 @@ export async function action({
         error,
         returnTo: "/modules/sites",
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -164,7 +164,7 @@ export async function action({
         error,
         returnTo: "/modules/sites",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -385,7 +385,7 @@ export default function CreateSite({
                     ...getInputProps(fields.pincode, { type: "text" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name
+                      fields.pincode.name,
                     )}`,
                   }}
                   labelProps={{
@@ -422,7 +422,7 @@ export default function CreateSite({
                     ...getInputProps(fields.longitude, { type: "number" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name
+                      fields.longitude.name,
                     )}`,
                   }}
                   labelProps={{

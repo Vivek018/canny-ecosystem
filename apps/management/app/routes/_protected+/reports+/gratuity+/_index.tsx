@@ -43,7 +43,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined
+      (value) => value !== null && value !== undefined,
     );
 
   const { data, meta, error } = await getEmployeesReportByCompanyId({
@@ -65,7 +65,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize
+    meta?.count && meta.count / (page + 1) > pageSize,
   );
 
   if (error || gratuityError) {
@@ -111,7 +111,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ...presentDaysInYears,
       is_eligible_for_gratuity: employeeWorkingYears >= gratuityEligibleYears,
       employee_eligible_date: new Date(
-        joining_date.setDate(joining_date.getDate() + totalDays)
+        joining_date.setDate(joining_date.getDate() + totalDays),
       ),
     };
   });

@@ -20,7 +20,7 @@ export function ExportBar({
 }) {
   function transformEmployeeData(
     data: any[],
-    columnVisibility: Record<string, boolean>
+    columnVisibility: Record<string, boolean>,
   ) {
     const toBeExportedData = data.map((element) => {
       const exportedData: {
@@ -120,7 +120,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Attendance Report - ${formatDateTime(Date.now())}`
+      `Attendance Report - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);
@@ -133,7 +133,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-16 md:bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

@@ -124,7 +124,7 @@ export default function LeavesEmailMenu({
     <div
       className={cn(
         !hasPermission(role, `${emailRole}:${attribute.leaves}`) && "hidden",
-        !selectedRows.length && "hidden"
+        !selectedRows.length && "hidden",
       )}
     >
       <Dialog>

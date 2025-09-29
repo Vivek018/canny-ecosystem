@@ -138,7 +138,7 @@ type DataType = {
 
 function chunkArray(array: any, size: number) {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size)
+    array.slice(i * size, i * size + size),
   );
 }
 
@@ -175,11 +175,11 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
           {chunk.map((emp: any, i: number) => {
             const earningsTotal = emp.earnings.reduce(
               (acc: number, e: any) => acc + e.amount,
-              0
+              0,
             );
             const deductionTotal = emp.deductions.reduce(
               (acc: number, d: any) => acc + d.amount,
-              0
+              0,
             );
             const netAmount = earningsTotal - deductionTotal;
 
@@ -284,7 +284,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                       ]}
                     >
                       {replaceUnderscore(
-                        emp.employeeProjectAssignmentData.position
+                        emp.employeeProjectAssignmentData.position,
                       )}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>ESI No.</Text>
@@ -334,7 +334,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <>
                         {formatDate(
-                          emp?.employeeProjectAssignmentData?.start_date
+                          emp?.employeeProjectAssignmentData?.start_date,
                         )}
                       </>
                     </Text>
@@ -369,7 +369,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                   {Array.from({
                     length: Math.max(
                       emp.earnings.length,
-                      emp.deductions.length
+                      emp.deductions.length,
                     ),
                   }).map((_, idx) => (
                     <View style={styles.row} key={idx.toString()}>
@@ -540,29 +540,29 @@ export default function SalarySlips() {
       }
 
       const orderedEarnings = preferredEarningOrder.filter((f) =>
-        earningFields.has(f)
+        earningFields.has(f),
       );
       const remainingEarnings = [...earningFields.keys()].filter(
-        (f) => !preferredEarningOrder.includes(f)
+        (f) => !preferredEarningOrder.includes(f),
       );
       const orderedDeductions = preferredDeductionOrder.filter((f) =>
-        deductionFields.has(f)
+        deductionFields.has(f),
       );
       const remainingDeductions = [...deductionFields.keys()].filter(
-        (f) => !preferredDeductionOrder.includes(f)
+        (f) => !preferredDeductionOrder.includes(f),
       );
 
       const earnings = [...orderedEarnings, ...remainingEarnings].map(
         (name) => ({
           name,
           amount: earningsMap[name],
-        })
+        }),
       );
       const deductions = [...orderedDeductions, ...remainingDeductions].map(
         (name) => ({
           name,
           amount: deductionsMap[name],
-        })
+        }),
       );
 
       return {

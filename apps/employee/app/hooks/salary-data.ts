@@ -83,13 +83,13 @@ export const useSalaryData = (data: any[]) => {
       const deptIds = departmentOptions.map((opt) => opt.value);
 
       setSelectedSiteIds(
-        newSelectedFields.filter((id) => siteIds.includes(id))
+        newSelectedFields.filter((id) => siteIds.includes(id)),
       );
       setSelectedDeptIds(
-        newSelectedFields.filter((id) => deptIds.includes(id))
+        newSelectedFields.filter((id) => deptIds.includes(id)),
       );
     },
-    [siteOptions, departmentOptions]
+    [siteOptions, departmentOptions],
   );
 
   return {

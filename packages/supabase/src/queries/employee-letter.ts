@@ -140,7 +140,7 @@ export async function getEmployeeLetterWithEmployeeById({
       `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, work_details!work_details_employee_id_fkey!left(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         sites, name)
-      ))`
+      ))`,
     )
     .eq("id", id)
     .order("created_at", { ascending: false })

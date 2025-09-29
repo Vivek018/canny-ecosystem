@@ -276,14 +276,14 @@ export function numberToWordsIndian(num: number) {
     let i = 0;
 
     while (n > 0) {
-      const remainder = n % (i === 0 ? 1000 : 100); 
+      const remainder = n % (i === 0 ? 1000 : 100);
       if (remainder > 0) {
-        const groupName = i > 0 ? units[i] : ""; 
+        const groupName = i > 0 ? units[i] : "";
         parts.unshift(
           convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
         );
       }
-      n = Math.floor(n / (i === 0 ? 1000 : 100)); 
+      n = Math.floor(n / (i === 0 ? 1000 : 100));
       i++;
     }
 

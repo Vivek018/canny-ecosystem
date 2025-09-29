@@ -30,9 +30,9 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
       const project = item.work_details[0]?.sites?.projects?.name;
       const site = item.work_details[0]?.sites?.name;
 
-      if (!site) continue; 
+      if (!site) continue;
 
-      const projectKey = project || site; 
+      const projectKey = project || site;
 
       if (!siteCounts[projectKey]) {
         siteCounts[projectKey] = {};
@@ -50,7 +50,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
           fill: `hsl(var(--chart-${index + 1}))`,
           sites,
         };
-      }
+      },
     );
 
     return finalData;

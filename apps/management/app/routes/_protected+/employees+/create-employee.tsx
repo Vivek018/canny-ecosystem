@@ -127,7 +127,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       workDetailCode = generateEmployeeCodes(
         siteData?.prefix ?? "",
         1,
-        data!
+        data!,
       )[0];
     }
 
@@ -174,7 +174,7 @@ export async function action({
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });
@@ -188,13 +188,13 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
       const employeeStatutoryDetailsData = session.get(
-        `${SESSION_KEY_PREFIX}2`
+        `${SESSION_KEY_PREFIX}2`,
       );
       const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
       const employeeWorkDetailsData = session.get(`${SESSION_KEY_PREFIX}4`);
@@ -238,7 +238,7 @@ export async function action({
             message: "Failed to create employee",
             returnTo: "/employees",
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -261,7 +261,7 @@ export async function action({
             message: "Failed to save employee details",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -280,7 +280,7 @@ export async function action({
             headers: {
               "Set-Cookie": await commitSession(session),
             },
-          }
+          },
         );
       }
     } else if (
@@ -299,7 +299,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -324,7 +324,7 @@ export async function action({
         message: `An unexpected error occurred${error}`,
         returnTo: "/employees",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

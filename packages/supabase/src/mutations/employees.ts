@@ -654,7 +654,7 @@ export async function getEmployeeDetailsConflicts({
       primary_mobile_number,
       secondary_mobile_number,
       personal_email
-    `
+    `,
     )
     .or(
       [
@@ -666,7 +666,7 @@ export async function getEmployeeDetailsConflicts({
           .map((phone) => phone)
           .join(",")})`,
         `personal_email.in.(${emails.map((email) => email).join(",")})`,
-      ].join(",")
+      ].join(","),
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -683,7 +683,7 @@ export async function getEmployeeDetailsConflicts({
           existing.employee_code === record.employee_code ||
           existing.primary_mobile_number === record.primary_mobile_number ||
           existing.secondary_mobile_number === record.secondary_mobile_number ||
-          existing.personal_email === record.personal_email
+          existing.personal_email === record.personal_email,
       );
 
       if (hasConflict) {
@@ -691,7 +691,7 @@ export async function getEmployeeDetailsConflicts({
       }
       return indices;
     },
-    []
+    [],
   );
 
   return { conflictingIndices, error: null };
@@ -726,7 +726,7 @@ export async function createEmployeeDetailsFromImportedData({
       employee_code,
       primary_mobile_number,
       secondary_mobile_number,
-      personal_email`
+      personal_email`,
     )
     .or(
       [
@@ -734,7 +734,7 @@ export async function createEmployeeDetailsFromImportedData({
         `primary_mobile_number.in.(${primaryPhones.join(",")})`,
         `secondary_mobile_number.in.(${secondaryPhones.join(",")})`,
         `personal_email.in.(${emails.join(",")})`,
-      ].join(",")
+      ].join(","),
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -753,7 +753,7 @@ export async function createEmployeeDetailsFromImportedData({
           existing.employee_code === record.employee_code ||
           existing.primary_mobile_number === record.primary_mobile_number ||
           existing.secondary_mobile_number === record.secondary_mobile_number ||
-          existing.personal_email === record.personal_email
+          existing.personal_email === record.personal_email,
       );
       return !hasConflict;
     });
@@ -800,7 +800,7 @@ export async function createEmployeeDetailsFromImportedData({
             existing.primary_mobile_number === record.primary_mobile_number ||
             existing.secondary_mobile_number ===
               record.secondary_mobile_number ||
-            existing.personal_email === record.personal_email
+            existing.personal_email === record.personal_email,
         );
 
         if (conflictingRecord) {
@@ -827,7 +827,7 @@ export async function createEmployeeDetailsFromImportedData({
           insertedOrUpdatedEmployees.push(insertedData);
         }
         return { type: "insert", error: insertError };
-      })
+      }),
     );
 
     const errors = results.filter((r) => r.error);
@@ -885,7 +885,7 @@ export async function getEmployeeStatutoryConflicts({
       esic_number,
       driving_license_number,
       passport_number
-    `
+    `,
     )
     .or(
       [
@@ -897,7 +897,7 @@ export async function getEmployeeStatutoryConflicts({
         `esic_number.in.(${esicNumbers.map((num) => num).join(",")})`,
         `driving_license_number.in.(${drivings.map((num) => num).join(",")})`,
         `passport_number.in.(${passports.map((num) => num).join(",")})`,
-      ].join(",")
+      ].join(","),
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -918,7 +918,7 @@ export async function getEmployeeStatutoryConflicts({
           existing.pf_number === record.pf_number ||
           existing.esic_number === record.esic_number ||
           existing.driving_license_number === record.driving_license_number ||
-          existing.passport_number === record.passport_number
+          existing.passport_number === record.passport_number,
       );
 
       if (hasConflict) {
@@ -926,7 +926,7 @@ export async function getEmployeeStatutoryConflicts({
       }
       return indices;
     },
-    []
+    [],
   );
 
   return { conflictingIndices, error: null };
@@ -959,11 +959,11 @@ export async function createEmployeeStatutoryFromImportedData({
   const { data: existingRecords, error: existingError } = await supabase
     .from("employee_statutory_details")
     .select(
-      "employee_id, aadhaar_number, pan_number, uan_number, pf_number, esic_number, driving_license_number, passport_number"
+      "employee_id, aadhaar_number, pan_number, uan_number, pf_number, esic_number, driving_license_number, passport_number",
     )
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+      identifiers.map((entry) => entry.employee_id).filter(Boolean),
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -978,17 +978,17 @@ export async function createEmployeeStatutoryFromImportedData({
   const existingSets = {
     ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
     aadhaars: new Set(
-      existingRecords?.map((e) => normalize(e.aadhaar_number)) || []
+      existingRecords?.map((e) => normalize(e.aadhaar_number)) || [],
     ),
     pans: new Set(existingRecords?.map((e) => normalize(e.pan_number)) || []),
     uans: new Set(existingRecords?.map((e) => normalize(e.uan_number)) || []),
     pfs: new Set(existingRecords?.map((e) => normalize(e.pf_number)) || []),
     esics: new Set(existingRecords?.map((e) => normalize(e.esic_number)) || []),
     drivingLicenses: new Set(
-      existingRecords?.map((e) => normalize(e.driving_license_number)) || []
+      existingRecords?.map((e) => normalize(e.driving_license_number)) || [],
     ),
     passports: new Set(
-      existingRecords?.map((e) => normalize(e.passport_number)) || []
+      existingRecords?.map((e) => normalize(e.passport_number)) || [],
     ),
   };
 
@@ -1007,7 +1007,7 @@ export async function createEmployeeStatutoryFromImportedData({
           existingSets.esics.has(normalize(entry.esic_number))) ||
         (entry.driving_license_number &&
           existingSets.drivingLicenses.has(
-            normalize(entry.driving_license_number)
+            normalize(entry.driving_license_number),
           )) ||
         (entry.passport_number &&
           existingSets.passports.has(normalize(entry.passport_number)));
@@ -1067,7 +1067,7 @@ export async function createEmployeeStatutoryFromImportedData({
                 normalize(record.driving_license_number)) ||
             (record.passport_number &&
               normalize(existing.passport_number) ===
-                normalize(record.passport_number))
+                normalize(record.passport_number)),
         );
 
         if (existingRecord) {
@@ -1084,7 +1084,7 @@ export async function createEmployeeStatutoryFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      })
+      }),
     );
 
     const errors = results.filter((r) => r.error);
@@ -1124,13 +1124,13 @@ export async function getEmployeeBankDetailsConflicts({
       `
       employee_id,
       account_number
-    `
+    `,
     )
     .or(
       [
         `employee_id.in.(${employeeIds.map((id) => id).join(",")})`,
         `account_number.in.(${accountNumbers.map((num) => num).join(",")})`,
-      ].join(",")
+      ].join(","),
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -1145,7 +1145,7 @@ export async function getEmployeeBankDetailsConflicts({
       const hasConflict = conflictingRecords?.some(
         (existing) =>
           existing.employee_id === record.employee_id ||
-          existing.account_number === record.account_number
+          existing.account_number === record.account_number,
       );
 
       if (hasConflict) {
@@ -1153,7 +1153,7 @@ export async function getEmployeeBankDetailsConflicts({
       }
       return indices;
     },
-    []
+    [],
   );
 
   return { conflictingIndices, error: null };
@@ -1182,7 +1182,7 @@ export async function createEmployeeBankDetailsFromImportedData({
     .select("employee_id, account_number")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+      identifiers.map((entry) => entry.employee_id).filter(Boolean),
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -1197,7 +1197,7 @@ export async function createEmployeeBankDetailsFromImportedData({
   const existingSets = {
     ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
     accounts: new Set(
-      existingRecords?.map((e) => normalize(e.account_number)) || []
+      existingRecords?.map((e) => normalize(e.account_number)) || [],
     ),
   };
 
@@ -1246,7 +1246,7 @@ export async function createEmployeeBankDetailsFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.account_number &&
               normalize(existing.account_number) ===
-                normalize(record.account_number))
+                normalize(record.account_number)),
         );
 
         if (existingRecord) {
@@ -1263,7 +1263,7 @@ export async function createEmployeeBankDetailsFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      })
+      }),
     );
 
     const errors = results.filter((r) => r.error);
@@ -1324,7 +1324,7 @@ export async function getEmployeeGuardiansConflicts({
       mobile_number,
       alternate_mobile_number,
       email
-    `
+    `,
     )
     .or(
       [
@@ -1333,7 +1333,7 @@ export async function getEmployeeGuardiansConflicts({
           .map((num) => num)
           .join(",")})`,
         `email.in.(${emails.map((email) => email).join(",")})`,
-      ].join(",")
+      ].join(","),
     );
 
   const { data: conflictingRecords, error } = await query;
@@ -1349,7 +1349,7 @@ export async function getEmployeeGuardiansConflicts({
         (existing) =>
           existing.mobile_number === record.mobile_number ||
           existing.alternate_mobile_number === record.alternate_mobile_number ||
-          existing.email === record.email
+          existing.email === record.email,
       );
 
       if (hasConflict) {
@@ -1357,7 +1357,7 @@ export async function getEmployeeGuardiansConflicts({
       }
       return indices;
     },
-    []
+    [],
   );
 
   return { conflictingIndices, error: null };
@@ -1390,7 +1390,7 @@ export async function createEmployeeGuardiansFromImportedData({
       entry.email ? `email.eq.${entry.email}` : null,
     ]
       .filter(Boolean)
-      .join(",")
+      .join(","),
   );
 
   const { data: existingRecords, error: fetchError } = await supabase
@@ -1405,10 +1405,10 @@ export async function createEmployeeGuardiansFromImportedData({
 
   const existingSets = {
     mobileNumbers: new Set(
-      existingRecords?.map((e) => normalize(e.mobile_number)) || []
+      existingRecords?.map((e) => normalize(e.mobile_number)) || [],
     ),
     alternateMobileNumbers: new Set(
-      existingRecords?.map((e) => normalize(e.alternate_mobile_number)) || []
+      existingRecords?.map((e) => normalize(e.alternate_mobile_number)) || [],
     ),
     emails: new Set(existingRecords?.map((e) => normalize(e.email)) || []),
   };
@@ -1418,7 +1418,7 @@ export async function createEmployeeGuardiansFromImportedData({
       const hasConflict =
         existingSets.mobileNumbers.has(normalize(entry.mobile_number)) ||
         existingSets.alternateMobileNumbers.has(
-          normalize(entry.alternate_mobile_number)
+          normalize(entry.alternate_mobile_number),
         ) ||
         existingSets.emails.has(normalize(entry.email));
 
@@ -1447,7 +1447,7 @@ export async function createEmployeeGuardiansFromImportedData({
           normalize(record.mobile_number) === normalize(entry.mobile_number) ||
           normalize(record.alternate_mobile_number) ===
             normalize(entry.alternate_mobile_number) ||
-          normalize(record.email) === normalize(entry.email)
+          normalize(record.email) === normalize(entry.email),
       );
 
       if (existing) {
@@ -1516,7 +1516,7 @@ export async function createEmployeeWorkDetailsFromImportedData({
     .select("employee_id")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+      identifiers.map((entry) => entry.employee_id).filter(Boolean),
     );
   if (existingError) {
     console.error("Error fetching existing records:", existingError);
@@ -1570,7 +1570,7 @@ export async function createEmployeeWorkDetailsFromImportedData({
       data.map(async (record) => {
         const existingRecord = existingRecords?.find(
           (existing) =>
-            normalize(existing.employee_id) === normalize(record.employee_id)
+            normalize(existing.employee_id) === normalize(record.employee_id),
         );
 
         if (existingRecord) {
@@ -1587,7 +1587,7 @@ export async function createEmployeeWorkDetailsFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      })
+      }),
     );
 
     const errors = results.filter((r) => r.error);

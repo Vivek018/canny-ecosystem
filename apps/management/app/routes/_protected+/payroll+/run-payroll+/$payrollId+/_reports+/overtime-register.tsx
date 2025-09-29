@@ -397,7 +397,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
 
               <Text style={{ textTransform: "capitalize" }}>
                 {replaceUnderscore(
-                  employee?.employeeProjectAssignmentData?.position
+                  employee?.employeeProjectAssignmentData?.position,
                 )}
                 <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
               </Text>
@@ -498,35 +498,35 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "HRA")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "LTA")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e.name === "Others")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BONUS")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
             </View>
@@ -540,14 +540,14 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .reduce((sum, earning) => sum + earning.amount, 0)
-                    ?.toFixed(2)
+                    ?.toFixed(2),
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text>0</Text>
@@ -573,7 +573,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "EPF" || "PF")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text
@@ -584,7 +584,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "ESIC")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text
@@ -595,7 +595,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "PT")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text
@@ -606,7 +606,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "PF")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text
@@ -617,7 +617,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "LWF")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
               <Text
@@ -628,7 +628,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e.name === "Advances")
-                    ?.amount?.toFixed(2) ?? 0.0
+                    ?.amount?.toFixed(2) ?? 0.0,
                 )}
               </Text>
             </View>
@@ -654,7 +654,7 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .reduce((sum, earning) => sum + earning?.amount, 0)
-                    ?.toFixed(2)
+                    ?.toFixed(2),
                 )}
               </Text>
             </View>
@@ -669,12 +669,12 @@ const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
                   Number(
                     employee?.earnings
                       .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2)
+                      ?.toFixed(2),
                   ) -
                   Number(
                     employee?.deductions
                       .reduce((sum, earning) => sum + earning?.amount, 0)
-                      ?.toFixed(2)
+                      ?.toFixed(2),
                   )
                 )?.toFixed(2)}
               </Text>
@@ -727,7 +727,7 @@ export default function OvertimeRegister() {
   const updatedData = {
     ...data,
     payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
-      selectedRows.some((emp2) => emp2.id === emp1.id)
+      selectedRows.some((emp2) => emp2.id === emp1.id),
     ),
   };
   const navigate = useNavigate();
@@ -876,7 +876,7 @@ export default function OvertimeRegister() {
             earnings,
             deductions,
           };
-        }
+        },
       );
 
     return {

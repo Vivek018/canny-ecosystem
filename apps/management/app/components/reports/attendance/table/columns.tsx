@@ -17,7 +17,7 @@ const currentYear = currentDate.getFullYear();
 
 export const columns = (
   monthYearArray: string[],
-  filters: AttendanceReportFilters
+  filters: AttendanceReportFilters,
 ): ColumnDef<AttendanceReport>[] => {
   return useMemo(
     () => [
@@ -121,6 +121,6 @@ export const columns = (
         ),
       },
     ],
-    [monthYearArray, filters]
+    [monthYearArray, filters],
   );
 };

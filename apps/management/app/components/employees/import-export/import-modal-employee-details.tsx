@@ -64,7 +64,7 @@ export const ImportEmployeeDetailsModal = () => {
   };
   const demo: any[] | Papa.UnparseObject<any> = [
     {
-      department:null,
+      department: null,
       first_name: null,
       middle_name: null,
       last_name: null,
@@ -86,7 +86,7 @@ export const ImportEmployeeDetailsModal = () => {
     },
   ];
   const downloadDemoCsv = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const csv = Papa.unparse(demo);
@@ -118,7 +118,7 @@ export const ImportEmployeeDetailsModal = () => {
                     e as unknown as React.MouseEvent<
                       HTMLButtonElement,
                       MouseEvent
-                    >
+                    >,
                   );
                 }
               }}
@@ -145,7 +145,7 @@ export const ImportEmployeeDetailsModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

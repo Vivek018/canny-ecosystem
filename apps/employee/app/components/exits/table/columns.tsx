@@ -50,7 +50,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees?.work_details[0]?.sites?.projects?.name ?? "--"}
+          {row.original?.employees?.work_details[0]?.sites?.projects?.name ??
+            "--"}
         </p>
       );
     },

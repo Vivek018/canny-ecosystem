@@ -7,7 +7,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 
 export const columns = (
-  isEmployeeRoute?: boolean
+  isEmployeeRoute?: boolean,
 ): ColumnDef<LeavesDataType>[] => [
   {
     id: "select",

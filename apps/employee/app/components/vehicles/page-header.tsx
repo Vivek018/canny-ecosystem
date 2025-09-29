@@ -34,7 +34,7 @@ export function VehiclePageHeader({
             <div
               className={cn(
                 "rounded-sm flex items-center",
-                vehicle.is_active ? "text-green" : "text-yellow-500"
+                vehicle.is_active ? "text-green" : "text-yellow-500",
               )}
             >
               <Icon name="dot-filled" className="mt-[1px]" />

@@ -93,7 +93,7 @@ export function VehiclePageHeader({
             <div
               className={cn(
                 "rounded-sm flex items-center",
-                vehicle.is_active ? "text-green" : "text-yellow-500"
+                vehicle.is_active ? "text-green" : "text-yellow-500",
               )}
             >
               <Icon name="dot-filled" className="mt-[1px]" />
@@ -119,7 +119,7 @@ export function VehiclePageHeader({
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
               !hasPermission(role, `${updateRole}:${attribute.vehicles}`) &&
-                "hidden"
+                "hidden",
             )}
           >
             <Icon name="edit" size="xs" className="mr-1.5" />
@@ -135,7 +135,7 @@ export function VehiclePageHeader({
                   buttonVariants({ variant: "outline" }),
                   "w-full bg-card",
                   !hasPermission(role, `${updateRole}:${attribute.vehicles}`) &&
-                    "hidden"
+                    "hidden",
                 )}
               >
                 <Icon name="dots-vertical" size="xs" className="mr-1.5" />

@@ -95,7 +95,7 @@ export async function getLeavesByEmployeeId({
         ),
         users!${users ? "inner" : "left"}(id, email)
       `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("employee_id", employeeId);
 
@@ -115,11 +115,11 @@ export async function getLeavesByEmployeeId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(date_end)},end_date.gte.${formatUTCDate(
-          date_start
+          date_start,
         )}),` +
           `and(start_date.gte.${formatUTCDate(
-            date_start
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+            date_start,
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
       );
     }
 
@@ -232,7 +232,7 @@ export async function getLeavesByCompanyId({
         ),
         users!${users ? "inner" : "left"}(id,email)
       `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("employees.company_id", companyId);
 
@@ -252,11 +252,11 @@ export async function getLeavesByCompanyId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(date_end)},end_date.gte.${formatUTCDate(
-          date_start
+          date_start,
         )}),` +
           `and(start_date.gte.${formatUTCDate(
-            date_start
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+            date_start,
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`,
       );
     }
 
@@ -315,11 +315,7 @@ export async function getLeavesByCompanyId({
       }
     };
 
-    if (
-      ["employee_name", "employee_code","email"].includes(
-        column
-      )
-    ) {
+    if (["employee_name", "employee_code", "email"].includes(column)) {
       data.sort((a: any, b: any) => {
         const aValue = getNestedValue(a);
         const bValue = getNestedValue(b);
@@ -357,7 +353,7 @@ export async function getLeaveTypeByCompanyId({
     .select(
       `
         ${columns.join(",")}
-      `
+      `,
     )
     .eq("company_id", companyId)
     .order("created_at", { ascending: true })

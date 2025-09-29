@@ -62,7 +62,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees?.work_details[0]?.sites?.projects?.name ?? "--"}
+          {row.original?.employees?.work_details[0]?.sites?.projects?.name ??
+            "--"}
         </p>
       );
     },
@@ -207,7 +208,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
                   "hidden",
-                !!row.original.invoice_id?.length && "hidden"
+                !!row.original.invoice_id?.length && "hidden",
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

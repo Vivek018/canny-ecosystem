@@ -98,7 +98,7 @@ export default function EmployeesEmailMenu({
     <div
       className={cn(
         !hasPermission(role, `${emailRole}:${attribute.employees}`) && "hidden",
-        !selectedRows.length && "hidden"
+        !selectedRows.length && "hidden",
       )}
     >
       <Dialog>

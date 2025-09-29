@@ -92,8 +92,8 @@ export function EmployeeDetailsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -111,7 +111,7 @@ export function EmployeeDetailsImportData({
       if (departmentError) throw departmentError;
 
       const departmentMap = new Map(
-        (departments ?? []).map((d) => [normalizeNames(d.name), d.id])
+        (departments ?? []).map((d) => [normalizeNames(d.name), d.id]),
       );
 
       const preData = importData.data.map((item: any) => {
@@ -153,7 +153,7 @@ export function EmployeeDetailsImportData({
       });
 
       const empCodeToId = Object.fromEntries(
-        employees!.map((emp) => [emp.employee_code, emp.id])
+        employees!.map((emp) => [emp.employee_code, emp.id]),
       );
 
       const workDetailsData = preData.map((entry) => ({
@@ -209,7 +209,7 @@ export function EmployeeDetailsImportData({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-background/80",
-          isImporting ? "block" : "hidden"
+          isImporting ? "block" : "hidden",
         )}
       >
         <LoadingSpinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0" />
@@ -235,10 +235,10 @@ export function EmployeeDetailsImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden"
+                conflictingIndex?.length > 0 ? "flex" : "hidden",
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[]
+                duplicationTypeArray as unknown as string[],
               )}
               value={importType}
               onChange={(value: string) => {

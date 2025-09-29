@@ -45,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.employee_work_portfolio}${args.params.employeeId}`,
-    args
+    args,
   );
 }
 
@@ -57,7 +57,7 @@ export default function WorkPortfolio() {
 
   if (error) {
     clearExactCacheEntry(
-      `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+      `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
     );
     return <ErrorBoundary error={error} message="Failed to load data" />;
   }
@@ -69,7 +69,7 @@ export default function WorkPortfolio() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
               );
               return (
                 <ErrorBoundary message="Failed to load employee work details" />
@@ -107,7 +107,7 @@ export function CommonWrapper({
   useEffect(() => {
     if (error) {
       clearExactCacheEntry(
-        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
       );
       toast({
         title: "Error",

@@ -43,7 +43,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options?.find(
-    (option) => String(option?.value) === String(value)
+    (option) => String(option?.value) === String(value),
   );
 
   return (
@@ -57,11 +57,11 @@ export function Combobox({
           className={cn(
             "truncate justify-between",
             !selectedOption && "text-muted-foreground",
-            className
+            className,
           )}
         >
           {replaceUnderscore(
-            selectedOption ? selectedOption?.label : placeholder
+            selectedOption ? selectedOption?.label : placeholder,
           )}
           <Icon
             name="caret-sort"
@@ -87,7 +87,7 @@ export function Combobox({
                   value={String(
                     (option?.value ?? "") +
                       (option?.label ?? "") +
-                      (option?.pseudoLabel ?? "")
+                      (option?.pseudoLabel ?? ""),
                   )}
                   onSelect={() => {
                     onChange(
@@ -99,7 +99,7 @@ export function Combobox({
                           String(option?.pseudoValue) === String(pseudoValue)
                             ? ""
                             : String(option?.pseudoValue),
-                      }
+                      },
                     );
                     setOpen(false);
                   }}
@@ -112,7 +112,7 @@ export function Combobox({
                       "mr-2 shrink-0",
                       String(value) === String(option?.value)
                         ? "opacity-100"
-                        : "opacity-0"
+                        : "opacity-0",
                     )}
                   />
                   <p className="truncate w-max flex-1">
@@ -121,7 +121,7 @@ export function Combobox({
                   <p
                     className={cn(
                       "text-muted-foreground ml-6 w-28 truncate",
-                      !option?.pseudoLabel && "hidden"
+                      !option?.pseudoLabel && "hidden",
                     )}
                   >
                     {option?.pseudoLabel}

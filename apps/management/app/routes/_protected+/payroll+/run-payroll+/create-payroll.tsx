@@ -131,7 +131,7 @@ export async function action({
 export default function CreatePayroll() {
   const { projectOptions, allSiteOptions, companyId } =
     useLoaderData<typeof loader>();
-    
+
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const [linkWith, setLinkWith] = useState("");

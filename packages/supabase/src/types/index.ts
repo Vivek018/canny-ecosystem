@@ -133,7 +133,6 @@ export type EmployeeWorkDetailsDatabaseInsert =
 export type EmployeeWorkDetailsDatabaseUpdate =
   Database["public"]["Tables"]["work_details"]["Update"];
 
-
 // Employee Documents
 export type EmployeeDocumentsDatabaseRow =
   Database["public"]["Tables"]["employee_documents"]["Row"];

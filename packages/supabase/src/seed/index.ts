@@ -88,7 +88,7 @@ dotenv.config();
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 // Function to generate a random number within a range
@@ -111,7 +111,7 @@ export async function seed(newCompanyId?: string) {
     }
 
     console.time(
-      "Created Locations and Relationships(with Project & Sites)..."
+      "Created Locations and Relationships(with Project & Sites)...",
     );
     for (let index = 0; index < 2; index++) {
       await createLocation({
@@ -388,7 +388,7 @@ export async function seed(newCompanyId?: string) {
       console.timeEnd("Created Project and Sites(with Employees)...");
     }
     console.timeEnd(
-      "Created Locations and Relationships(with Project & Sites)..."
+      "Created Locations and Relationships(with Project & Sites)...",
     );
 
     console.time("Created Taxes...");

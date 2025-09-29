@@ -138,7 +138,7 @@ export const columns = ({
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.work_details[0]?.assignment_type ?? ""
+            row.original?.work_details[0]?.assignment_type ?? "",
           )}
         </p>
       );
@@ -299,9 +299,9 @@ export const columns = ({
                 !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employees}`
+                    `${deleteRole}:${attribute.employees}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

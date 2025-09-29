@@ -77,7 +77,7 @@ export async function loader({
         companyId,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -96,7 +96,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -208,7 +208,7 @@ export default function CreatePayee({
                   key={resetKey}
                   className="mb-2"
                   options={transformStringArrayIntoOptions(
-                    reimbursementTypeArray as unknown as string[]
+                    reimbursementTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.type, { type: "text" }),
@@ -225,7 +225,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.fixed_amount, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.fixed_amount.name
+                      fields.fixed_amount.name,
                     )}`,
                   }}
                   labelProps={{
@@ -239,7 +239,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.bank_name, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.bank_name.name
+                      fields.bank_name.name,
                     )}`,
                   }}
                   labelProps={{
@@ -253,12 +253,12 @@ export default function CreatePayee({
                       type: "text",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.account_holder_name.name
+                      fields.account_holder_name.name,
                     )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.account_holder_name.name
+                      fields.account_holder_name.name,
                     ),
                   }}
                   errors={fields.account_holder_name.errors}
@@ -269,7 +269,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.account_number, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.account_number.name
+                      fields.account_number.name,
                     )}`,
                   }}
                   labelProps={{
@@ -281,7 +281,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.ifsc_code, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.ifsc_code.name
+                      fields.ifsc_code.name,
                     )}`,
                   }}
                   labelProps={{
@@ -295,7 +295,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.branch_name, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.branch_name.name
+                      fields.branch_name.name,
                     )}`,
                   }}
                   labelProps={{
@@ -307,7 +307,7 @@ export default function CreatePayee({
                   key={resetKey}
                   className="mb-2"
                   options={transformStringArrayIntoOptions(
-                    accountTypeArray as unknown as string[]
+                    accountTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.account_type, {
@@ -327,7 +327,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.aadhaar_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.aadhaar_number.name
+                      fields.aadhaar_number.name,
                     )}`,
                   }}
                   labelProps={{
@@ -339,7 +339,7 @@ export default function CreatePayee({
                   inputProps={{
                     ...getInputProps(fields.pan_number, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pan_number.name
+                      fields.pan_number.name,
                     )}`,
                   }}
                   labelProps={{

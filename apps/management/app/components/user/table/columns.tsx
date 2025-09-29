@@ -126,13 +126,13 @@ export const columns: ColumnDef<UsersType>[] = [
                   "h-8 w-8 p-0",
                   !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingUsers}`
+                    `${updateRole}:${attribute.settingUsers}`,
                   ) &&
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.settingUsers}`
+                      `${deleteRole}:${attribute.settingUsers}`,
                     ) &&
-                    "hidden"
+                    "hidden",
                 )}
               >
                 <span className="sr-only">Open menu</span>

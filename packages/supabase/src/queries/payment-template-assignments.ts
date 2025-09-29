@@ -23,7 +23,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (templateError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (templateData)",
-        templateError
+        templateError,
       );
       return { data: null, error: templateError };
     }
@@ -38,7 +38,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (employeeProjectError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (employeeProjectAssignment)",
-        employeeProjectError
+        employeeProjectError,
       );
       return { data: null, error: employeeProjectError };
     }
@@ -54,7 +54,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (sitePaymentError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (sitePaymentTemplateAssignment)",
-        sitePaymentError
+        sitePaymentError,
       );
       return { data: null, error: sitePaymentError };
     }
@@ -72,7 +72,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
     if (defaultTemplateError) {
       console.error(
         "getLinkedPaymentTemplateIdByEmployeeId Error (defaultTemplateData)",
-        defaultTemplateError
+        defaultTemplateError,
       );
       return { data: null, error: defaultTemplateError };
     }
@@ -81,7 +81,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
   } catch (error) {
     console.error(
       "getLinkedPaymentTemplateIdByEmployeeId Unexpected Error",
-      error
+      error,
     );
     return { data: null, error };
   }
@@ -297,7 +297,7 @@ export async function getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
   if (error) {
     console.error(
       "getPaymentTemplateAssignmentBySiteAndPositionOrSkillType Error",
-      error
+      error,
     );
   }
 

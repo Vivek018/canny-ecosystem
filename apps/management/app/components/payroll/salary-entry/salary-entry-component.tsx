@@ -84,18 +84,18 @@ export function SalaryEntryComponent({
   const totals = useMemo(
     () =>
       calculateFieldTotalsWithNetPay(selectedRows.length ? selectedRows : data),
-    [selectedRows, data]
+    [selectedRows, data],
   );
 
   const uniqueFields = useMemo(
     () => getUniqueFields(filteredData),
-    [filteredData]
+    [filteredData],
   );
 
   const updateStatusPayroll = useCallback(
     (
       e: React.MouseEvent<HTMLButtonElement>,
-      status: PayrollDatabaseRow["status"]
+      status: PayrollDatabaseRow["status"],
     ) => {
       e.preventDefault();
       clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
@@ -110,10 +110,10 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: `/payroll/run-payroll/${payrollId}`,
-        }
+        },
       );
     },
-    [payrollId, payrollData, submit]
+    [payrollId, payrollData, submit],
   );
 
   const handleUpdatePayroll = useCallback(
@@ -145,31 +145,31 @@ export function SalaryEntryComponent({
         {
           method: "POST",
           action: "/payroll/run-payroll/update-payroll",
-        }
+        },
       );
     },
-    [payrollId, payrollData?.id, submit]
+    [payrollId, payrollData?.id, submit],
   );
 
   const showSubmitButton = useMemo(
     () =>
       (payrollData.status === "pending" || payrollData.status === "approved") &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role]
+    [payrollData.status, role],
   );
 
   const showUndoSubmitButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${updateRole}:${attribute.payroll}`),
-    [payrollData.status, role]
+    [payrollData.status, role],
   );
 
   const showApproveButton = useMemo(
     () =>
       payrollData.status === "submitted" &&
       hasPermission(role, `${approveRole}:${attribute.payroll}`),
-    [payrollData.status, role]
+    [payrollData.status, role],
   );
 
   return (
@@ -202,7 +202,7 @@ export function SalaryEntryComponent({
           <div
             className={cn(
               "ml-auto flex flex-row max-sm:justify-end gap-3 max-sm:gap-2",
-              noButtons && "hidden"
+              noButtons && "hidden",
             )}
           >
             <Button
@@ -245,7 +245,7 @@ export function SalaryEntryComponent({
             className={cn(
               payrollData?.status === "pending" || !selectedRows.length
                 ? "hidden"
-                : ""
+                : "",
             )}
             epfData={epfData}
             payrollData={payrollData}

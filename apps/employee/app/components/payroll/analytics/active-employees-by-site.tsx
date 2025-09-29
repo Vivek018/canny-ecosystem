@@ -50,7 +50,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
           fill: `hsl(var(--chart-${index + 1}))`,
           sites,
         };
-      }
+      },
     );
 
     return finalData;
