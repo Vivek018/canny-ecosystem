@@ -109,7 +109,6 @@ export async function action({
 
         transformedSalaryEntries.push({
           monthly_attendance_id,
-          site_id: site,
         });
       }
 
