@@ -847,12 +847,14 @@ export const ImportEmployeeDetailsHeaderSchemaObject = z.object({
   skill_level: z.string().optional(),
   probation_period: z.string().optional(),
   probation_end_date: z.string().optional(),
+  employee_code: z.string().optional(),
 });
 
 export const ImportEmployeeDetailsHeaderSchema =
   ImportEmployeeDetailsHeaderSchemaObject.refine(
     (data) => {
       const values = [
+        data.employee_code,
         data.first_name,
         data.middle_name,
         data.last_name,

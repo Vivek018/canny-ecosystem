@@ -14,7 +14,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { Analytics } from "@vercel/analytics/remix";
+
 import { clientCaching } from "./utils/cache";
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
 import { getTheme } from "./utils/server/theme.server";
@@ -132,7 +132,7 @@ function Document({
       </head>
       <body className="h-full w-full bg-background text-foreground">
         {children}
-        <Analytics />
+
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>

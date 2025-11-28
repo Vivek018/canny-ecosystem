@@ -17,7 +17,6 @@ import {
 } from "@canny_ecosystem/ui/card";
 import type { ImportEmployeeDetailsHeaderSchemaObject } from "@canny_ecosystem/utils";
 import {
-  getLatestEmployeeOfTheSite,
   getSiteNamesByCompanyId,
   type ImportEmployeeDetailsDataType,
 } from "@canny_ecosystem/supabase/queries";
@@ -28,7 +27,6 @@ import {
   replaceUnderscore,
   pipe,
   replaceDash,
-  generateEmployeeCodes,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
 import { getEmployeeDetailsConflicts } from "@canny_ecosystem/supabase/mutations";
@@ -46,6 +44,10 @@ type FieldConfig = {
 };
 
 const FIELD_CONFIGS: FieldConfig[] = [
+  {
+    key: "employee_code",
+    required: true,
+  },
   {
     key: "department",
   },
@@ -109,14 +111,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.searchParams);
   const site = urlSearchParams.get("site") ?? "";
-  let lastCode = "";
-  if (site) {
-    const { data } = await getLatestEmployeeOfTheSite({
-      supabase,
-      siteId: site,
-    });
-    lastCode = data ?? "";
-  }
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -134,11 +128,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
     pseudoValue: site?.prefix,
     value: site?.id,
   }));
-  return json({ env, companyId, siteOptions, lastCode });
+  return json({ env, companyId, siteOptions });
 }
 
 export default function EmployeeDetailsImportFieldMapping() {
-  const { env, companyId, siteOptions, lastCode } =
+  const { env, companyId, siteOptions } =
     useLoaderData<typeof loader>();
   const { supabase } = useSupabase({ env });
   const [searchParams, setSearchParams] = useSearchParams();
@@ -274,11 +268,6 @@ export default function EmployeeDetailsImportFieldMapping() {
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
-          const codes = generateEmployeeCodes(
-            pseudoValue,
-            results?.data.length,
-            lastCode,
-          );
           const finalData = results?.data
             .filter((entry) =>
               Object.values(entry!).some(
@@ -306,7 +295,7 @@ export default function EmployeeDetailsImportFieldMapping() {
               return {
                 ...cleanEntry,
                 site_id: site,
-                employee_code: codes[index],
+                employee_code: cleanEntry.employee_code,
               } as ImportEmployeeDetailsDataType;
             });
 

@@ -64,6 +64,7 @@ export const ImportEmployeeDetailsModal = () => {
   };
   const demo: any[] | Papa.UnparseObject<any> = [
     {
+      employee_code: null,
       department: null,
       first_name: null,
       middle_name: null,
