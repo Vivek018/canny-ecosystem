@@ -319,6 +319,82 @@ We wish you all the best in your future endeavors and are confident that you wil
 Thank you for your service and commitment to $\{companyName} . Should you require any assistance or documentation in the future, please do not hesitate to reach out to us at \[Contact Information] .
 
 Yours sincerely,`;
+
+export const DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER = `
+Dear $\{employeeName},
+
+With reference to your application and subsequent interview, you are appointed as **$\{employeePosition}** in Canny under the contract of **$\{companyName}** on fixed term assignment basis specifically for **$\{projectName}** to be carried out at **$\{siteName}** for the specific period from **$\{employeeJoiningDate}** to **$\{employeeLeavingDate}** on the following terms and conditions:
+
+1. Your immediate posting will be at **$\{siteName}**.
+2. This Fixed Term Employment Contract shall automatically come to an end on **$\{employeeLeavingDate}** OR the date on which the OMC Project at **$\{siteName}** is terminated (whichever is earlier), unless extended by the Company in order to enable you to complete the assignment herein without the need for any further act or writing by either parties hereto. Prior thereto, this employment contract can be terminated by either party giving to the other, at any time, notice of 15 days in writing or by paying 15 day's gross salary in lieu of notice.
+
+3. The Company shall for the performance of your services under this contract and the due performance of thereof, pay the following remuneration to you
+
+**PART I:**
+
+Basic Salary (including VDA) : INR **$\{basicSalary}**/- per month.
+Bonus will be pay as government norm (8.33% on Basic + DA) per annum paid on pro rata basis
+No work no pay - Salary will not be paid if there will be no work at the site on which you have been deployed.
+
+If you are on leave frequently without any prior intimation/approval, Canny has rights to take necessary disciplinary action including termination of your Fixed Term Contract.
+
+During the contractual tenure, your service is transferable to any location within India as per the operational needs of the company.
+
+Consumption of alcohol at workplace or if found in intoxicated state at the workplace then, company has rights to take necessary disciplinary action including termination of your Fixed Term Contract.
+
+You shall be duty bound to inform the Company in writing about your affiliation, association, and membership to any Labour-Unions in India prior to the signing of this Contract. Non-disclosure of your membership to a Labour Union to the Company shall be considered as a material breach of this Contract. You shall not join any Labour-Union during the continuation of this Fixed Term Contract without informing the Company in advance. You shall not provoke any other indulgence in any anti-Company activities in unison with any Labour Unions affiliated to any breach of this Fixed Term Contract.
+
+**PART II:**
+
+Provident Fund, Gratuity, ESIC and Profession Tax: As per Government of India norms.
+
+
+4. You shall during the continuance of this contract honestly, faithfully, diligently and efficiently serve the Company and shall perform the duties assigned herein. You shall:
+
+a. You will be responsible for collecting samples as advised.
+b. You will also be responsible for preparing samples as per the requirements, if necessary.
+c. Carry out all the duties/assignments and functions entrusted to you from time to time.
+d. Devote the whole of your time and energy exclusively to assignment entrusted to you.
+e. Serve the Company, obey all the lawful directions and orders of the Company, the management and of any officer placed in authority over you.
+f. Shall responsible to dispose raw samples as per requirement.
+
+5. Al communications, reports, data, etc. that may have been prepared by you in the carrying out of the assignment hereunder shall be between you and the Company. You shall not divulge, discuss or provide any work hereunder to anyone else except the Company without the prior written consent of the Company.
+
+6. You shall at once inform the Company of any act of dishonesty and or any action prejudicial to the interests of the Company on the part of any person, which may come to your knowledge.
+
+7. You shall not at any time absent yourself without any prior intimation / permission of your superior. In case of illness or accidents you shall forthwith notify the Company or the management of such illness or accident and shall furnish such evidence thereof as may be required. However, the Leave shall be provided as per the Company Policy.
+
+8. You shall be bound by Canny's Business Ethics & Compliance Code during the continuance of this contract. Non-adherence to the same may cause termination of contract forthwith without any compensation.
+
+9. You acknowledge that you shall receive and/or have access to Confidential Information during the Term of this Contract. For the purposes of this Contract, term "Confidential Information" shall have the same meaning as assigned to in the "Non-disclosure Agreement" attached as Appendix 2 to this Contract. You shall, during and after the termination of employment under this Contract, observe strict secrecy regarding any Confidential Information of Canny and any company that is the parent or subsidiary of Canny parent company (collectively referred to as "an Associated Company of Canny"). You shall not at any time during or after the term of this contract disclose directly or indirectly to any Third Person or apply or use the benefit of the employee or of any Third Party except any Associated Company of Canny, any Confidential information of Canny or any Associated Company of Canny which may come to your knowledge during the term of this Contract, nor shall you use, attempt to use any such Confidential Information in any manner which may injure or cause loss, directly or indirectly, to Canny or to an Associated Company of Canny, nor use your personal knowledge of or influence over customers. Clients or contractors of Canny so as to take advantage of trade or business connections or utilise the Confidential Information obtained by you in connection with this appointment according to the "Non-disclosure Agreement".
+
+
+10. At all times throughout the Term of this Contract, you shall fully comply with all Indian Laws which apply to the business of Canny, including but not limited to labour, equal opportunity, privacy and sexual harassment laws. You shall promptly report to Canny of any violations of Indian Law encountered in the business. You shall also fully observe the Corporate Policies issued from time to time for the guidance of its employees. Canny shall have the right to terminate this contract with immediate effect for the violation of any applicable Indian Laws or Corporate Policies.
+
+11. You shall not during the continuance of this contract make otherwise than for the benefit of the Company any notes or memoranda relating to any matter within the scope of this contract or concerning any of the Company's dealings or affairs nor shall you either during the continuance of this contract or afterwards use or permit to be used any such notes or memoranda otherwise than for the benefit of the Company, it being the intention that all such notes or memoranda made by the you shall be the property of the Company and shall be left with the Company on the termination or expiration of this contract and you shall return the same to the Company upon termination/expiration of this contract or at any time upon request of the Company together with an affidavit stating that no such written drawings, documents, etc. are retained by you.
+
+12. The Employers processes follow ISO 9001 procedures and you should be familiar with the ISO processes at Canny and implement them in the employee's own sphere of activities.
+
+13. You shall not at any time during the term of this Contract either on your behalf or on the behalf of any Third Person:
+
+Canvass, solicit or endeavour to entice away from Canny or any Associated Company, any person, firm or establishment or company who shall at any time have been dealing with Canny or any Associated Company of Canny; or Accept from or perform for any Third Person, who shall at any time be a competitor of Canny or any Associated Company of Canny in the territory of employment according to this Contract, any business offered to the employee by such Third Person. The maximum conventional penalty in the case of a breach by you of this clause of the Contract shall be five months of the Salary which the Employer would have the right to demand at the time of the contravention.
+
+14. This Contract shall be interpreted and governed by Indian Law. In the event that a dispute of any nature arises between the Parties, the Parties agree to submit the dispute to binding arbitration before a sole arbitrator appointed mutually by the Parties, failing which before a panel of three arbitrators consisting of one arbitrator each appointed by each of the Parties and a third arbitrator mutually appointed by the two arbitrators appointed by the Parties. All arbitration proceedings shall be conducted in the English Language and the place of Arbitration shall be in Mumbai in accordance with Arbitration and Conciliation Act, 1996 of India. Each Party shall co-operate in good faith to expedite (to the maximum extent practicable) the conduct of any arbitral proceedings commenced under this Contract. The costs and expenses of the arbitration, including without limitation, the fees of the arbitration and the arbitrators shall be borne equally by each party to the dispute or claim and each Party shall pay its own fees, disbursements and other charges of its counsel, except as may be determined otherwise by the arbitrators). The arbitrators) would have the power to award interest on any sum awarded pursuant to the arbitration proceedings and such sum would carry interest, if awarded, until the actual payment of such amounts. Each Party specifically waives his/her right to bring the dispute before the court of law and stipulates that this contract shall be a complete defence to any action instituted in any court or before any administrative tribunal.
+
+15. Without limiting the remedies available to the Canny, you acknowledge that a breach of any of the covenants in this Contract may result in material irreparable injury to Canny and Cotecna Group of Companies for which there is no adequate remedy at law, and that it will not be possible to measure damages for such injuries precisely. You agree that if there is a breach or threatened breach, Canny or any member of the Cotecna Group Companies shall without prejudice to its other rights under this Contract or at law or equity, be entitled to apply for specific performance or injunctive or other equitable relief against you. All remedies provided by this Contract are cumulative, and not alternative. The recourse by Canny to one remedy shall not preclude it from seeking another remedy available to it under this Contract.
+
+16. During the continuance of this contract if you become physically or mentally unfit for work and if the Company has satisfied itself of this fact on advice or proper medical authorities, the Company shall terminate this Contract without any notice or compensation.
+
+17. If the Company has to close its business or curtail its activities due to circumstances beyond its control and if the Company finds that it is no longer possible to retain you any further, the Company shall have option to terminate this contract by giving you 15 days notice or paying 15 day's gross salary in lieu of notice. No further compensation will be payable by the Company in such case.
+
+18. The Company shall have the right to suspend you or terminate this contract without any payment or without any notice or compensation for breach of this contract, insubordination, misconduct either inside or outside, corruption, dishonesty, theft, fraud, absenteeism, etc.
+
+19. You agree to recognise that the services to be performed under this contract are necessary for the Company to fulfil its contractual obligations to its client and that the Company will suffer damages if the services are not performed fully and in time or performed without bringing to bear on them the necessary skill and experience possessed by you. Consequently, you agree that you shall not terminate this contract during its validity except with the written consent of the Company. Any breach of the provisions herein shall be liable to compensate the Company Without limiting the generality of the foregoing, you shall for any breach aforesaid be liable, at the minimum, to refund all the amounts paid to you by the Company. You also indemnify the Company against all losses, damages, adverse claims, litigation, charges, penalties which the Company may be subjected to by reason of his part performance/non-performance/delay in performance of any contractual obligations under this Contract.
+
+20. This Contract set forth the entire contract and understanding between the parties with respect to the subject matter hereof and merges all previous contracts, discussions and negotiations between them; and none of the parties shall be bound by any conditions, representations, understandings or warranties with respect to such subject matter other than as expressly provided herein.
+
+21. This Contract is executed in two copies. A signed copy of this Contract is to be held by both Parties.`;
+
 export const SUPABASE_STORAGE = {
   LOGOS: "logos",
   EMPLOYEE_PROFILE_PHOTO: "employees/profile_photo",
@@ -337,9 +413,9 @@ export function getFilePathFromUrl(url: string) {
     `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
   )
     ? url.slice(
-        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
-          .length,
-      )
+      `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
+        .length,
+    )
     : url;
 }
 

@@ -1,8 +1,9 @@
 import type {
   EmployeeDatabaseRow,
   EmployeeLetterDatabaseRow,
-  EmployeeProjectAssignmentDatabaseRow,
+  EmployeeWorkDetailsDatabaseRow,
   InferredType,
+  ProjectDatabaseRow,
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
@@ -99,16 +100,18 @@ export type EmployeeWithLetterDataType = Omit<
     "first_name" | "middle_name" | "last_name" | "gender" | "personal_email"
   > & {
     work_details: Pick<
-      EmployeeProjectAssignmentDatabaseRow,
+      EmployeeWorkDetailsDatabaseRow,
       | "employee_id"
       | "assignment_type"
       | "skill_level"
       | "position"
       | "start_date"
       | "end_date"
-    > & {
-      sites: Pick<SiteDatabaseRow, "id" | "name">;
-    };
+    >[] & {
+      sites: Pick<SiteDatabaseRow, "id" | "name"> & {
+        projects: Pick<ProjectDatabaseRow, "id" | "name">;
+      };
+    }[];
   };
 };
 
@@ -139,7 +142,7 @@ export async function getEmployeeLetterWithEmployeeById({
     .select(
       `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, work_details!work_details_employee_id_fkey!left(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites, name)
+        sites(id, name, projects(id, name))
       ))`,
     )
     .eq("id", id)

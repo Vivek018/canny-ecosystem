@@ -1,4 +1,5 @@
 import { AppointmentLetter } from "@/components/employees/employee/letters/letter-templates/appointment-letter";
+import { ContractualAppointmentLetter } from "@/components/employees/employee/letters/letter-templates/contractual-appointment-letter";
 import { ExperienceLetter } from "@/components/employees/employee/letters/letter-templates/experience-letter";
 import { NOCLetter } from "@/components/employees/employee/letters/letter-templates/noc-letter";
 import { OfferLetter } from "@/components/employees/employee/letters/letter-templates/offer-letter";
@@ -98,7 +99,7 @@ export default function LetterPreview() {
 
   const generateLetter = (letterType?: string) => {
     switch (letterType) {
-      case employeeLetterTypesArray[0]:
+      case "appointment_letter":
         return (
           <AppointmentLetter
             data={employeeLetterData}
@@ -107,7 +108,7 @@ export default function LetterPreview() {
           />
         );
 
-      case employeeLetterTypesArray[1]:
+      case "experience_letter":
         return (
           <ExperienceLetter
             data={employeeLetterData}
@@ -116,7 +117,7 @@ export default function LetterPreview() {
           />
         );
 
-      case employeeLetterTypesArray[2]:
+      case "offer_letter":
         return (
           <OfferLetter
             data={employeeLetterData}
@@ -125,7 +126,7 @@ export default function LetterPreview() {
           />
         );
 
-      case employeeLetterTypesArray[3]:
+      case "noc_letter":
         return (
           <NOCLetter
             data={employeeLetterData}
@@ -134,7 +135,7 @@ export default function LetterPreview() {
           />
         );
 
-      case employeeLetterTypesArray[4]:
+      case "relieving_letter":
         return (
           <RelievingLetter
             data={employeeLetterData}
@@ -143,9 +144,18 @@ export default function LetterPreview() {
           />
         );
 
-      case employeeLetterTypesArray[5]:
+      case "termination_letter":
         return (
           <TerminationLetter
+            data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
+            companyData={companyData}
+          />
+        );
+
+      case "contractual_appointment_letter":
+        return (
+          <ContractualAppointmentLetter
             data={employeeLetterData}
             employeeAddressData={employeeAddressData}
             companyData={companyData}

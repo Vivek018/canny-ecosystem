@@ -74,17 +74,17 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-            "application/zip",
-            "application/x-zip-compressed",
-            "multipart/x-zip",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+          "application/zip",
+          "application/x-zip-compressed",
+          "multipart/x-zip",
+        ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .zip formats are supported.",
   );
@@ -1507,6 +1507,7 @@ export const ImportEmployeeAttendanceDataSchema = z.object({
 });
 
 export const employeeLetterTypesArray = [
+  "contractual_appointment_letter",
   "appointment_letter",
   "experience_letter",
   "offer_letter",

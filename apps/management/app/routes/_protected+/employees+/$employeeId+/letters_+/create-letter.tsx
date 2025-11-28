@@ -11,6 +11,7 @@ import {
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   bringDefaultLetterContent,
+  capitalizeFirstLetter,
   createRole,
   EmployeeLetterSchema,
   employeeLetterTypesArray,
@@ -201,14 +202,16 @@ export default function CreateEmployeeLetter({
       clearCacheEntry(`${cacheKeyPrefix.employee_letters}${employeeId}`);
       toast({
         title: "Success",
-        description: "Employee created successfully",
+        description:
+          actionData?.message ?? "Employee letter created successfully",
         variant: "success",
       });
       navigate(`/employees/${employeeId}/letters`);
     } else {
       toast({
         title: "Error",
-        description: "Failed to create employee",
+        description:
+          actionData?.error?.message ?? "Failed to create employee letter",
         variant: "destructive",
       });
     }
@@ -281,11 +284,20 @@ export default function CreateEmployeeLetter({
 
               <div className="grid grid-cols-1 place-content-center justify-between gap-x-8 mt-4">
                 <Field
+                  key={
+                    (fields.letter_type.value ??
+                    fields.letter_type.initialValue) + fields.subject.id
+                  }
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
                       fields.subject.name,
                     )}`,
+                    defaultValue: !updateValues
+                      ? capitalizeFirstLetter(
+                          replaceUnderscore(fields.letter_type.value),
+                        )
+                      : fields.subject.value,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.subject.name),
@@ -294,7 +306,8 @@ export default function CreateEmployeeLetter({
                 />
                 <MarkdownField
                   key={
-                    fields.letter_type.value ?? fields.letter_type.initialValue
+                    (fields.letter_type.value ??
+                    fields.letter_type.initialValue) + fields.content.id
                   }
                   theme={theme}
                   inputProps={{

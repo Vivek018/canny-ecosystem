@@ -1,4 +1,5 @@
 import { AppointmentLetter } from "@/components/employees/employee/letters/letter-templates/appointment-letter";
+import { ContractualAppointmentLetter } from "@/components/employees/employee/letters/letter-templates/contractual-appointment-letter";
 import { ExperienceLetter } from "@/components/employees/employee/letters/letter-templates/experience-letter";
 import { NOCLetter } from "@/components/employees/employee/letters/letter-templates/noc-letter";
 import { OfferLetter } from "@/components/employees/employee/letters/letter-templates/offer-letter";
@@ -146,6 +147,15 @@ export default function LetterPreview() {
       case employeeLetterTypesArray[5]:
         return (
           <TerminationLetter
+            data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
+            companyData={companyData}
+          />
+        );
+
+      case employeeLetterTypesArray[6]:
+        return (
+          <ContractualAppointmentLetter
             data={employeeLetterData}
             employeeAddressData={employeeAddressData}
             companyData={companyData}

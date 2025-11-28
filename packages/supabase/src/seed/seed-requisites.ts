@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { employeeLetterTypesArray } from "@canny_ecosystem/utils";
 import {
   DEFAULT_APPOINTMENT_LETTER,
+  DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER,
   DEFAULT_EXPERIENCE_LETTER,
   DEFAULT_NOC_LETTER,
   DEFAULT_OFFER_LETTER,
@@ -280,7 +281,9 @@ export async function seedRequisitesForEmployeeCreation({
                 ? DEFAULT_RELIEVING_LETTER
                 : letterType === "termination_letter"
                   ? DEFAULT_TERMINATION_LETTER
-                  : null;
+                  : letterType === "contractual_appointment_letter"
+                    ? DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER
+                    : null;
 
     const letterData: Omit<EmployeeLetterDatabaseInsert, "created_at"> = {
       letter_type: letterType,

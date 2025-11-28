@@ -1,6 +1,7 @@
 import { StyleSheet } from "@react-pdf/renderer";
 import {
   DEFAULT_APPOINTMENT_LETTER,
+  DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER,
   DEFAULT_EXPERIENCE_LETTER,
   DEFAULT_NOC_LETTER,
   DEFAULT_OFFER_LETTER,
@@ -283,8 +284,7 @@ export const bringDefaultLetterContent = (
     for (const [key, value] of Object.entries(data.earning)) {
       const amount = value as number;
       salaryTablemarkdownLines.push(
-        `| ${
-          key.charAt(0).toUpperCase() + key.slice(1)
+        `| ${key.charAt(0).toUpperCase() + key.slice(1)
         }                     | ${amount.toLocaleString()}/-           |`,
       );
       totalGrossEarning += amount;
@@ -333,6 +333,9 @@ export const bringDefaultLetterContent = (
 
     case "termination_letter":
       return DEFAULT_TERMINATION_LETTER;
+
+    case "contractual_appointment_letter":
+      return DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER;
 
     default:
       return "";

@@ -59,6 +59,7 @@ import {
 } from "../queries";
 import {
   DEFAULT_APPOINTMENT_LETTER,
+  DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER,
   DEFAULT_EXPERIENCE_LETTER,
   DEFAULT_NOC_LETTER,
   DEFAULT_OFFER_LETTER,
@@ -223,17 +224,17 @@ export async function seed(newCompanyId?: string) {
                 const caseData: Partial<CasesDatabaseRow> = {};
                 const reportedBy =
                   reportedByArray[
-                    faker.number.int({
-                      min: 0,
-                      max: reportedByArray.length - 1,
-                    })
+                  faker.number.int({
+                    min: 0,
+                    max: reportedByArray.length - 1,
+                  })
                   ];
                 const reportedOn =
                   reportedOnArray[
-                    faker.number.int({
-                      min: 0,
-                      max: reportedOnArray.length - 1,
-                    })
+                  faker.number.int({
+                    min: 0,
+                    max: reportedOnArray.length - 1,
+                  })
                   ];
                 caseData.reported_by = reportedBy;
                 caseData.reported_on = reportedOn;
@@ -310,7 +311,9 @@ export async function seed(newCompanyId?: string) {
                               ? DEFAULT_RELIEVING_LETTER
                               : letterType === "termination_letter"
                                 ? DEFAULT_TERMINATION_LETTER
-                                : faker.lorem.paragraph(5);
+                                : letterType === "contractual_appointment_letter"
+                                  ? DEFAULT_CONTRACTUAL_APPOINTMENT_LETTER
+                                  : faker.lorem.paragraph(5);
                   const letterData: Omit<
                     EmployeeLetterDatabaseInsert,
                     "created_at"
